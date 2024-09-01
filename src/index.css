@@ -1,0 +1,37 @@
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    line-height: 1.5;
+    font-weight: 400;
+    --primary-color: #a8b1ff;
+}
+
+#root {
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+html,
+body {
+    min-height: 100vh;
+}
+
+button {
+    border: none;
+}
+
+p {
+    margin: 0;
+}

@@ -2,7 +2,7 @@ import React from 'react'
 import { Outlet, Link, NavLink } from 'react-router-dom'
 import './Navbar.css'
 
-function Mainlayout() {
+function Mainlayout({ children }) {
     return (
         <>
             <div className=" d-flex" style={{ justifyContent: 'center', minHeight: '100vh' }}>
@@ -34,9 +34,7 @@ function Mainlayout() {
                             </div>
                         </div>
                     </nav>
-                    <main>
-                        <Outlet />
-                    </main>
+                    <main>{children}</main>
                     <footer>Main Layout Footer</footer>
                 </div>
             </div>

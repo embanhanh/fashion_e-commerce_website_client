@@ -8,8 +8,15 @@ import { auth, fbProvider } from '../../firebase.config'
 function Signin() {
     const navigate = useNavigate()
 
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            navigate('/')
+        }
+    }, [navigate])
+
     const handleClick = () => {
-        navigate('/home')
+        navigate('/')
     }
 
     const [email, setEmail] = useState('')

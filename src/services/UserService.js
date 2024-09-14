@@ -21,17 +21,42 @@ export const login = async (user) => {
 }
 
 export const register = async (user) => {
-    const response = await fetch(API_URL + 'register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-    })
+    try {
+        const response = await fetch(API_URL + 'register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        })
 
-    if (!response.ok) {
-        throw new Error('Network response was not ok')
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.message)
+        }
+
+        return response.json()
+    } catch (error) {
+        throw error
     }
+}
 
-    return response.json()
+export const loginWithFirebase = async (token, type) => {
+    try {
+        const response = await fetch(API_URL + `login/${type}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(token),
+        })
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.message)
+        }
+
+        return response.json()
+    } catch (error) {
+        throw error
+    }
 }

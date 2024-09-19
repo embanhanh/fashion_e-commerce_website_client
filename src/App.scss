@@ -1,0 +1,61 @@
+.primary-btn {
+    background-color: #000;
+    padding: 12px 16px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.5);
+
+    border: 2px solid #000;
+    font-weight: 600;
+}
+
+.primary-btn.light {
+    background-color: #fff;
+    border: #fff;
+    color: #000;
+}
+
+.primary-btn p {
+    font-size: 1.6rem;
+}
+
+.primary-btn.light:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.primary-btn:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.primary-btn.btn-sm {
+    min-width: 80px;
+    padding: 8px 12px;
+}
+
+.primary-btn.btn-ssm {
+    min-width: 50px;
+    padding: 8px 12px;
+}
+
+.max-md {
+    max-width: 1140px;
+}
+
+.swiper {
+    height: 100%;
+}
+
+.shop-sm-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+.shop-body {
+    margin-top: var(--header-height);
+}

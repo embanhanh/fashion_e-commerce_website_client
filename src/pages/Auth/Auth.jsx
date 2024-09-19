@@ -2,22 +2,21 @@ import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import { Autoplay, Navigation, Pagination } from 'swiper/modules'
-import './Auth.css'
+import { Autoplay, Pagination } from 'swiper/modules'
+import './Auth.scss'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { login, register, loginWithFirebase } from '../../services/UserService'
-import { FacebookAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from 'firebase/auth'
+import { signInWithPopup } from 'firebase/auth'
 import { auth, fbProvider, ggProvider } from '../../firebase.config'
-import logoImg from '../../assets/image/logo_title.png'
-import titleShop from '../../assets/image/title_shop.png'
 import brand1 from '../../assets/image/brand/brand-1.png'
 import brand2 from '../../assets/image/brand/brand-2.png'
 import Notification from '../../components/Notification'
+import LogoShop from '../../components/LogoShop'
 
 function Auth() {
     const navigate = useNavigate()
     const location = useLocation()
-    const mode = location.state?.mode || 'login'
+    const mode = location.pathname == '/user/signup' ? 'signup' : 'login'
 
     useEffect(() => {
         setAuthError('')
@@ -118,7 +117,7 @@ function Auth() {
 
     return (
         <>
-            <div className="d-flex w-100 align-items-center flex-column justify-content-start" style={{ justifyContent: 'center', minHeight: '100vh' }}>
+            <div className="d-flex w-100 align-items-center flex-column justify-content-start h-100" style={{ minHeight: '100vh' }}>
                 {notication && (
                     <>
                         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.3' }} aria-modal="true" role="dialog">
@@ -132,18 +131,15 @@ function Auth() {
                         </div>
                     </>
                 )}
-                <div className="w-100 bg-white mb-5">
-                    <div className="container header d-flex justify-content-between align-items-center" style={{ height: '84px' }}>
-                        <Link to={'/'} className="logo-title d-flex align-items-center h-100">
-                            <img src={logoImg} alt="" style={{ height: '100%' }} />
-                            <img src={titleShop} alt="" style={{ width: '200px' }} />
-                        </Link>
+                <div className="w-100 bg-white header h-100">
+                    <div className="container max-md d-flex justify-content-between align-items-center" style={{ height: 84 }}>
+                        <LogoShop type={'dark'} />
                         <Link to={'/support'} style={{ cursor: 'pointer' }}>
                             Bạn cần giúp đỡ?
                         </Link>
                     </div>
                 </div>
-                <div className="content w-100 d-flex justify-content-center">
+                <div className="auth-content w-100 d-flex align-items-center justify-content-center">
                     <div className="content-container d-flex align-items-center" style={{ width: '800px', backgroundColor: '#fff', height: '500px', boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)' }}>
                         <div className=" w-50 h-100">
                             <Swiper
@@ -154,10 +150,10 @@ function Auth() {
                                     clickable: true,
                                 }}
                                 navigation={true}
-                                modules={[Autoplay, Pagination, Navigation]}
+                                modules={[Autoplay, Pagination]}
                                 className="mySwiper"
                                 autoplay={{
-                                    delay: 2500,
+                                    delay: 1500,
                                     disableOnInteraction: false,
                                 }}
                                 loop={true}
@@ -502,7 +498,7 @@ function Auth() {
                                 ) : (
                                     <>
                                         <p style={{ color: '#ccc' }}>Bạn chưa có tài khoản?</p>
-                                        <Link to={'/user/signup'} state={{ mode: 'signup' }} className="ms-2" style={{ color: 'var(--primary-color)', fontWeight: '500' }}>
+                                        <Link to={'/user/signup'} className="ms-2" style={{ color: 'var(--primary-color)', fontWeight: '500' }}>
                                             Đăng ký
                                         </Link>
                                     </>

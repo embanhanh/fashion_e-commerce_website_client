@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout.jsx'
 import PrivateRoute from './routes/PrivateRoute.jsx'
-import './App.css'
+import './App.scss'
 import { privateRoutes, publicRoutes } from './routes/index.js'
 
 function App() {

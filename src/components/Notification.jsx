@@ -1,4 +1,4 @@
-import './Notification.css'
+import './Notification.scss'
 
 function Notification({ title, description, isClosed, type }) {
     return (

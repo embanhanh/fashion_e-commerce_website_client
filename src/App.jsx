@@ -23,7 +23,39 @@ function App() {
                                 }
                                 path={route.path}
                             >
-                                {route.children}
+                                {route.children?.map((child, idx) => {
+                                    const ChildLayout = child.layout ? child.layout : Layout
+                                    const ChildPage = child.element
+
+                                    return (
+                                        <Route
+                                            key={idx}
+                                            path={child.path}
+                                            element={
+                                                <ChildLayout>
+                                                    <ChildPage />
+                                                </ChildLayout>
+                                            }
+                                        >
+                                            {child.children?.map((subChild, subIdx) => {
+                                                const SubChildLayout = subChild.layout ? subChild.layout : ChildLayout
+                                                const SubChildPage = subChild.element
+
+                                                return (
+                                                    <Route
+                                                        key={subIdx}
+                                                        path={subChild.path}
+                                                        element={
+                                                            <SubChildLayout>
+                                                                <SubChildPage />
+                                                            </SubChildLayout>
+                                                        }
+                                                    />
+                                                )
+                                            })}
+                                        </Route>
+                                    )
+                                })}
                             </Route>
                         )
                     })}

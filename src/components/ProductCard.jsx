@@ -10,7 +10,7 @@ function ProductCard({ name, url, originalPrice, discount, rating }) {
     return (
         <>
             <div className="product-card d-flex flex-column w-100 border border-2 rounded-2 h-100" style={{ borderColor: '#ccc' }}>
-                <img src={produtc1} alt="" className="product-img w-100" />
+                <img src={produtc1} alt={name} className="product-img w-100" loading="lazy" />
                 <div className="p-4 d-flex flex-column flex-grow-1">
                     <p className="product-name text-center fw-bolder fs-3 mb-2">{name}</p>
                     <div className="mt-auto"></div>

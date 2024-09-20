@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import './MainLayout.scss'
 import LogoShop from '../components/LogoShop'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,6 +8,7 @@ import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
 
 function Mainlayout({ children }) {
     const navigate = useNavigate()
+    const location = useLocation()
     const navList = [
         {
             title: 'Trang chủ',
@@ -15,11 +16,15 @@ function Mainlayout({ children }) {
         },
         {
             title: 'Cửa hàng',
-            to: '/',
+            to: '/products',
             className: 'show_detail',
         },
         {
             title: 'Liên hệ',
+            to: '/',
+        },
+        {
+            title: 'Chính sách',
             to: '/',
         },
     ]
@@ -28,7 +33,7 @@ function Mainlayout({ children }) {
 
     return (
         <>
-            <div className="header d-flex position-fixed top-0 end-0 start-0">
+            <div className={`header d-flex  ${location.pathname === '/' && 'position-fixed top-0 end-0 start-0 shadow'}`}>
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">
                         <LogoShop type={'dark'} />
@@ -47,14 +52,44 @@ function Mainlayout({ children }) {
                                     <p className="nav-title">{nav.title}</p>
                                 </Link>
                             ))}
-                            <div className="nav-shop-category"></div>
+                            <div className="nav-shop-category z-3 max-md row rounded-4 px-4 pt-4 pb-5 shadow-lg ">
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
+                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
+                                    <Link className="fs-4 p-2">Danh mục con</Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="header-section d-flex">
                         {localStorage.getItem('token') != null ? (
                             <></>
                         ) : (
-                            <div className="primary-btn btn-sm">
+                            <div
+                                className="primary-btn btn-sm"
+                                onClick={() => {
+                                    navigate('/user/login')
+                                }}
+                            >
                                 <p>Đăng nhập</p>
                             </div>
                         )}
@@ -62,7 +97,9 @@ function Mainlayout({ children }) {
                 </div>
             </div>
 
-            <div className="h-100 shop-body">{children}</div>
+            <div className="h-100 shop-body" style={{ marginTop: location.pathname == '/' ? 'var(--header-height)' : '0px' }}>
+                {children}
+            </div>
             <footer className=" bg-black text-white">
                 <div className="d-flex container p-5 max-md">
                     <div className="w-25">

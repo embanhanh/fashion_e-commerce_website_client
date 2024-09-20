@@ -1,0 +1,19 @@
+.accordion-custom {
+    width: 100%;
+
+    .accordion-title-custom {
+        cursor: pointer;
+        h3 {
+            margin: 0;
+        }
+    }
+
+    .accordion-content-wrapper {
+        overflow: hidden;
+        transition: height 0.3s ease-out;
+    }
+
+    .accordion-content-custom {
+        background-color: #fff;
+    }
+}

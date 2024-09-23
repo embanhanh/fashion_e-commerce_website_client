@@ -149,7 +149,6 @@ function Auth() {
                                 pagination={{
                                     clickable: true,
                                 }}
-                                navigation={true}
                                 modules={[Autoplay, Pagination]}
                                 className="mySwiper"
                                 autoplay={{

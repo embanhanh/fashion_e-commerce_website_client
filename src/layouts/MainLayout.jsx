@@ -3,7 +3,7 @@ import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-do
 import './MainLayout.scss'
 import LogoShop from '../components/LogoShop'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons'
+import { faBagShopping, faEnvelope, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons'
 import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
 
 function Mainlayout({ children }) {
@@ -81,9 +81,48 @@ function Mainlayout({ children }) {
                         </div>
                     </div>
                     <div className="header-section d-flex">
-                        {localStorage.getItem('token') != null ? (
-                            <></>
-                        ) : (
+                        {/* {localStorage.getItem('token') != null ? ( */}
+                        <>
+                            <div className="d-flex align-items-center">
+                                <div className="p-2 cart-container rounded-3 position-relative" onClick={() => navigate('/cart')}>
+                                    <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
+                                    <div className="cart-mini position-absolute shadow rounded-3 p-4">
+                                        <div className="mb-3 cart-product-container">
+                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
+                                                <img src="" className="me-4" alt="" width={50} height={50} />
+                                                <div className="w-100">
+                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
+                                                    <p className="fw-medium">1 x 150000đ</p>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
+                                                <img src="" className="me-4" alt="" width={50} height={50} />
+                                                <div className="w-100">
+                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
+                                                    <p className="fw-medium">1 x 150000đ</p>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
+                                                <img src="" className="me-4" alt="" width={50} height={50} />
+                                                <div className="w-100">
+                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
+                                                    <p className="fw-medium">1 x 150000đ</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <p className="fs-4 fw-medium">7 sản phẩm có trong giỏ hàng</p>
+                                            <div className="primary-btn p-3 shadow-none">
+                                                <p>Xem giỏ hàng</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <img src="" alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
+                                <p className="fs-4 fw-medium me-5">Trần Trung Thông</p>
+                            </div>
+                        </>
+                        {/* ) : (
                             <div
                                 className="primary-btn btn-sm"
                                 onClick={() => {
@@ -92,7 +131,7 @@ function Mainlayout({ children }) {
                             >
                                 <p>Đăng nhập</p>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>

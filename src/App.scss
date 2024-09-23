@@ -277,3 +277,21 @@ input[type='number'] {
 .select:has(.options input[type='radio']#option-4:checked) .selected::before {
     content: attr(data-four);
 }
+
+// product Name
+.product-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.6;
+    max-height: calc(1.6em * 2);
+}
+
+.ellipsis {
+    max-width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

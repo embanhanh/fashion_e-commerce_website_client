@@ -3,9 +3,11 @@ import Home from '../pages/Home/Home.jsx'
 import { Children, Fragment } from 'react'
 import ProductList from '../pages/ProductList/ProductList.jsx'
 import ProductDetail from '../pages/ProductDetail/ProductDetail.jsx'
+import Cart from '../pages/Cart/Cart.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
+    { path: '/cart', element: Cart },
     {
         path: '/products',
         element: ProductList,

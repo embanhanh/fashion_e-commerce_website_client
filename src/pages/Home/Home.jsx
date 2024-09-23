@@ -24,7 +24,6 @@ function Home() {
                         pagination={{
                             clickable: true,
                         }}
-                        navigation={true}
                         modules={[Autoplay, Pagination, Navigation]}
                         className="mySwiper"
                         autoplay={{
@@ -78,7 +77,6 @@ function Home() {
                                 }}
                                 spaceBetween={40}
                                 slidesPerView={4}
-                                navigation={true}
                                 modules={[Autoplay, Pagination, Navigation]}
                                 className="mySwiper"
                             >
@@ -141,7 +139,7 @@ function Home() {
                     <div className="content-policy"></div>
                 </div>
             </div>
-            <div className="pb-5" style={{ backgroundColor: '#fafafb' }}>
+            <div className="pb-5 " style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
                 <div className="d-flex max-md container justify-content-between align-items-center p-5">
                     <p className="shop-sm-title ps-4" style={{ fontWeight: '500' }}>
                         Đánh giá của khách hàng
@@ -155,7 +153,7 @@ function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="container max-md px-5" style={{ height: 250 }}>
+                <div className="container max-md px-5 " style={{ height: 250 }}>
                     <Swiper
                         ref={swiperReview}
                         style={{
@@ -166,7 +164,6 @@ function Home() {
                         }}
                         spaceBetween={30}
                         slidesPerView={3}
-                        navigation={true}
                         modules={[Autoplay, Pagination, Navigation]}
                         className="mySwiper"
                     >

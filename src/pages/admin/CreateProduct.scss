@@ -48,14 +48,18 @@
     gap: 10px;
 }
 
-.uploaded-image {
-    position: relative;
-}
-
 .uploaded-img {
     width: 100px;
     height: 100px;
     object-fit: cover;
     border: 2px solid #ddd;
     padding: 5px;
+}
+
+.uploaded-image:hover .close-uploaded-img {
+    display: block !important;
+}
+
+.uploaded-img-classify:hover .close-uploaded-img {
+    display: block !important;
 }

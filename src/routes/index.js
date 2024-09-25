@@ -33,13 +33,13 @@ const publicRoutes = [
         path: '/user/profile',
         element: ProfileLayout,
         children: [
-            { path: '', element: Info }, // Thông tin cá nhân
-            { path: 'orders', element: Orders }, // Đơn hàng
-            { path: 'wishlists', element: Wishlists }, // Danh sách yêu thích
-            { path: 'addresses', element: Addresses }, // Địa chỉ
-            { path: 'savedcards', element: SavedCards }, // Thẻ đã lưu
-            { path: 'notifications', element: Notifications }, // Thông báo
-            { path: 'settings', element: Settings }, // Cài đặt
+            { path: '', element: Info, layout: Fragment }, // Thông tin cá nhân
+            { path: 'orders', element: Orders, layout: Fragment }, // Đơn hàng
+            { path: 'wishlists', element: Wishlists, layout: Fragment }, // Danh sách yêu thích
+            { path: 'addresses', element: Addresses, layout: Fragment }, // Địa chỉ
+            { path: 'savedcards', element: SavedCards, layout: Fragment }, // Thẻ đã lưu
+            { path: 'notifications', element: Notifications, layout: Fragment }, // Thông báo
+            { path: 'settings', element: Settings, layout: Fragment }, // Cài đặt
         ],
     },
     { path: '/seller/products', element: ProductManagement, layout: Adminlayout },

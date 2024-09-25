@@ -1,0 +1,61 @@
+.custum-file-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    cursor: pointer;
+    padding: 20px;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.custum-file-upload .icon-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custum-file-upload .icon-image svg {
+    fill: rgba(75, 85, 99, 1);
+}
+
+.custum-file-upload .text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custum-file-upload .text span {
+    font-weight: 400;
+    color: rgba(75, 85, 99, 1);
+    font-size: 1.3rem;
+}
+
+.custum-file-upload input {
+    display: none;
+}
+
+.upload-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.uploaded-images {
+    display: flex;
+    gap: 10px;
+}
+
+.uploaded-image {
+    position: relative;
+}
+
+.uploaded-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    padding: 5px;
+}

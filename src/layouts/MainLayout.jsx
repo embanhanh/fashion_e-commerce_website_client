@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import './MainLayout.scss'
 import LogoShop from '../components/LogoShop'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBagShopping, faEnvelope, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons'
+import { faBagShopping, faEnvelope, faLocationDot, faPhone, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
 
 function Mainlayout({ children }) {
     const navigate = useNavigate()
+    useLayoutEffect(() => {
+        window.scrollTo(0, 0)
+    }, [navigate])
     const location = useLocation()
     const navList = [
         {
@@ -118,8 +121,20 @@ function Mainlayout({ children }) {
                                         </div>
                                     </div>
                                 </div>
-                                <img src="" alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
-                                <p className="fs-4 fw-medium me-5">Trần Trung Thông</p>
+                                <div className="user-actions-container position-relative d-flex align-items-center">
+                                    <img src="" alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
+                                    <p className="fs-4 fw-medium me-5 ">Trần Trung Thông</p>
+                                    <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
+                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</Link>
+                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>
+                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller/products'}>
+                                            Quản lý cửa hàng
+                                        </Link>
+                                        <Link className="user-action fs-4 fw-medium py-3 px-2">
+                                            <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
                         </>
                         {/* ) : (

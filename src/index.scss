@@ -5,6 +5,7 @@
     font-weight: 400;
     --primary-color: #1877f2;
     --header-height: 100px;
+    --header-admin-height: 60px;
 }
 
 #root {
@@ -23,6 +24,7 @@ body {
     margin: 0;
     padding: 0;
     line-height: 1.5;
+    scroll-behavior: smooth;
 }
 
 html,
@@ -43,6 +45,7 @@ a {
     text-decoration: none;
     color: #333;
     font-size: 1.4rem;
+    display: block;
 }
 
 input:-webkit-autofill {

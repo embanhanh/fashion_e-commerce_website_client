@@ -4,6 +4,9 @@ import { Children, Fragment } from 'react'
 import ProductList from '../pages/ProductList/ProductList.jsx'
 import ProductDetail from '../pages/ProductDetail/ProductDetail.jsx'
 import Cart from '../pages/Cart/Cart.jsx'
+import ProductManagement from '../pages/admin/ProductManagement.jsx'
+import Adminlayout from '../layouts/AdminLayout.jsx'
+import CreateProduct from '../pages/admin/CreateProduct.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
@@ -18,6 +21,8 @@ const publicRoutes = [
     },
     { path: '/user/login', element: Auth, layout: Fragment },
     { path: '/user/signup', element: Auth, layout: Fragment },
+    { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
+    { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout },
 ]
 const privateRoutes = []
 

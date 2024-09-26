@@ -4,6 +4,10 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
 import { createProduct } from '../../services/ProductService'
+import CategoryDropdown from '../../components/CategoryDropdown'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '../../firebase.config'
+import { v4 as uuidv4 } from 'uuid'
 
 function CreateProduct() {
     const [images, setImages] = useState([]) //state images cho sản phẩm
@@ -30,7 +34,35 @@ function CreateProduct() {
     const [isFeatured, setIsFeatured] = useState(false)
     const [minOrderQuantity, setMinOrderQuantity] = useState('')
     const [maxOrderQuantity, setMaxOrderQuantity] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const [errors, setErrors] = useState({})
+
+    const categories = [
+        {
+            id: 1,
+            name: 'Thời trang nam',
+            children: [
+                { id: 11, name: 'Áo thun' },
+                { id: 12, name: 'Quần jean' },
+                { id: 13, name: 'Quần kaki' },
+                { id: 14, name: 'Quần dài' },
+                { id: 15, name: 'Quần short' },
+                { id: 16, name: 'Quần ống rộng' },
+                { id: 17, name: 'Quần ống thẳng' },
+                { id: 18, name: 'Quần ống côn' },
+                // ... các danh mục con khác
+            ],
+        },
+        {
+            id: 2,
+            name: 'Thời trang nữ',
+            children: [
+                { id: 11, name: 'Váy' },
+                { id: 12, name: 'Quần jean' },
+                // ... các danh mục con khác
+            ],
+        },
+    ]
 
     const clearError = (field) => {
         setErrors((prevErrors) => {
@@ -43,6 +75,11 @@ function CreateProduct() {
     const handleNameChange = (e) => {
         setName(e.target.value)
         clearError('name')
+    }
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category)
+        console.log(category)
     }
 
     const handleDescriptionChange = (e) => {
@@ -95,7 +132,7 @@ function CreateProduct() {
                     newErrors[`classifyInputs.${index}.price`] = 'Giá là bắt buộc'
                 }
                 if (!input.imageUrl) {
-                    newErrors[`classifyInputs.${index}.image`] = 'Hình ảnh phân loại là bắt buộc'
+                    newErrors[`classifyInputs.${index}.image`] = 'Thiếu hình ảnh'
                 }
             })
         }
@@ -104,18 +141,47 @@ function CreateProduct() {
         return Object.keys(newErrors).length === 0
     }
 
+    const uploadImage = async (imageFile) => {
+        const imageRef = ref(storage, `products/${uuidv4()}`)
+        await uploadBytes(imageRef, imageFile)
+        return getDownloadURL(imageRef)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (validateForm()) {
             try {
-                const validVariants = classifyInputs.filter((input) => {
-                    return (!selectedClassify.includes('color') || input.color) && (!selectedClassify.includes('size') || input.size) && input.stockQuantity && input.price
-                })
+                const uploadedImageUrls = await Promise.all(
+                    images.map(async (image) => {
+                        const response = await fetch(image)
+                        const blob = await response.blob()
+                        return uploadImage(blob)
+                    })
+                )
+                const validVariants = await Promise.all(
+                    classifyInputs.map(async (input) => {
+                        if ((!selectedClassify.includes('color') || input.color) && (!selectedClassify.includes('size') || input.size) && input.stockQuantity && input.price) {
+                            let variantImageUrl = input.imageUrl
+                            if (input.imageUrl && !input.imageUrl.startsWith('http')) {
+                                const response = await fetch(input.imageUrl)
+                                const blob = await response.blob()
+                                variantImageUrl = await uploadImage(blob)
+                            }
+                            return {
+                                ...input,
+                                imageUrl: variantImageUrl,
+                            }
+                        }
+                        return null
+                    })
+                )
+
+                const filteredVariants = validVariants.filter((variant) => variant !== null)
 
                 const productData = {
                     name,
                     description,
-                    urlImage: images,
+                    urlImage: uploadedImageUrls,
                     brand,
                     material,
                     originalPrice: parseFloat(originalPrice),
@@ -125,7 +191,7 @@ function CreateProduct() {
                     isActive: true,
                     discount: parseFloat(discount) || 0,
                     categories: [],
-                    variants: isClassify ? validVariants : [],
+                    variants: isClassify ? filteredVariants : [],
                     minOrderQuantity: parseInt(minOrderQuantity) || 1,
                     maxOrderQuantity: parseInt(maxOrderQuantity) || 100,
                 }
@@ -252,7 +318,7 @@ function CreateProduct() {
                     <a href="#section3" className="fs-4 ms-3">
                         Thông tin bán hàng
                     </a>
-                    <a href="#section3" className="fs-4 ms-3">
+                    <a href="#section4" className="fs-4 ms-3">
                         Thông tin vận chuyển
                     </a>
                 </div>
@@ -292,7 +358,7 @@ function CreateProduct() {
                                 )}
                             </div>
                         </div>
-                        {errors.images && <p className="text-danger">{errors.images}</p>}
+                        {errors.images && <p className="text-danger ms-2 pt-2">{errors.images}</p>}
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25">
                                 <span style={{ color: 'red' }}>*</span> Tên sản phẩm:
@@ -301,16 +367,19 @@ function CreateProduct() {
                                 <input type="text" className="input-text w-100" placeholder="Tên sản phẩm" onChange={handleNameChange} value={name} />
                             </div>
                         </div>
-                        {errors.name && <p className="text-danger">{errors.name}</p>}
+                        {errors.name && <p className="text-danger ms-2 pt-2">{errors.name}</p>}
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25">
                                 <span style={{ color: 'red' }}>*</span> Danh mục:
                             </p>
-                            <div className="input-form d-flex align-items-center w-100">
+                            {/* <div className="input-form d-flex align-items-center w-100">
                                 <input type="text" className="input-text w-100" placeholder="Danh mục cho sản phẩm" />
+                            </div> */}
+                            <div className="d-flex align-items-center w-100">
+                                <CategoryDropdown categories={categories} onSelect={handleCategorySelect} />
                             </div>
                         </div>
-                        {errors.category && <p className="text-danger">{errors.category}</p>}
+                        {errors.category && <p className="text-danger ms-2 pt-2">{errors.category}</p>}
                         <div className="d-flex mt-4 ">
                             <p className="text-nowrap me-4 w-25 mt-2">
                                 <span style={{ color: 'red' }}>*</span> Mô tả sản phẩm:
@@ -327,7 +396,7 @@ function CreateProduct() {
                                 />
                             </div>
                         </div>
-                        {errors.description && <p className="text-danger">{errors.description}</p>}
+                        {errors.description && <p className="text-danger ms-2 pt-2">{errors.description}</p>}
                     </div>
                 </section>
                 <section id="section2" className="p-4 bg-white border mt-4">
@@ -349,7 +418,7 @@ function CreateProduct() {
                                 />
                             </div>
                         </div>
-                        {errors.stockQuantity && <p className="text-danger">{errors.stockQuantity}</p>}
+                        {errors.stockQuantity && <p className="text-danger ms-2 pt-2">{errors.stockQuantity}</p>}
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25">
                                 <span style={{ color: 'red' }}>*</span> Giá sản phẩm:
@@ -366,7 +435,7 @@ function CreateProduct() {
                                 />
                             </div>
                         </div>
-                        {errors.originalPrice && <p className="text-danger">{errors.originalPrice}</p>}
+                        {errors.originalPrice && <p className="text-danger ms-2 pt-2">{errors.originalPrice}</p>}
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25 ps-3">Thương hiệu:</p>
                             <div className="input-form d-flex align-items-center w-100">
@@ -407,14 +476,14 @@ function CreateProduct() {
                     <h2>Thông tin bán hàng</h2>
                     <div className="p-4">
                         <div className="d-flex mt-4">
-                            <div className="w-25 d-flex me-3">
+                            <div className="w-25 d-flex me-4">
                                 <label className="d-flex mx-3">
                                     <input type="checkbox" className="input-checkbox" onChange={() => setIsClassify((pre) => !pre)} />
                                     <span className="custom-checkbox mt-1"></span>
                                 </label>
                                 <p className="fs-4 fw-medium text-nowrap">Phân loại hàng</p>
                             </div>
-                            <div className="w-100 ms-3">
+                            <div className="w-100 ms-1">
                                 {selectedClassify.length > 0 && classifyInputs.length > 0 && isClassify && (
                                     <div className="border p-3 mb-3">
                                         <div className="d-flex justify-content-between py-2 border-bottom align-items-center">
@@ -438,7 +507,7 @@ function CreateProduct() {
                                                             </div>
                                                         </>
                                                     ) : (
-                                                        <>
+                                                        <div>
                                                             <label className="custum-file-upload p-0" style={{ width: 80, height: 80 }}>
                                                                 <div className="icon-image">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" width={50} height={50}>
@@ -457,34 +526,38 @@ function CreateProduct() {
 
                                                                 <input type="file" id="file" onChange={(e) => handleUploadImageClassify(e, index)} />
                                                             </label>
-                                                            {errors[`classifyInputs.${index}.image`] && <p className="text-danger">{errors[`classifyInputs.${index}.image`]}</p>}
-                                                        </>
+                                                            {errors[`classifyInputs.${index}.image`] && <p className="text-danger fs-5">{errors[`classifyInputs.${index}.image`]}</p>}
+                                                        </div>
                                                     )}
 
                                                     <div className="ms-3">
                                                         {selectedClassify.includes('color') && (
-                                                            <div className="input-form d-flex align-items-center w-100 h-auto">
-                                                                <input
-                                                                    type="text"
-                                                                    autoComplete="off"
-                                                                    className="input-text w-100 p-2"
-                                                                    placeholder="Màu sắc"
-                                                                    onChange={(e) => handleClassifyInputChange(index, 'color', e.target.value)}
-                                                                />
-                                                                {errors[`classifyInputs.${index}.color`] && <p className="text-danger">{errors[`classifyInputs.${index}.color`]}</p>}
-                                                            </div>
+                                                            <>
+                                                                <div className="input-form d-flex align-items-center w-100 h-auto">
+                                                                    <input
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        className="input-text w-100 p-2"
+                                                                        placeholder="Màu sắc"
+                                                                        onChange={(e) => handleClassifyInputChange(index, 'color', e.target.value)}
+                                                                    />
+                                                                </div>
+                                                                {errors[`classifyInputs.${index}.color`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.color`]}</p>}
+                                                            </>
                                                         )}
                                                         {selectedClassify.includes('size') && (
-                                                            <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
-                                                                <input
-                                                                    type="text"
-                                                                    autoComplete="off"
-                                                                    className="input-text w-100 p-2"
-                                                                    placeholder="Kích cỡ"
-                                                                    onChange={(e) => handleClassifyInputChange(index, 'size', e.target.value)}
-                                                                />
-                                                                {errors[`classifyInputs.${index}.size`] && <p className="text-danger">{errors[`classifyInputs.${index}.size`]}</p>}
-                                                            </div>
+                                                            <>
+                                                                <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
+                                                                    <input
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        className="input-text w-100 p-2"
+                                                                        placeholder="Kích cỡ"
+                                                                        onChange={(e) => handleClassifyInputChange(index, 'size', e.target.value)}
+                                                                    />
+                                                                </div>
+                                                                {errors[`classifyInputs.${index}.size`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.size`]}</p>}
+                                                            </>
                                                         )}
                                                         <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
                                                             <input
@@ -494,8 +567,8 @@ function CreateProduct() {
                                                                 placeholder="Số lượng"
                                                                 onChange={(e) => handleClassifyInputChange(index, 'stockQuantity', e.target.value)}
                                                             />
-                                                            {errors[`classifyInputs.${index}.stockQuantity`] && <p className="text-danger">{errors[`classifyInputs.${index}.stockQuantity`]}</p>}
                                                         </div>
+                                                        {errors[`classifyInputs.${index}.stockQuantity`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.stockQuantity`]}</p>}
                                                         <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
                                                             <input
                                                                 type="number"
@@ -504,8 +577,8 @@ function CreateProduct() {
                                                                 placeholder="Giá"
                                                                 onChange={(e) => handleClassifyInputChange(index, 'price', e.target.value)}
                                                             />
-                                                            {errors[`classifyInputs.${index}.price`] && <p className="text-danger">{errors[`classifyInputs.${index}.price`]}</p>}
                                                         </div>
+                                                        {errors[`classifyInputs.${index}.price`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.price`]}</p>}
                                                     </div>
                                                     <FontAwesomeIcon
                                                         icon={faTrashCan}
@@ -521,24 +594,24 @@ function CreateProduct() {
                                     </div>
                                 )}
                                 {isClassify && selectedClassify.length < 2 && (
-                                    <div className="select z-1">
-                                        <div className="selected">
+                                    <div className="select z-1 " style={{ height: 45 }}>
+                                        <div className="selected border rounded-0 py-3 px-4">
                                             <p>Thêm phân loại hàng</p>
                                             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                                 <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                             </svg>
                                         </div>
-                                        <div className="options">
+                                        <div className="options border rounded-0">
                                             {!selectedClassify.includes('color') && (
                                                 <div title="option-1">
                                                     <input id="option-1" name="option" type="radio" value="color" onChange={handleClassifyOptionChange} />
-                                                    <label className="option w-100" htmlFor="option-1" data-txt="Màu sắc" />
+                                                    <label className="option w-100 calssify-option" htmlFor="option-1" data-txt="Màu sắc" />
                                                 </div>
                                             )}
                                             {!selectedClassify.includes('size') && (
                                                 <div title="option-2">
                                                     <input id="option-2" name="option" type="radio" value="size" onChange={handleClassifyOptionChange} />
-                                                    <label className="option w-100" htmlFor="option-2" data-txt="Size" />
+                                                    <label className="option w-100 calssify-option" htmlFor="option-2" data-txt="Size" />
                                                 </div>
                                             )}
                                         </div>

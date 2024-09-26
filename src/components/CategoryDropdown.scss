@@ -1,0 +1,40 @@
+.category-dropdown {
+    position: relative;
+    min-width: 30%;
+
+    .dropdown-header {
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        z-index: 1000;
+
+        .parent-list,
+        .child-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1.4rem;
+
+            &:hover,
+            &.active {
+                background-color: rgba(0, 0, 0, 0.03);
+                color: #333;
+                border: none;
+            }
+        }
+
+        .child-list {
+            border-left: 1px solid rgba(0, 0, 0, 0.125);
+        }
+    }
+}

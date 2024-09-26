@@ -1,0 +1,30 @@
+.parent-category-group {
+    position: relative;
+}
+
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1050;
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.suggestions-list .list-group-item {
+    cursor: pointer;
+}
+
+.suggestions-list .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.modal-body {
+    padding-bottom: 1rem;
+}

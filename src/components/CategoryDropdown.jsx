@@ -1,14 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import './CategoryDropdown.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 
-const CategoryDropdown = ({ categories, onSelect }) => {
+const CategoryDropdown = ({ categories, onSelect, selectedCategories }) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState(null)
     const [activeParent, setActiveParent] = useState(null)
     const dropdownRef = useRef(null)
     const timeoutRef = useRef(null)
+
+    const filteredCategories = useMemo(() => {
+        return categories.reduce((acc, category) => {
+            if (!category.children || category.children.length === 0) {
+                // Nếu danh mục không có con và chưa được chọn, giữ lại
+                if (!selectedCategories.some((selectedCat) => selectedCat.id === category.id)) {
+                    acc.push(category)
+                }
+            } else {
+                // Lọc danh mục con chưa được chọn
+                const filteredChildren = category.children.filter((child) => !selectedCategories.some((selectedCat) => selectedCat.id === child.id && selectedCat.parent.id === category.id))
+
+                // Nếu còn danh mục con chưa được chọn, giữ lại danh mục cha với danh sách con đã lọc
+                if (filteredChildren.length > 0) {
+                    acc.push({
+                        ...category,
+                        children: filteredChildren,
+                    })
+                }
+            }
+            return acc
+        }, [])
+    }, [categories, selectedCategories])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -41,40 +63,45 @@ const CategoryDropdown = ({ categories, onSelect }) => {
     }
 
     const handleSelect = (category) => {
-        setSelectedCategory(category)
         onSelect(category)
         setIsOpen(false)
         setActiveParent(null)
     }
 
+    const activeParentCategory = activeParent ? filteredCategories.find((cat) => cat.id === activeParent) : null
+    const showChildList = activeParentCategory && activeParentCategory.children && activeParentCategory.children.length > 0
+
     return (
         <div className="category-dropdown" ref={dropdownRef}>
             <div className="dropdown-header form-control d-flex justify-content-between align-items-center py-3 rounded-0" onClick={() => setIsOpen(!isOpen)}>
-                <span className="fs-4 text-body-secondary fw-medium">{selectedCategory ? `${selectedCategory.parent.name} > ${selectedCategory.name}` : 'Chọn danh mục'}</span>
+                <span className="fs-4 text-body-secondary fw-medium">{selectedCategories.length > 0 ? `Đã chọn ${selectedCategories.length} danh mục` : 'Chọn danh mục'}</span>
                 <FontAwesomeIcon icon={isOpen ? faCaretUp : faCaretDown} className="ms-3" />
             </div>
-            {isOpen && (
-                <div className="dropdown-content shadow" onMouseLeave={handleContentMouseLeave} style={{ width: `${activeParent ? '200%' : '100%'}` }}>
+            {isOpen && filteredCategories.length > 0 && (
+                <div className="dropdown-content shadow mt-2" onMouseLeave={handleContentMouseLeave} style={{ width: showChildList ? '200%' : '100%' }}>
                     <div className="d-flex">
-                        <div className={`parent-list  ${activeParent ? 'w-50' : 'w-100'}`}>
+                        <div className={`parent-list ${showChildList ? 'w-50' : 'w-100'}`}>
                             <ul className="list-group list-group-flush">
-                                {categories.map((parent) => (
-                                    <li key={parent.id} className={`list-group-item py-3 px-4 ${activeParent === parent.id ? 'active' : ''}`} onMouseEnter={() => handleParentHover(parent.id)}>
+                                {filteredCategories.map((parent) => (
+                                    <li
+                                        key={parent.id}
+                                        className={`list-group-item py-3 px-4 ${activeParent === parent.id ? 'active' : ''}`}
+                                        onMouseEnter={() => handleParentHover(parent.id)}
+                                        onClick={() => (!parent.children || parent.children.length === 0 ? handleSelect(parent) : null)}
+                                    >
                                         {parent.name}
                                     </li>
                                 ))}
                             </ul>
                         </div>
-                        {activeParent && (
+                        {showChildList && (
                             <div className="child-list w-50">
                                 <ul className="list-group list-group-flush">
-                                    {categories
-                                        .find((parent) => parent.id === activeParent)
-                                        .children.map((child) => (
-                                            <li key={child.id} className="list-group-item py-3 px-4" onClick={() => handleSelect({ ...child, parent: categories.find((p) => p.id === activeParent) })}>
-                                                {child.name}
-                                            </li>
-                                        ))}
+                                    {activeParentCategory.children.map((child) => (
+                                        <li key={child.id} className="list-group-item py-3 px-4" onClick={() => handleSelect({ ...child, parent: activeParentCategory })}>
+                                            {child.name}
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         )}

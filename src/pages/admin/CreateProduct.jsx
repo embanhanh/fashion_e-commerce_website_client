@@ -4,24 +4,17 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
 import { createProduct } from '../../services/ProductService'
+import AddCategoryModal from '../../components/AddCategoryModal'
 import CategoryDropdown from '../../components/CategoryDropdown'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config'
 import { v4 as uuidv4 } from 'uuid'
+import { Button, Badge } from 'react-bootstrap'
 
 function CreateProduct() {
     const [images, setImages] = useState([]) //state images cho sản phẩm
     const [isClassify, setIsClassify] = useState(false) //checkbox phân loại
-    const [classifyInputs, setClassifyInputs] = useState([
-        {
-            color: '',
-            size: '',
-            stockQuantity: 1,
-            imageUrl: '',
-            price: 0,
-            id: 0,
-        },
-    ])
+    const [classifyInputs, setClassifyInputs] = useState([])
     const [selectedClassify, setSelectedClassify] = useState([])
     // ... các state hiện tại ...
     const [name, setName] = useState('')
@@ -34,7 +27,8 @@ function CreateProduct() {
     const [isFeatured, setIsFeatured] = useState(false)
     const [minOrderQuantity, setMinOrderQuantity] = useState('')
     const [maxOrderQuantity, setMaxOrderQuantity] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
+    const [selectedCategories, setSelectedCategories] = useState([])
     const [errors, setErrors] = useState({})
 
     const categories = [
@@ -62,6 +56,26 @@ function CreateProduct() {
                 // ... các danh mục con khác
             ],
         },
+        {
+            id: 3,
+            name: 'Thời trang trẻ em',
+        },
+        {
+            id: 4,
+            name: 'Thời trang mùa đông',
+        },
+        {
+            id: 5,
+            name: 'Thời trang mùa hè',
+        },
+        {
+            id: 6,
+            name: 'Thời trang mùa thu',
+        },
+        {
+            id: 7,
+            name: 'Thời trang mùa xuân',
+        },
     ]
 
     const clearError = (field) => {
@@ -72,14 +86,25 @@ function CreateProduct() {
         })
     }
 
+    const handleAddCategory = (newCategory) => {
+        // Gọi API để thêm danh mục mới
+        // Sau khi thêm thành công, cập nhật danh sách categories
+        console.log('New category:', newCategory)
+    }
+
     const handleNameChange = (e) => {
         setName(e.target.value)
         clearError('name')
     }
 
     const handleCategorySelect = (category) => {
-        setSelectedCategory(category)
+        setSelectedCategories((prev) => [...prev, category])
+        clearError('category')
         console.log(category)
+    }
+
+    const handleRemoveCategory = (categoryToRemove) => {
+        setSelectedCategories((prev) => prev.filter((cat) => cat.id !== categoryToRemove.id))
     }
 
     const handleDescriptionChange = (e) => {
@@ -115,6 +140,9 @@ function CreateProduct() {
         if (!stockQuantity) newErrors.stockQuantity = 'Số lượng trong kho là bắt buộc'
         if (images.length === 0) {
             newErrors.images = 'Cần ít nhất 1 hình ảnh sản phẩm'
+        }
+        if (selectedCategories.length === 0) {
+            newErrors.category = 'Cần chọn ít nhất 1 danh mục cho sản phẩm'
         }
 
         if (isClassify && classifyInputs.length > 0) {
@@ -190,7 +218,7 @@ function CreateProduct() {
                     isFeatured,
                     isActive: true,
                     discount: parseFloat(discount) || 0,
-                    categories: [],
+                    categories: selectedCategories,
                     variants: isClassify ? filteredVariants : [],
                     minOrderQuantity: parseInt(minOrderQuantity) || 1,
                     maxOrderQuantity: parseInt(maxOrderQuantity) || 100,
@@ -296,7 +324,7 @@ function CreateProduct() {
                 {
                     color: '',
                     size: '',
-                    stockQuantity: 1,
+                    stockQuantity: 0,
                     imageUrl: '',
                     price: 0,
                     id: 0,
@@ -372,14 +400,30 @@ function CreateProduct() {
                             <p className="text-nowrap me-4 w-25">
                                 <span style={{ color: 'red' }}>*</span> Danh mục:
                             </p>
-                            {/* <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="Danh mục cho sản phẩm" />
-                            </div> */}
-                            <div className="d-flex align-items-center w-100">
-                                <CategoryDropdown categories={categories} onSelect={handleCategorySelect} />
+
+                            <div className="d-flex align-items-center w-100 justify-content-between">
+                                <CategoryDropdown categories={categories} onSelect={handleCategorySelect} selectedCategories={selectedCategories} />
+                                <div className="ms-2 border p-3" onClick={() => setShowAddCategoryModal(true)}>
+                                    <p className="fs-4">
+                                        Thêm danh mục mới <FontAwesomeIcon icon={faPlus} className="ms-3" />
+                                    </p>
+                                </div>
                             </div>
                         </div>
+                        {selectedCategories.length > 0 && (
+                            <div className="mt-2 d-flex flex-wrap" style={{ marginLeft: '22%' }}>
+                                {selectedCategories.map((category, index) => (
+                                    <Badge key={index} bg="secondary" className="me-2 p-3" style={{ cursor: 'pointer' }}>
+                                        <p className="fs-5">
+                                            {category.parent ? `${category.parent.name} > ${category.name}` : category.name}{' '}
+                                            <FontAwesomeIcon onClick={() => handleRemoveCategory(category)} icon={faCircleXmark} className="ms-3" />
+                                        </p>
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
                         {errors.category && <p className="text-danger ms-2 pt-2">{errors.category}</p>}
+                        <AddCategoryModal show={showAddCategoryModal} handleClose={() => setShowAddCategoryModal(false)} categories={categories} onAddCategory={handleAddCategory} />
                         <div className="d-flex mt-4 ">
                             <p className="text-nowrap me-4 w-25 mt-2">
                                 <span style={{ color: 'red' }}>*</span> Mô tả sản phẩm:
@@ -655,11 +699,16 @@ function CreateProduct() {
                     <h2>Thông tin vận chuyển</h2>
                 </section>
                 <section className="d-flex flex-row-reverse mt-4">
-                    <div className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0" onClick={handleSubmit}>
-                        <p>Xác nhận</p>
-                    </div>
-                    <div className=" primary-btn px-4 py-2 border light shadow-none  rounded-0">
-                        <p>Hủy</p>
+                    <div className="">
+                        <div className="d-flex flex-row-reverse">
+                            <div className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0" onClick={handleSubmit}>
+                                <p>Xác nhận</p>
+                            </div>
+                            <div className=" primary-btn px-4 py-2 border light shadow-none  rounded-0">
+                                <p>Hủy</p>
+                            </div>
+                        </div>
+                        {Object.keys(errors).length !== 0 && <p className="text-danger ms-2 pt-2">Vui lòng điền đầy đủ thông tin cần thiết cho sản phẩm</p>}
                     </div>
                 </section>
             </div>

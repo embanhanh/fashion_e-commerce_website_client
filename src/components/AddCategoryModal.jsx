@@ -17,7 +17,8 @@ const AddCategoryModal = ({ show, handleClose, categories, onAddCategory }) => {
             setChildCategory('')
             setErrors({})
             setShowSuggestions(false)
-            setSuggestions(categories)
+            // Chỉ lấy các danh mục cha (không có parentCategory)
+            setSuggestions(categories.filter((cat) => !cat.parentCategory))
         }
     }, [show, categories])
 
@@ -39,10 +40,12 @@ const AddCategoryModal = ({ show, handleClose, categories, onAddCategory }) => {
         setParentCategory(value)
         setShowSuggestions(true)
         if (value) {
-            const filteredSuggestions = categories.filter((cat) => cat.name.toLowerCase().includes(value.toLowerCase()))
+            // Lọc chỉ các danh mục cha phù hợp với input
+            const filteredSuggestions = categories.filter((cat) => !cat.parentCategory).filter((cat) => cat.name.toLowerCase().includes(value.toLowerCase()))
             setSuggestions(filteredSuggestions)
         } else {
-            setSuggestions(categories)
+            // Nếu input rỗng, hiển thị tất cả danh mục cha
+            setSuggestions(categories.filter((cat) => !cat.parentCategory))
         }
     }
 
@@ -53,15 +56,21 @@ const AddCategoryModal = ({ show, handleClose, categories, onAddCategory }) => {
 
     const validateForm = () => {
         const newErrors = {}
-        if (!parentCategory) newErrors.parentCategory = 'Danh mục cha không được để trống'
+        if (!childCategory) {
+            newErrors.childCategory = 'Vui lòng nhập danh mục con'
+        }
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            onAddCategory({ parentCategory, childCategory })
-            handleClose()
+            try {
+                await onAddCategory({ parentCategory, childCategory })
+                handleClose()
+            } catch (error) {
+                setErrors({ ...errors, submit: error.message || 'Có lỗi xảy ra khi tạo danh mục' })
+            }
         }
     }
 
@@ -88,7 +97,7 @@ const AddCategoryModal = ({ show, handleClose, categories, onAddCategory }) => {
                         {showSuggestions && suggestions.length > 0 && (
                             <ListGroup className="suggestions-list" ref={suggestionsRef}>
                                 {suggestions.map((category) => (
-                                    <ListGroup.Item className="px-3 py-2 fs-4" key={category.id} action onClick={() => handleSuggestionClick(category)}>
+                                    <ListGroup.Item className="px-3 py-2 fs-4" key={category._id} action onClick={() => handleSuggestionClick(category)}>
                                         {category.name}
                                     </ListGroup.Item>
                                 ))}
@@ -96,15 +105,16 @@ const AddCategoryModal = ({ show, handleClose, categories, onAddCategory }) => {
                         )}
                     </Form.Group>
                     <Form.Group className="mt-3">
-                        <Form.Label>Danh mục con (không bắt buộc)</Form.Label>
+                        <Form.Label>Danh mục con (bắt buộc)</Form.Label>
                         <div className="input-form d-flex align-items-center w-100">
-                            <input type="text" className="input-text w-100" placeholder="Danh mục con" value={childCategory} onChange={(e) => setChildCategory(e.target.value)} />
+                            <input type="text" className="input-text w-100" placeholder="Danh mục con" value={childCategory} onChange={(e) => setChildCategory(e.target.value)} required />
                         </div>
                     </Form.Group>
                 </Form>
             </Modal.Body>
             <Modal.Footer className="d-flex w-100">
-                <p className="text-danger">{errors.parentCategory}</p>
+                <p className="text-danger">{errors.childCategory}</p>
+                <p className="text-danger">{errors.submit}</p>
                 <div onClick={handleClose} className="border py-2 px-4" style={{ cursor: 'pointer' }}>
                     <p className="fs-3 text-body-secondary">Đóng</p>
                 </div>

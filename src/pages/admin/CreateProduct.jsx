@@ -3,15 +3,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchCategories, addNewCategory } from '../../redux/slices/categorySlice'
 import { createProduct } from '../../services/ProductService'
 import AddCategoryModal from '../../components/AddCategoryModal'
 import CategoryDropdown from '../../components/CategoryDropdown'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config'
 import { v4 as uuidv4 } from 'uuid'
-import { Button, Badge } from 'react-bootstrap'
+import { Badge } from 'react-bootstrap'
+import Notification from '../../components/Notification'
+import { Modal } from 'react-bootstrap'
 
 function CreateProduct() {
+    const dispatch = useDispatch()
+    const { categories, status, error } = useSelector((state) => state.category)
     const [images, setImages] = useState([]) //state images cho sản phẩm
     const [isClassify, setIsClassify] = useState(false) //checkbox phân loại
     const [classifyInputs, setClassifyInputs] = useState([])
@@ -30,53 +36,31 @@ function CreateProduct() {
     const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
     const [selectedCategories, setSelectedCategories] = useState([])
     const [errors, setErrors] = useState({})
+    const [isLoading, setIsLoading] = useState(false)
+    const [message, setMessage] = useState({ title: '', description: '', type: '' })
 
-    const categories = [
-        {
-            id: 1,
-            name: 'Thời trang nam',
-            children: [
-                { id: 11, name: 'Áo thun' },
-                { id: 12, name: 'Quần jean' },
-                { id: 13, name: 'Quần kaki' },
-                { id: 14, name: 'Quần dài' },
-                { id: 15, name: 'Quần short' },
-                { id: 16, name: 'Quần ống rộng' },
-                { id: 17, name: 'Quần ống thẳng' },
-                { id: 18, name: 'Quần ống côn' },
-                // ... các danh mục con khác
-            ],
-        },
-        {
-            id: 2,
-            name: 'Thời trang nữ',
-            children: [
-                { id: 11, name: 'Váy' },
-                { id: 12, name: 'Quần jean' },
-                // ... các danh mục con khác
-            ],
-        },
-        {
-            id: 3,
-            name: 'Thời trang trẻ em',
-        },
-        {
-            id: 4,
-            name: 'Thời trang mùa đông',
-        },
-        {
-            id: 5,
-            name: 'Thời trang mùa hè',
-        },
-        {
-            id: 6,
-            name: 'Thời trang mùa thu',
-        },
-        {
-            id: 7,
-            name: 'Thời trang mùa xuân',
-        },
-    ]
+    const resetForm = () => {
+        setName('')
+        setDescription('')
+        setOriginalPrice('')
+        setBrand('')
+        setMaterial('')
+        setStockQuantity('')
+        setDiscount('')
+        setIsFeatured(false)
+        setMinOrderQuantity('')
+        setMaxOrderQuantity('')
+        setSelectedCategories([])
+        setImages([])
+        setIsClassify(false)
+        setErrors({})
+    }
+
+    useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchCategories())
+        }
+    }, [status, dispatch])
 
     const clearError = (field) => {
         setErrors((prevErrors) => {
@@ -86,10 +70,14 @@ function CreateProduct() {
         })
     }
 
-    const handleAddCategory = (newCategory) => {
-        // Gọi API để thêm danh mục mới
-        // Sau khi thêm thành công, cập nhật danh sách categories
-        console.log('New category:', newCategory)
+    const handleAddCategory = async (newCategoryData) => {
+        try {
+            await dispatch(addNewCategory(newCategoryData)).unwrap()
+            // Optionally, you can show a success message here
+        } catch (error) {
+            // Handle error, maybe show an error message
+            console.error('Failed to add new category:', error)
+        }
     }
 
     const handleNameChange = (e) => {
@@ -97,10 +85,8 @@ function CreateProduct() {
         clearError('name')
     }
 
-    const handleCategorySelect = (category) => {
+    const handleSelectCategory = (category) => {
         setSelectedCategories((prev) => [...prev, category])
-        clearError('category')
-        console.log(category)
     }
 
     const handleRemoveCategory = (categoryToRemove) => {
@@ -176,7 +162,7 @@ function CreateProduct() {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        setIsLoading(true)
         if (validateForm()) {
             try {
                 const uploadedImageUrls = await Promise.all(
@@ -218,18 +204,24 @@ function CreateProduct() {
                     isFeatured,
                     isActive: true,
                     discount: parseFloat(discount) || 0,
-                    categories: selectedCategories,
+                    categories: selectedCategories.map((cat) => cat._id),
                     variants: isClassify ? filteredVariants : [],
                     minOrderQuantity: parseInt(minOrderQuantity) || 1,
                     maxOrderQuantity: parseInt(maxOrderQuantity) || 100,
                 }
-                // const response = await createProduct(productData)
-                // console.log('Product created:', response)
+
+                const response = await createProduct(productData)
+                setIsLoading(false)
+                resetForm()
+                setMessage({ type: 'success', title: 'Thêm sản phẩm thành công', description: '' })
+
                 console.log(productData)
                 // Xử lý sau khi tạo sản phẩm thành công
             } catch (error) {
                 console.error('Error creating product:', error)
-                // Xử lý lỗi
+                setMessage({ type: 'error', title: error.message || 'Có lỗi xảy ra khi tạo sản phẩm', description: 'Vui lòng thử lại' })
+            } finally {
+                setIsLoading(false)
             }
         } else {
             console.log(errors)
@@ -335,6 +327,10 @@ function CreateProduct() {
 
     return (
         <>
+            <Modal show={!!message.type} onHide={() => setMessage({ type: '', title: '', description: '' })} centered>
+                <Notification title={message.title} description={message.description} type={message.type} />
+            </Modal>
+
             <div className="w-75 pb-5">
                 <div className="p-4 d-flex bg-white border">
                     <a href="#section1" className="fs-4 fw-medium">
@@ -402,7 +398,7 @@ function CreateProduct() {
                             </p>
 
                             <div className="d-flex align-items-center w-100 justify-content-between">
-                                <CategoryDropdown categories={categories} onSelect={handleCategorySelect} selectedCategories={selectedCategories} />
+                                <CategoryDropdown categories={categories} onSelect={handleSelectCategory} selectedCategories={selectedCategories} />
                                 <div className="ms-2 border p-3" onClick={() => setShowAddCategoryModal(true)}>
                                     <p className="fs-4">
                                         Thêm danh mục mới <FontAwesomeIcon icon={faPlus} className="ms-3" />
@@ -415,7 +411,7 @@ function CreateProduct() {
                                 {selectedCategories.map((category, index) => (
                                     <Badge key={index} bg="secondary" className="me-2 p-3" style={{ cursor: 'pointer' }}>
                                         <p className="fs-5">
-                                            {category.parent ? `${category.parent.name} > ${category.name}` : category.name}{' '}
+                                            {category.parentCategory ? `${category.parentCategory.name} > ${category.name}` : category.name}{' '}
                                             <FontAwesomeIcon onClick={() => handleRemoveCategory(category)} icon={faCircleXmark} className="ms-3" />
                                         </p>
                                     </Badge>
@@ -509,7 +505,7 @@ function CreateProduct() {
                         </div>
                         <div className="d-flex mt-4  align-items-center">
                             <label className="d-flex align-items-center mx-3">
-                                <input type="checkbox" className="input-checkbox" onChange={() => setIsFeatured((pre) => !pre)} />
+                                <input type="checkbox" className="input-checkbox" checked={isFeatured} onChange={() => setIsFeatured((pre) => !pre)} />
                                 <span className="custom-checkbox"></span>
                             </label>
                             <p className="fs-4 fw-medium">Sản phẩm nổi bật</p>
@@ -522,7 +518,7 @@ function CreateProduct() {
                         <div className="d-flex mt-4">
                             <div className="w-25 d-flex me-4">
                                 <label className="d-flex mx-3">
-                                    <input type="checkbox" className="input-checkbox" onChange={() => setIsClassify((pre) => !pre)} />
+                                    <input type="checkbox" className="input-checkbox" checked={isClassify} onChange={() => setIsClassify((pre) => !pre)} />
                                     <span className="custom-checkbox mt-1"></span>
                                 </label>
                                 <p className="fs-4 fw-medium text-nowrap">Phân loại hàng</p>
@@ -701,8 +697,24 @@ function CreateProduct() {
                 <section className="d-flex flex-row-reverse mt-4">
                     <div className="">
                         <div className="d-flex flex-row-reverse">
-                            <div className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0" onClick={handleSubmit}>
+                            <div
+                                className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0"
+                                onClick={() => {
+                                    handleSubmit()
+                                }}
+                            >
                                 <p>Xác nhận</p>
+                                {isLoading && (
+                                    <div className="dot-spinner ms-4">
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                    </div>
+                                )}
                             </div>
                             <div className=" primary-btn px-4 py-2 border light shadow-none  rounded-0">
                                 <p>Hủy</p>

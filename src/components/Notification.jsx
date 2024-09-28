@@ -18,17 +18,17 @@ function Notification({ title, description, isClosed, type }) {
                         </svg>
                     )) ||
                         (type == 'error' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" strokWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" strokeWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
                                 <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"></path>
                             </svg>
                         )) ||
                         (type == 'warning' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" strokWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" strokeWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
                                 <path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path>
                             </svg>
                         )) ||
                         (type == 'info' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth="0" fill="currentColor" stroke="currentColor" className={`icon ${type}`}>
                                 <path d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z"></path>
                                 <path d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z"></path>
                             </svg>

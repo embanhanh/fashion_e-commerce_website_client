@@ -44,6 +44,11 @@
     padding: 8px 12px;
 }
 
+.primary-btn.disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed;
+}
+
 // Input checkbox
 .input-checkbox {
     display: none;

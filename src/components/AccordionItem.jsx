@@ -80,7 +80,7 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                                           <span className="custom-checkbox"></span>
                                       </label>
                                   )}
-                                  <p className="ms-2 fw-medium fs-4" onClick={handleClick}>
+                                  <p className="ms-3 fw-medium fs-4" onClick={handleClick}>
                                       {item.name}
                                   </p>
                               </div>

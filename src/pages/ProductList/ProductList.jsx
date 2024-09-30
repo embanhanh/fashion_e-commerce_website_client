@@ -1,5 +1,5 @@
 import './ProductList.scss'
-import { useEffect, useLayoutEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
@@ -13,6 +13,8 @@ function ProductList() {
     const dispatch = useDispatch()
     const { allProducts, filteredProducts, filters, status, error } = useSelector((state) => state.product)
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
+    const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
+    const [selectedSizes, setSelectedSizes] = useState([])
 
     useEffect(() => {
         dispatch(fetchProducts())
@@ -27,6 +29,28 @@ function ProductList() {
                 children: categories.filter((child) => child.parentCategory && child.parentCategory._id === parent._id),
             }))
     }, [categories])
+
+    const handlePriceChange = (type, value) => {
+        setPriceRange((prev) => ({ ...prev, [type]: value }))
+    }
+
+    const handleSizeChange = (size) => {
+        setSelectedSizes((prev) => {
+            if (prev.includes(size)) {
+                return prev.filter((s) => s !== size)
+            } else {
+                return [...prev, size]
+            }
+        })
+    }
+
+    useEffect(() => {
+        dispatch(setFilters({ size: selectedSizes }))
+    }, [selectedSizes, dispatch])
+
+    const applyPriceFilter = () => {
+        dispatch(setFilters({ priceRange }))
+    }
 
     const handleFilterChange = (filterType, value) => {
         dispatch(setFilters({ [filterType]: value }))
@@ -82,13 +106,37 @@ function ProductList() {
                             <div className="">
                                 <div className="d-flex mb-3 align-items-center">
                                     <div className="input-form d-flex align-items-center " style={{ height: '30px' }}>
-                                        <input type="number" autoComplete="off" className="input-text w-100" placeholder="Từ" min="0" max="9999999999" />
+                                        <input
+                                            type="number"
+                                            autoComplete="off"
+                                            className="input-text w-100"
+                                            placeholder="Từ"
+                                            min="0"
+                                            max="9999999999"
+                                            value={priceRange.min === 0 ? '' : priceRange.min}
+                                            onChange={(e) => handlePriceChange('min', e.target.value)}
+                                        />
                                     </div>
                                     <div className="ms-3 input-form d-flex align-items-center " style={{ height: '30px' }}>
-                                        <input type="number" autoComplete="off" className="input-text w-100" placeholder="Đến" min="0" max="9999999999" />
+                                        <input
+                                            type="number"
+                                            autoComplete="off"
+                                            className="input-text w-100"
+                                            placeholder="Đến"
+                                            min="0"
+                                            max="9999999999"
+                                            value={priceRange.max === Infinity ? '' : priceRange.max}
+                                            onChange={(e) => handlePriceChange('max', e.target.value || Infinity)}
+                                        />
                                     </div>
                                 </div>
-                                <button className="primary-btn btn-sm w-100 py-1 mb-2 shadow-none">
+                                <button
+                                    className="primary-btn btn-sm w-100 py-1 mb-2 shadow-none"
+                                    onClick={() => {
+                                        console.log(priceRange)
+                                        applyPriceFilter()
+                                    }}
+                                >
                                     <p>Áp dụng</p>
                                 </button>
                             </div>
@@ -154,34 +202,15 @@ function ProductList() {
                             ]}
                             isOpen={true}
                         >
-                            <Accordion
-                                data={[
-                                    {
-                                        title: 'S',
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'M',
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'L',
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'XL',
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'XXL',
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'XXXL',
-                                        isChecked: true,
-                                    },
-                                ]}
-                            />
+                            {['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => (
+                                <div key={size} className="d-flex align-items-center">
+                                    <label className="d-flex align-items-center">
+                                        <input type="checkbox" className="input-checkbox" checked={selectedSizes.includes(size)} onChange={() => handleSizeChange(size)} />
+                                        <span className="custom-checkbox"></span>
+                                    </label>
+                                    <p className="ms-3 fw-medium fs-4">{size}</p>
+                                </div>
+                            ))}
                         </Accordion>
                     </div>
                     <div style={{ width: '80%' }} className="px-5 py-2">

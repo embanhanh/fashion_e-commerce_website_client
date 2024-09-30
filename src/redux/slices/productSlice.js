@@ -56,9 +56,11 @@ const productSlice = createSlice({
 const applyFilters = (products, filters) => {
     return products.filter((product) => {
         const categoryMatch = filters.category.length === 0 || product.categories.some((cat) => filters.category.includes(cat._id) || filters.category.includes(cat.parentCategory))
-        const priceMatch = (product.originalPrice * product.discount) / 100 >= filters.priceRange.min && (product.originalPrice * product.discount) / 100 <= filters.priceRange.max
+        const priceMatch =
+            product.originalPrice - (product.originalPrice * product.discount) / 100 >= filters.priceRange.min &&
+            product.originalPrice - (product.originalPrice * product.discount) / 100 <= filters.priceRange.max
         const colorMatch = filters.color.length === 0 || filters.color.some((color) => product.variants.some((v) => v.color === color))
-        const sizeMatch = filters.size.length === 0 || filters.size.some((size) => product.variants.some((v) => v.size === size))
+        const sizeMatch = filters.size.length === 0 || filters.size.some((size) => product.variants.some((v) => v.size.toLowerCase().trim() === size.toLowerCase().trim()))
 
         return categoryMatch && priceMatch && colorMatch && sizeMatch
     })

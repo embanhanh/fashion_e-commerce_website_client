@@ -10,3 +10,12 @@ export const createProduct = async (productData) => {
         throw error.response.data
     }
 }
+
+export const getAllProducts = async () => {
+    try {
+        const response = await axios.get(API_URL)
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

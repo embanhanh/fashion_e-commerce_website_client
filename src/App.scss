@@ -49,6 +49,20 @@
     cursor: not-allowed;
 }
 
+// button:disabled:hover {
+//     cursor: not-allowed;
+//     background-color: #ccc !important;
+//     border: 1px solid #ccc !important;
+//     color: #ccc !important;
+// }
+
+button:disabled {
+    cursor: not-allowed;
+    background-color: #ccc !important;
+    border: 1px solid #ccc !important;
+    color: #fff !important;
+}
+
 // Input checkbox
 .input-checkbox {
     display: none;

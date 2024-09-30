@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
-function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecked }) {
+function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecked, onSelect, selectedItems, idParent }) {
     const contentRef = useRef(null)
     const [height, setHeight] = useState('0px')
     const [isAnimating, setIsAnimating] = useState(false)
@@ -31,13 +31,28 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
         onClick()
     }
 
+    const handleCheckboxChange = (item, isChecked, childrenIds) => {
+        onSelect(item, isChecked, childrenIds)
+    }
+
     return (
         <div className="accordion-item-custom">
             <div className="accordion-title-custom d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center p-2  flex-grow-1">
                     {isChecked && (
                         <label className="d-flex align-items-center">
-                            <input type="checkbox" className="input-checkbox" />
+                            <input
+                                type="checkbox"
+                                className="input-checkbox"
+                                onChange={(e) =>
+                                    handleCheckboxChange(
+                                        idParent,
+                                        e.target.checked,
+                                        content.map((child) => child.id)
+                                    )
+                                }
+                                checked={selectedItems.includes(idParent)}
+                            />
                             <span className="custom-checkbox"></span>
                         </label>
                     )}
@@ -54,12 +69,19 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                               <div className="d-flex align-items-center" key={index}>
                                   {isChecked && (
                                       <label className="d-flex align-items-center">
-                                          <input type="checkbox" className="input-checkbox" />
+                                          <input
+                                              type="checkbox"
+                                              className="input-checkbox"
+                                              checked={selectedItems.includes(item.id) || selectedItems.includes(idParent)}
+                                              onChange={(e) => {
+                                                  handleCheckboxChange(item.id, e.target.checked, [])
+                                              }}
+                                          />
                                           <span className="custom-checkbox"></span>
                                       </label>
                                   )}
                                   <p className="ms-2 fw-medium fs-4" onClick={handleClick}>
-                                      {item}
+                                      {item.name}
                                   </p>
                               </div>
                           ))

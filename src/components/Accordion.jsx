@@ -2,8 +2,9 @@ import './Accordion.scss'
 import React, { useEffect, useState } from 'react'
 import AccordionItem from './AccordionItem'
 
-function Accordion({ data, children, isOpen }) {
+function Accordion({ data, children, isOpen, onChange }) {
     const [openIndices, setOpenIndices] = useState([])
+    const [selectedItems, setSelectedItems] = useState([])
 
     useEffect(() => {
         if (isOpen) {
@@ -20,6 +21,17 @@ function Accordion({ data, children, isOpen }) {
         }
     }
 
+    const handleItemSelect = (item, isSelected, childrenIds = []) => {
+        let newSelectedItems
+        if (isSelected) {
+            newSelectedItems = [...selectedItems, item]
+        } else {
+            newSelectedItems = selectedItems.filter((i) => i !== item && !childrenIds.includes(i))
+        }
+        setSelectedItems(newSelectedItems)
+        onChange(newSelectedItems)
+    }
+
     return (
         <div className="accordion-custom">
             {data.map((item, index) => (
@@ -31,6 +43,9 @@ function Accordion({ data, children, isOpen }) {
                     content={item.content}
                     isOpen={openIndices.includes(index)}
                     onClick={() => handleToggle(index)}
+                    onSelect={handleItemSelect}
+                    selectedItems={selectedItems}
+                    idParent={item.id}
                 />
             ))}
         </div>

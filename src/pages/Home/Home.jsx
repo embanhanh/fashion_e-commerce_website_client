@@ -8,11 +8,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faArrowRight, faCreditCard, faDollarSign, faHeadset, faTruckFast } from '@fortawesome/free-solid-svg-icons'
 import ProductCard from '../../components/ProductCard'
 import { Rating } from 'react-simple-star-rating'
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 
 function Home() {
     const swiperCategory = useRef(null)
     const swiperReview = useRef(null)
+
     return (
         <>
             <div className="container h-100">

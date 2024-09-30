@@ -87,10 +87,11 @@ function CreateProduct() {
 
     const handleSelectCategory = (category) => {
         setSelectedCategories((prev) => [...prev, category])
+        clearError('category')
     }
 
     const handleRemoveCategory = (categoryToRemove) => {
-        setSelectedCategories((prev) => prev.filter((cat) => cat.id !== categoryToRemove.id))
+        setSelectedCategories((prev) => prev.filter((cat) => cat._id !== categoryToRemove._id))
     }
 
     const handleDescriptionChange = (e) => {
@@ -162,8 +163,8 @@ function CreateProduct() {
     }
 
     const handleSubmit = async (e) => {
-        setIsLoading(true)
         if (validateForm()) {
+            setIsLoading(true)
             try {
                 const uploadedImageUrls = await Promise.all(
                     images.map(async (image) => {
@@ -230,6 +231,18 @@ function CreateProduct() {
 
     // Hàm xử lý khi upload ảnh
     const handleImageUpload = (e) => {
+        const files = Array.from(e.target.files)
+        if (files.length === 0) {
+            return
+        }
+        const remainingSlots = 5 - images.length
+        if (remainingSlots <= 0) {
+            return
+        }
+        const filesToAdd = files.slice(0, remainingSlots)
+        const newImages = filesToAdd.map((file) => URL.createObjectURL(file))
+        setImages((prevImages) => [...prevImages, ...newImages])
+        clearError('images')
         if (images.length < 5) {
             const file = e.target.files[0]
             const fileURL = URL.createObjectURL(file)
@@ -269,10 +282,12 @@ function CreateProduct() {
 
     const handleUploadImageClassify = (e, index) => {
         const file = e.target.files[0]
-        const fileURL = URL.createObjectURL(file)
+        if (file) {
+            const fileURL = URL.createObjectURL(file)
 
-        setClassifyInputs((prev) => prev.map((input, ind) => (ind === index ? { ...input, imageUrl: fileURL } : input)))
-        clearError(`classifyInputs.${index}.image`)
+            setClassifyInputs((prev) => prev.map((input, ind) => (ind === index ? { ...input, imageUrl: fileURL } : input)))
+            clearError(`classifyInputs.${index}.image`)
+        }
     }
 
     const removeImageUploadClassify = (index) => {
@@ -377,7 +392,7 @@ function CreateProduct() {
                                         <div className="text">
                                             <span>Thêm hình ảnh</span>
                                         </div>
-                                        <input type="file" id="file" onChange={handleImageUpload} />
+                                        <input type="file" multiple id="file" onChange={handleImageUpload} />
                                     </label>
                                 )}
                             </div>
@@ -697,7 +712,8 @@ function CreateProduct() {
                 <section className="d-flex flex-row-reverse mt-4">
                     <div className="">
                         <div className="d-flex flex-row-reverse">
-                            <div
+                            <button
+                                disabled={isLoading || Object.keys(errors).length !== 0}
                                 className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0"
                                 onClick={() => {
                                     handleSubmit()
@@ -715,10 +731,7 @@ function CreateProduct() {
                                         <div className="dot-spinner__dot"></div>
                                     </div>
                                 )}
-                            </div>
-                            <div className=" primary-btn px-4 py-2 border light shadow-none  rounded-0">
-                                <p>Hủy</p>
-                            </div>
+                            </button>
                         </div>
                         {Object.keys(errors).length !== 0 && <p className="text-danger ms-2 pt-2">Vui lòng điền đầy đủ thông tin cần thiết cho sản phẩm</p>}
                     </div>

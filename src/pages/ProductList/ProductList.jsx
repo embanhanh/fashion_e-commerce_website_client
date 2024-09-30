@@ -1,136 +1,49 @@
 import './ProductList.scss'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState, useMemo } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchProducts, setFilters, setSortOption } from '../../redux/slices/productSlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
+
 function ProductList() {
-    const [products, setProducts] = useState([
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-        {
-            name: 'Giày thể thao hhhhhhhhhh jasdasd jasdasda',
-            originalPrice: 150000,
-            discount: 0.15,
-            rating: 5,
-        },
-    ])
+    const dispatch = useDispatch()
+    const { allProducts, filteredProducts, filters, status, error } = useSelector((state) => state.product)
+    const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
+
+    useEffect(() => {
+        dispatch(fetchProducts())
+        dispatch(fetchCategories())
+    }, [dispatch])
+
+    const filteredCategories = useMemo(() => {
+        return categories
+            .filter((category) => !category.parentCategory)
+            .map((parent) => ({
+                ...parent,
+                children: categories.filter((child) => child.parentCategory && child.parentCategory._id === parent._id),
+            }))
+    }, [categories])
+
+    const handleFilterChange = (filterType, value) => {
+        dispatch(setFilters({ [filterType]: value }))
+    }
+
+    const handleSortChange = (e) => {
+        dispatch(setSortOption(e.target.value))
+    }
+
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
     const productsPerPage = 12
     const indexOfLastProduct = currentPage * productsPerPage
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct)
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
     const paginate = (pageNumber) => setCurrentPage(pageNumber)
-    const totalPages = Math.ceil(products.length / productsPerPage)
-
-    const [arrangeOption, setArrangeOption] = useState('')
-
-    const handleOptionChange = (e) => {
-        const value = e.target.value
-        setArrangeOption(value)
-    }
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
 
     return (
         <>
@@ -145,29 +58,16 @@ function ProductList() {
                                 },
                             ]}
                             isOpen={true}
+                            onChange={(value) => handleFilterChange('category', value)}
                         >
                             <Accordion
-                                data={[
-                                    {
-                                        title: 'Thời trang nam',
-                                        content: ['Áo thun', 'Áo phông'],
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'Thời trang nữ',
-                                        content: ['Đầm', 'Quần'],
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'Thời trang trẻ em',
-                                        content: ['Áo', 'Quần'],
-                                        isChecked: true,
-                                    },
-                                    {
-                                        title: 'Phụ kiện',
-                                        isChecked: true,
-                                    },
-                                ]}
+                                data={filteredCategories.map((parent) => ({
+                                    title: parent.name,
+                                    content: parent.children.map((child) => ({ name: child.name, id: child._id })),
+                                    isChecked: true,
+                                    id: parent._id,
+                                }))}
+                                onChange={(value) => handleFilterChange('category', value)}
                             />
                         </Accordion>
                         <div className=" w-100 border-bottom mt-2"></div>
@@ -285,7 +185,7 @@ function ProductList() {
                         </Accordion>
                     </div>
                     <div style={{ width: '80%' }} className="px-5 py-2">
-                        <div className="d-flex align-items-center justify-content-end">
+                        <div className="d-flex align-items-center justify-content-end border-bottom pb-3">
                             <div className="d-flex align-items-center">
                                 <p className="fw-medium me-4 fs-3">Sắp xếp theo</p>
                                 <div className="select">
@@ -296,23 +196,23 @@ function ProductList() {
                                     </div>
                                     <div className="options">
                                         <div title="all">
-                                            <input id="all" name="option" type="radio" defaultChecked value="" onChange={handleOptionChange} />
+                                            <input id="all" name="option" type="radio" defaultChecked value="" onChange={handleSortChange} />
                                             <label className="option" htmlFor="all" data-txt="Mặc định" />
                                         </div>
                                         <div title="option-1">
-                                            <input id="option-1" name="option" type="radio" value="asc" onChange={handleOptionChange} />
+                                            <input id="option-1" name="option" type="radio" value="priceAsc" onChange={handleSortChange} />
                                             <label className="option" htmlFor="option-1" data-txt="Giá cả tăng dần" />
                                         </div>
                                         <div title="option-2">
-                                            <input id="option-2" name="option" type="radio" value="desc" onChange={handleOptionChange} />
+                                            <input id="option-2" name="option" type="radio" value="priceDesc" onChange={handleSortChange} />
                                             <label className="option" htmlFor="option-2" data-txt="Giá cả giảm dần" />
                                         </div>
                                         <div title="option-3">
-                                            <input id="option-3" name="option" type="radio" value="common" onChange={handleOptionChange} />
+                                            <input id="option-3" name="option" type="radio" value="popular" onChange={handleSortChange} />
                                             <label className="option" htmlFor="option-3" data-txt="Phổ biến" />
                                         </div>
                                         <div title="option-4">
-                                            <input id="option-4" name="option" type="radio" value="latest" onChange={handleOptionChange} />
+                                            <input id="option-4" name="option" type="radio" value="newest" onChange={handleSortChange} />
                                             <label className="option" htmlFor="option-4" data-txt="Mới nhất" />
                                         </div>
                                     </div>
@@ -321,11 +221,25 @@ function ProductList() {
                         </div>
 
                         <div className="row">
+                            {status === 'loading' && (
+                                <section className="dots-container mt-4">
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                    <div className="dot"></div>
+                                </section>
+                            )}
                             {currentProducts.map((product, index) => (
                                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4">
-                                    <ProductCard name={product.name} originalPrice={product.price} discount={product.discount} rating={product.rating} image={product.image} />
+                                    <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
                                 </div>
                             ))}
+                            {currentProducts.length === 0 && (
+                                <div className="d-flex justify-content-center align-items-center">
+                                    <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
+                                </div>
+                            )}
                         </div>
                         <div className="">
                             <Pagination>

@@ -59,7 +59,7 @@ const applyFilters = (products, filters) => {
         const priceMatch =
             product.originalPrice - (product.originalPrice * product.discount) / 100 >= filters.priceRange.min &&
             product.originalPrice - (product.originalPrice * product.discount) / 100 <= filters.priceRange.max
-        const colorMatch = filters.color.length === 0 || filters.color.some((color) => product.variants.some((v) => v.color === color))
+        const colorMatch = filters.color.length === 0 || product.variants.some((variant) => filters.color.some((color) => variant.color.toLowerCase().trim().includes(color.toLowerCase().trim())))
         const sizeMatch = filters.size.length === 0 || filters.size.some((size) => product.variants.some((v) => v.size.toLowerCase().trim() === size.toLowerCase().trim()))
 
         return categoryMatch && priceMatch && colorMatch && sizeMatch

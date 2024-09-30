@@ -243,17 +243,14 @@ function CreateProduct() {
         const newImages = filesToAdd.map((file) => URL.createObjectURL(file))
         setImages((prevImages) => [...prevImages, ...newImages])
         clearError('images')
-        if (images.length < 5) {
-            const file = e.target.files[0]
-            const fileURL = URL.createObjectURL(file)
-
-            setImages((prevImages) => [...prevImages, fileURL])
-            clearError('images')
-        }
     }
 
     const removeImageUpload = (index) => {
         setImages((prevImages) => prevImages.filter((_, ind) => ind !== index))
+        const mainProductFileInput = document.getElementById('main-product-images')
+        if (mainProductFileInput) {
+            mainProductFileInput.value = ''
+        }
     }
 
     // Hàm render các ảnh đã upload
@@ -292,6 +289,11 @@ function CreateProduct() {
 
     const removeImageUploadClassify = (index) => {
         setClassifyInputs((prev) => prev.map((input, ind) => (ind === index ? { ...input, imageUrl: '' } : input)))
+
+        const classifyFileInput = document.getElementById(`classify-image-${index}`)
+        if (classifyFileInput) {
+            classifyFileInput.value = ''
+        }
     }
 
     const addClassifyInput = () => {
@@ -392,7 +394,7 @@ function CreateProduct() {
                                         <div className="text">
                                             <span>Thêm hình ảnh</span>
                                         </div>
-                                        <input type="file" multiple id="file" onChange={handleImageUpload} />
+                                        <input type="file" multiple id="main-product-images" onChange={handleImageUpload} accept="image/*" />
                                     </label>
                                 )}
                             </div>
@@ -579,7 +581,7 @@ function CreateProduct() {
                                                                     </svg>
                                                                 </div>
 
-                                                                <input type="file" id="file" onChange={(e) => handleUploadImageClassify(e, index)} />
+                                                                <input type="file" accept="image/*" id={`classify-image-${index}`} onChange={(e) => handleUploadImageClassify(e, index)} />
                                                             </label>
                                                             {errors[`classifyInputs.${index}.image`] && <p className="text-danger fs-5">{errors[`classifyInputs.${index}.image`]}</p>}
                                                         </div>

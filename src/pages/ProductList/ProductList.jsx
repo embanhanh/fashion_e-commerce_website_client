@@ -8,6 +8,7 @@ import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, setSortOption } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
+import { removeDiacritics } from '../../utils/StringUtil'
 
 function ProductList() {
     const dispatch = useDispatch()
@@ -15,6 +16,7 @@ function ProductList() {
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
     const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
     const [selectedSizes, setSelectedSizes] = useState([])
+    const [selectedColors, setSelectedColors] = useState([])
 
     useEffect(() => {
         dispatch(fetchProducts())
@@ -44,9 +46,23 @@ function ProductList() {
         })
     }
 
+    const handleColorChange = (color) => {
+        setSelectedColors((prev) => {
+            if (prev.includes(color)) {
+                return prev.filter((c) => c !== color)
+            } else {
+                return [...prev, color]
+            }
+        })
+    }
+
     useEffect(() => {
         dispatch(setFilters({ size: selectedSizes }))
     }, [selectedSizes, dispatch])
+
+    useEffect(() => {
+        dispatch(setFilters({ color: selectedColors }))
+    }, [selectedColors, dispatch])
 
     const applyPriceFilter = () => {
         dispatch(setFilters({ priceRange }))
@@ -150,48 +166,19 @@ function ProductList() {
                             ]}
                             isOpen={true}
                         >
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color bg-danger"></div>
-                                    <p className="ms-3 fw-medium fs-4">Đỏ</p>
+                            {['Đen', 'Trắng', 'Đỏ', 'Xanh', 'Vàng', 'Cam', 'Nâu', 'Xám'].map((color) => (
+                                <div key={color} className="d-flex py-2 align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center">
+                                        <label className="d-flex align-items-center">
+                                            <input type="checkbox" className="input-checkbox" checked={selectedColors.includes(color)} onChange={() => handleColorChange(color)} />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <div className={`rounded-3 filter-color shadow-sm ms-3 bg-${removeDiacritics(color.toLowerCase())}`}></div>
+                                        <p className="ms-3 fw-medium fs-4">{color}</p>
+                                    </div>
+                                    <p className="fw-medium fs-4"></p>
                                 </div>
-                                <p className="fw-medium fs-4"></p>
-                            </div>
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color bg-primary"></div>
-                                    <p className="ms-3 fw-medium fs-4">Xanh dương</p>
-                                </div>
-                                <p className="fw-medium fs-4"></p>
-                            </div>
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color"></div>
-                                    <p className="ms-3 fw-medium fs-4">Cam</p>
-                                </div>
-                                <p className="fw-medium fs-4"></p>
-                            </div>
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color bg-black"></div>
-                                    <p className="ms-3 fw-medium fs-4">Đen</p>
-                                </div>
-                                <p className="fw-medium fs-4"></p>
-                            </div>
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color bg-success"></div>
-                                    <p className="ms-3 fw-medium fs-4 ">Xanh lá</p>
-                                </div>
-                                <p className="fw-medium fs-4"></p>
-                            </div>
-                            <div className="d-flex p-2 align-items-center justify-content-between">
-                                <div className="d-flex">
-                                    <div className="rounded-3 filter-color bg-warning"></div>
-                                    <p className="ms-3 fw-medium fs-4">Vàng</p>
-                                </div>
-                                <p className="fw-medium fs-4">(10)</p>
-                            </div>
+                            ))}
                         </Accordion>
                         <div className=" w-100 border-bottom mt-2"></div>
                         <Accordion

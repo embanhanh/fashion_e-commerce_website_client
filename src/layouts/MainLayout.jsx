@@ -127,7 +127,7 @@ function Mainlayout({ children }) {
                                     <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
                                         <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</Link>
                                         <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>
-                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller/products'}>
+                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
                                             Quản lý cửa hàng
                                         </Link>
                                         <Link className="user-action fs-4 fw-medium py-3 px-2">

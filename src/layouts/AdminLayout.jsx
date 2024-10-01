@@ -63,7 +63,7 @@ function Adminlayout({ children }) {
                         <Link className="fs-4 seller-option">Cài đặt vận chuyển</Link>
                     </Accordion>
                 </div>
-                <div className="h-100 p-4 w-100" style={{ marginLeft: '20%' }}>
+                <div className="h-100 p-4 w-100" style={{ marginLeft: '20%', minHeight: '100vh' }}>
                     {children}
                 </div>
             </div>

@@ -15,7 +15,7 @@ import Cart from '../pages/Cart/Cart.jsx'
 import ProductManagement from '../pages/admin/ProductManagement.jsx'
 import Adminlayout from '../layouts/AdminLayout.jsx'
 import CreateProduct from '../pages/admin/CreateProduct.jsx'
-
+import MainManager from '../pages/admin/MainManager.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -33,17 +33,18 @@ const publicRoutes = [
         path: '/user/profile',
         element: ProfileLayout,
         children: [
-            { path: '', element: Info, layout: Fragment }, // Thông tin cá nhân
-            { path: 'orders', element: Orders, layout: Fragment }, // Đơn hàng
-            { path: 'wishlists', element: Wishlists, layout: Fragment }, // Danh sách yêu thích
-            { path: 'addresses', element: Addresses, layout: Fragment }, // Địa chỉ
-            { path: 'savedcards', element: SavedCards, layout: Fragment }, // Thẻ đã lưu
-            { path: 'notifications', element: Notifications, layout: Fragment }, // Thông báo
-            { path: 'settings', element: Settings, layout: Fragment }, // Cài đặt
+            { path: '', element: Info, layout: Fragment },
+            { path: 'orders', element: Orders, layout: Fragment },
+            { path: 'wishlists', element: Wishlists, layout: Fragment },
+            { path: 'addresses', element: Addresses, layout: Fragment },
+            { path: 'savedcards', element: SavedCards, layout: Fragment },
+            { path: 'notifications', element: Notifications, layout: Fragment },
+            { path: 'settings', element: Settings, layout: Fragment },
         ],
     },
-    { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
     { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout },
+    { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
+    { path: '/seller', element: MainManager, layout: Adminlayout },
 ]
 const privateRoutes = []
 

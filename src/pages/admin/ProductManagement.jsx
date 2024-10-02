@@ -1,10 +1,133 @@
+import React, { useState } from 'react'
 import './ProductManagement.scss'
 import img from '../../assets/image/product_image/product_image_1.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faList } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
+import { BsGridFill } from 'react-icons/bs'
 
 function ProductManagement() {
+    const [viewMode, setViewMode] = useState('list')
+
+    const products = [
+        { name: 'Giày thể thao nam Adidas', category: 'Phụ kiện', price: '1.000.000đ', stockQuantity: 100, soldQuantity: 100 },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+        {
+            name: 'Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt',
+            category: 'Phụ kiện',
+            price: '1.000.000đ',
+            stockQuantity: 100,
+            soldQuantity: 100,
+        },
+
+        // Thêm các sản phẩm khác nếu cần
+    ]
+
+    const toggleViewMode = () => {
+        setViewMode((prevMode) => (prevMode === 'list' ? 'grid' : 'list'))
+    }
+
+    const renderProductItem = (product, index) => {
+        if (viewMode === 'list') {
+            return (
+                <div key={index} className="product-grid product-row">
+                    <div className="checkbox-cell">
+                        <label className="d-flex align-items-center">
+                            <input type="checkbox" className="input-checkbox" />
+                            <span className="custom-checkbox"></span>
+                        </label>
+                    </div>
+                    <div className="product-info">
+                        <img src={img} alt="" className="product-image" />
+                        <p className="fs-4 fw-medium">{product.name}</p>
+                    </div>
+                    <p className="fs-4 fw-medium text-center">{product.category}</p>
+                    <p className="fs-4 fw-medium text-center">{product.price}</p>
+                    <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
+                    <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>
+                    <div className="d-flex align-items-center flex-column">
+                        <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                        <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" />
+                        <button className="primary-btn shadow-none px-2 py-0">
+                            <p className="">Chi tiết</p>
+                        </button>
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div key={index} className="product-grid-item">
+                    <img src={img} alt="" className="product-image" />
+                    <div className="product-details">
+                        <p className="fs-4 fw-medium product-name">{product.name}</p>
+                        <div className="product-info">
+                            <p className="fs-4 fw-medium">{product.price}</p>
+                            <div className="d-flex align-items-center justify-content-between w-100">
+                                <p className="fs-4 fw-medium">kho: {product.stockQuantity}</p>
+                                <p className="fs-4 fw-medium">đã bán: {product.soldQuantity}</p>
+                            </div>
+                            <div className="d-flex justify-content-center">
+                                <FontAwesomeIcon icon={faPen} className="fs-3 p-2 mx-2" color="#4a90e2" />
+                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 mx-2" color="#e74c3c" />
+                                <button className="primary-btn shadow-none px-2 py-0">
+                                    <p className="m-0">Chi tiết</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+    }
+
     return (
         <>
             <div className=" pb-5">
@@ -97,62 +220,28 @@ function ProductManagement() {
                     </div>
                     <div className="p-3">
                         <div className="border rounded-2 p-3">
-                            <div className="product-grid product-header">
-                                <div className="checkbox-cell">
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                                <p className="fs-4 fw-medium">Tên sản phẩm</p>
-                                <p className="fs-4 fw-medium text-center">Danh mục</p>
-                                <p className="fs-4 fw-medium text-center">Giá bán</p>
-                                <p className="fs-4 fw-medium text-center">Kho hàng</p>
-                                <p className="fs-4 fw-medium text-center">Đã bán</p>
-                                <div className="d-flex align-items-center flex-column">
-                                    <FontAwesomeIcon icon={faList} className="fs-3 p-2" />
-                                </div>
-                            </div>
-                            <div className="product-grid product-row">
-                                <div className="checkbox-cell">
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                                <div className="product-info">
-                                    <img src={img} alt="" className="product-image" />
-                                    <p className="fs-4 fw-medium ">Giày thể thao nam Adidas</p>
-                                </div>
-                                <p className="fs-4 fw-medium text-center">Phụ kiện</p>
-                                <p className="fs-4 fw-medium text-center">1.000.000đ</p>
-                                <p className="fs-4 fw-medium text-center">100</p>
-                                <p className="fs-4 fw-medium text-center">100</p>
-                                <div className="d-flex align-items-center flex-column">
-                                    <FontAwesomeIcon icon={faPen} className="fs-3 p-2" color="#4a90e2" />
-                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 mt-2 p-2" color="#e74c3c" />
+                            <div className="product-header product-grid">
+                                {viewMode === 'list' && (
+                                    <>
+                                        <div className="checkbox-cell">
+                                            <label className="d-flex align-items-center">
+                                                <input type="checkbox" className="input-checkbox" />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                        </div>
+                                        <p className="fs-4 fw-medium">Tên sản phẩm</p>
+                                        <p className="fs-4 fw-medium text-center">Danh mục</p>
+                                        <p className="fs-4 fw-medium text-center">Giá bán</p>
+                                        <p className="fs-4 fw-medium text-center">Kho hàng</p>
+                                        <p className="fs-4 fw-medium text-center">Đã bán</p>
+                                    </>
+                                )}
+                                <div className="d-flex align-items-center">
+                                    <FontAwesomeIcon icon={faList} className={`fs-3 p-2 hover-icon ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} />
+                                    <BsGridFill className={`p-2 ms-2 hover-icon ${viewMode === 'grid' ? 'active' : ''}`} size={27.5} onClick={() => setViewMode('grid')} />
                                 </div>
                             </div>
-                            <div className="product-grid product-row">
-                                <div className="checkbox-cell">
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                                <div className="product-info">
-                                    <img src={img} alt="" className="product-image" />
-                                    <p className="fs-4 fw-medium">Giày thể thao nam Adidas phong cách thể thao với độ bền cao của chất liệu cao su và phối màu đẹp mắt asdasda a sd á dá da sds a </p>
-                                </div>
-                                <p className="fs-4 fw-medium text-center">Phụ kiện</p>
-                                <p className="fs-4 fw-medium text-center">1.000.000đ</p>
-                                <p className="fs-4 fw-medium text-center">100</p>
-                                <p className="fs-4 fw-medium text-center">100</p>
-                                <div className="d-flex align-items-center flex-column">
-                                    <FontAwesomeIcon icon={faPen} className="fs-3 p-2" color="#4a90e2" />
-                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 mt-2 p-2" color="#e74c3c" />
-                                </div>
-                            </div>
+                            <div className={`product-container ${viewMode}`}>{products.map((product, index) => renderProductItem(product, index))}</div>
                         </div>
                     </div>
                 </div>

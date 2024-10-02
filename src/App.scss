@@ -201,6 +201,11 @@ input[type='number'] {
     transition: 300ms;
     color: #000;
     font-weight: 500;
+    &:hover {
+        .options {
+            z-index: 1;
+        }
+    }
 }
 
 .selected {
@@ -238,6 +243,7 @@ input[type='number'] {
     opacity: 0;
     transition: 300ms;
     border: 1px solid #000;
+    z-index: -1;
 }
 
 .select:hover > .options {

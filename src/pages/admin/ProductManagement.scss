@@ -8,6 +8,13 @@
     gap: 10px;
     align-items: center;
 
+    .hover-icon {
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+    }
+
     &.product-header {
         font-weight: bold;
         border-bottom: 1px solid #ddd;
@@ -82,5 +89,80 @@
                 color: #c0392b;
             }
         }
+    }
+}
+
+.product-container {
+    &.list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &.grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+}
+
+.product-grid-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .product-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: space-between;
+    }
+
+    .product-name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        height: 2.4em; // Đảm bảo chiều cao cố định cho 2 dòng
+        margin-bottom: 10px;
+    }
+
+    .product-info {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    p {
+        margin: 5px 0;
+    }
+    .hover-icon {
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: #4a90e2;
+        }
+    }
+}
+
+.hover-icon {
+    &.active {
+        color: #4a90e2;
     }
 }

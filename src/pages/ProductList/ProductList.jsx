@@ -1,27 +1,38 @@
 import './ProductList.scss'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProducts, setFilters, setSortOption } from '../../redux/slices/productSlice'
+import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { removeDiacritics } from '../../utils/StringUtil'
+import { debounce } from 'lodash'
 
 function ProductList() {
     const dispatch = useDispatch()
-    const { allProducts, filteredProducts, filters, status, error } = useSelector((state) => state.product)
+    const { products, totalPages, currentPage, filters, sortOption, status } = useSelector((state) => state.product)
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
     const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
     const [selectedSizes, setSelectedSizes] = useState([])
     const [selectedColors, setSelectedColors] = useState([])
 
+    const debouncedFetchProducts = useCallback(
+        debounce(() => {
+            dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage }))
+        }, 300),
+        [dispatch, filters, sortOption, currentPage]
+    )
+
     useEffect(() => {
-        dispatch(fetchProducts())
         dispatch(fetchCategories())
     }, [dispatch])
+
+    useEffect(() => {
+        debouncedFetchProducts()
+    }, [debouncedFetchProducts])
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -76,14 +87,12 @@ function ProductList() {
         dispatch(setSortOption(e.target.value))
     }
 
-    // Pagination
-    const [currentPage, setCurrentPage] = useState(1)
-    const productsPerPage = 12
-    const indexOfLastProduct = currentPage * productsPerPage
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
-    const paginate = (pageNumber) => setCurrentPage(pageNumber)
-    const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+    const handlePageChange = useCallback(
+        (page) => {
+            dispatch(setCurrentPage(page))
+        },
+        [dispatch]
+    )
 
     return (
         <>
@@ -246,19 +255,19 @@ function ProductList() {
                                     <div className="dot"></div>
                                 </section>
                             )}
-                            {currentProducts.map((product, index) => (
+                            {products.map((product, index) => (
                                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4">
                                     <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
                                 </div>
                             ))}
-                            {currentProducts.length === 0 && (
+                            {products.length === 0 && (
                                 <div className="d-flex justify-content-center align-items-center">
                                     <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
                                 </div>
                             )}
                         </div>
                         <div className="">
-                            <Pagination>
+                            {/* <Pagination>
                                 <Pagination.Prev
                                     onClick={() => {
                                         window.scrollTo(0, 0)
@@ -282,6 +291,13 @@ function ProductList() {
                                 >
                                     <FontAwesomeIcon icon={faCaretRight} size="lg" />
                                 </Pagination.Next>
+                            </Pagination> */}
+                            <Pagination>
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
+                                        {index + 1}
+                                    </Pagination.Item>
+                                ))}
                             </Pagination>
                         </div>
                     </div>

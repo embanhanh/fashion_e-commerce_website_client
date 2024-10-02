@@ -2,9 +2,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getAllProducts } from '../../services/ProductService'
 import _ from 'lodash'
 
-export const fetchProducts = createAsyncThunk('product/fetchProducts', async (_, { rejectWithValue }) => {
+export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
     try {
-        const response = await getAllProducts()
+        console.log(params)
+        const response = await getAllProducts(params)
         return response
     } catch (error) {
         return rejectWithValue(error.response.data)
@@ -14,13 +15,17 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async (_,
 const productSlice = createSlice({
     name: 'product',
     initialState: {
-        allProducts: [],
-        filteredProducts: [],
+        products: [],
+        totalPages: 0,
+        currentPage: 1,
         filters: {
             category: [],
             priceRange: { min: 0, max: Infinity },
             color: [],
             size: [],
+            stockQuantity: { min: 0, max: Infinity },
+            soldQuantity: { min: 0, max: Infinity },
+            search: '',
         },
         sortOption: '',
         status: 'idle',
@@ -29,11 +34,14 @@ const productSlice = createSlice({
     reducers: {
         setFilters: (state, action) => {
             state.filters = { ...state.filters, ...action.payload }
-            state.filteredProducts = applyFilters(state.allProducts, state.filters)
+            state.currentPage = 1
         },
         setSortOption: (state, action) => {
             state.sortOption = action.payload
-            state.filteredProducts = applySorting(state.filteredProducts, action.payload)
+            state.currentPage = 1
+        },
+        setCurrentPage: (state, action) => {
+            state.currentPage = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -43,8 +51,9 @@ const productSlice = createSlice({
             })
             .addCase(fetchProducts.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.allProducts = action.payload
-                state.filteredProducts = action.payload
+                state.products = action.payload.products
+                state.totalPages = action.payload.totalPages
+                state.currentPage = action.payload.currentPage
             })
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.status = 'failed'
@@ -81,6 +90,6 @@ const applySorting = (products, sortOption) => {
     }
 }
 
-export const { setFilters, setSortOption } = productSlice.actions
+export const { setFilters, setSortOption, setCurrentPage } = productSlice.actions
 
 export default productSlice.reducer

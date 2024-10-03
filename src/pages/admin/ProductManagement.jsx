@@ -79,7 +79,7 @@ function ProductManagement() {
                     <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
                     <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>
                     <div className="d-flex align-items-center flex-column">
-                        <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                        <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/products/edit/${product.slug}`)} />
                         <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" />
                         <button className="primary-btn shadow-none px-2 py-0">
                             <p className="">Chi tiết</p>
@@ -100,7 +100,7 @@ function ProductManagement() {
                                 <p className="fs-4 fw-medium">đã bán: {product.soldQuantity}</p>
                             </div>
                             <div className="d-flex justify-content-center">
-                                <FontAwesomeIcon icon={faPen} className="fs-3 p-2 mx-2" color="#4a90e2" />
+                                <FontAwesomeIcon icon={faPen} className="fs-3 p-2 mx-2" color="#4a90e2" onClick={() => navigate(`/seller/products/edit/${product.slug}`)} />
                                 <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 mx-2" color="#e74c3c" />
                                 <button className="primary-btn shadow-none px-2 py-0">
                                     <p className="m-0">Chi tiết</p>

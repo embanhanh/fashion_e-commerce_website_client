@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAllProducts, getProductByProductName } from '../../services/ProductService'
+import { getAllProducts, getProductByProductName, updateProduct } from '../../services/ProductService'
 import _ from 'lodash'
 
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
@@ -18,6 +18,15 @@ export const fetchProductByProductName = createAsyncThunk('product/fetchProductB
         return response
     } catch (error) {
         return rejectWithValue(error.response.data)
+    }
+})
+
+export const updateProductAction = createAsyncThunk('product/updateProduct', async ({ product_name, productData }, { rejectWithValue }) => {
+    try {
+        const response = await updateProduct(product_name, productData)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Failed to update product')
     }
 })
 
@@ -72,12 +81,13 @@ const productSlice = createSlice({
             .addCase(fetchProductByProductName.fulfilled, (state, action) => {
                 state.currentProduct = action.payload
             })
-        // .addCase(updateProduct.fulfilled, (state, action) => {
-        //     const index = state.products.findIndex(p => p._id === action.payload._id)
-        //     if (index !== -1) {
-        //         state.products[index] = action.payload
-        //     }
-        // })
+            .addCase(updateProductAction.fulfilled, (state, action) => {
+                state.currentProduct = action.payload.product
+                const index = state.products.findIndex((p) => p._id === action.payload.product._id)
+                if (index !== -1) {
+                    state.products[index] = action.payload.product
+                }
+            })
     },
 })
 

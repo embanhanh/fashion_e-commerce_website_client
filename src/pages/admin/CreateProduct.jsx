@@ -5,7 +5,7 @@ import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchCategories, addNewCategory } from '../../redux/slices/categorySlice'
-import { fetchProductByProductName } from '../../redux/slices/productSlice'
+import { fetchProductByProductName, updateProductAction } from '../../redux/slices/productSlice'
 import { createProduct } from '../../services/ProductService'
 import AddCategoryModal from '../../components/AddCategoryModal'
 import CategoryDropdown from '../../components/CategoryDropdown'
@@ -74,9 +74,32 @@ function CreateProduct() {
     }, [dispatch, product_name])
 
     useEffect(() => {
-        if (id && currentProduct) {
+        if (product_name && currentProduct) {
+            console.log(currentProduct)
+            setName(currentProduct.name)
+            setDescription(currentProduct.description)
+            setOriginalPrice(currentProduct.originalPrice)
+            setBrand(currentProduct.brand)
+            setMaterial(currentProduct.material)
+            setStockQuantity(currentProduct.stockQuantity)
+            setDiscount(currentProduct.discount)
+            setIsFeatured(currentProduct.isFeatured)
+            setMinOrderQuantity(currentProduct.minOrderQuantity)
+            setMaxOrderQuantity(currentProduct.maxOrderQuantity)
+            setSelectedCategories(currentProduct.categories)
+            setImages(currentProduct.urlImage)
+            setIsClassify(currentProduct.variants.length > 0)
+            let classify = []
+            if (currentProduct.variants.length > 0 && currentProduct.variants.find((variant) => variant.color !== '')) {
+                classify.push('color')
+            }
+            if (currentProduct.variants.length > 0 && currentProduct.variants.find((variant) => variant.size !== '')) {
+                classify.push('size')
+            }
+            setSelectedClassify(classify)
+            setClassifyInputs(currentProduct.variants.map((variant) => ({ ...variant, id: variant._id })))
         }
-    }, [id, currentProduct])
+    }, [product_name, currentProduct])
 
     const clearError = (field) => {
         setErrors((prevErrors) => {
@@ -184,9 +207,13 @@ function CreateProduct() {
             try {
                 const uploadedImageUrls = await Promise.all(
                     images.map(async (image) => {
-                        const response = await fetch(image)
-                        const blob = await response.blob()
-                        return uploadImage(blob)
+                        if (image.startsWith('https://firebasestorage.googleapis.com')) {
+                            return image
+                        } else {
+                            const response = await fetch(image)
+                            const blob = await response.blob()
+                            return uploadImage(blob)
+                        }
                     })
                 )
                 const validVariants = await Promise.all(
@@ -227,13 +254,18 @@ function CreateProduct() {
                     maxOrderQuantity: parseInt(maxOrderQuantity) || 100,
                 }
 
-                const response = await createProduct(productData)
-                setIsLoading(false)
+                if (product_name) {
+                    const response = await dispatch(updateProductAction({ product_name, productData }))
+                    if (response.payload.product) {
+                        setMessage({ type: 'success', title: 'Cập nhật sản phẩm thành công', description: '' })
+                    }
+                } else {
+                    const response = await createProduct(productData)
+                    if (response) {
+                        setMessage({ type: 'success', title: 'Thêm sản phẩm thành công', description: '' })
+                    }
+                }
                 resetForm()
-                setMessage({ type: 'success', title: 'Thêm sản phẩm thành công', description: '' })
-
-                console.log(productData)
-                // Xử lý sau khi tạo sản phẩm thành công
             } catch (error) {
                 console.error('Error creating product:', error)
                 setMessage({ type: 'error', title: error.message || 'Có lỗi xảy ra khi tạo sản phẩm', description: 'Vui lòng thử lại' })
@@ -271,7 +303,7 @@ function CreateProduct() {
 
     // Hàm render các ảnh đã upload
     const renderImages = () => {
-        return images.map((image, index) => (
+        return images?.map((image, index) => (
             <div key={index} className="uploaded-image position-relative">
                 <img src={image} alt={`Uploaded ${index}`} className="uploaded-img" />
                 {index === 0 && (
@@ -391,7 +423,7 @@ function CreateProduct() {
                                 {renderImages()}
 
                                 {/* Hiển thị nút thêm ảnh nếu số ảnh nhỏ hơn 5 */}
-                                {images.length < 5 && (
+                                {images?.length < 5 && (
                                     <label className="custum-file-upload">
                                         <div className="icon-image">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" className="upload-icon">
@@ -613,6 +645,7 @@ function CreateProduct() {
                                                                         className="input-text w-100 p-2"
                                                                         placeholder="Màu sắc"
                                                                         onChange={(e) => handleClassifyInputChange(index, 'color', e.target.value)}
+                                                                        value={input.color}
                                                                     />
                                                                 </div>
                                                                 {errors[`classifyInputs.${index}.color`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.color`]}</p>}
@@ -627,6 +660,7 @@ function CreateProduct() {
                                                                         className="input-text w-100 p-2"
                                                                         placeholder="Kích cỡ"
                                                                         onChange={(e) => handleClassifyInputChange(index, 'size', e.target.value)}
+                                                                        value={input.size}
                                                                     />
                                                                 </div>
                                                                 {errors[`classifyInputs.${index}.size`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.size`]}</p>}
@@ -639,6 +673,7 @@ function CreateProduct() {
                                                                 className="input-text w-100 p-2"
                                                                 placeholder="Số lượng"
                                                                 onChange={(e) => handleClassifyInputChange(index, 'stockQuantity', e.target.value)}
+                                                                value={input.stockQuantity}
                                                             />
                                                         </div>
                                                         {errors[`classifyInputs.${index}.stockQuantity`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.stockQuantity`]}</p>}
@@ -649,6 +684,7 @@ function CreateProduct() {
                                                                 className="input-text w-100 p-2"
                                                                 placeholder="Giá"
                                                                 onChange={(e) => handleClassifyInputChange(index, 'price', e.target.value)}
+                                                                value={input.price}
                                                             />
                                                         </div>
                                                         {errors[`classifyInputs.${index}.price`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.price`]}</p>}

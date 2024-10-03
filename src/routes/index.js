@@ -42,6 +42,7 @@ const publicRoutes = [
             { path: 'settings', element: Settings, layout: Fragment },
         ],
     },
+    { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout },
     { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout },
     { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
     { path: '/seller', element: MainManager, layout: Adminlayout },

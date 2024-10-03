@@ -28,3 +28,12 @@ export const getProductByProductName = async (product_name) => {
         throw error.response.data
     }
 }
+
+export const updateProduct = async (product_name, productData) => {
+    try {
+        const response = await axios.put(`${API_URL}edit/${product_name}`, productData)
+        return response.data
+    } catch (error) {
+        throw error.response ? error.response.data : new Error('Network Error')
+    }
+}

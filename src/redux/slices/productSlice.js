@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAllProducts } from '../../services/ProductService'
+import { getAllProducts, getProductByProductName } from '../../services/ProductService'
 import _ from 'lodash'
 
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
@@ -12,9 +12,19 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async (pa
     }
 })
 
+export const fetchProductByProductName = createAsyncThunk('product/fetchProductByProductName', async (product_name, { rejectWithValue }) => {
+    try {
+        const response = await getProductByProductName(product_name)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.response.data)
+    }
+})
+
 const productSlice = createSlice({
     name: 'product',
     initialState: {
+        currentProduct: null,
         products: [],
         totalPages: 0,
         currentPage: 1,
@@ -59,36 +69,17 @@ const productSlice = createSlice({
                 state.status = 'failed'
                 state.error = action.error.message
             })
+            .addCase(fetchProductByProductName.fulfilled, (state, action) => {
+                state.currentProduct = action.payload
+            })
+        // .addCase(updateProduct.fulfilled, (state, action) => {
+        //     const index = state.products.findIndex(p => p._id === action.payload._id)
+        //     if (index !== -1) {
+        //         state.products[index] = action.payload
+        //     }
+        // })
     },
 })
-
-const applyFilters = (products, filters) => {
-    return products.filter((product) => {
-        const categoryMatch = filters.category.length === 0 || product.categories.some((cat) => filters.category.includes(cat._id) || filters.category.includes(cat.parentCategory))
-        const priceMatch =
-            product.originalPrice - (product.originalPrice * product.discount) / 100 >= filters.priceRange.min &&
-            product.originalPrice - (product.originalPrice * product.discount) / 100 <= filters.priceRange.max
-        const colorMatch = filters.color.length === 0 || product.variants.some((variant) => filters.color.some((color) => variant.color.toLowerCase().trim().includes(color.toLowerCase().trim())))
-        const sizeMatch = filters.size.length === 0 || filters.size.some((size) => product.variants.some((v) => v.size.toLowerCase().trim() === size.toLowerCase().trim()))
-
-        return categoryMatch && priceMatch && colorMatch && sizeMatch
-    })
-}
-
-const applySorting = (products, sortOption) => {
-    switch (sortOption) {
-        case 'priceAsc':
-            return _.orderBy(products, ['originalPrice'], ['asc'])
-        case 'priceDesc':
-            return _.orderBy(products, ['originalPrice'], ['desc'])
-        case 'newest':
-            return _.orderBy(products, ['createdAt'], ['desc'])
-        case 'popular':
-            return _.orderBy(products, ['rating'], ['desc'])
-        default:
-            return products
-    }
-}
 
 export const { setFilters, setSortOption, setCurrentPage } = productSlice.actions
 

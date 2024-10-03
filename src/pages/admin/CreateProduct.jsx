@@ -5,6 +5,7 @@ import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchCategories, addNewCategory } from '../../redux/slices/categorySlice'
+import { fetchProductByProductName } from '../../redux/slices/productSlice'
 import { createProduct } from '../../services/ProductService'
 import AddCategoryModal from '../../components/AddCategoryModal'
 import CategoryDropdown from '../../components/CategoryDropdown'
@@ -14,8 +15,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { Badge } from 'react-bootstrap'
 import Notification from '../../components/Notification'
 import { Modal } from 'react-bootstrap'
+import { useNavigate, useParams } from 'react-router-dom'
 
 function CreateProduct() {
+    const { product_name } = useParams()
+    const { currentProduct } = useSelector((state) => state.product)
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { categories, status, error } = useSelector((state) => state.category)
     const [images, setImages] = useState([]) //state images cho sản phẩm
@@ -61,6 +66,17 @@ function CreateProduct() {
             dispatch(fetchCategories())
         }
     }, [status, dispatch])
+
+    useEffect(() => {
+        if (product_name) {
+            dispatch(fetchProductByProductName(product_name))
+        }
+    }, [dispatch, product_name])
+
+    useEffect(() => {
+        if (id && currentProduct) {
+        }
+    }, [id, currentProduct])
 
     const clearError = (field) => {
         setErrors((prevErrors) => {
@@ -734,7 +750,11 @@ function CreateProduct() {
                                     </div>
                                 )}
                             </button>
+                            <button className="border ms-4 bg-white" onClick={() => navigate(-1)}>
+                                <p>Hủy</p>
+                            </button>
                         </div>
+
                         {Object.keys(errors).length !== 0 && <p className="text-danger ms-2 pt-2">Vui lòng điền đầy đủ thông tin cần thiết cho sản phẩm</p>}
                     </div>
                 </section>

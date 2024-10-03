@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import './ProductManagement.scss'
-import img from '../../assets/image/product_image/product_image_1.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faList } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
@@ -9,8 +8,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { debounce } from 'lodash'
+import { useNavigate } from 'react-router-dom'
+import CategoryDropdown from '../../components/CategoryDropdown'
 
 function ProductManagement() {
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { products, totalPages, currentPage, filters, sortOption, status } = useSelector((state) => state.product)
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
@@ -18,6 +20,7 @@ function ProductManagement() {
     const [stockQuantityRange, setStockQuantityRange] = useState({ min: 0, max: Infinity })
     const [soldQuantityRange, setSoldQuantityRange] = useState({ min: 0, max: Infinity })
     const [search, setSearch] = useState('')
+    const [selectedCategories, setSelectedCategories] = useState([])
 
     const debouncedFetchProducts = useCallback(
         debounce(() => {
@@ -34,12 +37,27 @@ function ProductManagement() {
         dispatch(fetchCategories())
     }, [dispatch])
 
+    const handleSelectCategory = (category) => {
+        setSelectedCategories([category])
+    }
+
     const handleStockQuantityChange = (type, value) => {
         setStockQuantityRange((prev) => ({ ...prev, [type]: value }))
     }
 
     const handleSoldQuantityChange = (type, value) => {
         setSoldQuantityRange((prev) => ({ ...prev, [type]: value }))
+    }
+
+    const handleSubmitFilters = () => {
+        dispatch(
+            setFilters({
+                stockQuantity: stockQuantityRange,
+                soldQuantity: soldQuantityRange,
+                search,
+                category: selectedCategories.map((category) => category._id),
+            })
+        )
     }
 
     const renderProductItem = (product, index) => {
@@ -57,7 +75,7 @@ function ProductManagement() {
                         <p className="fs-4 fw-medium">{product.name}</p>
                     </div>
                     <p className="fs-4 fw-medium text-center">{product.categories.map((category) => categories.find((c) => c._id === category).name).join(', ')}</p>
-                    <p className="fs-4 fw-medium text-center">{product.originalPrice * product.discount}</p>
+                    <p className="fs-4 fw-medium text-center">{product.originalPrice - (product.originalPrice * product.discount) / 100}</p>
                     <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
                     <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>
                     <div className="d-flex align-items-center flex-column">
@@ -76,7 +94,7 @@ function ProductManagement() {
                     <div className="product-details">
                         <p className="fs-4 fw-medium product-name">{product.name}</p>
                         <div className="product-info">
-                            <p className="fs-4 fw-medium">{product.originalPrice * product.discount}</p>
+                            <p className="fs-4 fw-medium">{product.originalPrice - (product.originalPrice * product.discount) / 100}</p>
                             <div className="d-flex align-items-center justify-content-between w-100">
                                 <p className="fs-4 fw-medium">kho: {product.stockQuantity}</p>
                                 <p className="fs-4 fw-medium">đã bán: {product.soldQuantity}</p>
@@ -109,9 +127,7 @@ function ProductManagement() {
                         </div>
                         <div className="col-6 d-flex align-items-center">
                             <p className="fs-4 fw-medium text-nowrap me-4 label-width text-end">Danh mục</p>
-                            <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="" />
-                            </div>
+                            <CategoryDropdown categories={categories} onSelect={handleSelectCategory} selectedCategories={selectedCategories} isMultiple={false} />
                         </div>
                         <div className="col-6 d-flex align-items-center">
                             <p className="fs-4 fw-medium text-nowrap me-4 label-width text-end">Kho hàng</p>
@@ -138,19 +154,21 @@ function ProductManagement() {
                         <button
                             className="primary-btn shadow-none py-1 px-4 rounded-2 border-1"
                             onClick={() => {
-                                dispatch(
-                                    setFilters({
-                                        stockQuantity: stockQuantityRange,
-                                        soldQuantity: soldQuantityRange,
-                                        search,
-                                    })
-                                )
+                                handleSubmitFilters()
                             }}
                         >
                             <p className="fs-4 fw-medium">Tìm</p>
                         </button>
 
-                        <button className="ms-3 py-1 px-4 rounded-2 border bg-white">
+                        <button
+                            className="ms-3 py-1 px-4 rounded-2 border bg-white"
+                            onClick={() => {
+                                setSearch('')
+                                setStockQuantityRange({ min: 0, max: Infinity })
+                                setSoldQuantityRange({ min: 0, max: Infinity })
+                                setSelectedCategories([])
+                            }}
+                        >
                             <p className="fs-4 fw-medium">Nhập lại</p>
                         </button>
                     </div>
@@ -160,7 +178,7 @@ function ProductManagement() {
                     <div className="p-3 d-flex align-items-center justify-content-between">
                         <p className="fs-3 fw-medium">20 sản phẩm</p>
                         <div className="d-flex">
-                            <button className="primary-btn shadow-none py-2 px-4 rounded-2 border-1">
+                            <button className="primary-btn shadow-none py-2 px-4 rounded-2 border-1" onClick={() => navigate('/seller/products/create')}>
                                 <p className="fs-4 fw-medium">
                                     Thêm sản phẩm mới <span className="ms-2">+</span>
                                 </p>

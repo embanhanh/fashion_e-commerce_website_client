@@ -19,3 +19,12 @@ export const getAllProducts = async (params) => {
         throw error.response.data
     }
 }
+
+export const getProductByProductName = async (product_name) => {
+    try {
+        const response = await axios.get(API_URL + product_name)
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

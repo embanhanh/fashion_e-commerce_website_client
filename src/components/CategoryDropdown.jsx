@@ -3,7 +3,7 @@ import './CategoryDropdown.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 
-const CategoryDropdown = ({ categories, onSelect, selectedCategories }) => {
+const CategoryDropdown = ({ categories, onSelect, selectedCategories, isMultiple = true }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [activeParent, setActiveParent] = useState(null)
     const dropdownRef = useRef(null)
@@ -35,18 +35,18 @@ const CategoryDropdown = ({ categories, onSelect, selectedCategories }) => {
         }
     }, [])
 
-    const handleParentHover = (parentId) => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current)
-        }
-        setActiveParent(parentId)
-    }
+    // const handleParentHover = (parentId) => {
+    //     if (timeoutRef.current) {
+    //         clearTimeout(timeoutRef.current)
+    //     }
+    //     setActiveParent(parentId)
+    // }
 
-    const handleContentMouseLeave = () => {
-        timeoutRef.current = setTimeout(() => {
-            setActiveParent(null)
-        }, 100)
-    }
+    // const handleContentMouseLeave = () => {
+    //     timeoutRef.current = setTimeout(() => {
+    //         setActiveParent(null)
+    //     }, 100)
+    // }
 
     const handleSelect = (category) => {
         onSelect(category)
@@ -60,7 +60,9 @@ const CategoryDropdown = ({ categories, onSelect, selectedCategories }) => {
     return (
         <div className="category-dropdown" ref={dropdownRef}>
             <div className="dropdown-header form-control d-flex justify-content-between align-items-center py-3 rounded-0" onClick={() => setIsOpen(!isOpen)}>
-                <span className="fs-4 text-body-secondary fw-medium">{selectedCategories.length > 0 ? `Đã chọn ${selectedCategories.length} danh mục` : 'Chọn danh mục'}</span>
+                <span className="fs-4 text-body-secondary fw-medium">
+                    {selectedCategories.length > 0 ? `${!isMultiple ? selectedCategories[0].name : `Đã chọn ${selectedCategories.length} danh mục`}` : 'Chọn danh mục'}
+                </span>
                 <FontAwesomeIcon icon={isOpen ? faCaretUp : faCaretDown} className="ms-3" />
             </div>
             {isOpen && filteredCategories.length > 0 && (

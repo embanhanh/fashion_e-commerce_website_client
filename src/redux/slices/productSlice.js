@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAllProducts, getProductByProductName, updateProduct } from '../../services/ProductService'
+import { getAllProducts, getProductByProductName, updateProduct, deleteProduct } from '../../services/ProductService'
 import _ from 'lodash'
 
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
@@ -27,6 +27,15 @@ export const updateProductAction = createAsyncThunk('product/updateProduct', asy
         return response
     } catch (error) {
         return rejectWithValue(error.message || 'Failed to update product')
+    }
+})
+
+export const deleteProductAction = createAsyncThunk('product/deleteProduct', async (product_name, { rejectWithValue }) => {
+    try {
+        const response = await deleteProduct(product_name)
+        return { product_name, message: response.message }
+    } catch (error) {
+        return rejectWithValue(error.message || 'Failed to delete product')
     }
 })
 
@@ -87,6 +96,12 @@ const productSlice = createSlice({
                 if (index !== -1) {
                     state.products[index] = action.payload.product
                 }
+            })
+            .addCase(deleteProductAction.fulfilled, (state, action) => {
+                state.products = state.products.filter((product) => product.slug !== action.payload.product_name)
+            })
+            .addCase(deleteProductAction.rejected, (state, action) => {
+                state.error = action.payload
             })
     },
 })

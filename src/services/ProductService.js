@@ -37,3 +37,12 @@ export const updateProduct = async (product_name, productData) => {
         throw error.response ? error.response.data : new Error('Network Error')
     }
 }
+
+export const deleteProduct = async (product_name) => {
+    try {
+        const response = await axios.delete(`${API_URL}delete/${product_name}`)
+        return response.data
+    } catch (error) {
+        throw error.response ? error.response.data : new Error('Network Error')
+    }
+}

@@ -36,7 +36,7 @@ function Mainlayout({ children }) {
 
     return (
         <>
-            <div className={`header d-flex  ${location.pathname === '/' && 'position-fixed top-0 end-0 start-0 shadow'}`}>
+            <div className={`header d-flex  ${location.pathname === '/' && 'position-fixed top-0 end-0 start-0 '} shadow`}>
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">
                         <LogoShop type={'dark'} />

@@ -12,11 +12,16 @@ import brand1 from '../../assets/image/brand/brand-1.png'
 import brand2 from '../../assets/image/brand/brand-2.png'
 import Notification from '../../components/Notification'
 import LogoShop from '../../components/LogoShop'
+import { useDispatch, useSelector } from 'react-redux'
+import { loginWithFirebaseAction, registerUser, loginUser } from '../../redux/slices/authSlice'
 
 function Auth() {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
     const mode = location.pathname == '/user/signup' ? 'signup' : 'login'
+    const { from } = location.state || { from: '/' }
+    const { isLoggedIn, loading } = useSelector((state) => state.auth)
 
     useEffect(() => {
         setAuthError('')
@@ -57,11 +62,8 @@ function Auth() {
                 const user = result.user
                 const idToken = await user.getIdToken()
 
-                const response = await loginWithFirebase({ token: idToken }, 'facebook')
-                if (response) {
-                    localStorage.setItem('token', response.token)
-                    setNotication('success_login')
-                }
+                await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'facebook' })).unwrap()
+                setNotication('success_login')
             }
         } catch (error) {
             const errorMessage = error.message
@@ -78,17 +80,42 @@ function Auth() {
                 const user = result.user
                 const idToken = await user.getIdToken()
 
-                const response = await loginWithFirebase({ token: idToken }, 'google')
-                if (response) {
-                    localStorage.setItem('token', response.token)
-                    setNotication('success_login')
-                }
+                await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'google' })).unwrap()
+                setNotication('success_login')
             }
         } catch (error) {
             const errorMessage = error.message
             setAuthError(errorMessage)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleSubmit = async () => {
+        if (mode === 'signup') {
+            if (confirmPassword !== password) {
+                setError3('Mật khẩu nhập lại không trùng khớp')
+            } else {
+                setIsLoading(true)
+                try {
+                    await dispatch(registerUser({ email, password })).unwrap()
+                    setNotication('success_signup')
+                } catch (e) {
+                    setAuthError(e.message)
+                } finally {
+                    setIsLoading(false)
+                }
+            }
+        } else {
+            setIsLoading(true)
+            try {
+                await dispatch(loginUser({ email, password })).unwrap()
+                setNotication('success_login')
+            } catch (e) {
+                setAuthError(e.message)
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 
@@ -104,7 +131,7 @@ function Auth() {
     useEffect(() => {
         if (notication == 'success_login') {
             setTimeout(() => {
-                navigate('/')
+                navigate(from)
             }, 1000)
         }
         if (notication == 'success_signup') {
@@ -113,7 +140,7 @@ function Auth() {
                 setNotication('')
             }, 1000)
         }
-    }, [notication])
+    }, [notication, navigate, from])
 
     return (
         <>
@@ -396,38 +423,7 @@ function Auth() {
                                 <button
                                     className="button-submit d-flex align-items-center justify-content-center"
                                     disabled={email.trim() == '' || password.trim() == '' || (mode == 'signup' && confirmPassword.trim() == '') || isLoading}
-                                    onClick={async () => {
-                                        if (mode == 'signup') {
-                                            if (confirmPassword !== password) {
-                                                setError3('Mật khẩu nhập lại không trùng khớp')
-                                            } else {
-                                                setIsLoading(true)
-                                                try {
-                                                    const response = await register({ email, password })
-                                                    if (response) {
-                                                        setNotication('success_signup')
-                                                    }
-                                                } catch (e) {
-                                                    setAuthError(e.message)
-                                                } finally {
-                                                    setIsLoading(false)
-                                                }
-                                            }
-                                        } else {
-                                            setIsLoading(true)
-                                            try {
-                                                const response = await login({ email, password })
-                                                if (response) {
-                                                    localStorage.setItem('token', response.token)
-                                                    setNotication('success_login')
-                                                }
-                                            } catch (e) {
-                                                setAuthError(e.message)
-                                            } finally {
-                                                setIsLoading(false)
-                                            }
-                                        }
-                                    }}
+                                    onClick={handleSubmit}
                                 >
                                     {mode == 'signup' ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}
                                     {isLoading && (

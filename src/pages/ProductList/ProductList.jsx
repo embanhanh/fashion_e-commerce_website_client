@@ -10,8 +10,10 @@ import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { removeDiacritics } from '../../utils/StringUtil'
 import { debounce } from 'lodash'
+import { useNavigate } from 'react-router-dom'
 
 function ProductList() {
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { products, totalPages, currentPage, filters, sortOption, status } = useSelector((state) => state.product)
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
@@ -256,7 +258,7 @@ function ProductList() {
                                 </section>
                             )}
                             {products.map((product, index) => (
-                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4">
+                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
                                     <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
                                 </div>
                             ))}

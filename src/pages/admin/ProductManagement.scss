@@ -62,34 +62,6 @@
         margin: 0;
         padding: 0;
     }
-
-    .action-icons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        align-items: center;
-
-        .edit-icon,
-        .delete-icon {
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
-        }
-
-        .edit-icon {
-            color: #4a90e2;
-            &:hover {
-                color: #2a6fc2;
-            }
-        }
-
-        .delete-icon {
-            color: #e74c3c;
-            &:hover {
-                color: #c0392b;
-            }
-        }
-    }
 }
 
 .product-container {
@@ -151,18 +123,14 @@
     p {
         margin: 5px 0;
     }
-    .hover-icon {
-        cursor: pointer;
-        transition: color 0.3s ease;
-
-        &:hover {
-            color: #4a90e2;
-        }
-    }
 }
 
-.hover-icon {
+.view-icon {
     &.active {
         color: #4a90e2;
+    }
+    &:hover {
+        color: #4a90e2;
+        background-color: rgba(0, 0, 0, 0.1);
     }
 }

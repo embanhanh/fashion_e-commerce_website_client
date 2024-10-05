@@ -58,8 +58,8 @@ function Mainlayout({ children }) {
         },
     ]
 
-    const handleLogout = () => {
-        dispatch(logout())
+    const handleLogout = async () => {
+        await dispatch(logout())
         navigate('/user/login')
     }
 
@@ -127,7 +127,7 @@ function Mainlayout({ children }) {
                                                         <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
                                                             <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
                                                             <div className="w-100">
-                                                                <p className="fs-4 fw-medium ellipsis">{item.variant.product.name || ''}</p>
+                                                                <p className="fs-4 fw-medium ellipsis">{item.variant.product?.name || ''}</p>
                                                                 <p className="fw-medium">
                                                                     {item.quantity} x {item.variant.price || 0}đ
                                                                 </p>
@@ -152,7 +152,7 @@ function Mainlayout({ children }) {
                                             <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
                                                 Quản lý cửa hàng
                                             </Link>
-                                            <Link className="user-action fs-4 fw-medium py-3 px-2" onClick={handleLogout}>
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2" onClick={() => handleLogout()}>
                                                 <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
                                             </Link>
                                         </div>

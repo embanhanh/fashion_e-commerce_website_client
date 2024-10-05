@@ -27,3 +27,33 @@ export const addToCart = async (productData) => {
         throw error.response.data
     }
 }
+
+export const updateCartItemQuantity = async (itemId, quantity) => {
+    try {
+        const response = await axios.put(
+            `${API_URL}update/${itemId}`,
+            { quantity },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}
+
+export const removeCartItem = async (itemId) => {
+    try {
+        const response = await axios.delete(`${API_URL}remove/${itemId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

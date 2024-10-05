@@ -106,8 +106,8 @@ function ProductManagement() {
                                 <p className="fs-4 fw-medium">đã bán: {product.soldQuantity}</p>
                             </div>
                             <div className="d-flex justify-content-center">
-                                <FontAwesomeIcon icon={faPen} className="fs-3 p-2 mx-2" color="#4a90e2" onClick={() => navigate(`/seller/products/edit/${product.slug}`)} />
-                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 mx-2" color="#e74c3c" onClick={() => handleDeleteProduct(product.slug)} />
+                                <FontAwesomeIcon icon={faPen} className="fs-3 p-2 mx-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/products/edit/${product.slug}`)} />
+                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 mx-2 hover-icon" color="#e74c3c" onClick={() => handleDeleteProduct(product.slug)} />
                                 <button className="primary-btn shadow-none px-2 py-0">
                                     <p className="m-0">Chi tiết</p>
                                 </button>
@@ -239,8 +239,8 @@ function ProductManagement() {
                                     </>
                                 )}
                                 <div className="d-flex align-items-center">
-                                    <FontAwesomeIcon icon={faList} className={`fs-3 p-2 hover-icon ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} />
-                                    <BsGridFill className={`p-2 ms-2 hover-icon ${viewMode === 'grid' ? 'active' : ''}`} size={27.5} onClick={() => setViewMode('grid')} />
+                                    <FontAwesomeIcon icon={faList} className={`fs-3 p-2 view-icon ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} />
+                                    <BsGridFill className={`p-2 ms-2 view-icon ${viewMode === 'grid' ? 'active' : ''}`} size={27.5} onClick={() => setViewMode('grid')} />
                                 </div>
                             </div>
                             <div className={`product-container ${viewMode}`}>{products.map((product, index) => renderProductItem(product, index))}</div>

@@ -320,3 +320,10 @@ input[type='number'] {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.hover-icon {
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+}

@@ -29,8 +29,8 @@ function ProductDetail() {
     const [activeIndex, setActiveIndex] = useState(0)
     const [allImages, setAllImages] = useState([])
     const [uniqueColors, setUniqueColors] = useState([])
-    const [selectedColor, setSelectedColor] = useState(null)
-    const [selectedSize, setSelectedSize] = useState(null)
+    const [selectedColor, setSelectedColor] = useState('')
+    const [selectedSize, setSelectedSize] = useState('')
     const [availableQuantity, setAvailableQuantity] = useState(0)
     const [quantity, setQuantity] = useState(1)
     // confirm and notification
@@ -106,7 +106,7 @@ function ProductDetail() {
                 }
             }
         } else {
-            setSelectedColor(null)
+            setSelectedColor('')
         }
     }
 
@@ -114,7 +114,7 @@ function ProductDetail() {
         if (size !== selectedSize) {
             setSelectedSize(size)
         } else {
-            setSelectedSize(null)
+            setSelectedSize('')
         }
     }
 
@@ -133,16 +133,14 @@ function ProductDetail() {
         if (!isLoggedIn) {
             setShowLoginModal(true)
         } else {
-            if (selectedColor && selectedSize) {
-                const selectedVariant = currentProduct.variants.find((v) => v.color === selectedColor && v.size === selectedSize)
-                if (selectedVariant) {
-                    dispatch(
-                        addItemToCart({
-                            variant: selectedVariant._id,
-                            quantity: quantity,
-                        })
-                    )
-                }
+            const selectedVariant = currentProduct.variants.find((v) => v.color === selectedColor && v.size === selectedSize)
+            if (selectedVariant) {
+                dispatch(
+                    addItemToCart({
+                        variant: selectedVariant._id,
+                        quantity: quantity,
+                    })
+                )
             }
         }
     }
@@ -238,7 +236,7 @@ function ProductDetail() {
                             <p className="fs-2 fw-medium text-decoration-line-through text-body-tertiary">{currentProduct.originalPrice}đ</p>
                             <p className="fs-2 ms-4 fw-medium text-danger">Giảm {currentProduct.discount}% </p>
                         </div>
-                        <p className="fs-3 lh-1 my-4 fw-medium">Màu Sắc</p>
+                        {currentProduct.variants.some((variant) => variant.color) && <p className="fs-3 lh-1 my-4 fw-medium">Màu Sắc</p>}
                         <div className="row g-3">
                             {uniqueColors.map((variant, index) => {
                                 if (variant.color) {
@@ -258,7 +256,7 @@ function ProductDetail() {
                                 return null
                             })}
                         </div>
-                        <p className="fs-3 lh-1 my-4 fw-medium">Size</p>
+                        {currentProduct.variants.some((variant) => variant.size) && <p className="fs-3 lh-1 my-4 fw-medium">Size</p>}
                         <div className="d-flex">
                             {currentProduct.variants.some((variant) => variant.size) && (
                                 <>
@@ -288,7 +286,11 @@ function ProductDetail() {
                         <div className="d-flex align-items-center mt-4 position-relative">
                             <button
                                 onClick={handleAddToCart}
-                                disabled={availableQuantity === 0 || !selectedColor || !selectedSize}
+                                disabled={
+                                    availableQuantity === 0 ||
+                                    !(!currentProduct.variants.some((variant) => variant.color) || selectedColor) ||
+                                    !(!currentProduct.variants.some((variant) => variant.size) || selectedSize)
+                                }
                                 className="cartBtn rounded-4 d-flex align-items-center justify-content-center p-4"
                             >
                                 <svg style={{ height: 18 }} className="cart" fill="white" viewBox="0 0 576 512" height="1em" xmlns="http://www.w3.org/2000/svg">

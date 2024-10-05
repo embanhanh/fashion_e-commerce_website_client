@@ -4,7 +4,6 @@ import { login, register, loginWithFirebase } from '../../services/UserService'
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
     try {
         const response = await login(credentials)
-        localStorage.setItem('token', response.token)
         return response.user
     } catch (error) {
         return rejectWithValue(error.response.data)
@@ -43,6 +42,7 @@ const authSlice = createSlice({
             state.user = null
             state.isLoggedIn = false
             localStorage.removeItem('token')
+            localStorage.removeItem('refreshToken')
         },
     },
     extraReducers: (builder) => {

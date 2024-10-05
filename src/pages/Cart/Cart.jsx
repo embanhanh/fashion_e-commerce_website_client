@@ -4,7 +4,7 @@ import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-ic
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
 import { useState, useEffect } from 'react'
-import { fetchCart } from '../../redux/slices/cartSlice'
+import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { useSelector, useDispatch } from 'react-redux'
 
 function Cart() {
@@ -24,6 +24,24 @@ function Cart() {
         setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
     }
 
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedItems(cart.items.map((item) => item._id))
+        } else {
+            setSelectedItems([])
+        }
+    }
+
+    const handleQuantityChange = (itemId, change) => {
+        const item = cart.items.find((i) => i._id === itemId)
+        const newQuantity = Math.max(1, item.quantity + change)
+        dispatch(updateItemQuantity({ itemId, quantity: newQuantity }))
+    }
+
+    const handleRemoveItem = (itemId) => {
+        dispatch(removeItemFromCart(itemId))
+    }
+
     const calculateTotal = () => {
         return selectedItems.reduce((total, itemId) => {
             const item = cart.items.find((i) => i._id === itemId)
@@ -37,6 +55,18 @@ function Cart() {
     const handleShowAddress = () => setShowAddress(true)
     const handleClosePaymentMethod = () => setShowPaymentMethod(false)
     const handleShowPaymentMethod = () => setShowPaymentMethod(true)
+
+    if (!cart) {
+        return (
+            <section className="dots-container mt-4">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+            </section>
+        )
+    }
 
     return (
         <>
@@ -254,7 +284,7 @@ function Cart() {
                         <div className="d-flex pb-3 border-bottom">
                             <div className="d-flex" style={{ width: '40%' }}>
                                 <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" />
+                                    <input type="checkbox" className="input-checkbox" onChange={handleSelectAll} checked={selectedItems.length === cart.items.length} />
                                     <span className="custom-checkbox"></span>
                                 </label>
                                 <p className="fs-3 ms-3 fw-medium ">Sản phẩm</p>
@@ -285,15 +315,15 @@ function Cart() {
                                     </div>
                                     <div className="flex-grow-1 justify-content-center d-flex">
                                         <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
-                                            <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
+                                            <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, -1)} style={{ cursor: 'pointer' }} />
                                             <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
-                                            <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
+                                            <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
                                         </div>
                                     </div>
                                     <div className="flex-grow-1 m-auto">
                                         <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
                                     </div>
-                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 py-4" color="#ff7262" />
+                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 hover-icon" color="#ff7262" onClick={() => handleRemoveItem(item._id)} />
                                 </div>
                             ))}
                         </div>

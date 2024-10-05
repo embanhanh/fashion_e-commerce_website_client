@@ -1,17 +1,43 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect, useState, useEffect } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import './MainLayout.scss'
 import LogoShop from '../components/LogoShop'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBagShopping, faEnvelope, faLocationDot, faPhone, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchCart } from '../redux/slices/cartSlice'
+import { logout } from '../redux/slices/authSlice'
+import defaultAvatar from '../assets/image/default/default-avatar.png'
 
 function Mainlayout({ children }) {
     const navigate = useNavigate()
+    const location = useLocation()
+    const dispatch = useDispatch()
+    const { isLoggedIn, user } = useSelector((state) => state.auth)
+    const { cart } = useSelector((state) => state.cart)
+    const [navOption, setNavOption] = useState('Trang chủ')
+
+    useEffect(() => {
+        if (user) {
+            console.log(user)
+        }
+
+        if (cart) {
+            console.log(cart)
+        }
+    }, [cart, user])
+
     useLayoutEffect(() => {
         window.scrollTo(0, 0)
     }, [navigate])
-    const location = useLocation()
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            dispatch(fetchCart())
+        }
+    }, [isLoggedIn, dispatch])
+
     const navList = [
         {
             title: 'Trang chủ',
@@ -32,7 +58,10 @@ function Mainlayout({ children }) {
         },
     ]
 
-    const [navOption, setNavOption] = useState('Trang chủ')
+    const handleLogout = () => {
+        dispatch(logout())
+        navigate('/user/login')
+    }
 
     return (
         <>
@@ -84,60 +113,53 @@ function Mainlayout({ children }) {
                         </div>
                     </div>
                     <div className="header-section d-flex">
-                        {/* {localStorage.getItem('token') != null ? ( */}
-                        <>
-                            <div className="d-flex align-items-center">
-                                <div className="p-2 cart-container rounded-3 position-relative" onClick={() => navigate('/cart')}>
-                                    <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
-                                    <div className="cart-mini position-absolute shadow rounded-3 p-4">
-                                        <div className="mb-3 cart-product-container">
-                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
-                                                <img src="" className="me-4" alt="" width={50} height={50} />
-                                                <div className="w-100">
-                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
-                                                    <p className="fw-medium">1 x 150000đ</p>
-                                                </div>
+                        {isLoggedIn ? (
+                            <>
+                                <div className="d-flex align-items-center">
+                                    <div className="p-2 cart-container rounded-3 position-relative" onClick={() => navigate('/cart')}>
+                                        <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
+                                        {cart && cart.items && cart.items.length > 0 && <span className="cart-count">{cart.items.length}</span>}
+                                        <div className="cart-mini position-absolute shadow rounded-3 p-4">
+                                            <div className="mb-3 cart-product-container">
+                                                {cart &&
+                                                    cart.items &&
+                                                    cart.items.map((item, index) => (
+                                                        <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
+                                                            <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
+                                                            <div className="w-100">
+                                                                <p className="fs-4 fw-medium ellipsis">{item.variant.product.name || ''}</p>
+                                                                <p className="fw-medium">
+                                                                    {item.quantity} x {item.variant.price || 0}đ
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                             </div>
-                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
-                                                <img src="" className="me-4" alt="" width={50} height={50} />
-                                                <div className="w-100">
-                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
-                                                    <p className="fw-medium">1 x 150000đ</p>
-                                                </div>
-                                            </div>
-                                            <div className="d-flex  align-items-center pb-4 mb-4 border-bottom">
-                                                <img src="" className="me-4" alt="" width={50} height={50} />
-                                                <div className="w-100">
-                                                    <p className="fs-4 fw-medium ellipsis">Giày thể thao giá rẻ cdasdasdasdadadaasdas asdadas asdasda dasa</p>
-                                                    <p className="fw-medium">1 x 150000đ</p>
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <p className="fs-4 fw-medium">{cart ? cart.items.length : 0} sản phẩm có trong giỏ hàng</p>
+                                                <div className="primary-btn p-3 shadow-none" onClick={() => navigate('/cart')}>
+                                                    <p>Xem giỏ hàng</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <p className="fs-4 fw-medium">7 sản phẩm có trong giỏ hàng</p>
-                                            <div className="primary-btn p-3 shadow-none">
-                                                <p>Xem giỏ hàng</p>
-                                            </div>
+                                    </div>
+                                    <div className="user-actions-container position-relative d-flex align-items-center" style={{ minWidth: 200 }}>
+                                        <img src={user.avatar || defaultAvatar} alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
+                                        <p className="fs-4 fw-medium me-5 ">{user.name || user.email.split('@')[0]}</p>
+                                        <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</Link>
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
+                                                Quản lý cửa hàng
+                                            </Link>
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2" onClick={handleLogout}>
+                                                <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="user-actions-container position-relative d-flex align-items-center">
-                                    <img src="" alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
-                                    <p className="fs-4 fw-medium me-5 ">Trần Trung Thông</p>
-                                    <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
-                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</Link>
-                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>
-                                        <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
-                                            Quản lý cửa hàng
-                                        </Link>
-                                        <Link className="user-action fs-4 fw-medium py-3 px-2">
-                                            <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                        {/* ) : (
+                            </>
+                        ) : (
                             <div
                                 className="primary-btn btn-sm"
                                 onClick={() => {
@@ -146,7 +168,7 @@ function Mainlayout({ children }) {
                             >
                                 <p>Đăng nhập</p>
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </div>
             </div>

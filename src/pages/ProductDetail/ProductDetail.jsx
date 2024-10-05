@@ -11,8 +11,9 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProductByProductName } from '../../redux/slices/productSlice'
+import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import ProductCard from '../../components/ProductCard'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, Toast } from 'react-bootstrap'
 
 function ProductDetail() {
     const { product_name } = useParams()
@@ -20,8 +21,8 @@ function ProductDetail() {
     const navigate = useNavigate()
     const location = useLocation()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
+    const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
     // state ...
-    const [showLoginModal, setShowLoginModal] = useState(false)
     const { currentProduct } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
     const [mainSwiper, setMainSwiper] = useState(null)
@@ -31,6 +32,12 @@ function ProductDetail() {
     const [selectedColor, setSelectedColor] = useState(null)
     const [selectedSize, setSelectedSize] = useState(null)
     const [availableQuantity, setAvailableQuantity] = useState(0)
+    const [quantity, setQuantity] = useState(1)
+    // confirm and notification
+    const [showLoginModal, setShowLoginModal] = useState(false)
+    const [showToast, setShowToast] = useState(false)
+    const [toastMessage, setToastMessage] = useState('')
+    const [toastVariant, setToastVariant] = useState('success')
 
     useEffect(() => {
         dispatch(fetchProductByProductName(product_name))
@@ -72,6 +79,21 @@ function ProductDetail() {
         }
     }, [currentProduct, selectedColor, selectedSize])
 
+    useEffect(() => {
+        if (addToCartSuccess) {
+            setToastMessage('Đã thêm sản phẩm vào giỏ hàng thành công!')
+            setToastVariant('success')
+            setShowToast(true)
+            setTimeout(() => {
+                dispatch(resetAddToCartSuccess())
+            }, 1000)
+        } else if (cartError) {
+            setToastMessage('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + cartError)
+            setToastVariant('danger')
+            setShowToast(true)
+        }
+    }, [addToCartSuccess, cartError, dispatch])
+
     const handleColorSelect = (color) => {
         if (color !== selectedColor) {
             setSelectedColor(color)
@@ -96,19 +118,31 @@ function ProductDetail() {
         }
     }
 
+    const handleDecreaseQuantity = () => {
+        if (quantity > 1) {
+            setQuantity(quantity - 1)
+        }
+    }
+
+    const handleIncreaseQuantity = () => {
+        if (quantity < availableQuantity) {
+            setQuantity(quantity + 1)
+        }
+    }
     const handleAddToCart = () => {
         if (!isLoggedIn) {
             setShowLoginModal(true)
         } else {
             if (selectedColor && selectedSize) {
-                // const variantId = currentProduct.variants.find(v => v.color === selectedColor && v.size === selectedSize)._id;
-                // dispatch(addToCartAction({
-                //     userId: user._id,
-                //     productId: currentProduct._id,
-                //     variantId,
-                //     quantity
-                // }));
-                console.log('Add to cart')
+                const selectedVariant = currentProduct.variants.find((v) => v.color === selectedColor && v.size === selectedSize)
+                if (selectedVariant) {
+                    dispatch(
+                        addItemToCart({
+                            variant: selectedVariant._id,
+                            quantity: quantity,
+                        })
+                    )
+                }
             }
         }
     }
@@ -244,9 +278,9 @@ function ProductDetail() {
                         <p className="fs-3 lh-1 my-4 fw-medium">Số lượng</p>
                         <div className=" d-flex align-items-center mt-4">
                             <div className="d-flex align-items-center px-1 py-1 rounded-4 border border-black ">
-                                <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
-                                <p className="fs-3 fw-medium lh-1 mx-2">1</p>
-                                <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
+                                <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={handleDecreaseQuantity} />
+                                <p className="fs-3 fw-medium lh-1 mx-2">{quantity}</p>
+                                <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={handleIncreaseQuantity} />
                             </div>
 
                             <p className="fs-3 fw-medium ms-4">{availableQuantity} sản phẩm có sẵn</p>
@@ -264,6 +298,18 @@ function ProductDetail() {
                                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512" className="product">
                                     <path d="M211.8 0c7.8 0 14.3 5.7 16.7 13.2C240.8 51.9 277.1 80 320 80s79.2-28.1 91.5-66.8C413.9 5.7 420.4 0 428.2 0h12.6c22.5 0 44.2 7.9 61.5 22.3L628.5 127.4c6.6 5.5 10.7 13.5 11.4 22.1s-2.1 17.1-7.8 23.6l-56 64c-11.4 13.1-31.2 14.6-44.6 3.5L480 197.7V448c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64V197.7l-51.5 42.9c-13.3 11.1-33.1 9.6-44.6-3.5l-56-64c-5.7-6.5-8.5-15-7.8-23.6s4.8-16.6 11.4-22.1L137.7 22.3C155 7.9 176.7 0 199.2 0h12.6z"></path>
                                 </svg>
+                                {cartLoading && (
+                                    <div className="dot-spinner ms-4">
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                        <div className="dot-spinner__dot"></div>
+                                    </div>
+                                )}
                             </button>
                             <div className="position-absolute tooltip-cartbtn">
                                 <p>Bạn phải chọn phân loại hàng trước khi thêm vào giỏ hàng</p>
@@ -376,6 +422,24 @@ function ProductDetail() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <Toast
+                show={showToast}
+                onClose={() => setShowToast(false)}
+                delay={3000}
+                autohide
+                style={{
+                    position: 'fixed',
+                    top: 20,
+                    right: 20,
+                    minWidth: '200px',
+                }}
+                bg={toastVariant}
+            >
+                <Toast.Header>
+                    <strong className="me-auto">Thông báo</strong>
+                </Toast.Header>
+                <Toast.Body className={toastVariant === 'danger' ? 'text-white' : ''}>{toastMessage}</Toast.Body>
+            </Toast>
         </>
     )
 }

@@ -1,11 +1,30 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 import categoryReducer from './slices/categorySlice'
 import productReducer from './slices/productSlice'
 import authReducer from './slices/authSlice'
-export default configureStore({
+import cartReducer from './slices/cartSlice'
+
+const authPersistConfig = {
+    key: 'auth',
+    storage,
+    whitelist: ['isLoggedIn', 'user'],
+}
+
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer)
+
+export const store = configureStore({
     reducer: {
         category: categoryReducer,
         product: productReducer,
-        auth: authReducer,
+        auth: persistedAuthReducer,
+        cart: cartReducer,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 })
+
+export const persistor = persistStore(store)

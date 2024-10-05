@@ -3,12 +3,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { fetchCart } from '../../redux/slices/cartSlice'
+import { useSelector, useDispatch } from 'react-redux'
 
 function Cart() {
+    const dispatch = useDispatch()
+    const { cart, loading } = useSelector((state) => state.cart)
+    // state
+    const [selectedItems, setSelectedItems] = useState([])
     const [showVoucher, setShowVoucher] = useState(false)
     const [showAddress, setShowAddress] = useState(false)
     const [showPaymentMethod, setShowPaymentMethod] = useState(false)
+
+    useEffect(() => {
+        dispatch(fetchCart())
+    }, [dispatch])
+
+    const handleSelectItem = (itemId) => {
+        setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
+    }
+
+    const calculateTotal = () => {
+        return selectedItems.reduce((total, itemId) => {
+            const item = cart.items.find((i) => i._id === itemId)
+            return total + item.variant.price * item.quantity
+        }, 0)
+    }
 
     const handleCloseVoucher = () => setShowVoucher(false)
     const handleShowVoucher = () => setShowVoucher(true)
@@ -243,100 +264,45 @@ function Cart() {
                             <p className="fs-3 fw-medium flex-grow-1 text-center">Tổng</p>
                         </div>
                         <div className="" style={{ maxHeight: 1000, overflowY: 'auto' }}>
-                            <div className="d-flex py-3 border-bottom align-items-center">
-                                <div className="d-flex align-items-center" style={{ width: '40%' }}>
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <img className="mx-3" src="" alt="" width={70} height={70} />
-                                    <div className="flex-grow-1">
-                                        <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
-                                            Giày thể thao dasdas
-                                        </p>
-                                        <p className="fw-medium">Size: S</p>
+                            {cart.items.map((item) => (
+                                <div key={item._id} className="d-flex py-3 border-bottom align-items-center">
+                                    <div className="d-flex align-items-center" style={{ width: '40%' }}>
+                                        <label className="d-flex align-items-center">
+                                            <input type="checkbox" className="input-checkbox" checked={selectedItems.includes(item._id)} onChange={() => handleSelectItem(item._id)} />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <img className="mx-3" src={item.variant.imageUrl} alt="" width={70} height={70} />
+                                        <div className="flex-grow-1">
+                                            <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
+                                                {item.variant.product.name}
+                                            </p>
+                                            <p className="fw-medium">Size: {item.variant.size}</p>
+                                            <p className="fw-medium">Màu: {item.variant.color}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center fs-3 ">150.000đ</p>
-                                </div>
-                                <div className="flex-grow-1 justify-content-center d-flex">
-                                    <div className="d-flex align-items-center justify-content-center  px-1 py-1 rounded-4 border border-black my-4">
-                                        <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
-                                        <p className="fs-3 fw-medium lh-1 mx-2">1</p>
-                                        <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
+                                    <div className="flex-grow-1 m-auto">
+                                        <p className="text-center fs-3">{item.variant.price}đ</p>
                                     </div>
-                                </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center fs-3">180.000đ</p>
-                                </div>
-                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 py-4" color="#ff7262" />
-                            </div>
-                            <div className="d-flex py-3 border-bottom align-items-center">
-                                <div className="d-flex align-items-center" style={{ width: '40%' }}>
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <img className="mx-3" src="" alt="" width={70} height={70} />
-                                    <div className="ms-3 flex-grow-1">
-                                        <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
-                                            Giày thể thao dasdas
-                                        </p>
-                                        <p className="fw-medium">Size: S</p>
+                                    <div className="flex-grow-1 justify-content-center d-flex">
+                                        <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
+                                            <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
+                                            <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
+                                            <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center  fs-3 ">150.000đ</p>
-                                </div>
-                                <div className="flex-grow-1 justify-content-center d-flex">
-                                    <div className="d-flex align-items-center justify-content-center  px-1 py-1 rounded-4 border border-black my-4">
-                                        <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
-                                        <p className="fs-3 fw-medium lh-1 mx-2">1</p>
-                                        <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
+                                    <div className="flex-grow-1 m-auto">
+                                        <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
                                     </div>
+                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 py-4" color="#ff7262" />
                                 </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center  fs-3">180.000đ</p>
-                                </div>
-                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 py-4" color="#ff7262" />
-                            </div>
-                            <div className="d-flex py-3 border-bottom align-items-center">
-                                <div className="d-flex align-items-center" style={{ width: '40%' }}>
-                                    <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <img className="mx-3" src="" alt="" width={70} height={70} />
-                                    <div className="ms-3 flex-grow-1">
-                                        <p className="fs-3 fw-medium product-name" style={{ maxWidth: '90%' }}>
-                                            Giày thể thao dasdas
-                                        </p>
-                                        <p className="fw-medium">Size: S</p>
-                                    </div>
-                                </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center fs-3 ">150.000đ</p>
-                                </div>
-                                <div className="flex-grow-1 justify-content-center d-flex">
-                                    <div className="d-flex align-items-center justify-content-center  px-1 py-1 rounded-4 border border-black my-4">
-                                        <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" />
-                                        <p className="fs-3 fw-medium lh-1 mx-2">1</p>
-                                        <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" />
-                                    </div>
-                                </div>
-                                <div className="flex-grow-1 m-auto">
-                                    <p className=" text-center fs-3">180.000đ</p>
-                                </div>
-                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 py-4" color="#ff7262" />
-                            </div>
+                            ))}
                         </div>
                     </div>
                     <div className="p-4" style={{ width: '30%' }}>
                         <div className="w-100 h-100 border p-3">
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium ">Tổng tiền hàng:</p>
-                                <p className="fs-3 ">200.000đ</p>
+                                <p className="fs-3 ">{calculateTotal()}đ</p>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium ">

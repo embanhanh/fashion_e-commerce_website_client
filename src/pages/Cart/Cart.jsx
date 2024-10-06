@@ -247,20 +247,20 @@ function Cart() {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="">
-                            <d className="d-flex p-3 align-items-center border-bottom">
+                            <div className="d-flex p-3 align-items-center border-bottom">
                                 <label className="d-flex align-items-center me-3">
                                     <input type="checkbox" className="input-checkbox" />
                                     <span className="custom-checkbox"></span>
                                 </label>
                                 <p className="fs-3">Thanh toán khi nhận hàng</p>
-                            </d>
-                            <d className="d-flex p-3 align-items-center border-bottom">
+                            </div>
+                            <div className="d-flex p-3 align-items-center border-bottom">
                                 <label className="d-flex align-items-center me-3">
                                     <input type="checkbox" className="input-checkbox" />
                                     <span className="custom-checkbox"></span>
                                 </label>
                                 <p className="fs-3">Thanh toán bằng chuyển khoản</p>
-                            </d>
+                            </div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
@@ -273,60 +273,65 @@ function Cart() {
                     </Modal.Footer>
                 </Modal>
                 <p className="fw-bold fs-2">Giỏ hàng</p>
-                {/* <div className="text-center">
-                    <p className="fs-3 fw-medium">Giỏ hàng của bạn còn trống</p>
-                    <div className="primary-btn px-4 py-2 shadow-none mt-3">
-                        <p>Mua ngay</p>
-                    </div>
-                </div> */}
                 <div className="d-flex">
                     <div className="mt-2 me-4" style={{ width: '70%' }}>
-                        <div className="d-flex pb-3 border-bottom">
-                            <div className="d-flex" style={{ width: '40%' }}>
-                                <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" onChange={handleSelectAll} checked={selectedItems.length === cart.items.length} />
-                                    <span className="custom-checkbox"></span>
-                                </label>
-                                <p className="fs-3 ms-3 fw-medium ">Sản phẩm</p>
+                        {cart.items.length === 0 || !cart ? (
+                            <div className="text-center">
+                                <p className="fs-3 fw-medium">Giỏ hàng của bạn còn trống</p>
+                                <div className="primary-btn px-4 py-2 shadow-none mt-3">
+                                    <p>Mua ngay</p>
+                                </div>
                             </div>
-                            <p className="fs-3 fw-medium flex-grow-1 text-center">Giá</p>
-                            <p className="fs-3 fw-medium flex-grow-1 text-center">Số lượng</p>
-                            <p className="fs-3 fw-medium flex-grow-1 text-center">Tổng</p>
-                        </div>
-                        <div className="" style={{ maxHeight: 1000, overflowY: 'auto' }}>
-                            {cart.items.map((item) => (
-                                <div key={item._id} className="d-flex py-3 border-bottom align-items-center">
-                                    <div className="d-flex align-items-center" style={{ width: '40%' }}>
+                        ) : (
+                            <>
+                                <div className="d-flex pb-3 border-bottom">
+                                    <div className="d-flex" style={{ width: '40%' }}>
                                         <label className="d-flex align-items-center">
-                                            <input type="checkbox" className="input-checkbox" checked={selectedItems.includes(item._id)} onChange={() => handleSelectItem(item._id)} />
+                                            <input type="checkbox" className="input-checkbox" onChange={handleSelectAll} checked={selectedItems.length === cart.items.length} />
                                             <span className="custom-checkbox"></span>
                                         </label>
-                                        <img className="mx-3" src={item.variant.imageUrl} alt="" width={70} height={70} />
-                                        <div className="flex-grow-1">
-                                            <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
-                                                {item.variant.product.name}
-                                            </p>
-                                            <p className="fw-medium">Size: {item.variant.size}</p>
-                                            <p className="fw-medium">Màu: {item.variant.color}</p>
-                                        </div>
+                                        <p className="fs-3 ms-3 fw-medium ">Sản phẩm</p>
                                     </div>
-                                    <div className="flex-grow-1 m-auto">
-                                        <p className="text-center fs-3">{item.variant.price}đ</p>
-                                    </div>
-                                    <div className="flex-grow-1 justify-content-center d-flex">
-                                        <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
-                                            <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, -1)} style={{ cursor: 'pointer' }} />
-                                            <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
-                                            <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
-                                        </div>
-                                    </div>
-                                    <div className="flex-grow-1 m-auto">
-                                        <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
-                                    </div>
-                                    <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 hover-icon" color="#ff7262" onClick={() => handleRemoveItem(item._id)} />
+                                    <p className="fs-3 fw-medium flex-grow-1 text-center">Giá</p>
+                                    <p className="fs-3 fw-medium flex-grow-1 text-center">Số lượng</p>
+                                    <p className="fs-3 fw-medium flex-grow-1 text-center">Tổng</p>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="" style={{ maxHeight: 1000, overflowY: 'auto' }}>
+                                    {cart.items.map((item) => (
+                                        <div key={item._id} className="d-flex py-3 border-bottom align-items-center">
+                                            <div className="d-flex align-items-center" style={{ width: '40%' }}>
+                                                <label className="d-flex align-items-center">
+                                                    <input type="checkbox" className="input-checkbox" checked={selectedItems.includes(item._id)} onChange={() => handleSelectItem(item._id)} />
+                                                    <span className="custom-checkbox"></span>
+                                                </label>
+                                                <img className="mx-3" src={item.variant.imageUrl} alt="" width={70} height={70} />
+                                                <div className="flex-grow-1">
+                                                    <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
+                                                        {item.variant.product.name}
+                                                    </p>
+                                                    <p className="fw-medium">Size: {item.variant.size}</p>
+                                                    <p className="fw-medium">Màu: {item.variant.color}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex-grow-1 m-auto">
+                                                <p className="text-center fs-3">{item.variant.price}đ</p>
+                                            </div>
+                                            <div className="flex-grow-1 justify-content-center d-flex">
+                                                <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
+                                                    <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, -1)} style={{ cursor: 'pointer' }} />
+                                                    <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
+                                                    <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
+                                                </div>
+                                            </div>
+                                            <div className="flex-grow-1 m-auto">
+                                                <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
+                                            </div>
+                                            <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 hover-icon" color="#ff7262" onClick={() => handleRemoveItem(item._id)} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="p-4" style={{ width: '30%' }}>
                         <div className="w-100 h-100 border p-3">

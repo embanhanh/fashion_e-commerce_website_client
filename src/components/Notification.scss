@@ -8,17 +8,18 @@
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     position: relative;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    // display: flex;
+    // align-items: center;
+    // justify-content: space-around;
     gap: 15px;
 }
 .wave {
     position: absolute;
     transform: rotate(90deg);
-    left: -39px;
-    top: 40px;
-    width: 100px;
+    left: -80px;
+    top: 78px;
+    width: 200px;
+    height: 40px;
 }
 .wave.success {
     fill: #04e4003a;

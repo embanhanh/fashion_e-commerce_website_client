@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart } from '../redux/slices/cartSlice'
 import { logout } from '../redux/slices/authSlice'
 import defaultAvatar from '../assets/image/default/default-avatar.png'
+import cartEmpty from '../assets/image/default/cart-empty.jpg'
 
 function Mainlayout({ children }) {
     const navigate = useNavigate()
@@ -17,16 +18,6 @@ function Mainlayout({ children }) {
     const { isLoggedIn, user } = useSelector((state) => state.auth)
     const { cart } = useSelector((state) => state.cart)
     const [navOption, setNavOption] = useState('Trang chủ')
-
-    useEffect(() => {
-        if (user) {
-            console.log(user)
-        }
-
-        if (cart) {
-            console.log(cart)
-        }
-    }, [cart, user])
 
     useLayoutEffect(() => {
         window.scrollTo(0, 0)
@@ -120,27 +111,47 @@ function Mainlayout({ children }) {
                                         <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
                                         {cart && cart.items && cart.items.length > 0 && <span className="cart-count">{cart.items.length}</span>}
                                         <div className="cart-mini position-absolute shadow rounded-3 p-4">
-                                            <div className="mb-3 cart-product-container">
-                                                {cart &&
-                                                    cart.items &&
-                                                    cart.items.map((item, index) => (
-                                                        <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
-                                                            <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
-                                                            <div className="w-100">
-                                                                <p className="fs-4 fw-medium ellipsis">{item.variant.product?.name || ''}</p>
-                                                                <p className="fw-medium">
-                                                                    {item.quantity} x {item.variant.price || 0}đ
-                                                                </p>
+                                            {!cart ? (
+                                                <section className="dots-container mt-4">
+                                                    <div className="dot"></div>
+                                                    <div className="dot"></div>
+                                                    <div className="dot"></div>
+                                                    <div className="dot"></div>
+                                                    <div className="dot"></div>
+                                                </section>
+                                            ) : (
+                                                <>
+                                                    <div className="mb-3 cart-product-container">
+                                                        {cart && cart.items && cart.items.length === 0 && (
+                                                            <div className="d-flex justify-content-center align-items-center">
+                                                                <img src={cartEmpty} alt="" style={{ width: 300, height: 300, objectFit: 'cover' }} />
+                                                            </div>
+                                                        )}
+
+                                                        {cart &&
+                                                            cart.items &&
+                                                            cart.items.map((item, index) => (
+                                                                <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
+                                                                    <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
+                                                                    <div className="w-100">
+                                                                        <p className="fs-4 fw-medium ellipsis">{item.variant.product?.name || ''}</p>
+                                                                        <p className="fw-medium">
+                                                                            {item.quantity} x {item.variant.price || 0}đ
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                    </div>
+                                                    {cart && cart.items && cart.items.length > 0 && (
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <p className="fs-4 fw-medium">{cart ? cart.items.length : 0} sản phẩm có trong giỏ hàng</p>
+                                                            <div className="primary-btn p-3 shadow-none" onClick={() => navigate('/cart')}>
+                                                                <p>Xem giỏ hàng</p>
                                                             </div>
                                                         </div>
-                                                    ))}
-                                            </div>
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <p className="fs-4 fw-medium">{cart ? cart.items.length : 0} sản phẩm có trong giỏ hàng</p>
-                                                <div className="primary-btn p-3 shadow-none" onClick={() => navigate('/cart')}>
-                                                    <p>Xem giỏ hàng</p>
-                                                </div>
-                                            </div>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="user-actions-container position-relative d-flex align-items-center" style={{ minWidth: 200 }}>

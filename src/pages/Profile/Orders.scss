@@ -1,0 +1,45 @@
+.order-page {
+    min-height: 100vh;
+}
+
+.QmO3Bu {
+    background: #fff;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    display: flex;
+    margin-bottom: 12px;
+    overflow: hidden;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+.mRVNLm {
+    border-color: #ee4d2d;
+    color: #ee4d2d;
+}
+.KI5har {
+    align-items: center;
+    background: #fff;
+    border-bottom: 2px solid rgba(0, 0, 0, .09);
+    color: rgba(0, 0, 0, .8);
+    cursor: pointer;
+    display: flex;
+    flex: 1;
+    font-size: 16px;
+    justify-content: center;
+    line-height: 19px;
+    overflow: hidden;
+    padding: 16px 0;
+    text-align: center;
+    transition: color .2s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.order-list{ 
+    margin-top: 2rem;
+}

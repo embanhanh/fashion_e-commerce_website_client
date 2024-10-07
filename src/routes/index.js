@@ -30,10 +30,10 @@ const publicRoutes = [
     { path: '/user/login', element: Auth, layout: Fragment },
     { path: '/user/signup', element: Auth, layout: Fragment },
     {
-        path: '/user/profile',
+        path: '/user/account',
         element: ProfileLayout,
         children: [
-            { path: '', element: Info, layout: Fragment },
+            { path: 'profile', element: Info, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },

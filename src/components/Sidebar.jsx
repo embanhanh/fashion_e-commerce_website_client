@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import {
     FaUser,
-    FaBagShopping ,
+    FaBagShopping,
     FaRegHeart,
     FaLocationDot,
     FaCreditCard,
@@ -10,51 +10,43 @@ import {
     FaGear,
     FaCircleUser,
 } from "react-icons/fa6";
-import './Sidebar.css'; 
+import './Sidebar.scss';
 
 function Sidebar() {
     const menuItem = [
         {
-            path: "/user/profile",
+            path: "/user/account/profile",
             name: "Thông tin cá nhân",
             icon: <FaCircleUser />
         },
         {
-            path: "/user/profile/orders",
+            path: "/user/account/orders",
             name: "Đơn hàng",
-            icon: <FaBagShopping   />
+            icon: <FaBagShopping />
         },
         {
-            path: "/user/profile/wishlists",
+            path: "/user/account/wishlists",
             name: "Danh sách yêu thích",
-            icon: <FaRegHeart   />
+            icon: <FaRegHeart />
         },
         {
-            path: "/user/profile/addresses",
+            path: "/user/account/addresses",
             name: "Địa chỉ",
-            icon: <FaLocationDot  />
-        },
+            icon: <FaLocationDot />
+        },        
         {
-            path: "/user/profile/savedcards",
-            name: "Thẻ đã lưu",
-            icon: <FaCreditCard  />
-        },
-        {
-            path: "/user/profile/notifications",
+            path: "/user/account/notifications",
             name: "Thông báo",
-            icon: <FaRegBell  />
-        },
-        {
-            path: "/user/profile/settings",
-            name: "Cài đặt",
-            icon: <FaGear />
-        }
+            icon: <FaRegBell />
+        },        
     ];
 
-    return (        
-
+    return (
         <nav className="sidebar-nav">
-            <div className="d-flex flex-column bg-light d-inline-flex">               
+            <div>
+                <span>o day chua hinh</span>
+            </div>
+            <div className="d-flex flex-column bg-light d-inline-flex ">
                 <ul className="nav nav-pills flex-column mb-auto ">
                     {menuItem.map((item, index) => (
                         <li key={index} className="nav-item">

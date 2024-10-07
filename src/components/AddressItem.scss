@@ -1,6 +1,5 @@
-.container {
-    background: #fff;
-    border-bottom: 1px solid rgba(0,0,0,.09);
+.address-item-container {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.09);
     padding: 10px 0px 10px 0px;
     &:last-child {
         border-bottom: 0;
@@ -9,12 +8,12 @@
 
 .address-item {
     min-width: 0;
-    width: 100%
+    width: 100%;
 }
 
 .address-header {
     margin: 0 0 4px;
-    padding: 2px 4px 0px 0px ;
+    padding: 2px 4px 0px 0px;
     justify-content: space-between;
     box-sizing: border-box;
 }
@@ -25,35 +24,35 @@
     overflow-x: hidden;
 }
 
-.address-name-container{
-    color: rgba(0,0,0,.87);
+.address-name-container {
+    color: rgba(0, 0, 0, 0.87);
     font-size: 1.6rem;
     line-height: 2.4rem;
     font-weight: 500;
-    min-width: 0;    
+    min-width: 0;
 }
 
-.address-name{
+.address-name {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.spacer{
-    border-left: .5px solid rgba(0,0,0,.26);
+.spacer {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.26);
     margin: 0 8px;
 }
 
-.address-phone{
+.address-phone {
     white-space: nowrap;
-    color: rgba(0,0,0,.54);
+    color: rgba(0, 0, 0, 0.54);
 }
 
-.address-actions{
+.address-actions {
     flex-basis: 40px;
 }
 
-.btn-update{
+.btn-update {
     background: none;
     border: 0;
     color: #08f;
@@ -62,34 +61,33 @@
     white-space: nowrap;
 }
 
-.address-content{
+.address-content {
     justify-content: space-between;
 }
 
-.address-details{
+.address-details {
     margin-right: 8px;
     flex-grow: 1;
     overflow-x: hidden;
 }
 
-.address-lines{
+.address-lines {
     font-size: 1.4rem;
-    line-height: 2.0rem;
+    line-height: 2rem;
 }
 
-.default-btn-container{
+.default-btn-container {
     padding-top: 4px;
     flex-basis: 40px;
-
 }
 
-.btn-set-default{
-    border: 1px solid rgba(0,0,0,.26);
-    box-shadow: 0 1px 1px rgba(0,0,0,.03);
-    color: rgba(0,0,0,.87);
+.btn-set-default {
+    border: 1px solid rgba(0, 0, 0, 0.26);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+    color: rgba(0, 0, 0, 0.87);
     font-size: 1.4rem;
     height: 28px;
-    line-height: 2.0rem;
+    line-height: 2rem;
     min-width: 0;
     padding: 4px 12px;
     white-space: nowrap;
@@ -108,28 +106,26 @@
     color: #ee4d2d;
 
     &:hover {
-        opacity: .9
+        opacity: 0.9;
     }
     &:active {
-        opacity: 1
+        opacity: 1;
     }
     &:disabled {
         cursor: not-allowed;
-        opacity: .7
+        opacity: 0.7;
     }
 }
 
-.badge-container{
+.badge-container {
     flex-wrap: wrap;
-    
 }
 
-.badge-default{
+.badge-default {
     margin: 0 4px 4px 0;
     border-color: #ee4d2d;
     color: #ee4d2d;
-    border: .5px solid;
+    border: 0.5px solid;
     border-radius: 1px;
     padding: 2px 4px;
 }
-

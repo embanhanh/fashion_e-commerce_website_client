@@ -158,7 +158,9 @@ function Mainlayout({ children }) {
                                         <img src={user.avatar || defaultAvatar} alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
                                         <p className="fs-4 fw-medium me-5 ">{user.name || user.email.split('@')[0]}</p>
                                         <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
-                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</Link>
+                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/profile'}>
+                                                Tài khoản của tôi
+                                            </Link>
                                             <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>
                                             <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
                                                 Quản lý cửa hàng

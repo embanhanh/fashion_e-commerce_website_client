@@ -1,7 +1,7 @@
-import React from 'react';
-import AddressItem from '../../components/AddressItem';
-import {FaPlus} from 'react-icons/fa6'
-import './Addresses.scss';
+import React from 'react'
+import AddressItem from '../../components/AddressItem'
+import { FaPlus } from 'react-icons/fa6'
+import './Addresses.scss'
 
 function Addresses() {
     const addresses = [
@@ -19,13 +19,13 @@ function Addresses() {
             addressDetail: 'Trường Đại Học Công Nghệ Thông Tin, Khu Phố 6 Làng Đại Học Quốc Gia Tphcm',
             isDefault: false,
         },
-    ];
+    ]
 
     return (
         // <div className="container">
 
         // </div>
-        
+
         <div className="container">
             <div className="address-section d-flex align-content-center border-bottom">
                 <div className="address-header">
@@ -47,17 +47,15 @@ function Addresses() {
                     </div>
                 </div>
             </div>
-                
-                
-            <div class="address-container">
-                <div class="address-title">Địa chỉ</div>
+
+            <div className="address-container">
+                <div className="address-title">Địa chỉ</div>
                 {addresses.map((address, index) => (
                     <AddressItem key={index} address={address} />
                 ))}
             </div>
         </div>
-        
-    );
+    )
 }
 
-export default Addresses;
+export default Addresses

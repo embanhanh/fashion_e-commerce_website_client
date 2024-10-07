@@ -247,8 +247,8 @@ function ProductList() {
                             </div>
                         </div>
 
-                        <div className="row">
-                            {status === 'loading' && (
+                        <div className="row" style={{ minHeight: '200px' }}>
+                            {status === 'loading' ? (
                                 <section className="dots-container mt-4">
                                     <div className="dot"></div>
                                     <div className="dot"></div>
@@ -256,16 +256,19 @@ function ProductList() {
                                     <div className="dot"></div>
                                     <div className="dot"></div>
                                 </section>
-                            )}
-                            {products.map((product, index) => (
-                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
-                                    <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
-                                </div>
-                            ))}
-                            {products.length === 0 && (
-                                <div className="d-flex justify-content-center align-items-center">
-                                    <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
-                                </div>
+                            ) : (
+                                <>
+                                    {products.map((product, index) => (
+                                        <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
+                                            <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
+                                        </div>
+                                    ))}
+                                    {products.length === 0 && (
+                                        <div className="d-flex justify-content-center align-items-center">
+                                            <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                         <div className="">

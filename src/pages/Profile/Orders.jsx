@@ -37,7 +37,7 @@ function Orders() {
 
     return (
         <div className="container">
-            <div className="tab">
+            <div className="order-tabs mt-4 z-0 position-sticky">
                 <section className="QmO3Bu">
                     <h2 className="a11y-hidden"></h2>
 

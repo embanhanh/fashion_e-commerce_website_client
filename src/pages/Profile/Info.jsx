@@ -1,8 +1,41 @@
 import { FaPenToSquare } from 'react-icons/fa6'
-import brandImage from '../../assets/image/brand/brand-1.png'
 import './Info.scss'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
+import {fetchUser } from '../../redux/slices/userSlice'
+
+
 
 function Info() {
+    const dispatch = useDispatch();
+    const { user, loading, error } = useSelector((state) => state.user);
+    
+    const [userName, setUserName] = useState('')
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+    const [birth, setBirth] = useState('')
+    
+    // Gọi API lấy thông tin hồ sơ khi component được mount
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
+    
+    useEffect(() => {
+        if (user) {
+            setUserName(user.name); 
+            setEmail(user.email);       
+            setPhone(user.phone);
+            setBirth(user.birth)
+        }       
+    }, [user]);
+    
+    //state
+    if (loading) return <div>Loading...</div>;
+    if (error) {
+        console.error(error); // Log lỗi ra console để kiểm tra
+        return <div>Error: {error.message || 'Something went wrong'}</div>;
+    }
+
     return (
         <>
             <div className="profile-container">
@@ -22,7 +55,9 @@ function Info() {
                                         <td className="input-cell">
                                             <div>
                                                 <div className="input-wrapper">
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control" value={userName} onChange={(e) => {
+                                                        setUserName(e.target.value);
+                                                    }} />
                                                 </div>
                                             </div>
                                         </td>
@@ -33,8 +68,8 @@ function Info() {
                                         </td>
                                         <td className="input-cell">
                                             <div className="input-group d-inline-flex">
-                                                <div className="readonly-input">tr**********@gmail.com</div>
-                                                <a href="/user/account/email" className="btn-control">
+                                                <div className="readonly-input">{email}</div>                                                
+                                                <a href="#" className="btn-control">
                                                     Thay đổi
                                                 </a>
                                             </div>
@@ -46,8 +81,8 @@ function Info() {
                                         </td>
                                         <td className="input-cell">
                                             <div className="input-group">
-                                                <div className="readonly-input">*********91</div>
-                                                <a className="btn-control">Thay đổi</a>
+                                                <div className="readonly-input">{ phone }</div>
+                                                <a href="#" className="btn-control">Thay đổi</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -79,7 +114,7 @@ function Info() {
                                         </td>
                                         <td className="input-cell">
                                             <div className="input-group">
-                                                <div className="readonly-input">**/07/20**</div>
+                                                <div className="readonly-input">{ birth }</div>
                                                 <a className="btn-control">Thay đổi</a>
                                             </div>
                                         </td>
@@ -87,7 +122,7 @@ function Info() {
                                     <tr>
                                         <td className="label-cell"></td>
                                         <td className="input-cell">
-                                            <button type="button" className="btn-info btn-solid-primary">
+                                            <button type="button" className="btn btn-solid-primary">
                                                 Lưu
                                             </button>
                                         </td>
@@ -100,9 +135,7 @@ function Info() {
                         <div className="avatar-wrapper" style={{ backgroundImage: 'url("https://down-vn.img.susercontent.com/file/vn-11134004-7ras8-m0rc3sf0xksv28")' }}></div>
                         <div className="custom-file-upload">
                             <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" />
-                            <label htmlFor="file-upload" className="btn-info btn-light">
-                                Chọn ảnh
-                            </label>
+                            <label htmlFor="file-upload" className="btn btn-light">Chọn ảnh</label>
                         </div>
 
                         <div className="file-info">
@@ -113,7 +146,7 @@ function Info() {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default Info
+export default Info;

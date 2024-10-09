@@ -85,3 +85,16 @@ export const loginWithFirebase = async (token, type) => {
         throw error
     }
 }
+
+export const getUser = async () => {
+    try {
+        const response = await axios.get(API_URL + 'account/profile', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

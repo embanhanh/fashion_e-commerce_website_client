@@ -91,6 +91,11 @@
     transition: all 250ms;
 }
 
+.btn-facebook,
+.btn-google {
+    background-color: #fff;
+}
+
 .btn.btn-facebook::before {
     background-color: #1877f2;
 }
@@ -102,6 +107,7 @@
 .btn:hover {
     color: #fff;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    border: none;
 }
 
 .btn:hover::before {

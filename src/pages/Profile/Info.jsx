@@ -87,7 +87,7 @@ function Info() {
                                     <tr>
                                         <td className="label-cell"></td>
                                         <td className="input-cell">
-                                            <button type="button" className="btn btn-solid-primary">
+                                            <button type="button" className="btn-info btn-solid-primary">
                                                 Lưu
                                             </button>
                                         </td>
@@ -100,7 +100,7 @@ function Info() {
                         <div className="avatar-wrapper" style={{ backgroundImage: 'url("https://down-vn.img.susercontent.com/file/vn-11134004-7ras8-m0rc3sf0xksv28")' }}></div>
                         <div className="custom-file-upload">
                             <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" />
-                            <label htmlFor="file-upload" className="btn btn-light">
+                            <label htmlFor="file-upload" className="btn-info btn-light">
                                 Chọn ảnh
                             </label>
                         </div>

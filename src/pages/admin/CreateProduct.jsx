@@ -489,7 +489,7 @@ function CreateProduct() {
                             <p className="text-nowrap me-4 w-25 mt-2">
                                 <span style={{ color: 'red' }}>*</span> Mô tả sản phẩm:
                             </p>
-                            <div className="input-form d-flex align-items-center w-100 h-auto">
+                            <div className="input-form d-flex align-items-center w-100 h-100">
                                 <textarea
                                     type="text"
                                     autoComplete="off"

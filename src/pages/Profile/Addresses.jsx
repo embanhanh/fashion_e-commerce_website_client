@@ -35,7 +35,7 @@ function Addresses() {
                 <div>
                     <div className="add-address-button-container">
                         <div className="d-flex align-content-center">
-                            <button className="btn btn-dark add-address-btn">
+                            <button className="btn-addnew btn-dark add-address-btn">
                                 <div className="button-content d-flex">
                                     <div className="icon-wrapper">
                                         <FaPlus className="me-2" />

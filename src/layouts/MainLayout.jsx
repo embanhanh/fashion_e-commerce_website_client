@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState, useEffect } from 'react'
+import React, { useLayoutEffect, useState, useEffect, useMemo } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import './MainLayout.scss'
 import LogoShop from '../components/LogoShop'
@@ -8,6 +8,7 @@ import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart } from '../redux/slices/cartSlice'
 import { logout } from '../redux/slices/authSlice'
+import { fetchCategories } from '../redux/slices/categorySlice'
 import defaultAvatar from '../assets/image/default/default-avatar.png'
 import cartEmpty from '../assets/image/default/cart-empty.jpg'
 
@@ -16,7 +17,8 @@ function Mainlayout({ children }) {
     const location = useLocation()
     const dispatch = useDispatch()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
-    const { cart } = useSelector((state) => state.cart)
+    const { categories, status } = useSelector((state) => state.category)
+    const { cart, error } = useSelector((state) => state.cart)
     const [navOption, setNavOption] = useState('Trang chủ')
 
     useLayoutEffect(() => {
@@ -27,7 +29,17 @@ function Mainlayout({ children }) {
         if (isLoggedIn) {
             dispatch(fetchCart())
         }
+        dispatch(fetchCategories())
     }, [isLoggedIn, dispatch])
+
+    const filteredCategories = useMemo(() => {
+        return categories
+            .filter((category) => !category.parentCategory)
+            .map((parent) => ({
+                ...parent,
+                children: categories.filter((child) => child.parentCategory && child.parentCategory._id === parent._id),
+            }))
+    }, [categories])
 
     const navList = [
         {
@@ -75,31 +87,28 @@ function Mainlayout({ children }) {
                                     <p className="nav-title">{nav.title}</p>
                                 </Link>
                             ))}
-                            <div className="nav-shop-category z-3 max-md row rounded-4 px-4 pt-4 pb-5 shadow-lg ">
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
-                                <div className=" col-md-4 col-lg-3 g-4 d-inline-flex flex-column  ">
-                                    <Link className="fw-bold fs-4 p-2">Danh mục cha</Link>
-                                    <Link className="fs-4 p-2">Danh mục con</Link>
-                                </div>
+                            <div className="nav-shop-category z-3 max-md row g-2 rounded-4 px-4 py-3 shadow-lg ">
+                                {status === 'loading' ? (
+                                    <div className="dots-container mt-4">
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                    </div>
+                                ) : (
+                                    filteredCategories.map((category) => (
+                                        <div key={category._id} className=" col-md-4 col-lg-3 d-inline-flex flex-column  ">
+                                            <Link className="fw-bold fs-4 p-1">{category.name}</Link>
+                                            {category.children &&
+                                                category.children.map((child) => (
+                                                    <Link key={child._id} className="fs-4 p-1">
+                                                        {child.name}
+                                                    </Link>
+                                                ))}
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>

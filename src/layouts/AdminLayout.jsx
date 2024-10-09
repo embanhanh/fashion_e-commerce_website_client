@@ -62,6 +62,20 @@ function Adminlayout({ children }) {
                         <Link className="fs-4 seller-option">Trả hàng/hoàn tiền</Link>
                         <Link className="fs-4 seller-option">Cài đặt vận chuyển</Link>
                     </Accordion>
+                    <Accordion
+                        data={[
+                            {
+                                title: 'Quản lý Shop',
+                            },
+                        ]}
+                    >
+                        <Link className="fs-4 seller-option" to={'/seller/shop/infomation'}>
+                            Hồ sơ Shop
+                        </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/shop/design'}>
+                            Trang trí Shop
+                        </Link>
+                    </Accordion>
                 </div>
                 <div className="h-100 p-4 w-100" style={{ marginLeft: '20%', minHeight: '100vh' }}>
                     {children}

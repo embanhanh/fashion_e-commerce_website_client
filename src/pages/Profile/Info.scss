@@ -1,229 +1,212 @@
 // Styling for the profile container
 .profile-container {
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
 }
 
-.profile-header {  
-  border-bottom: 1px solid #efefef;
-  padding: 18px 0px;  
+.profile-header {
+    border-bottom: 1px solid #efefef;
+    padding: 18px 0px;
 }
 
 .profile-title {
-  font-size: 1.8rem;
-  font-weight: 500;
-  margin-bottom: 10px;
-  line-height: 1.5rem;
-  text-transform: capitalize;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.5rem;
+    text-transform: capitalize;
 }
-  
+
 .profile-subtitle {
-  font-size: 1.4rem;
-  color: #555;
-  line-height: 1.0625rem;
-}    
+    font-size: 1.4rem;
+    color: #555;
+    line-height: 1.0625rem;
+}
 
 .profile-body {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .profile-form {
-  flex: 1;
-  padding-right: 50px;
+    flex: 1;
+    padding-right: 50px;
 }
 
 .table-content {
-  width: 100%;  
+    width: 100%;
 }
 
 .label-cell {
-  text-align: right;
-  padding-bottom: 30px;
-  font-size: 1.4rem;
+    text-align: right;
+    padding-bottom: 30px;
+    font-size: 1.4rem;
 }
 
 .input-cell {
-  padding-left: 20px;
-  padding-bottom: 30px;
+    padding-left: 20px;
+    padding-bottom: 30px;
 }
 
 .form-control {
-  box-sizing: border-box;
-  padding: 12px;  
-  font-size: 1.4rem;
+    box-sizing: border-box;
+    padding: 12px;
+    font-size: 1.4rem;
 }
 
-.input-wraper {  
-  box-sizing: border-box;  
+.input-wraper {
+    box-sizing: border-box;
 }
-
 
 .readonly-input {
-  margin-right: 5px;
-  font-size: 1.4rem;
+    margin-right: 5px;
+    font-size: 1.4rem;
 }
 
 .btn-control {
     background: none;
     border: 0;
     color: #05a;
-    font-size: 1.3rem;  
+    font-size: 1.3rem;
     text-decoration: underline;
-    
 }
 .radio-group {
-  display: flex;
-  gap: 20px; /* Adds space between the radio options */
-  align-items: center; /* Aligns radio buttons and text vertically */
+    display: flex;
+    gap: 20px; /* Adds space between the radio options */
+    align-items: center; /* Aligns radio buttons and text vertically */
 }
 
 .radio-option {
-  display: flex;
-  align-items: center;
-  font-size: 14px; /* Adjusts text size to match the design */
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px; /* Adjusts text size to match the design */
+    cursor: pointer;
 
-  input[type="radio"] {
-      display: none; /* Hide the default radio button */
-  }
+    input[type='radio'] {
+        display: none; /* Hide the default radio button */
+    }
 
-  .custom-radio {
-      width: 14px; /* Matches the size of the circles */
-      height: 14px;
-      border: 2px solid #999; /* Gray border for the radio button */
-      border-radius: 50%; /* Makes the circle round */
-      margin-right: 8px; /* Space between the circle and the label */
-      display: inline-block;
-      position: relative;
-  }
+    .custom-radio {
+        width: 14px; /* Matches the size of the circles */
+        height: 14px;
+        border: 2px solid #999; /* Gray border for the radio button */
+        border-radius: 50%; /* Makes the circle round */
+        margin-right: 8px; /* Space between the circle and the label */
+        display: inline-block;
+        position: relative;
+    }
 
-  /* When the radio button is checked, show the filled circle */
-  input[type="radio"]:checked + .custom-radio {
-      background-color: #333; /* Darker color for the selected state */
-      border-color: #333; /* Matches the circle's background color */
-  }
+    /* When the radio button is checked, show the filled circle */
+    input[type='radio']:checked + .custom-radio {
+        background-color: #333; /* Darker color for the selected state */
+        border-color: #333; /* Matches the circle's background color */
+    }
 
-  /* Circle inside the custom radio when checked */
-  input[type="radio"]:checked + .custom-radio::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background-color: white;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-  }
+    /* Circle inside the custom radio when checked */
+    input[type='radio']:checked + .custom-radio::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
-  &:hover .custom-radio {
-      border-color: #666; /* Darken border on hover */
-  }
+    &:hover .custom-radio {
+        border-color: #666; /* Darken border on hover */
+    }
 }
 
-
-
 .file-info {
-  text-align: center;
-  color: #888;
-  font-size: 14px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
 }
 
 .avatar-wrapper {
-  width: 96px;
-  height: 96px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 50%;
-  margin-bottom: 10px;
+    width: 96px;
+    height: 96px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    margin-bottom: 10px;
 }
 
 .profile-avatar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-  // // Body section styling
-  
-  //   // Form section styling
-    
-  //     form {
-  //       padding-right: 50px;
-  //       table {
-  //         width: 100%;
+// // Body section styling
 
-  //         tr>td:first-child{
-  //           min-width: 20%;
-  //           box-sizing: border-box;
-  //           text-align: right;
-  //           padding-bottom: 30px;
-  //           white-space: nowrap;
-  //         }
-          
-  //         td {
-  //           padding: 10px;            
-  //           margin-left: 20px;
-  //           margin-bottom: 30px;
-  //           color: #0099ff;
-  //         }
+//   // Form section styling
 
-  //         label {
-  //           color: rgba(85, 85, 85, .8);
-  //           overflow: hidden;
-  //           padding-bottom: 30px;            
-  //         }
+//     form {
+//       padding-right: 50px;
+//       table {
+//         width: 100%;
 
-  //         .title {
-  //           text-align: right;
-  //         }
+//         tr>td:first-child{
+//           min-width: 20%;
+//           box-sizing: border-box;
+//           text-align: right;
+//           padding-bottom: 30px;
+//           white-space: nowrap;
+//         }
 
-  //         // Input group styling
-          
+//         td {
+//           padding: 10px;
+//           margin-left: 20px;
+//           margin-bottom: 30px;
+//           color: #0099ff;
+//         }
 
-  //         // Radio button group styling
-          
-            
-          
-  //   // Avatar section styling
-    
+//         label {
+//           color: rgba(85, 85, 85, .8);
+//           overflow: hidden;
+//           padding-bottom: 30px;
+//         }
 
-      
+//         .title {
+//           text-align: right;
+//         }
 
-      // File info section styling
-      
-    
+//         // Input group styling
 
+//         // Radio button group styling
 
+//   // Avatar section styling
+
+// File info section styling
 
 .custom-file-upload {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .file-input {
-  display: none;
+    display: none;
 }
 
-.btn {
-  display: inline-block;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border: 2px solid #0099ff;
-  border-radius: 4px;
-  color: #0099ff;
-  background-color: transparent;
-  transition: all 0.3s ease;
+.btn-info {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 2px solid #0099ff;
+    border-radius: 4px;
+    color: #0099ff;
+    background-color: transparent;
+    transition: all 0.3s ease;
 
-  &:hover {
-    background-color: #0099ff;
-    color: white;
-  }  
+    &:hover {
+        background-color: #0099ff;
+        color: white;
+    }
 }
-
-
-

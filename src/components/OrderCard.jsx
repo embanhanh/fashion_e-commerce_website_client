@@ -16,21 +16,15 @@ function OrderCart({ product }) {
                     <p>{product.price.toLocaleString()}đ</p>
                 </div>
                 <div className="order-action align-self-center">
-                    {product.status === 'delivered' ? (
-                        <button className="btn rate-btn">Đánh Giá</button>
-                    ) : (
-                        <button className="btn cancel-btn">Hủy Đơn Hàng</button>
-                    )}
+                    {product.status === 'delivered' ? <button className="btn-order rate-btn">Đánh Giá</button> : <button className="btn-order cancel-btn">Hủy Đơn Hàng</button>}
                 </div>
             </div>
             <div className="d-flex justify-content-left">
-                {product.status === 'delivered' ? (
-                    <p className="delivered-status me-4">Đã giao hàng</p>
-                ) : <p className="process-status me-4">Đang xử lý</p>}
-                <p className="statusMessage">{ product.statusMessage}</p>
+                {product.status === 'delivered' ? <p className="delivered-status me-4">Đã giao hàng</p> : <p className="process-status me-4">Đang xử lý</p>}
+                <p className="statusMessage">{product.statusMessage}</p>
             </div>
         </div>
-    );
+    )
 }
 
-export default OrderCart;
+export default OrderCart

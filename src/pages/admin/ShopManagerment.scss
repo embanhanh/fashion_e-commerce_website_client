@@ -1,3 +1,20 @@
 .form-label {
     flex: 0 0 120px;
 }
+
+.sticky-button-container {
+    position: sticky;
+    top: 90px;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end;
+    background-color: transparent; // Semi-transparent background
+    transition: background-color 0.3s ease;
+    button {
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import axios from 'axios'
-
+import { storage } from '../firebase.config'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 const API_URL = 'http://localhost:5000/shop/'
 
 const axiosInstance = axios.create({
@@ -28,19 +29,25 @@ export const getShop = async () => {
 
 export const updateShop = async (shopData) => {
     try {
-        const formData = new FormData()
-        for (const key in shopData) {
-            if (key === 'logo' && shopData[key] instanceof File) {
-                formData.append('logo', shopData[key])
-            } else {
-                formData.append(key, shopData[key])
+        let logoUrl = shopData.logo
+
+        if (shopData.logo instanceof File) {
+            if (shopData.oldLogoUrl) {
+                const oldLogoRef = ref(storage, shopData.oldLogoUrl)
+                await deleteObject(oldLogoRef)
             }
+
+            const logoRef = ref(storage, `shop_logos/${Date.now()}_${shopData.logo.name}`)
+            await uploadBytes(logoRef, shopData.logo)
+            logoUrl = await getDownloadURL(logoRef)
         }
-        const response = await axiosInstance.put('/edit', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
+
+        const updatedShopData = {
+            ...shopData,
+            logo: logoUrl,
+        }
+
+        const response = await axiosInstance.put('edit', updatedShopData)
         return response.data
     } catch (error) {
         throw error

@@ -18,10 +18,8 @@ const DraggableBox = ({ id, children, type }) => {
                 cursor: 'move',
                 padding: '5px',
                 margin: '5px',
-                backgroundColor: '#f0f0f0',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
             }}
+            className="draggable-elements-container"
         >
             {children}
         </div>

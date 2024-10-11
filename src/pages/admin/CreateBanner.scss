@@ -1,4 +1,11 @@
 .create-banner-container {
+    .draggable-elements-box {
+        background-color: #ccc;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        height: 60px;
+    }
     .template-list {
         width: 20%;
         overflow-y: auto;
@@ -26,5 +33,34 @@
 
     .banner-info {
         width: 25%;
+    }
+
+    button.draggable-elements {
+        background-color: #000;
+        color: #fff;
+    }
+
+    .draggable-elements-close {
+        transform: translate(50%, -50%);
+        display: none;
+    }
+}
+
+.draggable-elements-container {
+    &:hover {
+        border: 1px solid #fff;
+        .draggable-elements-close {
+            display: block;
+        }
+    }
+}
+
+.change-img-banner {
+    display: none;
+}
+
+.input-img-banner:hover {
+    .change-img-banner {
+        display: block;
     }
 }

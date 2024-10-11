@@ -1,18 +1,23 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useLayoutEffect, useCallback, useMemo } from 'react'
 import { DndProvider, useDrag, useDrop, useDragLayer } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useDropzone } from 'react-dropzone'
 import html2canvas from 'html2canvas'
-// import axios from 'axios';
-// import { storage } from '../../firebase';
+import { useDispatch, useSelector } from 'react-redux'
+import { createBannerAction, resetBannerState } from '../../redux/slices/bannerSlice'
+import Notification from '../../components/Notification'
+import { storage } from '../../firebase.config'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRight, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import imageCompression from 'browser-image-compression'
 import './CreateBanner.scss'
 import banner1 from '../../assets/image/banner/banner1.png'
 import banner2 from '../../assets/image/banner/banner2.png'
+import DraggableBox from '../../components/DraggableBox'
+import Modal from 'react-bootstrap/Modal'
 
 const DraggableElement = React.memo(({ id, children, position }) => {
     const [{ isDragging }, drag] = useDrag(
@@ -31,42 +36,61 @@ const DraggableElement = React.memo(({ id, children, position }) => {
             ref={drag}
             style={{
                 position: 'absolute',
-                top: position.top,
-                left: position.left,
+                top: `${position.top}%`,
+                left: `${position.left}%`,
+                // transform: `translate(${position.left}%, ${position.top}%)`,
                 opacity: isDragging ? 0.5 : 1,
-                border: isDragging ? '1px solid #fff' : 'none',
+                // border: isDragging ? '1px solid #fff' : 'none',
                 cursor: 'move',
                 userSelect: 'none',
             }}
+            className="draggable-elements-container"
         >
             {children}
         </div>
     )
 })
 
-function DropArea({ children, onMove, backgroundImage }) {
-    const [, dropRef] = useDrop({
+const DropArea = React.memo(({ children, onMove, onRemove, backgroundImage }) => {
+    const dropAreaRef = useRef(null)
+    const [, drop] = useDrop({
         accept: 'element',
         drop: (item, monitor) => {
-            const delta = monitor.getDifferenceFromInitialOffset()
-            if (delta) {
-                onMove(item.id, {
-                    top: Math.round(item.top + delta.y),
-                    left: Math.round(item.left + delta.x),
-                })
+            const clientOffset = monitor.getSourceClientOffset()
+
+            if (dropAreaRef.current) {
+                const dropAreaRect = dropAreaRef.current.getBoundingClientRect()
+                const left = ((clientOffset.x - dropAreaRect.x) / dropAreaRect.width) * 100
+                const top = ((clientOffset.y - dropAreaRect.y) / dropAreaRect.height) * 100
+                if (item.isNew) {
+                    onMove(item.id, { left, top }, true)
+                } else {
+                    onMove(item.id, { left, top })
+                }
             }
         },
     })
 
     return (
-        <div className="banner-design position-relative w-100 h-100" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} ref={dropRef}>
+        <div
+            className="banner-design position-relative w-100 h-100"
+            style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            ref={drop(dropAreaRef)}
+        >
             {children}
         </div>
     )
-}
+})
 
 function CreateBanner() {
-    const [bannerTemplates, setBannerTemplates] = useState([banner1, banner2])
+    const dispatch = useDispatch()
+    const { loading, error, success } = useSelector((state) => state.banner)
+    const [showNotification, setShowNotification] = useState(false)
+    const [notificationMessage, setNotificationMessage] = useState('')
+    const [notificationType, setNotificationType] = useState('')
+    const bannerTemplates = useMemo(() => [banner1, banner2], [])
+    const [file, setFile] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
     const [bannerInfo, setBannerInfo] = useState({
         imageUrl: '',
         title: 'Tiêu đề',
@@ -77,21 +101,16 @@ function CreateBanner() {
         displayEndTime: new Date(),
         isActive: true,
     })
-    const [elements, setElements] = useState({
-        title: { top: 70, left: 70 },
-        description: { top: 90, left: 70 },
-        button: { top: 175, left: 70 },
-    })
+    const [elements, setElements] = useState({})
     const bannerRef = useRef(null)
 
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0]
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setBannerInfo((prev) => ({ ...prev, imageUrl: e.target.result }))
-            }
-            reader.readAsDataURL(file)
+            setFile(file)
+            const objectUrl = URL.createObjectURL(file)
+            setBannerInfo((prev) => ({ ...prev, imageUrl: objectUrl }))
+            return () => URL.revokeObjectURL(objectUrl)
         }
     }, [])
 
@@ -102,73 +121,147 @@ function CreateBanner() {
         },
     })
 
-    const handleMove = useCallback((id, newPosition) => {
-        setElements((prev) => ({
-            ...prev,
-            [id]: newPosition,
-        }))
+    const handleMove = useCallback((id, newPosition, isNew = false) => {
+        setElements((prev) => {
+            const existingElement = prev[id]
+            return {
+                ...prev,
+                [id]: {
+                    ...newPosition,
+                    type: isNew ? id : existingElement ? existingElement.type : id,
+                },
+            }
+        })
     }, [])
-    const handleSave = async () => {
-        const canvas = await html2canvas(bannerRef.current)
-        const blob = await new Promise((resolve) => canvas.toBlob(resolve))
-        const file = new File([blob], 'banner.png', { type: 'image/png' })
 
-        // const storageRef = ref(storage, `banners/${file.name}`);
-        // await uploadBytes(storageRef, file);
-        // const downloadURL = await getDownloadURL(storageRef);
+    const handleRemove = useCallback((id) => {
+        setElements((prev) => {
+            const newElements = { ...prev }
+            delete newElements[id]
+            return newElements
+        })
+    }, [])
 
-        // const bannerData = {
-        //   ...bannerInfo,
-        //   imageUrl: downloadURL,
-        //   elements: elements,
-        // };
+    const handleSave = useCallback(async () => {
+        if (!bannerInfo.imageUrl) {
+            setNotificationMessage('Vui lòng chọn ảnh banner')
+            setNotificationType('error')
+            setShowNotification(true)
+            return
+        }
 
-        // try {
-        //   await axios.post('/api/banner/create', bannerData);
-        //   alert('Banner saved successfully!');
-        // } catch (error) {
-        //   console.error('Error saving banner:', error);
-        //   alert('Failed to save banner');
-        // }
-    }
+        try {
+            setIsLoading(true)
+            let downloadURL = bannerInfo.imageUrl
+            const isTemplate = bannerTemplates.includes(bannerInfo.imageUrl)
+            if (!isTemplate) {
+                const storageRef = ref(storage, `banners/${Date.now()}_${file.name}`)
+                const snapshot = await uploadBytes(storageRef, file)
+                downloadURL = await getDownloadURL(snapshot.ref)
+            }
 
-    const handleTemplateSelect = (template) => {
+            const bannerData = {
+                ...bannerInfo,
+                imageUrl: downloadURL,
+                elements: {
+                    title: elements.title
+                        ? {
+                              top: elements.title.top,
+                              left: elements.title.left,
+                          }
+                        : {},
+                    description: elements.description
+                        ? {
+                              top: elements.description.top,
+                              left: elements.description.left,
+                          }
+                        : {},
+                    button: elements.button
+                        ? {
+                              top: elements.button.top,
+                              left: elements.button.left,
+                          }
+                        : {},
+                },
+            }
+
+            console.log(bannerData)
+
+            dispatch(createBannerAction(bannerData))
+        } catch (error) {
+            console.error('Error uploading image:', error)
+            setNotificationMessage('Lỗi khi tải ảnh lên')
+            setNotificationType('error')
+            setShowNotification(true)
+        } finally {
+            setIsLoading(false)
+        }
+    })
+
+    useLayoutEffect(() => {
+        if (success) {
+            setNotificationMessage('Banner đã được lưu thành công!')
+            setNotificationType('success')
+            setShowNotification(true)
+            setBannerInfo({
+                imageUrl: '',
+                title: 'Tiêu đề',
+                description: 'Mô tả',
+                buttonText: 'Tiêu đề nút',
+                linkUrl: '',
+                displayStartTime: new Date(),
+                displayEndTime: new Date(),
+                isActive: true,
+            })
+        } else if (error) {
+            setNotificationMessage('Lỗi khi lưu banner: ' + error)
+            setNotificationType('error')
+            setShowNotification(true)
+        }
+    }, [success, error])
+
+    const handleTemplateSelect = useCallback((template) => {
         setBannerInfo((prev) => ({ ...prev, imageUrl: template }))
-    }
+    })
 
     const truncateText = (text, maxLength) => {
         return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
     }
 
     const draggableElements = useMemo(
-        () => ({
-            title: (
-                <DraggableElement key="title" id="title" position={elements.title}>
-                    <h2 className="text-white fw-bold fs-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
-                        {bannerInfo.title}
-                    </h2>
-                </DraggableElement>
-            ),
-            description: (
-                <DraggableElement key="description" id="description" position={elements.description}>
-                    <p className="text-white fw-medium fs-5" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
-                        {bannerInfo.description}
-                    </p>
-                </DraggableElement>
-            ),
-            button: (
-                <DraggableElement key="button" id="button" position={elements.button}>
-                    <button className="primary-btn px-3 py-1">
-                        <p className="fs-5 p-0">
-                            {truncateText(bannerInfo.buttonText, 20)} <FontAwesomeIcon icon={faArrowRight} />
-                        </p>
-                    </button>
-                </DraggableElement>
-            ),
-        }),
-        [elements, bannerInfo, truncateText]
+        () =>
+            Object.entries(elements)
+                .map(([id, element]) => {
+                    if (!element || !element.type) return null
+                    const { top, left, type } = element
+                    return (
+                        <DraggableElement key={id} id={id} position={{ top, left }} onMove={handleMove} onRemove={handleRemove}>
+                            {type === 'title' && (
+                                <h2 className="draggable-elements text-white fw-bold fs-2 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                    {bannerInfo.title}
+                                </h2>
+                            )}
+                            {type === 'description' && (
+                                <p className="draggable-elements text-white fw-medium fs-5 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                    {bannerInfo.description}
+                                </p>
+                            )}
+                            {type === 'button' && (
+                                <button className="draggable-elements primary-btn px-3 py-1">
+                                    <p className="fs-5 p-0">
+                                        {truncateText(bannerInfo.buttonText, 20)} <FontAwesomeIcon icon={faArrowRight} />
+                                    </p>
+                                </button>
+                            )}
+                            <button onClick={() => handleRemove(id)} className="fs-4 bg-transparent border-0 draggable-elements-close position-absolute top-0 end-0 p-0">
+                                <FontAwesomeIcon icon={faCircleXmark} color="#fff" />
+                            </button>
+                        </DraggableElement>
+                    )
+                })
+                .filter(Boolean),
+        [elements, bannerInfo, handleMove, handleRemove, truncateText]
     )
-
     return (
         <DndProvider backend={HTML5Backend}>
             <p className="fs-3 fw-medium p-3 border-top border-end border-start bg-white">Thiết kế Banner</p>
@@ -179,26 +272,41 @@ function CreateBanner() {
                     ))}
                 </div>
                 <div className="border-start" style={{ minHeight: '80vh' }}></div>
-                <div className="banner-design position-relative" ref={bannerRef}>
-                    <DropArea onMove={handleMove} backgroundImage={bannerInfo.imageUrl}>
-                        {bannerInfo.imageUrl ? Object.values(draggableElements) : null}
-                    </DropArea>
+                <div className="">
+                    <div className="draggable-elements-box border d-flex justify-content-center w-100 mb-4 align-items-center">
+                        <DraggableBox id="title" type="title">
+                            <h2 className="text-white fw-bold fs-2 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                Tiêu đề
+                            </h2>
+                        </DraggableBox>
+                        <DraggableBox id="description" type="description">
+                            <p className="text-white fw-medium fs-5 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                Mô tả
+                            </p>
+                        </DraggableBox>
+                        <DraggableBox id="button" type="button">
+                            <button className="primary-btn px-3 py-1 draggable-elements">
+                                <p className="fs-5 p-0">
+                                    Tiêu đề nút <FontAwesomeIcon icon={faArrowRight} />
+                                </p>
+                            </button>
+                        </DraggableBox>
+                    </div>
+                    <div className="banner-design position-relative" ref={bannerRef}>
+                        <DropArea onMove={handleMove} onRemove={handleRemove} backgroundImage={bannerInfo.imageUrl}>
+                            {bannerInfo.imageUrl ? draggableElements : null}
+                        </DropArea>
+                    </div>
                 </div>
                 <div className="border-start" style={{ minHeight: '80vh' }}></div>
 
                 <div className="banner-info h-auto p-3">
-                    <div className="d-flex justify-content-center align-items-center mb-3" {...getRootProps()}>
+                    <div className="input-img-banner d-flex justify-content-center align-items-center mb-3 position-relative" {...getRootProps()}>
                         <input {...getInputProps()} />
                         {bannerInfo.imageUrl ? (
                             <div className="selected-image-container">
                                 <img src={bannerInfo.imageUrl} alt="Selected banner" className="w-100 h-100" style={{ objectFit: 'cover' }} />
-                                <button
-                                    className="p-3 bg-white"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        setBannerInfo((prev) => ({ ...prev, imageUrl: '' }))
-                                    }}
-                                >
+                                <button className="change-img-banner p-3 text-white fs-3 w-100 h-100 position-absolute top-0 start-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                                     Thay đổi
                                 </button>
                             </div>
@@ -274,11 +382,34 @@ function CreateBanner() {
                         placeholderText="Ngày kết thúc"
                         dateFormat="dd/MM/yyyy"
                     />
-                    <button className="p-3 border d-block bg-white" onClick={handleSave}>
-                        <p className="fs-4 fw-medium">Lưu</p>
+                    <button disabled={isLoading || !bannerInfo.imageUrl} className="p-3 border d-flex justify-content-center align-items-center bg-white" onClick={handleSave}>
+                        <p className="fs-4 fw-medium">{isLoading ? 'Đang lưu...' : 'Lưu'}</p>
+                        {isLoading && (
+                            <div className="dot-spinner ms-4">
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                                <div className="dot-spinner__dot"></div>
+                            </div>
+                        )}
                     </button>
                 </div>
             </div>
+            {showNotification && (
+                <Modal
+                    show={showNotification}
+                    onHide={() => {
+                        setShowNotification(false)
+                        dispatch(resetBannerState())
+                    }}
+                    centered
+                >
+                    <Notification type={notificationType} title={notificationType === 'success' ? 'Thành công' : 'Lỗi'} description={notificationMessage} />
+                </Modal>
+            )}
         </DndProvider>
     )
 }

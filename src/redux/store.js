@@ -6,6 +6,7 @@ import productReducer from './slices/productSlice'
 import authReducer from './slices/authSlice'
 import cartReducer from './slices/cartSlice'
 import shopReducer from './slices/shopSlice'
+import bannerReducer from './slices/bannerSlice'
 const authPersistConfig = {
     key: 'auth',
     storage,
@@ -21,6 +22,7 @@ export const store = configureStore({
         auth: persistedAuthReducer,
         cart: cartReducer,
         shop: shopReducer,
+        banner: bannerReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

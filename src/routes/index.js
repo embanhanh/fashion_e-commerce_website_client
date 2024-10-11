@@ -18,6 +18,7 @@ import CreateProduct from '../pages/admin/CreateProduct.jsx'
 import MainManager from '../pages/admin/MainManager.jsx'
 import ShopManagerment from '../pages/admin/ShopManagerment.jsx'
 import DesignShop from '../pages/admin/DesignShop.jsx'
+import CreateBanner from '../pages/admin/CreateBanner.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -48,7 +49,8 @@ const publicRoutes = [
     { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout },
     { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
     { path: '/seller/shop/infomation', element: ShopManagerment, layout: Adminlayout },
-    { path: '/seller/shop/design', element: DesignShop, layout: Adminlayout },
+    { path: '/seller/shop/banner', element: DesignShop, layout: Adminlayout },
+    { path: '/seller/shop/banner/create', element: CreateBanner, layout: Adminlayout },
     { path: '/seller', element: MainManager, layout: Adminlayout },
 ]
 const privateRoutes = []

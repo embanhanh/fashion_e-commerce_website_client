@@ -72,8 +72,11 @@ function Adminlayout({ children }) {
                         <Link className="fs-4 seller-option" to={'/seller/shop/infomation'}>
                             Hồ sơ Shop
                         </Link>
-                        <Link className="fs-4 seller-option" to={'/seller/shop/design'}>
-                            Trang trí Shop
+                        <Link className="fs-4 seller-option" to={'/seller/shop/banner'}>
+                            Banner của Shop
+                        </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/shop/banner/create'}>
+                            Tạo banner
                         </Link>
                     </Accordion>
                 </div>

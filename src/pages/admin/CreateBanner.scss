@@ -1,0 +1,30 @@
+.create-banner-container {
+    .template-list {
+        width: 20%;
+        overflow-y: auto;
+        max-height: 80vh;
+
+        img {
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+
+            &.selected {
+                border-color: #007bff;
+            }
+        }
+    }
+
+    .banner-design {
+        width: 550px;
+        position: relative;
+        height: 275px;
+        border: 1px solid #ccc;
+        overflow: hidden;
+    }
+
+    .banner-info {
+        width: 25%;
+    }
+}

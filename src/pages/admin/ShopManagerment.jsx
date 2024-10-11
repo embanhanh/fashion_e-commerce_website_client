@@ -133,7 +133,7 @@ function ShopManagerment() {
     ]
 
     return (
-        <div className=" pb-5  shop-management">
+        <div className=" pb-5">
             <div className="bg-white border">
                 {loading ? (
                     <div className="dot-spinner ms-4">

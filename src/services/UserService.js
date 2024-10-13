@@ -98,3 +98,29 @@ export const getUser = async () => {
         throw error.response.data
     }
 }
+
+export const updateProfile = async (userData) => {
+    try {
+        const response = await axios.put(API_URL + 'account/profile/edit', userData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,  // Thêm token vào headers
+                'Content-Type': 'application/json', // Đảm bảo định dạng JSON
+            },
+        });
+
+        return response.data;  // Trả về dữ liệu từ response
+    } catch (error) {
+        // Xử lý lỗi từ phía server hoặc mạng
+        if (error.response) {
+            // Lỗi từ phía server (4xx hoặc 5xx)
+            const message = error.response.data?.message || 'Cập nhật hồ sơ thất bại';
+            throw new Error(message);
+        } else if (error.request) {
+            // Lỗi từ phía mạng hoặc yêu cầu không được thực thi
+            throw new Error('Không thể kết nối đến máy chủ, vui lòng kiểm tra kết nối mạng.');
+        } else {
+            // Lỗi khi tạo yêu cầu hoặc các lỗi khác
+            throw new Error('Có lỗi xảy ra: ' + error.message);
+        }
+    }
+};

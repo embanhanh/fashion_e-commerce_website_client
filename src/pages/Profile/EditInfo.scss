@@ -2,12 +2,9 @@
 .profile-container {
     display: flex;
     flex-direction: column;
-    margin-left: 20px;    
+    margin-left: 20px;
 }
 
-.profile-avatar {
-    height: 200px;
-}
 .profile-header {
     border-bottom: 1px solid #efefef;
     padding: 18px 0px;
@@ -145,6 +142,16 @@
     flex-direction: column;
     align-items: center;
 }
+.notification-overlay {
+    position: fixed;
+    top: 20px; /* Điều chỉnh vị trí từ trên xuống */
+    right: 20px; /* Điều chỉnh vị trí từ phải sang */
+    z-index: 9999; /* Z-index cao để hiển thị phía trên */
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng để rõ ràng hơn */
+    border-radius: 8px;
+}
 
 
 .custom-file-upload {
@@ -156,20 +163,19 @@
     display: none;
 }
 
-.edit-btn {
+.btn-info {
     display: inline-block;
     padding: 6px 12px;
     font-size: 14px;
-    cursor: pointer;    
+    cursor: pointer;
+    border: 2px solid #0099ff;
     border-radius: 4px;
-    color: #efefef;
-    background-color: #000;
+    color: #0099ff;
+    background-color: transparent;
     transition: all 0.3s ease;
 
     &:hover {
-        background-color: #333;
+        background-color: #0099ff;
         color: white;
     }
 }
-
-

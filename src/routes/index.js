@@ -18,6 +18,7 @@ import CreateProduct from '../pages/admin/CreateProduct.jsx'
 import MainManager from '../pages/admin/MainManager.jsx'
 import ShopManagerment from '../pages/admin/ShopManagerment.jsx'
 import DesignShop from '../pages/admin/DesignShop.jsx'
+import EditInfo from '../pages/Profile/EditInfo.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -42,6 +43,7 @@ const publicRoutes = [
             { path: 'savedcards', element: SavedCards, layout: Fragment },
             { path: 'notifications', element: Notifications, layout: Fragment },
             { path: 'settings', element: Settings, layout: Fragment },
+            { path: 'profile/edit', element: EditInfo, layout: Fragment },
         ],
     },
     { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout },

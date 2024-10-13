@@ -47,3 +47,20 @@
 .min-vh-100 {
     min-height: 100vh;
 }
+
+.sidebar-nav .avartar-profile {    
+    text-align: left;
+    padding: 15px 0;
+    background-color: #f8f9fa; /* Màu nền nhẹ */
+}
+
+.sidebar-nav .avatar-img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sidebar-nav .greeting-text {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}

@@ -15,6 +15,19 @@ export const createBanner = async (bannerData) => {
     }
 }
 
+export const getBannerById = async (bannerId) => {
+    try {
+        const response = await axios.get(`${API_URL}get/${bannerId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}
+
 export const getAllBanners = async (params) => {
     try {
         const response = await axios.get(API_URL, { params })

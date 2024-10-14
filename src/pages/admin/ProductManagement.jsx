@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import './ProductManagement.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faList } from '@fortawesome/free-solid-svg-icons'
-import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
+import { faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons'
 import { BsGridFill } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, setSortOption, setCurrentPage, deleteProductAction } from '../../redux/slices/productSlice'
@@ -84,12 +84,10 @@ function ProductManagement() {
                     <p className="fs-4 fw-medium text-center">{product.originalPrice - (product.originalPrice * product.discount) / 100}</p>
                     <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
                     <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>
-                    <div className="d-flex align-items-center flex-column">
+                    <div className="d-flex align-items-center flex-column px-4">
                         <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/products/edit/${product.slug}`)} />
                         <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" onClick={() => handleDeleteProduct(product.slug)} />
-                        <button className="primary-btn shadow-none px-2 py-0">
-                            <p className="">Chi tiết</p>
-                        </button>
+                        <FontAwesomeIcon icon={faEye} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => navigate(`/seller/products/detail/${product.slug}`)} />
                     </div>
                 </div>
             )

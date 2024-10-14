@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useLayoutEffect, useCallback, useMemo } from 'react'
 import { DndProvider, useDrag, useDrop, useDragLayer } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import DatePicker from 'react-datepicker'
@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { useDropzone } from 'react-dropzone'
 import html2canvas from 'html2canvas'
 import { useDispatch, useSelector } from 'react-redux'
-import { createBannerAction, resetBannerState } from '../../redux/slices/bannerSlice'
+import { createBannerAction, resetBannerState, fetchBannerById, updateBanner } from '../../redux/slices/bannerSlice'
 import Notification from '../../components/Notification'
 import { storage } from '../../firebase.config'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -18,6 +18,7 @@ import banner1 from '../../assets/image/banner/banner1.png'
 import banner2 from '../../assets/image/banner/banner2.png'
 import DraggableBox from '../../components/DraggableBox'
 import Modal from 'react-bootstrap/Modal'
+import { useParams, useNavigate } from 'react-router-dom'
 
 const DraggableElement = React.memo(({ id, children, position }) => {
     const [{ isDragging }, drag] = useDrag(
@@ -83,8 +84,10 @@ const DropArea = React.memo(({ children, onMove, onRemove, backgroundImage }) =>
 })
 
 function CreateBanner() {
+    const { banner_id } = useParams()
+    const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { loading, error, success } = useSelector((state) => state.banner)
+    const { currentBanner, loading, error, success } = useSelector((state) => state.banner)
     const [showNotification, setShowNotification] = useState(false)
     const [notificationMessage, setNotificationMessage] = useState('')
     const [notificationType, setNotificationType] = useState('')
@@ -103,6 +106,35 @@ function CreateBanner() {
     })
     const [elements, setElements] = useState({})
     const bannerRef = useRef(null)
+
+    useEffect(() => {
+        if (banner_id) {
+            dispatch(fetchBannerById(banner_id))
+        }
+    }, [banner_id])
+
+    useEffect(() => {
+        if (currentBanner && banner_id) {
+            setBannerInfo({
+                imageUrl: currentBanner.imageUrl,
+                title: currentBanner.title,
+                description: currentBanner.description,
+                buttonText: currentBanner.buttonText,
+                linkUrl: currentBanner.linkUrl,
+                displayStartTime: new Date(currentBanner.displayStartTime),
+                displayEndTime: new Date(currentBanner.displayEndTime),
+                isActive: currentBanner.isActive,
+            })
+            const newElements = {}
+            Object.entries(currentBanner.elements).forEach(([key, value]) => {
+                newElements[key] = {
+                    ...value,
+                    type: key,
+                }
+            })
+            setElements(newElements)
+        }
+    }, [currentBanner, banner_id])
 
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles.length > 0) {
@@ -154,7 +186,7 @@ function CreateBanner() {
             setIsLoading(true)
             let downloadURL = bannerInfo.imageUrl
             const isTemplate = bannerTemplates.includes(bannerInfo.imageUrl)
-            if (!isTemplate) {
+            if (!isTemplate && file) {
                 const storageRef = ref(storage, `banners/${Date.now()}_${file.name}`)
                 const snapshot = await uploadBytes(storageRef, file)
                 downloadURL = await getDownloadURL(snapshot.ref)
@@ -185,9 +217,11 @@ function CreateBanner() {
                 },
             }
 
-            console.log(bannerData)
-
-            dispatch(createBannerAction(bannerData))
+            if (banner_id) {
+                dispatch(updateBanner({ bannerId: banner_id, bannerData }))
+            } else {
+                dispatch(createBannerAction(bannerData))
+            }
         } catch (error) {
             console.error('Error uploading image:', error)
             setNotificationMessage('Lỗi khi tải ảnh lên')

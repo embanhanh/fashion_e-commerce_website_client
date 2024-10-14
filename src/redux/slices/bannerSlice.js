@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createBanner, getAllBanners, editBanner, removeBanner } from '../../services/BannerService'
+import { createBanner, getAllBanners, editBanner, removeBanner, getBannerById } from '../../services/BannerService'
 
 export const createBannerAction = createAsyncThunk('banner/createBanner', async (bannerData, { rejectWithValue }) => {
     try {
@@ -7,6 +7,15 @@ export const createBannerAction = createAsyncThunk('banner/createBanner', async 
         return response
     } catch (error) {
         return rejectWithValue(error.message || 'Không thể tạo banner')
+    }
+})
+
+export const fetchBannerById = createAsyncThunk('banner/fetchBannerById', async (bannerId, { rejectWithValue }) => {
+    try {
+        const response = await getBannerById(bannerId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Không thể lấy banner')
     }
 })
 
@@ -103,6 +112,7 @@ const bannerSlice = createSlice({
                     state.banners[index] = action.payload
                 }
                 state.success = true
+                state.currentBanner = action.payload
             })
             .addCase(updateBanner.rejected, (state, action) => {
                 state.loading = false
@@ -110,19 +120,28 @@ const bannerSlice = createSlice({
                 state.success = false
             })
             .addCase(deleteBanner.pending, (state) => {
-                state.loading = true
                 state.error = null
                 state.success = false
             })
             .addCase(deleteBanner.fulfilled, (state, action) => {
-                state.loading = false
                 state.banners = state.banners.filter((banner) => banner._id !== action.payload._id)
                 state.success = true
             })
             .addCase(deleteBanner.rejected, (state, action) => {
-                state.loading = false
                 state.error = action.payload
                 state.success = false
+            })
+            .addCase(fetchBannerById.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(fetchBannerById.fulfilled, (state, action) => {
+                state.loading = false
+                state.currentBanner = action.payload
+                console.log(state.currentBanner)
+            })
+            .addCase(fetchBannerById.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
             })
     },
 })

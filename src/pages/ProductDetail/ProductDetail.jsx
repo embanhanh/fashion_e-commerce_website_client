@@ -89,7 +89,7 @@ function ProductDetail() {
                 dispatch(resetAddToCartSuccess())
             }, 1000)
         } else if (cartError) {
-            setToastMessage('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + cartError)
+            setToastMessage('Có lỗi xảy ra ' + cartError)
             setToastVariant('error')
             setShowToast(true)
         }

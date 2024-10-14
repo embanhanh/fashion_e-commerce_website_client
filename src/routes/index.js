@@ -19,6 +19,7 @@ import MainManager from '../pages/admin/MainManager.jsx'
 import ShopManagerment from '../pages/admin/ShopManagerment.jsx'
 import DesignShop from '../pages/admin/DesignShop.jsx'
 import CreateBanner from '../pages/admin/CreateBanner.jsx'
+import NotFound from '../pages/NotFound/NotFound.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -51,7 +52,9 @@ const publicRoutes = [
     { path: '/seller/shop/infomation', element: ShopManagerment, layout: Adminlayout },
     { path: '/seller/shop/banner', element: DesignShop, layout: Adminlayout },
     { path: '/seller/shop/banner/create', element: CreateBanner, layout: Adminlayout },
+    { path: '/seller/shop/banner/edit/:banner_id', element: CreateBanner, layout: Adminlayout },
     { path: '/seller', element: MainManager, layout: Adminlayout },
+    { path: '*', element: NotFound, layout: Fragment },
 ]
 const privateRoutes = []
 

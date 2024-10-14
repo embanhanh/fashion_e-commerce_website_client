@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faTrashCan, faEye, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import banner from '../../assets/image/banner/banner1.png'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchBanners, setFilters, deleteBanner, resetBannerState, fetchBannerById } from '../../redux/slices/bannerSlice'
+import { fetchBanners, setFilters, deleteManyBanners, resetBannerState, fetchBannerById } from '../../redux/slices/bannerSlice'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate } from 'react-router-dom'
@@ -27,6 +27,8 @@ function DesignShop() {
         show: false,
         bannerId: [],
     })
+    const [selectedBanners, setSelectedBanners] = useState([])
+    const [bulkAction, setBulkAction] = useState('')
 
     useEffect(() => {
         dispatch(fetchBanners(filters))
@@ -56,10 +58,49 @@ function DesignShop() {
         })
     }, [banners, search, statusFilter])
 
+    const handleSelectAll = (event) => {
+        if (event.target.checked) {
+            setSelectedBanners(filteredBanners.map((banner) => banner._id))
+        } else {
+            setSelectedBanners([])
+        }
+    }
+
+    const handleSelectBanner = (bannerId) => {
+        setSelectedBanners((prevSelected) => {
+            if (prevSelected.includes(bannerId)) {
+                return prevSelected.filter((id) => id !== bannerId)
+            } else {
+                return [...prevSelected, bannerId]
+            }
+        })
+    }
+
+    const handleBulkAction = () => {
+        if (bulkAction === 'deleteSelectedBanners') {
+            setShowConfirmDelete({ show: true, bannerId: selectedBanners })
+        }
+    }
+
+    const handleDeleteSelectedBanners = async () => {
+        if (showConfirmDelete.bannerId.length > 0) {
+            await dispatch(deleteManyBanners(showConfirmDelete.bannerId))
+            setShowConfirmDelete({ show: false, bannerId: [] })
+            setSelectedBanners([])
+            setBulkAction('')
+        }
+    }
+
+    useEffect(() => {
+        if (bulkAction === 'deleteSelectedBanners' && selectedBanners.length > 0) {
+            handleBulkAction()
+        }
+    }, [bulkAction])
+
     useEffect(() => {
         if (success) {
             setNotificationMessage('Banner đã được xóa thành công!')
-            setNotificationType('info')
+            setNotificationType('success')
             setShowNotification(true)
         } else if (error) {
             setNotificationMessage('Lỗi khi xóa banner: ' + error)
@@ -126,12 +167,31 @@ function DesignShop() {
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">{filteredBanners.length} banner</p>
                     <div className="d-flex">
-                        <button className="primary-btn shadow-none py-2 px-4 rounded-2 border-1" onClick={() => navigate('/seller/shop/banner/create')}>
-                            <p className="fs-4 fw-medium">
-                                Tạo banner mới <span className="ms-2">+</span>
-                            </p>
-                        </button>
-                        <div className="select ms-3">
+                        <div className="select ">
+                            <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xóa các banner đang chọn">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                    <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                                </svg>
+                            </div>
+                            <div className="options">
+                                <div title="all">
+                                    <input id="all-v2" name="option-v2" type="radio" checked={bulkAction === ''} onChange={() => setBulkAction('')} />
+                                    <label className="option" htmlFor="all-v2" data-txt="Công cụ xử lý hàng loạt" />
+                                </div>
+                                <div title="option-1">
+                                    <input
+                                        id="option-1-v2"
+                                        name="option-v2"
+                                        type="radio"
+                                        value="deleteSelectedBanners"
+                                        checked={bulkAction === 'deleteSelectedBanners'}
+                                        onChange={(e) => setBulkAction(e.target.value)}
+                                    />
+                                    <label className="option" htmlFor="option-1-v2" data-txt="Xóa các banner đang chọn" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="select mx-3">
                             <div className="selected" data-default="Tất cả" data-one="Đang hoạt động" data-two="Đã hết hạn" data-three="Sắp diễn ra">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                     <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
@@ -156,6 +216,11 @@ function DesignShop() {
                                 </div>
                             </div>
                         </div>
+                        <button className="primary-btn shadow-none py-2 px-4 rounded-2 border-1" onClick={() => navigate('/seller/shop/banner/create')}>
+                            <p className="fs-4 fw-medium">
+                                Tạo banner mới <span className="ms-2">+</span>
+                            </p>
+                        </button>
                     </div>
                 </div>
                 <div className="p-3">
@@ -163,7 +228,7 @@ function DesignShop() {
                         <div className="banner-grid py-3 border-bottom">
                             <div className="checkbox-cell">
                                 <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" />
+                                    <input checked={selectedBanners.length === filteredBanners.length} type="checkbox" className="input-checkbox" onChange={handleSelectAll} />
                                     <span className="custom-checkbox"></span>
                                 </label>
                             </div>
@@ -183,7 +248,7 @@ function DesignShop() {
                                 <div key={banner._id} className="banner-grid py-3 border-bottom">
                                     <div className="checkbox-cell">
                                         <label className="d-flex align-items-center">
-                                            <input type="checkbox" className="input-checkbox" />
+                                            <input type="checkbox" className="input-checkbox" checked={selectedBanners.includes(banner._id)} onChange={() => handleSelectBanner(banner._id)} />
                                             <span className="custom-checkbox"></span>
                                         </label>
                                     </div>
@@ -282,18 +347,12 @@ function DesignShop() {
             )}
             {showConfirmDelete.show && (
                 <Modal show={showConfirmDelete.show} onHide={() => setShowConfirmDelete({ show: false, bannerId: [] })} centered>
-                    <Notification type="warning" title="Bạn có chắc chắn muốn xóa banner này?" description="Bạn sẽ không thể hoàn tác sau khi xóa">
+                    <Notification type="warning" title="Bạn có chắc chắn muốn xóa (các) banner này?" description="Bạn sẽ không thể hoàn tác sau khi xóa">
                         <div className="d-flex align-items-center justify-content-center bg-white">
                             <button className=" border px-3 py-1 bg-white rounded-2" onClick={() => setShowConfirmDelete({ show: false, bannerId: [] })}>
                                 <p className="fs-4">Hủy</p>
                             </button>
-                            <button
-                                className="primary-btn shadow-none py-1 px-3 ms-3"
-                                onClick={async () => {
-                                    await dispatch(deleteBanner(showConfirmDelete.bannerId[0]))
-                                    setShowConfirmDelete({ show: false, bannerId: [] })
-                                }}
-                            >
+                            <button className="primary-btn shadow-none py-1 px-3 ms-3" onClick={handleDeleteSelectedBanners}>
                                 <p className="fs-4">Xóa</p>
                             </button>
                         </div>

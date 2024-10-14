@@ -62,3 +62,20 @@ export const removeBanner = async (bannerId) => {
         throw error.response.data
     }
 }
+
+export const removeManyBanners = async (bannerIds) => {
+    try {
+        const response = await axios.post(
+            `${API_URL}remove-many`,
+            { bannerIds },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

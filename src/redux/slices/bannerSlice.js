@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createBanner, getAllBanners, editBanner, removeBanner, getBannerById } from '../../services/BannerService'
+import { createBanner, getAllBanners, editBanner, removeBanner, getBannerById, removeManyBanners } from '../../services/BannerService'
 
 export const createBannerAction = createAsyncThunk('banner/createBanner', async (bannerData, { rejectWithValue }) => {
     try {
@@ -43,6 +43,15 @@ export const deleteBanner = createAsyncThunk('banner/deleteBanner', async (banne
         return response
     } catch (error) {
         return rejectWithValue(error.message || 'Không thể xóa banner')
+    }
+})
+
+export const deleteManyBanners = createAsyncThunk('banner/deleteManyBanners', async (bannerIds, { rejectWithValue }) => {
+    try {
+        const response = await removeManyBanners(bannerIds)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Không thể xóa các banner')
     }
 })
 
@@ -142,6 +151,18 @@ const bannerSlice = createSlice({
             .addCase(fetchBannerById.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
+            })
+            .addCase(deleteManyBanners.pending, (state) => {
+                state.error = null
+                state.success = false
+            })
+            .addCase(deleteManyBanners.fulfilled, (state, action) => {
+                state.banners = state.banners.filter((banner) => !action.payload.includes(banner._id))
+                state.success = true
+            })
+            .addCase(deleteManyBanners.rejected, (state, action) => {
+                state.error = action.payload
+                state.success = false
             })
     },
 })

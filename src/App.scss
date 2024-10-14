@@ -260,7 +260,7 @@ input[type='number'] {
     padding: 5px;
     transition: 300ms;
     background-color: white;
-    width: 150px;
+    width: 100%;
     font-size: 15px;
 }
 .option:hover {
@@ -287,19 +287,24 @@ input[type='number'] {
     display: none;
 }
 
-.select:has(.options input[type='radio']#all:checked) .selected::before {
+.select:has(.options input[type='radio']#all:checked) .selected::before,
+.select:has(.options input[type='radio']#all-v2:checked) .selected::before {
     content: attr(data-default);
 }
-.select:has(.options input[type='radio']#option-1:checked) .selected::before {
+.select:has(.options input[type='radio']#option-1:checked) .selected::before,
+.select:has(.options input[type='radio']#option-1-v2:checked) .selected::before {
     content: attr(data-one);
 }
-.select:has(.options input[type='radio']#option-2:checked) .selected::before {
+.select:has(.options input[type='radio']#option-2:checked) .selected::before,
+.select:has(.options input[type='radio']#option-2-v2:checked) .selected::before {
     content: attr(data-two);
 }
-.select:has(.options input[type='radio']#option-3:checked) .selected::before {
+.select:has(.options input[type='radio']#option-3:checked) .selected::before,
+.select:has(.options input[type='radio']#option-3-v2:checked) .selected::before {
     content: attr(data-three);
 }
-.select:has(.options input[type='radio']#option-4:checked) .selected::before {
+.select:has(.options input[type='radio']#option-4:checked) .selected::before,
+.select:has(.options input[type='radio']#option-4-v2:checked) .selected::before {
     content: attr(data-four);
 }
 

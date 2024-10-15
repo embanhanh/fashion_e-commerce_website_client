@@ -1,6 +1,5 @@
 import Auth from '../pages/Auth/Auth.jsx'
 import Home from '../pages/Home/Home.jsx'
-import Info from '../pages/Profile/Info.jsx'
 import Orders from '../pages/Profile/Orders.jsx'
 import Wishlists from '../pages/Profile/Wishlists.jsx'
 import Addresses from '../pages/Profile/Addresses.jsx'
@@ -18,7 +17,7 @@ import CreateProduct from '../pages/admin/CreateProduct.jsx'
 import MainManager from '../pages/admin/MainManager.jsx'
 import ShopManagerment from '../pages/admin/ShopManagerment.jsx'
 import DesignShop from '../pages/admin/DesignShop.jsx'
-import EditInfo from '../pages/Profile/EditInfo.jsx'
+import Profile from '../pages/Profile/Profile.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -36,14 +35,13 @@ const publicRoutes = [
         path: '/user/account',
         element: ProfileLayout,
         children: [
-            { path: 'profile', element: Info, layout: Fragment },
+            { path: 'profile', element: Profile, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },
             { path: 'savedcards', element: SavedCards, layout: Fragment },
             { path: 'notifications', element: Notifications, layout: Fragment },
             { path: 'settings', element: Settings, layout: Fragment },
-            { path: 'profile/edit', element: EditInfo, layout: Fragment },
         ],
     },
     { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout },

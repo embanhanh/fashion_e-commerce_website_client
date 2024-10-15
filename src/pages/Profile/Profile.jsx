@@ -1,5 +1,5 @@
 import { FaPenToSquare } from 'react-icons/fa6';
-import './EditInfo.scss';
+import './Profile.scss'; // Đổi tên file SCSS nếu cần
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice';
@@ -7,8 +7,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebase.config'; // Đảm bảo đường dẫn đúng
 import { v4 as uuidv4 } from 'uuid';
 import Notification from '../../components/Notification'; // Import component Notification
+import { NavLink } from 'react-router-dom';
 
-function EditInfo() {
+function Profile() {
     const dispatch = useDispatch();
     const { user, loading, error, success } = useSelector((state) => state.user);
 
@@ -18,8 +19,8 @@ function EditInfo() {
     const [birth, setBirth] = useState('');
     const [gender, setGender] = useState('male');
     const [urlImage, setUrlImage] = useState('');
-    const [isLoading, setIsLoading] = useState(false)
-    const [isSuccess,setIsSuccess] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [showNotification, setShowNotification] = useState(false); // State để quản lý hiển thị thông báo
 
     useEffect(() => {
@@ -41,7 +42,7 @@ function EditInfo() {
         if (success && isSuccess) {
             setShowNotification(true); // Hiển thị thông báo khi cập nhật thành công            
             setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
-            setIsSuccess(false)
+            setIsSuccess(false);
         }
     }, [success]);
 
@@ -52,7 +53,8 @@ function EditInfo() {
         const month = String(date.getMonth() + 1).padStart(2, '0'); // Lấy tháng, cộng thêm 1 do tháng bắt đầu từ 0
         const day = String(date.getDate()).padStart(2, '0'); // Lấy ngày
         return `${year}-${month}-${day}`; // Trả về định dạng yyyy-MM-dd
-    };   
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -73,7 +75,7 @@ function EditInfo() {
             };
 
             await dispatch(updateUserProfile(userData)); // Update user profile with Firebase URL
-            setIsSuccess(true)
+            setIsSuccess(true);
         } catch (error) {
             console.error('Error updating user profile:', error);
         } finally {
@@ -99,13 +101,13 @@ function EditInfo() {
         } else {
             alert('Please select a valid image format: .JPEG, .PNG');
         }
-    };  
+    };
 
     if (loading && isLoading) return (
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
         </div>
-    )
+    );
     if (error) {
         console.error(error);
         return <div>Error: {error}</div>;  // Hiển thị lỗi cho người dùng
@@ -119,7 +121,7 @@ function EditInfo() {
                         title="Cập nhật thành công"
                         description="Thông tin hồ sơ của bạn đã được cập nhật."
                         type="success"
-                        isClosed={true}                        
+                        isClosed={true}
                     />
                 )}
             </div>
@@ -197,7 +199,6 @@ function EditInfo() {
                                         </div>
                                     </td>
                                 </tr>
-
                                 <tr>
                                     <td className="label-cell"></td>
                                     <td className="input-cell">
@@ -216,14 +217,12 @@ function EditInfo() {
                         <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" onChange={handleImageUpload} />
                         <label htmlFor="file-upload" className="btn btn-light">Chọn ảnh</label>
                     </div>
-                    <div className="file-info">
-                        <div>Dụng lượng file tối đa 1 MB</div>
-                        <div>Định dạng:.JPEG, .PNG</div>
-                    </div>
+                    <div>Dụng lượng file tối đa 1 MB</div>
+                    <div>Định dạng:.JPEG, .PNG</div>
                 </div>
             </div>
         </div>
     );
 }
 
-export default EditInfo;
+export default Profile;

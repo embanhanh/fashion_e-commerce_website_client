@@ -106,21 +106,62 @@ export const updateProfile = async (userData) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,  // Thêm token vào headers
                 'Content-Type': 'application/json', // Đảm bảo định dạng JSON
             },
-        });
+        })
 
-        return response.data;  // Trả về dữ liệu từ response
+        return response.data  // Trả về dữ liệu từ response
     } catch (error) {
-        // Xử lý lỗi từ phía server hoặc mạng
-        if (error.response) {
-            // Lỗi từ phía server (4xx hoặc 5xx)
-            const message = error.response.data?.message || 'Cập nhật hồ sơ thất bại';
-            throw new Error(message);
-        } else if (error.request) {
-            // Lỗi từ phía mạng hoặc yêu cầu không được thực thi
-            throw new Error('Không thể kết nối đến máy chủ, vui lòng kiểm tra kết nối mạng.');
-        } else {
-            // Lỗi khi tạo yêu cầu hoặc các lỗi khác
-            throw new Error('Có lỗi xảy ra: ' + error.message);
-        }
+        throw error.response.data
+    }
+}
+
+export const getAddressesUser = async () => {
+    const response = await axios.get(API_URL + 'account/address', {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
+    console.log(response.data) // Kiểm tra dữ liệu nhận được
+    return response.data
+}
+
+export const createAddress = async (addresData) => {
+    try {
+        const response = await axiosInstance.post('account/address/create', addresData, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data // Trả về dữ liệu từ response
+    } catch (error) {
+        throw new Error(error.response?.data?.message || error.message)
+    }
+}
+
+export const updateAddressUser = async (address_id, addressData) => {
+    try {
+        const response = await axiosInstance.put(`account/address/update/${address_id}`, addressData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating address:', error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || error.message);
     }
 };
+
+export const deleteAddressUser = async (address_id) => {
+    try {
+        const response = await axiosInstance.delete(`account/address/delete/${address_id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error delete address:', error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || error.message);
+    }
+}

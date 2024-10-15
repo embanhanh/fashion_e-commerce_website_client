@@ -1,51 +1,83 @@
-import React from 'react'
+import React, { useState } from 'react'
+import EditAddressModal from './EditAddressModal'
 import './AddressItem.scss' // Import SCSS file
+import { deleteAddress, updateAddress } from '../redux/slices/userSlice'
+import { useDispatch } from 'react-redux'
 
-function AddressItem({ address }) {
+function AddressItem({ address, onAddressUpdated }) {
+    const dispatch = useDispatch()
+    const [showEditModal, setShowEditModal] = useState(false) // State để quản lý modal
+
+    const handleEditAddress = async (updatedAddress) => {
+        if (address._id) {
+            try {
+                await dispatch(updateAddress({ address_id: address._id, addressData: updatedAddress }))
+                onAddressUpdated() // Gọi callback để thông báo đã cập nhật
+                setShowEditModal(false)
+            } catch (error) {
+                console.error('Error updating address:', error)
+            }
+        } else {
+            console.error('Address ID is undefined')
+        }
+    }
+
+    const handleDeleteAddress = async () => {
+        try {
+            if (address._id) {  // Ensure address._id exists before calling the API
+                await dispatch(deleteAddress({ address_id: address._id }))
+                onAddressUpdated()
+            } else {
+                console.error('Address ID is undefined')
+            }
+        } catch (error) {
+            console.error('Error deleting address:', error)
+        }
+    }
+
+
+
     return (
-        <div class="address-item-container">
-            <div class="address-item">
-                <div role="heading" class="address-header d-flex">
-                    <div class="address-header-details d-flex">
-                        <span class="address-name-container">
-                            <div class="address-name">{address.name}</div>
+        <div className="address-item-container">
+            <div className="address-item">
+                <div role="heading" className="address-header d-flex">
+                    <div className="address-header-details d-flex flex-row">
+                        <span className="address-name-container">
+                            <div className="address-name">{address.name}</div>
                         </span>
-                        <div class="spacer"></div>
-                        <div role="row" class="address-phone">
+                        <div className="spacer"></div>
+                        <div role="row" className="address-phone">
                             {address.phone}
                         </div>
                     </div>
-                    <div class="address-actions">
-                        <button class="btn-update">Cập nhật</button>
+                    <div className="address-actions">
+                        <button className="btn-update" onClick={() => setShowEditModal(true)}>Cập nhật</button> {/* Mở modal khi nhấn nút */}
                     </div>
-                    <div class="address-actions">
-                        <button class="btn-update">Xóa</button>
+                    <div className="address-actions">
+                        <button className="btn-update" onClick={handleDeleteAddress}>Xóa</button>
                     </div>
                 </div>
-                <div role="heading" class="address-content d-flex">
-                    <div class="address-details">
-                        <div class="address-lines">
-                            <div role="row" class="address-line">
-                                {address.addressDetail}
-                            </div>
-                            <div role="row" class="address-line">
-                                {address.address}
+                <div role="heading" className="address-content d-flex">
+                    <div className="address-details">
+                        <div className="address-lines">
+                            <div role="row" className="address-line">
+                                {address.location}
                             </div>
                         </div>
                     </div>
-                    <div class="default-btn-container">
-                        {address.isDefault ? (
-                            <button class="btn-set-default" disabled>
+                    <div className="default-btn-container">
+                        {address.default ? (
+                            <button className="btn-set-default" disabled>
                                 Thiết lập mặc định
                             </button>
                         ) : (
-                            <button class="btn-set-default">Thiết lập mặc định</button>
+                            <button className="btn-set-default">Thiết lập mặc định</button>
                         )}
                     </div>
                 </div>
-                <div id="address-card_02585faf-3edc-40d0-a080-3a20474a005e_badge" role="row" class="badge-container">
-                    {address.isDefault ? (
-                        <span role="mark" class="badge-default">
+                <div role="row" className="badge-container mt-4">
+                    {address.default ? (
+                        <span role="mark" className="badge-default">
                             Mặc định
                         </span>
                     ) : (
@@ -53,6 +85,13 @@ function AddressItem({ address }) {
                     )}
                 </div>
             </div>
+            {/* Thêm EditAddressModal */}
+            <EditAddressModal
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                onEditAddress={handleEditAddress}
+                address={address} // Truyền địa chỉ hiện tại vào modal
+            />
         </div>
     )
 }

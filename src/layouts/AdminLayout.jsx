@@ -79,6 +79,20 @@ function Adminlayout({ children }) {
                             Tạo banner
                         </Link>
                     </Accordion>
+                    <Accordion
+                        data={[
+                            {
+                                title: 'Quản lý khuyến mãi',
+                            },
+                        ]}
+                    >
+                        <Link className="fs-4 seller-option" to={'/seller/voucher'}>
+                            Mã khuyến mãi của Shop
+                        </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/voucher/create'}>
+                            Tạo mã khuyến mãi
+                        </Link>
+                    </Accordion>
                 </div>
                 <div className="h-100 p-4 w-100" style={{ marginLeft: '20%', minHeight: '100vh' }}>
                     {children}

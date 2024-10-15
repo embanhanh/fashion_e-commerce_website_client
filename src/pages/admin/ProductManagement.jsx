@@ -33,7 +33,7 @@ function ProductManagement() {
 
     const debouncedFetchProducts = useCallback(
         debounce(() => {
-            dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage }))
+            dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage, limit: 1000000 }))
         }, 300),
         [dispatch, filters, sortOption, currentPage]
     )
@@ -59,9 +59,6 @@ function ProductManagement() {
     }
 
     const handleDeleteProduct = (product_name) => {
-        // if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-        //     dispatch(deleteProductAction(product_name))
-        // }
         setProductNames([product_name])
     }
 
@@ -231,10 +228,10 @@ function ProductManagement() {
                 <div className="bg-white border mt-3">
                     <p className="fs-3 fw-medium p-3 border-bottom">Danh sách sản phẩm</p>
                     <div className="p-3 d-flex align-items-center justify-content-between">
-                        <p className="fs-3 fw-medium">20 sản phẩm</p>
+                        <p className="fs-3 fw-medium">{products.length} sản phẩm</p>
                         <div className="d-flex">
                             <div className="select ">
-                                <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xóa các sản phẩm đang chọn">
+                                <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xóa các sản phẩm đang chọn" data-two="Thêm các sản phẩm mới">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
@@ -245,8 +242,12 @@ function ProductManagement() {
                                         <label className="option" htmlFor="all-v2" data-txt="Công cụ xử lý hàng loạt" />
                                     </div>
                                     <div title="option-1">
-                                        <input id="option-1-v2" name="option-v2" type="radio" value="deleteSelectedBanners" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <input id="option-1-v2" name="option-v2" type="radio" value="deleteSelectedProducts" onChange={(e) => setBulkAction(e.target.value)} />
                                         <label className="option" htmlFor="option-1-v2" data-txt="Xóa các sản phẩm đang chọn" />
+                                    </div>
+                                    <div title="option-2">
+                                        <input id="option-2-v2" name="option-v2" type="radio" value="addNewProducts" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <label className="option" htmlFor="option-2-v2" data-txt="Thêm các sản phẩm mới" />
                                     </div>
                                 </div>
                             </div>
@@ -309,7 +310,21 @@ function ProductManagement() {
                                     <BsGridFill className={`p-2 ms-2 view-icon ${viewMode === 'grid' ? 'active' : ''}`} size={27.5} onClick={() => setViewMode('grid')} />
                                 </div>
                             </div>
-                            <div className={`product-container ${viewMode}`}>{products.map((product, index) => renderProductItem(product, index))}</div>
+                            <div className={`product-container ${viewMode}`}>
+                                {status === 'loading' ? (
+                                    <section className="dots-container mt-4">
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                    </section>
+                                ) : products.length === 0 ? (
+                                    <p className="fs-3 fw-medium text-center">Không có sản phẩm nào</p>
+                                ) : (
+                                    products.map((product, index) => renderProductItem(product, index))
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,15 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getAllProducts, getProductByProductName, updateProduct, deleteProduct, deleteManyProducts } from '../../services/ProductService'
 import _ from 'lodash'
 
+// export const fetchAllProducts = createAsyncThunk('product/fetchAllProducts', async (_, { rejectWithValue }) => {
+//     try {
+//         const response = await getAllProducts({ limit: 1000000 })
+//         return response
+//     } catch (error) {
+//         return rejectWithValue(error.response.data)
+//     }
+// })
+
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
     try {
         console.log(params)
@@ -118,6 +127,17 @@ const productSlice = createSlice({
             .addCase(deleteManyProductsAction.rejected, (state, action) => {
                 state.error = action.payload
             })
+        // .addCase(fetchAllProducts.pending, (state) => {
+        //     state.status = 'loading'
+        // })
+        // .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        //     state.status = 'succeeded'
+        //     state.products = action.payload.products
+        // })
+        // .addCase(fetchAllProducts.rejected, (state, action) => {
+        //     state.status = 'failed'
+        //     state.error = action.error.message
+        // })
     },
 })
 

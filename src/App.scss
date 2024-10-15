@@ -288,23 +288,28 @@ input[type='number'] {
 }
 
 .select:has(.options input[type='radio']#all:checked) .selected::before,
-.select:has(.options input[type='radio']#all-v2:checked) .selected::before {
+.select:has(.options input[type='radio']#all-v2:checked) .selected::before,
+.select:has(.options input[type='radio']#all-v3:checked) .selected::before {
     content: attr(data-default);
 }
 .select:has(.options input[type='radio']#option-1:checked) .selected::before,
-.select:has(.options input[type='radio']#option-1-v2:checked) .selected::before {
+.select:has(.options input[type='radio']#option-1-v2:checked) .selected::before,
+.select:has(.options input[type='radio']#option-1-v3:checked) .selected::before {
     content: attr(data-one);
 }
 .select:has(.options input[type='radio']#option-2:checked) .selected::before,
-.select:has(.options input[type='radio']#option-2-v2:checked) .selected::before {
+.select:has(.options input[type='radio']#option-2-v2:checked) .selected::before,
+.select:has(.options input[type='radio']#option-2-v3:checked) .selected::before {
     content: attr(data-two);
 }
 .select:has(.options input[type='radio']#option-3:checked) .selected::before,
-.select:has(.options input[type='radio']#option-3-v2:checked) .selected::before {
+.select:has(.options input[type='radio']#option-3-v2:checked) .selected::before,
+.select:has(.options input[type='radio']#option-3-v3:checked) .selected::before {
     content: attr(data-three);
 }
 .select:has(.options input[type='radio']#option-4:checked) .selected::before,
-.select:has(.options input[type='radio']#option-4-v2:checked) .selected::before {
+.select:has(.options input[type='radio']#option-4-v2:checked) .selected::before,
+.select:has(.options input[type='radio']#option-4-v3:checked) .selected::before {
     content: attr(data-four);
 }
 

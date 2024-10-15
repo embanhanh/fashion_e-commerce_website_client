@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAllProducts, getProductByProductName, updateProduct, deleteProduct } from '../../services/ProductService'
+import { getAllProducts, getProductByProductName, updateProduct, deleteProduct, deleteManyProducts } from '../../services/ProductService'
 import _ from 'lodash'
 
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
@@ -36,6 +36,15 @@ export const deleteProductAction = createAsyncThunk('product/deleteProduct', asy
         return { product_name, message: response.message }
     } catch (error) {
         return rejectWithValue(error.message || 'Failed to delete product')
+    }
+})
+
+export const deleteManyProductsAction = createAsyncThunk('product/deleteManyProducts', async (product_names, { rejectWithValue }) => {
+    try {
+        const response = await deleteManyProducts(product_names)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Failed to delete products')
     }
 })
 
@@ -101,6 +110,12 @@ const productSlice = createSlice({
                 state.products = state.products.filter((product) => product.slug !== action.payload.product_name)
             })
             .addCase(deleteProductAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(deleteManyProductsAction.fulfilled, (state, action) => {
+                state.products = state.products.filter((product) => !action.payload.includes(product.slug))
+            })
+            .addCase(deleteManyProductsAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

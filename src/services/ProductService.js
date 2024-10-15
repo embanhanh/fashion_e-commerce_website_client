@@ -46,3 +46,20 @@ export const deleteProduct = async (product_name) => {
         throw error.response ? error.response.data : new Error('Network Error')
     }
 }
+
+export const deleteManyProducts = async (product_names) => {
+    try {
+        const response = await axios.post(
+            `${API_URL}delete-many`,
+            { productSlugs: product_names },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error.response ? error.response.data : new Error('Network Error')
+    }
+}

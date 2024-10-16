@@ -1,6 +1,5 @@
 import Auth from '../pages/Auth/Auth.jsx'
 import Home from '../pages/Home/Home.jsx'
-import Info from '../pages/Profile/Info.jsx'
 import Orders from '../pages/Profile/Orders.jsx'
 import Wishlists from '../pages/Profile/Wishlists.jsx'
 import Addresses from '../pages/Profile/Addresses.jsx'
@@ -18,6 +17,7 @@ import CreateProduct from '../pages/admin/CreateProduct.jsx'
 import MainManager from '../pages/admin/MainManager.jsx'
 import ShopManagerment from '../pages/admin/ShopManagerment.jsx'
 import DesignShop from '../pages/admin/DesignShop.jsx'
+import Profile from '../pages/Profile/Profile.jsx'
 import CreateBanner from '../pages/admin/CreateBanner.jsx'
 import NotFound from '../pages/NotFound/NotFound.jsx'
 import VoucherManagement from '../pages/admin/VoucherManagement.jsx'
@@ -39,7 +39,7 @@ const publicRoutes = [
         path: '/user/account',
         element: ProfileLayout,
         children: [
-            { path: 'profile', element: Info, layout: Fragment },
+            { path: 'profile', element: Profile, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },

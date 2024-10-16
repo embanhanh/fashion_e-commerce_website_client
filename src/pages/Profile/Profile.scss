@@ -1,10 +1,13 @@
-// Styling for the profile container
+
 .profile-container {
     display: flex;
     flex-direction: column;
-    margin-left: 20px;
+    margin-left: 20px;    
 }
 
+.profile-avatar {
+    height: 200px;
+}
 .profile-header {
     border-bottom: 1px solid #efefef;
     padding: 18px 0px;
@@ -143,47 +146,6 @@
     align-items: center;
 }
 
-// // Body section styling
-
-//   // Form section styling
-
-//     form {
-//       padding-right: 50px;
-//       table {
-//         width: 100%;
-
-//         tr>td:first-child{
-//           min-width: 20%;
-//           box-sizing: border-box;
-//           text-align: right;
-//           padding-bottom: 30px;
-//           white-space: nowrap;
-//         }
-
-//         td {
-//           padding: 10px;
-//           margin-left: 20px;
-//           margin-bottom: 30px;
-//           color: #0099ff;
-//         }
-
-//         label {
-//           color: rgba(85, 85, 85, .8);
-//           overflow: hidden;
-//           padding-bottom: 30px;
-//         }
-
-//         .title {
-//           text-align: right;
-//         }
-
-//         // Input group styling
-
-//         // Radio button group styling
-
-//   // Avatar section styling
-
-// File info section styling
 
 .custom-file-upload {
     position: relative;
@@ -194,19 +156,20 @@
     display: none;
 }
 
-.btn-info {
+.edit-btn {
     display: inline-block;
     padding: 6px 12px;
     font-size: 14px;
-    cursor: pointer;
-    border: 2px solid #0099ff;
+    cursor: pointer;    
     border-radius: 4px;
-    color: #0099ff;
-    background-color: transparent;
+    color: #efefef;
+    background-color: #000;
     transition: all 0.3s ease;
 
     &:hover {
-        background-color: #0099ff;
+        background-color: #333;
         color: white;
     }
 }
+
+

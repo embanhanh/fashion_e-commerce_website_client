@@ -1,69 +1,70 @@
-import { FaPenToSquare } from 'react-icons/fa6';
-import './Profile.scss'; // Đổi tên file SCSS nếu cần
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebase.config'; // Đảm bảo đường dẫn đúng
-import { v4 as uuidv4 } from 'uuid';
-import Notification from '../../components/Notification'; // Import component Notification
-import { NavLink } from 'react-router-dom';
+import { FaPenToSquare } from 'react-icons/fa6'
+import './Profile.scss' // Đổi tên file SCSS nếu cần
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
+import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '../../firebase.config' // Đảm bảo đường dẫn đúng
+import { v4 as uuidv4 } from 'uuid'
+import Notification from '../../components/Notification' // Import component Notification
+import { NavLink } from 'react-router-dom'
+import Modal from 'react-bootstrap/Modal'
 
 function Profile() {
-    const dispatch = useDispatch();
-    const { user, loading, error, success } = useSelector((state) => state.user);
+    const dispatch = useDispatch()
+    const { user, loading, error, success } = useSelector((state) => state.user)
 
-    const [userName, setUserName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [birth, setBirth] = useState('');
-    const [gender, setGender] = useState('male');
-    const [urlImage, setUrlImage] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
-    const [showNotification, setShowNotification] = useState(false); // State để quản lý hiển thị thông báo
+    const [userName, setUserName] = useState('')
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+    const [birth, setBirth] = useState('')
+    const [gender, setGender] = useState('male')
+    const [urlImage, setUrlImage] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+    const [showNotification, setShowNotification] = useState(false) // State để quản lý hiển thị thông báo
 
     useEffect(() => {
-        dispatch(fetchUser());
-    }, [dispatch]);
+        dispatch(fetchUser())
+    }, [dispatch])
 
     useEffect(() => {
         if (user) {
-            setUserName(user.name || '');
-            setEmail(user.email || '');
-            setPhone(user.phone || '');
-            setBirth(formatDate(user.birthday)); // Định dạng ngày tháng đúng
-            setGender(user.gender || '');
-            setUrlImage(user.urlImage || '');
+            setUserName(user.name || '')
+            setEmail(user.email || '')
+            setPhone(user.phone || '')
+            setBirth(formatDate(user.birthday)) // Định dạng ngày tháng đúng
+            setGender(user.gender || '')
+            setUrlImage(user.urlImage || '')
         }
-    }, [user]);
+    }, [user])
 
     useEffect(() => {
         if (success && isSuccess) {
-            setShowNotification(true); // Hiển thị thông báo khi cập nhật thành công            
-            setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
-            setIsSuccess(false);
+            setShowNotification(true) // Hiển thị thông báo khi cập nhật thành công
+            // setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
+            setIsSuccess(false)
         }
-    }, [success]);
+    }, [success])
 
     const formatDate = (dateString) => {
-        if (!dateString) return ''; // Kiểm tra nếu ngày tháng null hoặc undefined
-        const date = new Date(dateString); // Chuyển đổi string thành đối tượng Date
-        const year = date.getFullYear(); // Lấy năm
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Lấy tháng, cộng thêm 1 do tháng bắt đầu từ 0
-        const day = String(date.getDate()).padStart(2, '0'); // Lấy ngày
-        return `${year}-${month}-${day}`; // Trả về định dạng yyyy-MM-dd
-    };
+        if (!dateString) return '' // Kiểm tra nếu ngày tháng null hoặc undefined
+        const date = new Date(dateString) // Chuyển đổi string thành đối tượng Date
+        const year = date.getFullYear() // Lấy năm
+        const month = String(date.getMonth() + 1).padStart(2, '0') // Lấy tháng, cộng thêm 1 do tháng bắt đầu từ 0
+        const day = String(date.getDate()).padStart(2, '0') // Lấy ngày
+        return `${year}-${month}-${day}` // Trả về định dạng yyyy-MM-dd
+    }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
+        e.preventDefault()
+        setIsLoading(true)
 
         try {
-            let avatarUrl = urlImage;
+            let avatarUrl = urlImage
 
             if (urlImage && !urlImage.startsWith('https://firebasestorage.googleapis.com')) {
-                avatarUrl = await uploadImage(urlImage); // Upload the new image if necessary
+                avatarUrl = await uploadImage(urlImage) // Upload the new image if necessary
             }
 
             const userData = {
@@ -72,57 +73,55 @@ function Profile() {
                 birthday: birth,
                 phone,
                 urlImage: avatarUrl,
-            };
+            }
 
-            await dispatch(updateUserProfile(userData)); // Update user profile with Firebase URL
-            setIsSuccess(true);
+            await dispatch(updateUserProfile(userData)) // Update user profile with Firebase URL
+            setIsSuccess(true)
         } catch (error) {
-            console.error('Error updating user profile:', error);
+            console.error('Error updating user profile:', error)
         } finally {
-            setIsLoading(false);
+            setIsLoading(false)
         }
-    };
+    }
 
     // Function to upload image to Firebase
     const uploadImage = async (imageFile) => {
-        const imageRef = ref(storage, `avatars/${uuidv4()}`);
-        const response = await fetch(imageFile);
-        const blob = await response.blob();
-        await uploadBytes(imageRef, blob);
-        return getDownloadURL(imageRef);
-    };
+        const imageRef = ref(storage, `avatars/${uuidv4()}`)
+        const response = await fetch(imageFile)
+        const blob = await response.blob()
+        await uploadBytes(imageRef, blob)
+        return getDownloadURL(imageRef)
+    }
 
     // Handle image upload and display preview
     const handleImageUpload = (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files[0]
         if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
-            const fileURL = URL.createObjectURL(file);
-            setUrlImage(fileURL); // Display the selected image as a preview
+            const fileURL = URL.createObjectURL(file)
+            setUrlImage(fileURL) // Display the selected image as a preview
         } else {
-            alert('Please select a valid image format: .JPEG, .PNG');
+            alert('Please select a valid image format: .JPEG, .PNG')
         }
-    };
+    }
 
-    if (loading && isLoading) return (
-        <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
-        </div>
-    );
+    if (loading && isLoading)
+        return (
+            <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        )
     if (error) {
-        console.error(error);
-        return <div>Error: {error}</div>;  // Hiển thị lỗi cho người dùng
+        console.error(error)
+        return <div>Error: {error}</div> // Hiển thị lỗi cho người dùng
     }
 
     return (
         <div className="profile-container">
             <div className="z-3 position-absolute end-0 top">
                 {showNotification && (
-                    <Notification
-                        title="Cập nhật thành công"
-                        description="Thông tin hồ sơ của bạn đã được cập nhật."
-                        type="success"
-                        isClosed={true}
-                    />
+                    <Modal show={showNotification} onHide={() => setShowNotification(false)} centered>
+                        <Notification title="Cập nhật thành công" description="Thông tin hồ sơ của bạn đã được cập nhật." type="success" isClosed={true} />
+                    </Modal>
                 )}
             </div>
 
@@ -215,14 +214,16 @@ function Profile() {
                     <div className="avatar-wrapper" style={{ backgroundImage: `url(${urlImage})` }}></div>
                     <div className="custom-file-upload">
                         <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" onChange={handleImageUpload} />
-                        <label htmlFor="file-upload" className="btn btn-light">Chọn ảnh</label>
+                        <label htmlFor="file-upload" className="btn btn-light">
+                            Chọn ảnh
+                        </label>
                     </div>
                     <div>Dụng lượng file tối đa 1 MB</div>
                     <div>Định dạng:.JPEG, .PNG</div>
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Profile;
+export default Profile

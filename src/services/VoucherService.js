@@ -17,7 +17,11 @@ export const createVoucher = async (voucherData) => {
 
 export const getVouchers = async () => {
     try {
-        const response = await axios.get(API_URL)
+        const response = await axios.get(API_URL, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error.response.data

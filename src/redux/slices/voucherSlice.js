@@ -10,6 +10,15 @@ export const createVoucherAction = createAsyncThunk('voucher/createVoucher', asy
     }
 })
 
+export const getVouchersAction = createAsyncThunk('voucher/getVouchers', async (_, { rejectWithValue }) => {
+    try {
+        const response = await getVouchers()
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const voucherSlice = createSlice({
     name: 'voucher',
     initialState: {
@@ -21,6 +30,17 @@ const voucherSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            .addCase(getVouchersAction.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(getVouchersAction.fulfilled, (state, action) => {
+                state.vouchers = action.payload
+                state.status = 'succeeded'
+            })
+            .addCase(getVouchersAction.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.payload
+            })
             .addCase(createVoucherAction.pending, (state) => {
                 state.error = null
             })

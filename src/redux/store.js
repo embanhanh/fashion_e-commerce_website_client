@@ -8,6 +8,8 @@ import cartReducer from './slices/cartSlice'
 import shopReducer from './slices/shopSlice'
 import bannerReducer from './slices/bannerSlice'
 import userReducer from './slices/userSlice'
+import voucherReducer from './slices/voucherSlice'
+
 const authPersistConfig = {
     key: 'auth',
     storage,
@@ -25,6 +27,7 @@ export const store = configureStore({
         shop: shopReducer,
         user: userReducer,
         banner: bannerReducer,
+        voucher: voucherReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

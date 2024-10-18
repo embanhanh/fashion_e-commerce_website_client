@@ -103,12 +103,12 @@ export const updateProfile = async (userData) => {
     try {
         const response = await axios.put(API_URL + 'account/profile/edit', userData, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,  // Thêm token vào headers
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào headers
                 'Content-Type': 'application/json', // Đảm bảo định dạng JSON
             },
         })
 
-        return response.data  // Trả về dữ liệu từ response
+        return response.data // Trả về dữ liệu từ response
     } catch (error) {
         throw error.response.data
     }
@@ -120,7 +120,6 @@ export const getAddressesUser = async () => {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
     })
-    console.log(response.data) // Kiểm tra dữ liệu nhận được
     return response.data
 }
 
@@ -144,13 +143,13 @@ export const updateAddressUser = async (address_id, addressData) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
             },
-        });
-        return response.data;
+        })
+        return response.data
     } catch (error) {
-        console.error('Error updating address:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || error.message);
+        console.error('Error updating address:', error.response?.data || error.message)
+        throw new Error(error.response?.data?.message || error.message)
     }
-};
+}
 
 export const deleteAddressUser = async (address_id) => {
     try {
@@ -158,10 +157,10 @@ export const deleteAddressUser = async (address_id) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
             },
-        });
-        return response;
+        })
+        return response
     } catch (error) {
-        console.error('Error delete address:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || error.message);
+        console.error('Error delete address:', error.response?.data || error.message)
+        throw new Error(error.response?.data?.message || error.message)
     }
 }

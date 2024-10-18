@@ -42,22 +42,22 @@ function Mainlayout({ children }) {
                     </div>
                     <div className="w-25 d-flex flex-column ms-2">
                         <p className="fw-bold fs-3">Thông tin</p>
-                        <Link className="text-white p-2">Tài khoản cá nhân</Link>
-                        <Link className="text-white p-2">Đăng nhập</Link>
-                        <Link className="text-white p-2">Giỏ hàng</Link>
-                        <Link className="text-white p-2">Sản phẩm</Link>
-                        <Link className="text-white p-2">Về chúng tôi</Link>
-                        <Link className="text-white p-2">FAQ</Link>
+                        <Link className="text-white py-2">Tài khoản cá nhân</Link>
+                        <Link className="text-white py-2">Đăng nhập</Link>
+                        <Link className="text-white py-2">Giỏ hàng</Link>
+                        <Link className="text-white py-2">Sản phẩm</Link>
+                        <Link className="text-white py-2">Về chúng tôi</Link>
+                        <Link className="text-white py-2">FAQ</Link>
                     </div>
                     <div className="w-25 d-flex flex-column ms-2">
                         <p className="fw-bold fs-3">Dịch vụ</p>
-                        <Link className="text-white p-2">Chính sách bảo mật</Link>
-                        <Link className="text-white p-2">Điều khoản sử dụng</Link>
-                        <Link className="text-white p-2">Chính sách đổi trả</Link>
+                        <Link className="text-white py-2">Chính sách bảo mật</Link>
+                        <Link className="text-white py-2">Điều khoản sử dụng</Link>
+                        <Link className="text-white py-2">Chính sách đổi trả</Link>
                     </div>
                     <div className="w-25 d-flex flex-column ms-2">
                         <p className="fw-bold fs-3">Theo dõi chúng tôi</p>
-                        <p className="ms-2 p-2">Kết nối với chúng tôi trên các nền tảng xã hội để cập nhật xu hướng thời trang mới nhất và nhận ưu đãi độc quyền</p>
+                        <p className=" py-2">Kết nối với chúng tôi trên các nền tảng xã hội để cập nhật xu hướng thời trang mới nhất và nhận ưu đãi độc quyền</p>
                         <div className="flex">
                             <Link>
                                 <FontAwesomeIcon color="#1877f2" size="2xl" icon={faSquareFacebook} />

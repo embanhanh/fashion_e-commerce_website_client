@@ -13,17 +13,14 @@ export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWi
 })
 
 // Định nghĩa createAsyncThunk cho updateUserProfile
-export const updateUserProfile = createAsyncThunk(
-    'user/updateUserProfile',
-    async (userData, { rejectWithValue }) => {
-        try {
-            const response = await updateProfile(userData)
-            return response
-        } catch (error) {
-            return rejectWithValue(error.message)
-        }
+export const updateUserProfile = createAsyncThunk('user/updateUserProfile', async (userData, { rejectWithValue }) => {
+    try {
+        const response = await updateProfile(userData)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message)
     }
-)
+})
 
 export const fetchAddresses = createAsyncThunk('user/fetchAddresses', async (_, { rejectWithValue }) => {
     try {
@@ -36,12 +33,12 @@ export const fetchAddresses = createAsyncThunk('user/fetchAddresses', async (_, 
 
 export const addNewAddress = createAsyncThunk('user/createAddress', async (addressData, { rejectWithValue }) => {
     try {
-        const response = await createAddress(addressData); // Đảm bảo trả về response.data đúng cách
-        return response; // Không cần return response.data.data
+        const response = await createAddress(addressData) // Đảm bảo trả về response.data đúng cách
+        return response // Không cần return response.data.data
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra');
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
     }
-});
+})
 
 export const updateAddress = createAsyncThunk('user/updateAddress', async ({ address_id, addressData }, { rejectWithValue }) => {
     try {
@@ -59,27 +56,7 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
     } catch (error) {
         return rejectWithValue(error.message || 'Failed to update delete')
     }
-
 })
-
-
-// export const updateItemQuantity = createAsyncThunk('cart/updateItemQuantity', async ({ itemId, quantity }, { rejectWithValue }) => {
-//     try {
-//         const response = await updateCartItemQuantity(itemId, quantity)
-//         return response
-//     } catch (error) {
-//         return rejectWithValue(error)
-//     }
-// })
-
-// export const removeItemFromCart = createAsyncThunk('cart/removeItemFromCart', async (itemId, { rejectWithValue }) => {
-//     try {
-//         const response = await removeCartItem(itemId)
-//         return response
-//     } catch (error) {
-//         return rejectWithValue(error)
-//     }
-// })
 
 const userSlice = createSlice({
     name: 'user',
@@ -106,24 +83,23 @@ const userSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(updateUserProfile.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.success = false;
+                state.loading = true
+                state.error = null
+                state.success = false
             })
             .addCase(updateUserProfile.fulfilled, (state, action) => {
-                state.loading = false;
-                state.user = action.payload;
-                state.success = true;
+                state.loading = false
+                state.user = action.payload
+                state.success = true
             })
             .addCase(updateUserProfile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                state.success = false;
+                state.loading = false
+                state.error = action.payload
+                state.success = false
             })
             .addCase(fetchAddresses.pending, (state) => {
                 state.loading = true
                 state.error = null
-
             })
             .addCase(fetchAddresses.fulfilled, (state, action) => {
                 state.loading = false
@@ -134,50 +110,46 @@ const userSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(addNewAddress.pending, (state) => {
-                state.loading = true;
+                state.loading = true
             })
             .addCase(addNewAddress.fulfilled, (state, action) => {
-                state.loading = false;
-                state.addresses.push(action.payload); // Thêm địa chỉ mới vào danh sách
+                state.loading = false
+                state.addresses.push(action.payload) // Thêm địa chỉ mới vào danh sách
             })
             .addCase(addNewAddress.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload; // Lưu lỗi vào state
-                console.error('Error adding address:', action.payload); // Ghi lại lỗi
+                state.loading = false
+                state.error = action.payload // Lưu lỗi vào state
+                console.error('Error adding address:', action.payload) // Ghi lại lỗi
             })
             .addCase(updateAddress.pending, (state) => {
-                state.loading = true;
+                state.loading = true
             })
             .addCase(updateAddress.fulfilled, (state, action) => {
-                state.loading = false;
-                const index = state.addresses.findIndex(address => address.id === action.payload.id); // Tìm chỉ số địa chỉ cần cập nhật
+                state.loading = false
+                const index = state.addresses.findIndex((address) => address.id === action.payload.id) // Tìm chỉ số địa chỉ cần cập nhật
                 if (index !== -1) {
-                    state.addresses[index] = action.payload; // Cập nhật địa chỉ trong danh sách
+                    state.addresses[index] = action.payload // Cập nhật địa chỉ trong danh sách
                 }
             })
             .addCase(updateAddress.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload; // Lưu lỗi vào state
-                console.error('Error updating address:', action.payload); // Ghi lại lỗi
+                state.loading = false
+                state.error = action.payload // Lưu lỗi vào state
+                console.error('Error updating address:', action.payload) // Ghi lại lỗi
             })
             .addCase(deleteAddress.pending, (state) => {
-                state.loading = true;
+                state.loading = true
             })
             .addCase(deleteAddress.fulfilled, (state, action) => {
-                state.loading = false;
+                state.loading = false
                 // Remove the address from the addresses array using the address_id
-                state.addresses = state.addresses.filter(
-                    (address) => address.id !== action.payload.id
-                );
+                state.addresses = state.addresses.filter((address) => address.id !== action.payload.id)
             })
             .addCase(deleteAddress.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                console.error('Error deleting address:', action.payload); // Log the error
-            });
+                state.loading = false
+                state.error = action.payload
+                console.error('Error deleting address:', action.payload) // Log the error
+            })
     },
 })
-
-
 
 export default userSlice.reducer

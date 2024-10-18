@@ -4,13 +4,19 @@ import product from '../assets/image/product_image/cotton_shirt.png'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, deleteProductAction, deleteManyProductsAction } from '../redux/slices/productSlice'
 
-const ProductModal = ({ show, onHide, handleConfirm }) => {
+const ProductModal = ({ show, onHide, handleConfirm, voucherData }) => {
     const dispatch = useDispatch()
     const { products, totalPages, currentPage, filters, sortOption, status } = useSelector((state) => state.product)
     const [selectedProducts, setSelectedProducts] = useState([])
     useEffect(() => {
         dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage, limit: 1000000 }))
     }, [dispatch, currentPage, sortOption, filters])
+
+    useEffect(() => {
+        if (voucherData) {
+            setSelectedProducts(voucherData.applicableProducts)
+        }
+    }, [voucherData])
 
     const handleSearch = (e) => {
         dispatch(setFilters({ ...filters, search: e.target.value }))

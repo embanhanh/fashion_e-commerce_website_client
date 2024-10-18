@@ -19,6 +19,33 @@ export const getVouchersAction = createAsyncThunk('voucher/getVouchers', async (
     }
 })
 
+export const getVoucherByIdAction = createAsyncThunk('voucher/getVoucherById', async (voucherId, { rejectWithValue }) => {
+    try {
+        const response = await getVoucherById(voucherId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const updateVoucherAction = createAsyncThunk('voucher/updateVoucher', async ({ voucherId, voucherData }, { rejectWithValue }) => {
+    try {
+        const response = await updateVoucher(voucherId, voucherData)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const deleteManyVoucherAction = createAsyncThunk('voucher/deleteManyVoucher', async (voucherIds, { rejectWithValue }) => {
+    try {
+        const response = await deleteManyVoucher(voucherIds)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const voucherSlice = createSlice({
     name: 'voucher',
     initialState: {
@@ -48,6 +75,35 @@ const voucherSlice = createSlice({
                 state.vouchers.push(action.payload)
             })
             .addCase(createVoucherAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getVoucherByIdAction.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(getVoucherByIdAction.fulfilled, (state, action) => {
+                state.currentVoucher = action.payload
+                state.status = 'succeeded'
+            })
+            .addCase(getVoucherByIdAction.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.payload
+            })
+            .addCase(updateVoucherAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(updateVoucherAction.fulfilled, (state, action) => {
+                state.vouchers = state.vouchers.map((voucher) => (voucher._id === action.payload._id ? action.payload : voucher))
+            })
+            .addCase(updateVoucherAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(deleteManyVoucherAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(deleteManyVoucherAction.fulfilled, (state, action) => {
+                state.vouchers = state.vouchers.filter((voucher) => !action.payload.includes(voucher._id))
+            })
+            .addCase(deleteManyVoucherAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

@@ -64,20 +64,21 @@ function ProductManagement() {
 
     const handleDeleteSelectedProducts = async () => {
         if (productNames.length > 0) {
-            const result = await dispatch(deleteManyProductsAction(productNames))
-            if (result.type.includes('fulfilled')) {
+            try {
+                await dispatch(deleteManyProductsAction(productNames))
                 setNotificationTitle('Thành công')
                 setNotificationMessage('Xóa sản phẩm thành công')
                 setNotificationType('success')
                 setShowNotification(true)
-            } else {
+                setProductNames([])
+                setSelectedProducts([])
+                setBulkAction('')
+            } catch (error) {
                 setNotificationTitle('Thất bại')
-                setNotificationMessage('Xóa sản phẩm thất bại')
+                setNotificationMessage('Xóa sản phẩm thất bại: ' + error.message)
                 setNotificationType('error')
                 setShowNotification(true)
             }
-            setProductNames([])
-            setSelectedProducts([])
         }
     }
 

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import './VoucherManagement.scss'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getVouchersAction } from '../../redux/slices/voucherSlice'
+import { getVouchersAction, deleteManyVoucherAction } from '../../redux/slices/voucherSlice'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faPen, faTrashCan, faShare } from '@fortawesome/free-solid-svg-icons'
 import { ref, listAll, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config'
+import Modal from 'react-bootstrap/Modal'
+import Notification from '../../components/Notification'
 
 const VoucherManagement = () => {
     const navigate = useNavigate()
@@ -16,6 +18,12 @@ const VoucherManagement = () => {
     const [selectedVoucher, setSelectedVoucher] = useState([])
     const [filters, setFilters] = useState({ code: '', voucherType: '', status: '' })
     const [filteredVouchers, setFilteredVouchers] = useState([])
+    const [bulkAction, setBulkAction] = useState('')
+    const [selectedVoucherIds, setSelectedVoucherIds] = useState([])
+    const [showNotification, setShowNotification] = useState(false)
+    const [notificationMessage, setNotificationMessage] = useState('')
+    const [notificationType, setNotificationType] = useState('')
+    const [notificationTitle, setNotificationTitle] = useState('')
 
     const fetchVoucherImages = async () => {
         const vouchersRef = ref(storage, 'vouchers')
@@ -78,6 +86,36 @@ const VoucherManagement = () => {
     const handleResetFilters = () => {
         setFilters({ code: '', voucherType: '', status: '' })
     }
+
+    const handleDeleteVoucher = (voucherId) => {
+        setSelectedVoucherIds([voucherId])
+    }
+
+    const handleDeleteSelectedVouchers = async () => {
+        if (selectedVoucherIds.length > 0) {
+            try {
+                await dispatch(deleteManyVoucherAction(selectedVoucherIds))
+                setNotificationTitle('Thành công')
+                setNotificationMessage('Xóa voucher thành công')
+                setNotificationType('success')
+                setShowNotification(true)
+                setSelectedVoucherIds([])
+                setSelectedVoucher([])
+                setBulkAction('')
+            } catch (error) {
+                setNotificationTitle('Thất bại')
+                setNotificationMessage('Xóa voucher thất bại: ' + error.message)
+                setNotificationType('error')
+                setShowNotification(true)
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (bulkAction === 'deleteSelectedVouchers' && selectedVoucher.length > 0) {
+            setSelectedVoucherIds(selectedVoucher)
+        }
+    }, [bulkAction])
 
     useEffect(() => {
         handleConfirmFilters()
@@ -144,11 +182,11 @@ const VoucherManagement = () => {
                             </div>
                             <div className="options">
                                 <div title="all">
-                                    <input id="all-v3" name="option-v3" type="radio" defaultChecked value="" />
+                                    <input id="all-v3" name="option-v3" type="radio" defaultChecked value="" onChange={(e) => setBulkAction(e.target.value)} />
                                     <label className="option" htmlFor="all-v3" data-txt="Công cụ xử lý hàng loạt" />
                                 </div>
                                 <div title="option-1">
-                                    <input id="option-1-v3" name="option-v3" type="radio" value="deleteSelectedProducts" />
+                                    <input id="option-1-v3" name="option-v3" type="radio" value="deleteSelectedVouchers" onChange={(e) => setBulkAction(e.target.value)} />
                                     <label className="option" htmlFor="option-1-v3" data-txt="Xóa các voucher đang chọn" />
                                 </div>
                             </div>
@@ -294,9 +332,9 @@ const VoucherManagement = () => {
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon icon={faEye} className="fs-3 my-2 p-2 hover-icon" color="#000" />
-                                        <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" />
-                                        <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" />
-                                        <FontAwesomeIcon icon={faShare} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                                        <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/voucher/edit/${voucher._id}`)} />
+                                        <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" onClick={() => handleDeleteVoucher(voucher._id)} />
+                                        {voucher.voucherType === 'product' && <FontAwesomeIcon icon={faShare} className="fs-3 p-2 hover-icon" color="#4a90e2" />}
                                     </div>
                                 </div>
                             ))
@@ -304,6 +342,25 @@ const VoucherManagement = () => {
                     </div>
                 </div>
             </div>
+            {selectedVoucherIds.length > 0 && (
+                <Modal show={selectedVoucherIds.length > 0} onHide={() => setSelectedVoucherIds([])} centered>
+                    <Notification type="warning" title="Bạn có chắc chắn muốn xóa (các) voucher này?" description="Bạn sẽ không thể hoàn tác sau khi xóa">
+                        <div className="d-flex align-items-center justify-content-center bg-white">
+                            <button className=" border px-3 py-1 bg-white rounded-2" onClick={() => setSelectedVoucherIds([])}>
+                                <p className="fs-4">Hủy</p>
+                            </button>
+                            <button className="primary-btn shadow-none py-1 px-3 ms-3" onClick={handleDeleteSelectedVouchers}>
+                                <p className="fs-4">Xóa</p>
+                            </button>
+                        </div>
+                    </Notification>
+                </Modal>
+            )}
+            {showNotification && (
+                <Modal show={showNotification} onHide={() => setShowNotification(false)} centered>
+                    <Notification type={notificationType} title={notificationTitle} description={notificationMessage} />
+                </Modal>
+            )}
         </div>
     )
 }

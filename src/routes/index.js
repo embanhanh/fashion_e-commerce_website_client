@@ -57,6 +57,7 @@ const publicRoutes = [
     { path: '/seller/shop/banner/edit/:banner_id', element: CreateBanner, layout: Adminlayout },
     { path: '/seller', element: MainManager, layout: Adminlayout },
     { path: '/seller/voucher', element: VoucherManagement, layout: Adminlayout },
+    { path: '/seller/voucher/edit/:voucher_id', element: CreateVoucher, layout: Adminlayout },
     { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout },
     { path: '*', element: NotFound, layout: Fragment },
 ]

@@ -1,15 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './CreateVoucher.scss'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import ProductModal from '../../components/ProductModal'
-import { useDispatch } from 'react-redux'
-import { createVoucherAction } from '../../redux/slices/voucherSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { createVoucherAction, getVoucherByIdAction, updateVoucherAction } from '../../redux/slices/voucherSlice'
 import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
+import { useParams } from 'react-router-dom'
 
 const CreateVoucher = () => {
     const dispatch = useDispatch()
+    const { voucher_id } = useParams()
+    const { currentVoucher } = useSelector((state) => state.voucher)
     const [voucherData, setVoucherData] = useState({
         voucherType: 'all',
         code: '',
@@ -31,6 +34,26 @@ const CreateVoucher = () => {
     const [notificationMessage, setNotificationMessage] = useState('')
     const [notificationType, setNotificationType] = useState('success')
     const [notificationTitle, setNotificationTitle] = useState('')
+
+    useEffect(() => {
+        if (voucher_id) {
+            dispatch(getVoucherByIdAction(voucher_id))
+        }
+    }, [voucher_id, dispatch])
+
+    useEffect(() => {
+        if (currentVoucher) {
+            const newVoucherData = {
+                ...currentVoucher,
+                applicableProducts: currentVoucher.applicableProducts?.map((product) => product._id),
+            }
+            delete newVoucherData.used
+            delete newVoucherData.createdAt
+            delete newVoucherData.updatedAt
+            delete newVoucherData.__v
+            setVoucherData(newVoucherData)
+        }
+    }, [currentVoucher])
 
     const handleChange = (name, value) => {
         delete errors[name]
@@ -87,10 +110,15 @@ const CreateVoucher = () => {
         if (validateForm()) {
             setLoading(true)
             try {
-                await dispatch(createVoucherAction(voucherData)).unwrap()
+                if (voucher_id) {
+                    await dispatch(updateVoucherAction({ voucherId: voucher_id, voucherData })).unwrap()
+                    setNotificationMessage('Khuyến mãi đã được cập nhật thành công')
+                } else {
+                    await dispatch(createVoucherAction(voucherData)).unwrap()
+                    setNotificationMessage('Khuyến mãi đã được tạo thành công')
+                }
                 setShowNotification(true)
                 setNotificationTitle('Thành công')
-                setNotificationMessage('Khuyến mãi đã được tạo thành công')
                 setNotificationType('success')
             } catch (error) {
                 setShowNotification(true)
@@ -359,12 +387,12 @@ const CreateVoucher = () => {
                     {Object.keys(errors).length > 0 && <p className="text-danger mt-3">Vui lòng kiểm tra lại thông tin</p>}
                 </div>
             </section>
-            {showProductModal && <ProductModal show={showProductModal} onHide={() => setShowProductModal(false)} handleConfirm={handleConfirm} />}
+            {showProductModal && <ProductModal show={showProductModal} onHide={() => setShowProductModal(false)} handleConfirm={handleConfirm} voucherData={voucherData} />}
             {showNotification && (
                 <Modal
                     show={showNotification}
                     onHide={() => {
-                        if (notificationType === 'success') {
+                        if (notificationType === 'success' && !voucher_id) {
                             setVoucherData({
                                 voucherType: 'all',
                                 code: '',

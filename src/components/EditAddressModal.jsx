@@ -1,5 +1,6 @@
 import { Form, Button, Modal, ListGroup } from 'react-bootstrap';
 import { useState, useEffect, useRef } from 'react';
+import './EditAddressModal.scss'
 
 function EditAddressModal({ show, handleClose, onEditAddress, address }) {
     const [name, setName] = useState('');
@@ -86,11 +87,11 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Chỉnh sửa địa chỉ</Modal.Title>
+                <Modal.Title className="fs-1">Chỉnh sửa địa chỉ</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Họ và tên</Form.Label>
                         <Form.Control
                             type="text"
@@ -101,7 +102,7 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
                         {errors.name && <p className="text-danger">{errors.name}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Số điện thoại</Form.Label>
                         <Form.Control
                             type="text"
@@ -112,7 +113,7 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
                         {errors.phone && <p className="text-danger">{errors.phone}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Địa chỉ</Form.Label>
                         <div className="input-form d-flex align-items-center w-100">
                             <input
@@ -141,7 +142,7 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
                         {errors.location && <p className="text-danger">{errors.location}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Loại địa chỉ</Form.Label>
                         <Form.Control
                             as="select"
@@ -155,7 +156,7 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
                         {errors.type && <p className="text-danger">{errors.type}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Check
                             type="checkbox"
                             name="isDefault"
@@ -168,12 +169,14 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
             </Modal.Body>
             <Modal.Footer>
                 {errors.submit && <p className="text-danger">{errors.submit}</p>}
-                <Button variant="secondary" onClick={handleClose}>
-                    Trở lại
-                </Button>
-                <Button variant="primary" onClick={handleSubmit}>
-                    Hoàn thành
-                </Button>
+                <div className="d-flex flex-row  mb-3">
+                    <Button className="close-btn mx-3" variant="danger" onClick={handleClose}>
+                        Trở lại
+                    </Button>
+                    <Button className="success-btn mx-3" variant="success" onClick={handleSubmit}>
+                        Hoàn thành
+                    </Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );

@@ -1,14 +1,12 @@
-import { FaPenToSquare } from 'react-icons/fa6'
 import './Profile.scss' // Đổi tên file SCSS nếu cần
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
+import Modal from 'react-bootstrap/Modal'
+import { v4 as uuidv4 } from 'uuid'
 import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config' // Đảm bảo đường dẫn đúng
-import { v4 as uuidv4 } from 'uuid'
 import Notification from '../../components/Notification' // Import component Notification
-import { NavLink } from 'react-router-dom'
-import Modal from 'react-bootstrap/Modal'
 
 function Profile() {
     const dispatch = useDispatch()
@@ -201,7 +199,7 @@ function Profile() {
                                 <tr>
                                     <td className="label-cell"></td>
                                     <td className="input-cell">
-                                        <button type="submit" className="btn btn-solid-primary">
+                                        <button type="submit" className="btn edit-btn">
                                             Lưu
                                         </button>
                                     </td>

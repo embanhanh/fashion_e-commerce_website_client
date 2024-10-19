@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser } from '../../services/UserService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, setDefaultAddress } from '../../services/UserService'
 
 // import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '../../services/CartService'
 
@@ -62,24 +62,14 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
 
 })
 
-
-// export const updateItemQuantity = createAsyncThunk('cart/updateItemQuantity', async ({ itemId, quantity }, { rejectWithValue }) => {
-//     try {
-//         const response = await updateCartItemQuantity(itemId, quantity)
-//         return response
-//     } catch (error) {
-//         return rejectWithValue(error)
-//     }
-// })
-
-// export const removeItemFromCart = createAsyncThunk('cart/removeItemFromCart', async (itemId, { rejectWithValue }) => {
-//     try {
-//         const response = await removeCartItem(itemId)
-//         return response
-//     } catch (error) {
-//         return rejectWithValue(error)
-//     }
-// })
+export const setDefaultAddressUser = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
+    try {
+        const response = await setDefaultAddress(address_id)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
 
 const userSlice = createSlice({
     name: 'user',
@@ -174,7 +164,23 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
                 console.error('Error deleting address:', action.payload); // Log the error
-            });
+            })
+            .addCase(setDefaultAddressUser.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(setDefaultAddressUser.fulfilled, (state, action) => {
+                state.loading = false;
+                const index = state.addresses.findIndex(address => address.id === action.payload.id); // Tìm chỉ số địa chỉ cần cập nhật
+                if (index !== -1) {
+                    state.addresses[index] = action.payload; // Cập nhật địa chỉ trong danh sách
+                }
+            })
+            .addCase(setDefaultAddressUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                console.error('Error deleting address:', action.payload); // Log the error
+            })
+
     },
 })
 

@@ -1,5 +1,6 @@
 import { Form, Button, Modal, ListGroup } from 'react-bootstrap';
 import { useState, useEffect, useRef } from 'react';
+import './AddAddressModal.scss'
 
 function AddAddressModal({ show, handleClose, onAddAddress }) {
     const [name, setName] = useState('');
@@ -87,11 +88,11 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Thêm địa chỉ mới</Modal.Title>
+                <Modal.Title className="fs-1">Thêm địa chỉ mới</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Họ và tên</Form.Label>
                         <Form.Control
                             type="text"
@@ -102,7 +103,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         {errors.name && <p className="text-danger">{errors.name}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Số điện thoại</Form.Label>
                         <Form.Control
                             type="text"
@@ -113,7 +114,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         {errors.phone && <p className="text-danger">{errors.phone}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Địa chỉ</Form.Label>
                         <div className="input-form d-flex align-items-center w-100">
                             <input
@@ -142,7 +143,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         {errors.location && <p className="text-danger">{errors.location}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Label>Loại địa chỉ</Form.Label>
                         <Form.Control
                             as="select"
@@ -156,7 +157,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         {errors.type && <p className="text-danger">{errors.type}</p>}
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 fs-4">
                         <Form.Check
                             type="checkbox"
                             name="isDefault"
@@ -169,12 +170,14 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
             </Modal.Body>
             <Modal.Footer>
                 {errors.submit && <p className="text-danger">{errors.submit}</p>}
-                <Button variant="secondary" onClick={handleClose}>
-                    Trở lại
-                </Button>
-                <Button variant="primary" onClick={handleSubmit}>
-                    Hoàn thành
-                </Button>
+                <div className="d-flex flex-row">
+                    <Button className="button-close mx-3" variant="danger" onClick={handleClose}>
+                        Trở lại
+                    </Button>
+                    <Button className="button-success mx-3" variant="success" onClick={handleSubmit}>
+                        Hoàn thành
+                    </Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );

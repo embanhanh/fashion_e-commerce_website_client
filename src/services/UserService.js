@@ -165,3 +165,16 @@ export const deleteAddressUser = async (address_id) => {
         throw new Error(error.response?.data?.message || error.message);
     }
 }
+
+export const setDefaultAddress = async (address_id) => {
+    try {
+        const respone = await axiosInstance.put(`account/address/setdefault/${address_id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
+            },
+        });
+        return respone;
+    } catch (error) {
+        throw new Error(error.respone?.data?.message || error.message);
+    }
+}

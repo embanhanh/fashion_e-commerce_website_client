@@ -3,6 +3,7 @@ import EditAddressModal from './EditAddressModal'
 import './AddressItem.scss' // Import SCSS file
 import { deleteAddress, updateAddress } from '../redux/slices/userSlice'
 import { useDispatch } from 'react-redux'
+import { setDefaultAddress } from '../services/UserService'
 
 function AddressItem({ address, onAddressUpdated }) {
     const dispatch = useDispatch()
@@ -35,6 +36,17 @@ function AddressItem({ address, onAddressUpdated }) {
         }
     }
 
+    const handleSetDefaultAddress = async () => {
+        try {
+            if (address._id) {  // Ensure address._id exists before calling the API
+                await dispatch(setDefaultAddress({ address_id: address._id }))
+            } else {
+                console.error('Address ID is undefined')
+            }
+        } catch (error) {
+            console.error('Error deleting address:', error)
+        }
+    }
 
 
     return (
@@ -46,7 +58,7 @@ function AddressItem({ address, onAddressUpdated }) {
                             <div className="address-name">{address.name}</div>
                         </span>
                         <div className="spacer"></div>
-                        <div role="row" className="address-phone">
+                        <div role="row" className="address-phone mt-2 ">
                             {address.phone}
                         </div>
                     </div>
@@ -71,7 +83,7 @@ function AddressItem({ address, onAddressUpdated }) {
                                 Thiết lập mặc định
                             </button>
                         ) : (
-                            <button className="btn-set-default">Thiết lập mặc định</button>
+                            <button className="btn-set-default" onClick={handleSetDefaultAddress}>Thiết lập mặc định</button>
                         )}
                     </div>
                 </div>

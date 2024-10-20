@@ -22,6 +22,7 @@ import CreateBanner from '../pages/admin/CreateBanner.jsx'
 import NotFound from '../pages/NotFound/NotFound.jsx'
 import VoucherManagement from '../pages/admin/VoucherManagement.jsx'
 import CreateVoucher from '../pages/admin/CreateVoucher.jsx'
+import OrderManagement from '../pages/admin/OrderManagement.jsx'
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -59,6 +60,7 @@ const publicRoutes = [
     { path: '/seller/voucher', element: VoucherManagement, layout: Adminlayout },
     { path: '/seller/voucher/edit/:voucher_id', element: CreateVoucher, layout: Adminlayout },
     { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout },
+    { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
     { path: '*', element: NotFound, layout: Fragment },
 ]
 const privateRoutes = []

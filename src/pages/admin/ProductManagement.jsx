@@ -322,6 +322,8 @@ function ProductManagement() {
                                     </section>
                                 ) : products.length === 0 ? (
                                     <p className="fs-3 fw-medium text-center">Không có sản phẩm nào</p>
+                                ) : status === 'failed' ? (
+                                    <p className="fs-3 fw-medium text-center">Không tìm thấy sản phẩm nào</p>
                                 ) : (
                                     products.map((product, index) => renderProductItem(product, index))
                                 )}

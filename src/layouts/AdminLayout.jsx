@@ -42,6 +42,7 @@ function Adminlayout({ children }) {
                                 title: 'Quản lý sản phẩm',
                             },
                         ]}
+                        isOpen={true}
                     >
                         <Link className="fs-4 seller-option" to={'/seller/products'}>
                             Tất cả sản phẩm
@@ -56,8 +57,11 @@ function Adminlayout({ children }) {
                                 title: 'Quản lý đơn hàng',
                             },
                         ]}
+                        isOpen={true}
                     >
-                        <Link className="fs-4 seller-option">Tất cả đơn hàng</Link>
+                        <Link className="fs-4 seller-option" to={'/seller/orders'}>
+                            Tất cả đơn hàng
+                        </Link>
                         <Link className="fs-4 seller-option">Đơn hủy</Link>
                         <Link className="fs-4 seller-option">Trả hàng/hoàn tiền</Link>
                         <Link className="fs-4 seller-option">Cài đặt vận chuyển</Link>
@@ -68,6 +72,7 @@ function Adminlayout({ children }) {
                                 title: 'Quản lý Shop',
                             },
                         ]}
+                        isOpen={true}
                     >
                         <Link className="fs-4 seller-option" to={'/seller/shop/infomation'}>
                             Hồ sơ Shop
@@ -85,6 +90,7 @@ function Adminlayout({ children }) {
                                 title: 'Quản lý khuyến mãi',
                             },
                         ]}
+                        isOpen={true}
                     >
                         <Link className="fs-4 seller-option" to={'/seller/voucher'}>
                             Mã khuyến mãi của Shop

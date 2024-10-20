@@ -28,3 +28,34 @@ export const getOrders = async () => {
         throw error.response.data
     }
 }
+
+export const getAdminOrders = async (filters) => {
+    try {
+        const response = await axios.get(API_URL, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: filters,
+        })
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}
+
+export const updateOrderStatusMany = async (orderIds, status) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'update-status-many',
+            { orderIds, status },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

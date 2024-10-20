@@ -172,7 +172,7 @@ const VoucherManagement = () => {
             <div className="bg-white border mt-3">
                 <p className="fs-3 fw-medium p-3 border-bottom">Danh sách voucher</p>
                 <div className="p-3 d-flex align-items-center justify-content-between">
-                    <p className="fs-3 fw-medium">5 voucher</p>
+                    <p className="fs-3 fw-medium">{filteredVouchers.length} voucher</p>
                     <div className="d-flex">
                         <div className="select ">
                             <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xóa các voucher đang chọn">
@@ -280,6 +280,8 @@ const VoucherManagement = () => {
                                 <div className="dot"></div>
                                 <div className="dot"></div>
                             </section>
+                        ) : status === 'failed' ? (
+                            <p>{error}</p>
                         ) : filteredVouchers.length == 0 ? (
                             <p className="fs-3 fw-medium text-center">Không có voucher nào</p>
                         ) : (
@@ -309,7 +311,10 @@ const VoucherManagement = () => {
                                         />
                                         <p className="ms-3 fs-4 fw-medium">{voucher.code}</p>
                                     </div>
-                                    <p className="fs-4 fw-medium text-center">{voucher.discountValue}%</p>
+                                    <p className="fs-4 fw-medium text-center">
+                                        {voucher.discountValue}
+                                        {voucher.discountType === 'percentage' ? '%' : 'đ'}
+                                    </p>
                                     <p className="fs-4 fw-medium text-center">{voucher.usageLimit}</p>
                                     <p className="fs-4 fw-medium text-center">{voucher.used}</p>
                                     <div>

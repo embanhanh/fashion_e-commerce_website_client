@@ -8,9 +8,11 @@ import { createVoucherAction, getVoucherByIdAction, updateVoucherAction } from '
 import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const CreateVoucher = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const { voucher_id } = useParams()
     const { currentVoucher } = useSelector((state) => state.voucher)
     const [voucherData, setVoucherData] = useState({

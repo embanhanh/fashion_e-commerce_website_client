@@ -7,4 +7,10 @@ export default defineConfig({
     optimizeDeps: {
         include: ['@react-pdf/renderer'],
     },
+    build: {
+        commonjsOptions: {
+            transformMixedEsModules: true,
+        },
+    },
+    assetsInclude: ['**/*.ttf', '**/*.woff', '**/*.woff2'],
 })

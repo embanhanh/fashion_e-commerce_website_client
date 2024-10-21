@@ -30,8 +30,8 @@ const OrderManagement = () => {
     const [filterStatus, setFilterStatus] = useState('')
     const [filterLocal, setFilterLocal] = useState({
         productName: '',
-        orderStartDate: new Date(),
-        orderEndDate: new Date(),
+        orderStartDate: null,
+        orderEndDate: null,
         paymentMethod: 'paymentUponReceipt',
         shippingMethod: 'default',
     })
@@ -84,6 +84,14 @@ const OrderManagement = () => {
             setBulkAction('')
         }
     }
+
+    const handlePrintInvoice = (orderId) => {
+        window.open(`/invoice/${orderId}`, '_blank', 'noopener,noreferrer')
+    }
+
+    useEffect(() => {
+        handleSubmitFilters()
+    }, [filterStatus])
 
     useEffect(() => {
         if (bulkAction && selectedOrderIds.length > 0) {
@@ -294,7 +302,7 @@ const OrderManagement = () => {
                             <p className="fs-4 fw-medium text-center">Hình thức thanh toán</p>
                             <p className="fs-4 fw-medium text-center">Tổng tiền</p>
                             <p className="fs-4 fw-medium text-center">Trạng thái</p>
-                            <div className="px-4"></div>
+                            <div className="px-5"></div>
                         </div>
                         {status === 'loading' ? (
                             <section className="dots-container mt-4">
@@ -369,7 +377,10 @@ const OrderManagement = () => {
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" />
-                                        <p className="fs-4 text-danger hover-icon p-2">Hủy</p>
+                                        <p className="fs-5 text-primary hover-icon p-2" onClick={() => handlePrintInvoice(order._id)}>
+                                            In hóa đơn
+                                        </p>
+                                        <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>
                                     </div>
                                 </div>
                             ))

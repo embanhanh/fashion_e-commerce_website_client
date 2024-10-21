@@ -1,13 +1,26 @@
 import './InvoicePage.scss'
-import { PDFViewer } from '@react-pdf/renderer'
-import InvoiceComponent from '../../components/InvoiceComponent'
+import React, { Suspense, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { getOrderByIdAction } from '../../redux/slices/orderSilce'
+import { getShopInfo } from '../../redux/slices/shopSlice'
+const LazyPDFViewer = React.lazy(() => import('./lazyPDFViewer'))
 
 const InvoicePage = () => {
+    const { order_id } = useParams()
+    const dispatch = useDispatch()
+    const { currentOrder } = useSelector((state) => state.order)
+    const { shopInfo } = useSelector((state) => state.shop)
+    useEffect(() => {
+        if (order_id) {
+            dispatch(getOrderByIdAction(order_id))
+            dispatch(getShopInfo())
+        }
+    }, [dispatch, order_id])
+
     return (
         <div>
-            <PDFViewer width="100%" style={{ height: '100vh' }} className="app">
-                <InvoiceComponent />
-            </PDFViewer>
+            <Suspense fallback={<div>Đang tải PDF...</div>}>{currentOrder && shopInfo && <LazyPDFViewer order={currentOrder} shop={shopInfo} />}</Suspense>
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createOrder, getOrders, getAdminOrders, updateOrderStatusMany } from '../../services/OrderService'
+import { createOrder, getOrders, getAdminOrders, updateOrderStatusMany, getOrderById } from '../../services/OrderService'
 
 export const createOrderAction = createAsyncThunk('order/createOrder', async (orderData, { rejectWithValue }) => {
     try {
@@ -13,6 +13,15 @@ export const createOrderAction = createAsyncThunk('order/createOrder', async (or
 export const getOrdersAction = createAsyncThunk('order/getOrders', async (_, { rejectWithValue }) => {
     try {
         const response = await getOrders()
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const getOrderByIdAction = createAsyncThunk('order/getOrderById', async (orderId, { rejectWithValue }) => {
+    try {
+        const response = await getOrderById(orderId)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -98,6 +107,15 @@ const orderSlice = createSlice({
                 state.orders = state.orders.map((order) => (action.payload.orderIds.includes(order._id) ? { ...order, status: action.payload.status } : order))
             })
             .addCase(updateOrderStatusManyAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getOrderByIdAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(getOrderByIdAction.fulfilled, (state, action) => {
+                state.currentOrder = action.payload
+            })
+            .addCase(getOrderByIdAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

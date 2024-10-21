@@ -29,6 +29,19 @@ export const getOrders = async () => {
     }
 }
 
+export const getOrderById = async (orderId) => {
+    try {
+        const response = await axios.get(API_URL + orderId, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}
+
 export const getAdminOrders = async (filters) => {
     try {
         const response = await axios.get(API_URL, {

@@ -62,7 +62,7 @@ const publicRoutes = [
     { path: '/seller/voucher/edit/:voucher_id', element: CreateVoucher, layout: Adminlayout },
     { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout },
     { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
-    { path: '/invoice/:order_id', element: InvoicePage, layout: Fragment },
+    { path: '/invoice', element: InvoicePage, layout: Fragment },
     { path: '*', element: NotFound, layout: Fragment },
 ]
 const privateRoutes = []

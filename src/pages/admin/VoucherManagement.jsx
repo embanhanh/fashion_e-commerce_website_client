@@ -182,11 +182,22 @@ const VoucherManagement = () => {
                             </div>
                             <div className="options">
                                 <div title="all">
-                                    <input id="all-v3" name="option-v3" type="radio" defaultChecked value="" onChange={(e) => setBulkAction(e.target.value)} />
+                                    <input id="all-v3" name="option-v3" type="radio" checked={bulkAction === ''} value="" onChange={(e) => setBulkAction(e.target.value)} />
                                     <label className="option" htmlFor="all-v3" data-txt="Công cụ xử lý hàng loạt" />
                                 </div>
                                 <div title="option-1">
-                                    <input id="option-1-v3" name="option-v3" type="radio" value="deleteSelectedVouchers" onChange={(e) => setBulkAction(e.target.value)} />
+                                    <input
+                                        id="option-1-v3"
+                                        name="option-v3"
+                                        type="radio"
+                                        value="deleteSelectedVouchers"
+                                        checked={bulkAction === 'deleteSelectedVouchers'}
+                                        onChange={(e) => {
+                                            if (selectedVoucher.length > 0) {
+                                                setBulkAction(e.target.value)
+                                            }
+                                        }}
+                                    />
                                     <label className="option" htmlFor="option-1-v3" data-txt="Xóa các voucher đang chọn" />
                                 </div>
                             </div>

@@ -156,7 +156,12 @@ function ShopManagerment() {
                                 Thông tin cơ bản
                             </p>
                             <div className="sticky-button-container d-inline-block ">
-                                <button className="py-2 px-3 border bg-white d-flex align-items-center gap-2" onClick={isEditing ? handleSave : handleEdit}>
+                                {isEditing && (
+                                    <button className="me-2 py-2 px-3 border bg-white d-inline-flex align-items-center gap-2" onClick={() => setIsEditing(false)}>
+                                        <p className="fs-4 fw-medium">Hủy</p>
+                                    </button>
+                                )}
+                                <button className=" py-2 px-3 border bg-white d-inline-flex align-items-center gap-2" onClick={isEditing ? handleSave : handleEdit}>
                                     <p className="fs-4 fw-medium">{isEditing ? 'Lưu' : 'Chỉnh sửa'}</p>
                                     <FontAwesomeIcon icon={isEditing ? faSave : faPen} />
                                 </button>

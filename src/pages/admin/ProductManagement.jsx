@@ -239,15 +239,37 @@ function ProductManagement() {
                                 </div>
                                 <div className="options">
                                     <div title="all">
-                                        <input id="all-v2" name="option-v2" type="radio" defaultChecked value="" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <input id="all-v2" name="option-v2" type="radio" checked={bulkAction === ''} onChange={(e) => setBulkAction(e.target.value)} />
                                         <label className="option" htmlFor="all-v2" data-txt="Công cụ xử lý hàng loạt" />
                                     </div>
                                     <div title="option-1">
-                                        <input id="option-1-v2" name="option-v2" type="radio" value="deleteSelectedProducts" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <input
+                                            id="option-1-v2"
+                                            name="option-v2"
+                                            type="radio"
+                                            value="deleteSelectedProducts"
+                                            checked={bulkAction === 'deleteSelectedProducts'}
+                                            onChange={(e) => {
+                                                if (selectedProducts.length > 0) {
+                                                    setBulkAction(e.target.value)
+                                                }
+                                            }}
+                                        />
                                         <label className="option" htmlFor="option-1-v2" data-txt="Xóa các sản phẩm đang chọn" />
                                     </div>
                                     <div title="option-2">
-                                        <input id="option-2-v2" name="option-v2" type="radio" value="addNewProducts" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <input
+                                            id="option-2-v2"
+                                            name="option-v2"
+                                            type="radio"
+                                            value="addNewProducts"
+                                            checked={bulkAction === 'addNewProducts'}
+                                            onChange={(e) => {
+                                                if (selectedProducts.length > 0) {
+                                                    setBulkAction(e.target.value)
+                                                }
+                                            }}
+                                        />
                                         <label className="option" htmlFor="option-2-v2" data-txt="Thêm các sản phẩm mới" />
                                     </div>
                                 </div>

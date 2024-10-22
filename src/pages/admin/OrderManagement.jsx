@@ -85,8 +85,19 @@ const OrderManagement = () => {
         }
     }
 
-    const handlePrintInvoice = (orderId) => {
-        window.open(`/invoice/${orderId}`, '_blank', 'noopener,noreferrer')
+    const handlePrintInvoice = (order) => {
+        localStorage.setItem('selectedOrders', JSON.stringify([order]))
+        window.open(`/invoice`, '_blank', 'noopener,noreferrer')
+    }
+
+    const handlePrintInvoiceMany = () => {
+        if (selectedOrderIds.length > 0) {
+            const selectedOrders = orders.filter((order) => selectedOrderIds.includes(order._id))
+            if (selectedOrders.length > 0) {
+                localStorage.setItem('selectedOrders', JSON.stringify(selectedOrders))
+                window.open('/invoice', '_blank', 'noopener,noreferrer')
+            }
+        }
     }
 
     useEffect(() => {
@@ -264,7 +275,13 @@ const OrderManagement = () => {
                     <p className="fs-3 fw-medium">{orders.length} đơn hàng</p>
                     <div className="d-flex">
                         <div className="select ">
-                            <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xác nhận các đơn hàng đang chọn" data-two="Xác nhận giao hàng các đơn đang chọn">
+                            <div
+                                className="selected"
+                                data-default="Công cụ xử lý hàng loạt"
+                                data-one="Xác nhận các đơn hàng đang chọn"
+                                data-two="Xác nhận giao hàng các đơn đang chọn"
+                                data-three="In hóa đơn các đơn hàng đang chọn"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                     <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                 </svg>
@@ -275,12 +292,47 @@ const OrderManagement = () => {
                                     <label className="option" htmlFor="all" data-txt="Công cụ xử lý hàng loạt" />
                                 </div>
                                 <div title="option-1">
-                                    <input id="option-1" name="option" type="radio" value="processing" checked={bulkAction === 'processing'} onChange={() => setBulkAction('processing')} />
+                                    <input
+                                        id="option-1"
+                                        name="option"
+                                        type="radio"
+                                        value="processing"
+                                        checked={bulkAction === 'processing'}
+                                        onChange={() => {
+                                            if (selectedOrderIds.length > 0) {
+                                                setBulkAction('processing')
+                                            }
+                                        }}
+                                    />
                                     <label className="option" htmlFor="option-1" data-txt="Xác nhận các đơn hàng đang chọn" />
                                 </div>
                                 <div title="option-2">
-                                    <input id="option-2" name="option" type="radio" value="delivering" checked={bulkAction === 'delivering'} onChange={() => setBulkAction('delivering')} />
+                                    <input
+                                        id="option-2"
+                                        name="option"
+                                        type="radio"
+                                        value="delivering"
+                                        checked={bulkAction === 'delivering'}
+                                        onChange={() => {
+                                            if (selectedOrderIds.length > 0) {
+                                                setBulkAction('delivering')
+                                            }
+                                        }}
+                                    />
                                     <label className="option" htmlFor="option-2" data-txt="Xác nhận giao hàng các đơn đang chọn" />
+                                </div>
+                                <div title="option-3">
+                                    <input
+                                        id="option-3"
+                                        name="option"
+                                        type="radio"
+                                        value="printInvoice"
+                                        checked={bulkAction === 'printInvoice'}
+                                        onChange={() => {
+                                            handlePrintInvoiceMany()
+                                        }}
+                                    />
+                                    <label className="option" htmlFor="option-3" data-txt="In hóa đơn các đơn hàng đang chọn" />
                                 </div>
                             </div>
                         </div>
@@ -357,7 +409,7 @@ const OrderManagement = () => {
                                     <p className="fs-4 text-center">{order.paymentMethod === 'bankTransfer' ? 'Thanh toán chuyển khoản' : 'Thanh toán khi nhận hàng'}</p>
                                     <p className="fs-4 text-center">{order.totalPrice}đ</p>
                                     <div className="text-center">
-                                        <p className={`text-center text-warning`}>
+                                        <p className={`text-center ${order.status === 'cancelled' ? 'text-danger' : order.status === 'delivered' ? 'text-success' : 'text-warning'}`}>
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
@@ -377,7 +429,7 @@ const OrderManagement = () => {
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" />
-                                        <p className="fs-5 text-primary hover-icon p-2" onClick={() => handlePrintInvoice(order._id)}>
+                                        <p className="fs-5 text-primary hover-icon p-2" onClick={() => handlePrintInvoice(order)}>
                                             In hóa đơn
                                         </p>
                                         <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>

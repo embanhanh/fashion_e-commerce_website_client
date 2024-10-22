@@ -112,7 +112,7 @@ function Cart() {
                 shippingAddress: orderData.shippingAddress._id,
             }
             try {
-                const response = await dispatch(createOrderAction(finalOrderData))
+                await dispatch(createOrderAction(finalOrderData)).unwrap()
                 setNotification({
                     show: true,
                     description: 'Đặt hàng thành công',

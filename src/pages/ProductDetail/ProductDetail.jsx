@@ -302,7 +302,8 @@ function ProductDetail() {
                                         disabled={
                                             availableQuantity === 0 ||
                                             !(!currentProduct.variants.some((variant) => variant.color) || selectedColor) ||
-                                            !(!currentProduct.variants.some((variant) => variant.size) || selectedSize)
+                                            !(!currentProduct.variants.some((variant) => variant.size) || selectedSize) ||
+                                            quantity > availableQuantity
                                         }
                                         className="cartBtn rounded-4 d-flex align-items-center justify-content-center p-4"
                                     >

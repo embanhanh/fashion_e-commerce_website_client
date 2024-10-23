@@ -8,11 +8,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faArrowRight, faCreditCard, faDollarSign, faHeadset, faTruckFast } from '@fortawesome/free-solid-svg-icons'
 import ProductCard from '../../components/ProductCard'
 import { Rating } from 'react-simple-star-rating'
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchBanners } from '../../redux/slices/bannerSlice'
+import TomTomMap from '../../components/TomTomMap'
 
 function Home() {
     const swiperCategory = useRef(null)
     const swiperReview = useRef(null)
+    const dispatch = useDispatch()
+    const { banners } = useSelector((state) => state.banner)
+
+    useEffect(() => {
+        dispatch(fetchBanners({ isActive: true }))
+    }, [dispatch])
+
+    useEffect(() => {
+        console.log(banners)
+    }, [banners])
 
     return (
         <>
@@ -33,26 +46,66 @@ function Home() {
                         }}
                         loop={true}
                     >
-                        <SwiperSlide>
-                            <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={banner1} loading="lazy" />
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                            <div className="slideshow-content">
-                                <div className="mb-3">
-                                    <p className="slideshow-title">Phong Cách Cổ Điển</p>
-                                    <p className="slideshow-description">Trở về với những thiết kế cổ điển tinh tế, mang đến vẻ đẹp không bao giờ lỗi mốt</p>
-                                </div>
-                                <div className="primary-btn btn-sm">
-                                    <p>
-                                        Khám phá ngay <FontAwesomeIcon icon={faArrowRight} />
+                        {banners.map((banner) => (
+                            <SwiperSlide key={banner._id}>
+                                <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={banner.imageUrl} loading="lazy" />
+                                <div
+                                    className="banner-overlay"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)',
+                                    }}
+                                ></div>
+                                <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                                {banner.elements.button && (
+                                    <button style={{ position: 'absolute', top: `${banner.elements.button.top}%`, left: `${banner.elements.button.left}%` }} className="primary-btn py-3 px-5">
+                                        <p className="fs-1 fw-medium">
+                                            {banner.buttonText} <FontAwesomeIcon icon={faArrowRight} />
+                                        </p>
+                                    </button>
+                                )}
+                                {banner.elements.title && (
+                                    <h2
+                                        className="text-white fw-bold"
+                                        style={{
+                                            padding: 8,
+                                            fontSize: '4.8rem',
+                                            maxWidth: '600px',
+                                            textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
+                                            position: 'absolute',
+                                            top: `${banner.elements.title.top}%`,
+                                            left: `${banner.elements.title.left}%`,
+                                        }}
+                                    >
+                                        {banner.title}
+                                    </h2>
+                                )}
+                                {banner.elements.description && (
+                                    <p
+                                        className="text-white fw-medium"
+                                        style={{
+                                            fontSize: '3rem',
+                                            padding: 8,
+                                            maxWidth: '600px',
+                                            textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
+                                            position: 'absolute',
+                                            top: `${banner.elements.description.top}%`,
+                                            left: `${banner.elements.description.left}%`,
+                                        }}
+                                    >
+                                        {banner.description}
                                     </p>
-                                </div>
-                            </div>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={banner2} loading="lazy" />
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
+                                )}
+                            </SwiperSlide>
+                        ))}
                     </Swiper>
+                </div>
+                <div className="container max-md p-5">
+                    <TomTomMap />
                 </div>
                 <div className=" container max-md p-5">
                     <div className="content-category w-100 py-5">

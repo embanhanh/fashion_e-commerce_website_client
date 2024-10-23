@@ -142,6 +142,7 @@ function Header({ location }) {
                                 <div className="d-flex align-items-center">
                                     <div className="p-2 notification-container rounded-3 position-relative">
                                         <FontAwesomeIcon className="fs-2" icon={faBell} />
+                                        {notifications.length > 0 && <span className="notification-count">{notifications.length}</span>}
                                         <div className="notification-mini position-absolute shadow rounded-3 p-4">
                                             <div className="mb-3 notification-item-container">
                                                 {notifications.length === 0 ? (

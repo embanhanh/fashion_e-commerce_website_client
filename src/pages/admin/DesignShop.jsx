@@ -319,7 +319,7 @@ function DesignShop() {
                                     style={{
                                         padding: 8,
                                         fontSize: '3.8rem',
-                                        maxWidth: '350px',
+                                        maxWidth: '450px',
                                         textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
                                         position: 'absolute',
                                         top: `${currentBanner.elements.title.top}%`,
@@ -335,7 +335,7 @@ function DesignShop() {
                                     style={{
                                         fontSize: '2.2rem',
                                         padding: 8,
-                                        maxWidth: '350px',
+                                        maxWidth: '450px',
                                         textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
                                         position: 'absolute',
                                         top: `${currentBanner.elements.description.top}%`,

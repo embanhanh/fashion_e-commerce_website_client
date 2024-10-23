@@ -269,12 +269,12 @@ function CreateBanner() {
                     return (
                         <DraggableElement key={id} id={id} position={{ top, left }} onMove={handleMove} onRemove={handleRemove}>
                             {type === 'title' && (
-                                <h2 className="draggable-elements text-white fw-bold fs-2 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                <h2 className="draggable-elements text-white fw-bold fs-2 p-2" style={{ maxWidth: '250px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
                                     {bannerInfo.title}
                                 </h2>
                             )}
                             {type === 'description' && (
-                                <p className="draggable-elements text-white fw-medium fs-5 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                                <p className="draggable-elements text-white fw-medium fs-5 p-2" style={{ maxWidth: '250px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
                                     {bannerInfo.description}
                                 </p>
                             )}
@@ -307,12 +307,12 @@ function CreateBanner() {
                 <div className="">
                     <div className="draggable-elements-box border d-flex justify-content-center w-100 mb-4 align-items-center">
                         <DraggableBox id="title" type="title">
-                            <h2 className="text-white fw-bold fs-2 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                            <h2 className="text-white fw-bold fs-2 p-2" style={{ maxWidth: '250px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
                                 Tiêu đề
                             </h2>
                         </DraggableBox>
                         <DraggableBox id="description" type="description">
-                            <p className="text-white fw-medium fs-5 p-2" style={{ maxWidth: '200px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
+                            <p className="text-white fw-medium fs-5 p-2" style={{ maxWidth: '250px', textShadow: '2px 2px 5px rgba(0, 0, 0, 0.7)' }}>
                                 Mô tả
                             </p>
                         </DraggableBox>

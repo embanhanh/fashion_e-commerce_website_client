@@ -166,15 +166,19 @@ export const deleteAddressUser = async (address_id) => {
     }
 }
 
-export const setDefaultAddress = async (address_id) => {
+export const setDefaultAddressUser = async (address_id) => {
     try {
-        const respone = await axiosInstance.put(`account/address/setdefault/${address_id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
-            },
-        });
-        return respone;
+        const response = await axiosInstance.put(
+            `account/address/setdefault/${address_id}`,
+            {}, // Assuming you don't need to send any data in the request body
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`, // Send token in header
+                },
+            }
+        );
+        return response;
     } catch (error) {
-        throw new Error(error.respone?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || error.message); // Fix typo 'respone' to 'response'
     }
-}
+};

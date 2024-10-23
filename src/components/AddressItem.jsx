@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import EditAddressModal from './EditAddressModal'
 import './AddressItem.scss' // Import SCSS file
-import { deleteAddress, updateAddress } from '../redux/slices/userSlice'
+import { deleteAddress, updateAddress, setDefaultAddress } from '../redux/slices/userSlice'
 import { useDispatch } from 'react-redux'
-import { setDefaultAddress } from '../services/UserService'
 
 function AddressItem({ address, onAddressUpdated }) {
     const dispatch = useDispatch()
@@ -38,13 +37,14 @@ function AddressItem({ address, onAddressUpdated }) {
 
     const handleSetDefaultAddress = async () => {
         try {
-            if (address._id) {  // Ensure address._id exists before calling the API
-                await dispatch(setDefaultAddress({ address_id: address._id }))
+            if (address._id) {
+                await dispatch(setDefaultAddress(address._id)); // Gửi ID thay vì đối tượng
+                onAddressUpdated();
             } else {
-                console.error('Address ID is undefined')
+                console.error('Address ID is undefined'); // Log error if ID is undefined
             }
         } catch (error) {
-            console.error('Error deleting address:', error)
+            console.error('Error setting default address:', error);
         }
     }
 
@@ -63,10 +63,10 @@ function AddressItem({ address, onAddressUpdated }) {
                         </div>
                     </div>
                     <div className="address-actions">
-                        <button className="btn-update" onClick={() => setShowEditModal(true)}>Cập nhật</button> {/* Mở modal khi nhấn nút */}
+                        <button className="btn-update fs-5" onClick={() => setShowEditModal(true)}>Cập nhật</button> {/* Mở modal khi nhấn nút */}
                     </div>
                     <div className="address-actions">
-                        <button className="btn-update" onClick={handleDeleteAddress}>Xóa</button>
+                        <button className="btn-update fs-5" onClick={handleDeleteAddress}>Xóa</button>
                     </div>
                 </div>
                 <div role="heading" className="address-content d-flex">

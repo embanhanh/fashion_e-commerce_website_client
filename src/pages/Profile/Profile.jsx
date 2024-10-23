@@ -134,20 +134,20 @@ function Profile() {
                             <tbody>
                                 <tr>
                                     <td className="label-cell">
+                                        <label>Email</label>
+                                    </td>
+                                    <td className="input-cell">
+                                        <div className="readonly-input">{email}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="label-cell">
                                         <label>Tên</label>
                                     </td>
                                     <td className="input-cell">
                                         <div className="input-wrapper">
                                             <input type="text" className="form-control" value={userName} onChange={(e) => setUserName(e.target.value)} />
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Email</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="readonly-input">{email}</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -212,7 +212,7 @@ function Profile() {
                     <div className="avatar-wrapper" style={{ backgroundImage: `url(${urlImage})` }}></div>
                     <div className="custom-file-upload">
                         <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" onChange={handleImageUpload} />
-                        <label htmlFor="file-upload" className="btn btn-light">
+                        <label htmlFor="file-upload" className="btn choosefile-btn">
                             Chọn ảnh
                         </label>
                     </div>

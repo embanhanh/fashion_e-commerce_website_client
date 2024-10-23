@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, setDefaultAddress } from '../../services/UserService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, setDefaultAddressUser } from '../../services/UserService'
 
 // import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '../../services/CartService'
 
@@ -62,9 +62,9 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
 
 })
 
-export const setDefaultAddressUser = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
+export const setDefaultAddress = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
     try {
-        const response = await setDefaultAddress(address_id)
+        const response = await setDefaultAddressUser(address_id)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -165,21 +165,19 @@ const userSlice = createSlice({
                 state.error = action.payload;
                 console.error('Error deleting address:', action.payload); // Log the error
             })
-            .addCase(setDefaultAddressUser.pending, (state) => {
-                state.loading = true;
+            .addCase(setDefaultAddress.fulfilled, (state, action) => {
+                // Xử lý khi đặt địa chỉ mặc định thành công
+                const updatedAddresses = state.addresses.map((address) =>
+                    address._id === action.payload._id
+                        ? { ...address, default: true }
+                        : { ...address, default: false }
+                );
+                state.addresses = updatedAddresses;
             })
-            .addCase(setDefaultAddressUser.fulfilled, (state, action) => {
-                state.loading = false;
-                const index = state.addresses.findIndex(address => address.id === action.payload.id); // Tìm chỉ số địa chỉ cần cập nhật
-                if (index !== -1) {
-                    state.addresses[index] = action.payload; // Cập nhật địa chỉ trong danh sách
-                }
-            })
-            .addCase(setDefaultAddressUser.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                console.error('Error deleting address:', action.payload); // Log the error
-            })
+            .addCase(setDefaultAddress.rejected, (state, action) => {
+                state.error = action.payload
+                console.error('Error setting default address:', action.error.message);
+            });
 
     },
 })

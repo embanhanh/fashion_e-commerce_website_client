@@ -98,6 +98,12 @@ function Adminlayout({ children }) {
                         <Link className="fs-4 seller-option" to={'/seller/voucher/create'}>
                             Tạo mã khuyến mãi
                         </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/combo'}>
+                            Combo khuyến mãi
+                        </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/combo/create'}>
+                            Tạo combo khuyến mãi
+                        </Link>
                     </Accordion>
                 </div>
                 <div className="h-100 p-4 w-100" style={{ marginLeft: '20%', minHeight: '100vh' }}>

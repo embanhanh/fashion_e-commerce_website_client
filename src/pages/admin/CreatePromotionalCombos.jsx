@@ -1,19 +1,21 @@
 import './CreatePromotionalCombos.scss'
-import { useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ProductModal from '../../components/ProductModal'
 import { useDispatch, useSelector } from 'react-redux'
-import { createPromotionalComboAction } from '../../redux/slices/promotionalComboSlice'
+import { createPromotionalComboAction, getPromotionalComboByIdAction, updatePromotionalComboAction } from '../../redux/slices/promotionalComboSlice'
 import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 
 function CreatePromotionalCombos() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { combo_id } = useParams()
+    const { promotionalCombo } = useSelector((state) => state.promotionalCombo)
     const [comboData, setComboData] = useState({
         name: '',
         startDate: new Date(),
@@ -37,6 +39,21 @@ function CreatePromotionalCombos() {
         type: 'success',
         title: '',
     })
+
+    useEffect(() => {
+        if (combo_id) {
+            dispatch(getPromotionalComboByIdAction(combo_id))
+        }
+    }, [combo_id])
+
+    useEffect(() => {
+        if (promotionalCombo) {
+            setComboData({
+                ...promotionalCombo,
+                products: promotionalCombo.products.map((product) => product._id),
+            })
+        }
+    }, [promotionalCombo])
 
     const validateField = (name, value) => {
         let error = ''
@@ -86,10 +103,14 @@ function CreatePromotionalCombos() {
         if (validateForm()) {
             setLoading(true)
             try {
-                await dispatch(createPromotionalComboAction(comboData)).unwrap()
+                if (combo_id) {
+                    await dispatch(updatePromotionalComboAction({ combo_id, promotionalComboData: comboData })).unwrap()
+                } else {
+                    await dispatch(createPromotionalComboAction(comboData)).unwrap()
+                }
                 setShowNotification({
                     show: true,
-                    description: 'Tạo combo khuyến mãi thành công',
+                    description: `${combo_id ? 'Cập nhật' : 'Tạo'} combo khuyến mãi thành công`,
                     type: 'success',
                     title: 'Thành công',
                 })

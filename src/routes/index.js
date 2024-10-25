@@ -66,6 +66,7 @@ const publicRoutes = [
     { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout },
     { path: '/seller/combo', element: PromotionalCombos, layout: Adminlayout },
     { path: '/seller/combo/create', element: CreatePromotionalCombos, layout: Adminlayout },
+    { path: '/seller/combo/edit/:combo_id', element: CreatePromotionalCombos, layout: Adminlayout },
     { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
     { path: '/invoice', element: InvoicePage, layout: Fragment },
     { path: '*', element: NotFound, layout: Fragment },

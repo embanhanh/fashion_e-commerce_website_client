@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getShopInfo, updateShopInfo } from '../../redux/slices/shopSlice'
 import { Modal } from 'react-bootstrap'
 import Notification from '../../components/Notification'
+import TomTomMap from '../../components/TomTomMap'
 
 function ShopManagerment() {
     const initializeWorkingHours = () => {
@@ -37,6 +38,10 @@ function ShopManagerment() {
         returnPolicy: '',
         promotionPolicy: '',
         workingHours: initializeWorkingHours(),
+        location: {
+            lat: 21.0285,
+            lng: 105.8542,
+        },
     })
     const [newLogo, setNewLogo] = useState(null)
     const [showToast, setShowToast] = useState(false)
@@ -94,6 +99,16 @@ function ShopManagerment() {
             [category]: {
                 ...prev[category],
                 [field]: value,
+            },
+        }))
+    }
+
+    const handleLocationChange = (location) => {
+        setEditedShopInfo((prev) => ({
+            ...prev,
+            location: {
+                lat: location.lat,
+                lng: location.lng,
             },
         }))
     }
@@ -223,6 +238,11 @@ function ShopManagerment() {
                                         />
                                     </div>
                                 </div>
+                                {isEditing && (
+                                    <div className="mb-4">
+                                        <TomTomMap initialLocation={editedShopInfo.location} onLocationChange={handleLocationChange} />
+                                    </div>
+                                )}
                                 <div className="d-flex align-items-center">
                                     <p className="fs-4 fw-medium form-label">Email</p>
                                     <div className="input-form d-flex align-items-center w-100">

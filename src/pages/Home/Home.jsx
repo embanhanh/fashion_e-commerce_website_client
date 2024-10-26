@@ -104,9 +104,6 @@ function Home() {
                         ))}
                     </Swiper>
                 </div>
-                <div className="container max-md p-5">
-                    <TomTomMap />
-                </div>
                 <div className=" container max-md p-5">
                     <div className="content-category w-100 py-5">
                         <div className="header-category d-flex justify-content-between align-items-center">

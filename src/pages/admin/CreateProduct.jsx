@@ -43,6 +43,7 @@ function CreateProduct() {
     const [errors, setErrors] = useState({})
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState({ title: '', description: '', type: '' })
+    const [shippingInfo, setShippingInfo] = useState([{ type: 'basic', price: 0 }])
 
     const resetForm = () => {
         setName('')
@@ -59,6 +60,7 @@ function CreateProduct() {
         setImages([])
         setIsClassify(false)
         setErrors({})
+        setShippingInfo([{ type: 'basic', price: 0 }])
     }
 
     useEffect(() => {
@@ -89,6 +91,7 @@ function CreateProduct() {
             setSelectedCategories(currentProduct.categories)
             setImages(currentProduct.urlImage)
             setIsClassify(currentProduct.variants.length > 0)
+            setShippingInfo(currentProduct.shippingInfo)
             let classify = []
             if (currentProduct.variants.length > 0 && currentProduct.variants.find((variant) => variant.color !== '')) {
                 classify.push('color')
@@ -191,6 +194,10 @@ function CreateProduct() {
             })
         }
 
+        if (shippingInfo.length === 0) {
+            newErrors.shippingInfo = 'Cần ít nhất 1 phương thức vận chuyển'
+        }
+
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -252,6 +259,7 @@ function CreateProduct() {
                     variants: isClassify ? filteredVariants : [],
                     minOrderQuantity: parseInt(minOrderQuantity) || 1,
                     maxOrderQuantity: parseInt(maxOrderQuantity) || 100,
+                    shippingInfo,
                 }
 
                 if (product_name) {
@@ -397,21 +405,6 @@ function CreateProduct() {
             </Modal>
 
             <div className="w-75 pb-5">
-                <div className="p-4 d-flex bg-white border">
-                    <a href="#section1" className="fs-4 fw-medium">
-                        Thông tin cơ bản
-                    </a>
-                    <a href="#section2" className="fs-4 ms-3">
-                        Thông tin chi tiết
-                    </a>
-                    <a href="#section3" className="fs-4 ms-3">
-                        Thông tin bán hàng
-                    </a>
-                    <a href="#section4" className="fs-4 ms-3">
-                        Thông tin vận chuyển
-                    </a>
-                </div>
-
                 <section id="section1" className="p-4 bg-white border mt-4">
                     <h2>Thông tin cơ bản</h2>
                     <div className="p-4">
@@ -689,14 +682,16 @@ function CreateProduct() {
                                                         </div>
                                                         {errors[`classifyInputs.${index}.price`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.price`]}</p>}
                                                     </div>
-                                                    <FontAwesomeIcon
-                                                        icon={faTrashCan}
-                                                        className="fs-3 ms-3 p-2"
-                                                        color="#ff7262"
-                                                        onClick={() => {
-                                                            removeClassifyInput(input.id)
-                                                        }}
-                                                    />
+                                                    {classifyInputs.length > 1 && (
+                                                        <FontAwesomeIcon
+                                                            icon={faTrashCan}
+                                                            className="fs-3 ms-3 p-2"
+                                                            color="#ff7262"
+                                                            onClick={() => {
+                                                                removeClassifyInput(input.id)
+                                                            }}
+                                                        />
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -762,6 +757,99 @@ function CreateProduct() {
                 </section>
                 <section id="section4" className="p-4 bg-white border mt-4">
                     <h2>Thông tin vận chuyển</h2>
+                    <div className="p-4">
+                        <div className="d-flex align-items-center justify-content-between py-3 border-bottom">
+                            <p className="fs-4 w-25 fw-medium">Vận chuyển cơ bản</p>
+                            <div className="d-flex align-items-center">
+                                {shippingInfo.some((info) => info.type === 'basic') && (
+                                    <div className="input-form d-flex align-items-center me-3" style={{ width: 150 }}>
+                                        <input
+                                            type="number"
+                                            value={shippingInfo.find((info) => info.type === 'basic')?.price}
+                                            onChange={(e) => {
+                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'basic' ? { ...info, price: e.target.value } : info)))
+                                            }}
+                                            className="input-text w-100"
+                                            placeholder="Phí vận chuyển"
+                                        />
+                                    </div>
+                                )}
+                                <input
+                                    type="checkbox"
+                                    checked={shippingInfo.some((info) => info.type === 'basic')}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setShippingInfo((pre) => [...pre, { type: 'basic', price: 0 }])
+                                        } else {
+                                            setShippingInfo((pre) => pre.filter((info) => info.type !== 'basic'))
+                                        }
+                                    }}
+                                    className="theme-checkbox"
+                                />
+                            </div>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between py-3 border-bottom">
+                            <p className="fs-4 w-25 fw-medium">Vận chuyển nhanh</p>
+                            <div className="d-flex align-items-center">
+                                {shippingInfo.some((info) => info.type === 'fast') && (
+                                    <div className="input-form d-flex align-items-center me-3" style={{ width: 150 }}>
+                                        <input
+                                            type="number"
+                                            value={shippingInfo.find((info) => info.type === 'fast')?.price}
+                                            onChange={(e) => {
+                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'fast' ? { ...info, price: e.target.value } : info)))
+                                            }}
+                                            className="input-text w-100"
+                                            placeholder="Phí vận chuyển"
+                                        />
+                                    </div>
+                                )}
+                                <input
+                                    type="checkbox"
+                                    checked={shippingInfo.some((info) => info.type === 'fast')}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setShippingInfo((pre) => [...pre, { type: 'fast', price: 0 }])
+                                        } else {
+                                            setShippingInfo((pre) => pre.filter((info) => info.type !== 'fast'))
+                                        }
+                                    }}
+                                    className="theme-checkbox"
+                                />
+                            </div>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between py-3 border-bottom">
+                            <p className="fs-4 w-25 fw-medium">Vận chuyển hỏa tốc</p>
+                            <div className="d-flex align-items-center">
+                                {shippingInfo.some((info) => info.type === 'express') && (
+                                    <div className="input-form d-flex align-items-center me-3" style={{ width: 150 }}>
+                                        <input
+                                            type="number"
+                                            value={shippingInfo.find((info) => info.type === 'express')?.price}
+                                            onChange={(e) => {
+                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'express' ? { ...info, price: e.target.value } : info)))
+                                            }}
+                                            className="input-text w-100"
+                                            placeholder="Phí vận chuyển"
+                                        />
+                                    </div>
+                                )}
+                                <input
+                                    type="checkbox"
+                                    checked={shippingInfo.some((info) => info.type === 'express')}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setShippingInfo((pre) => [...pre, { type: 'express', price: 0 }])
+                                        } else {
+                                            setShippingInfo((pre) => pre.filter((info) => info.type !== 'express'))
+                                        }
+                                    }}
+                                    className="theme-checkbox"
+                                />
+                            </div>
+                        </div>
+                        {errors.shippingInfo && <p className="text-danger ms-2 pt-2">{errors.shippingInfo}</p>}
+                    </div>
                 </section>
                 <section className="d-flex flex-row-reverse mt-4">
                     <div className="">

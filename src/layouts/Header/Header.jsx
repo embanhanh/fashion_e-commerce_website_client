@@ -183,7 +183,7 @@ function Header({ location }) {
                                                             cartStatus === 'succeeded' &&
                                                             cart.items.map((item, index) => (
                                                                 <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
-                                                                    <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
+                                                                    <img src={item.variant.product?.urlImage || ''} className="me-4" alt="" width={50} height={50} />
                                                                     <div className="w-100">
                                                                         <p className="fs-4 fw-medium ellipsis">{item.variant.product?.name || ''}</p>
                                                                         <p className="fw-medium">

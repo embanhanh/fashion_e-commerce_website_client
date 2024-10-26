@@ -113,6 +113,13 @@ function ShopManagerment() {
         }))
     }
 
+    const handleAddressChange = (address) => {
+        setEditedShopInfo((prev) => ({
+            ...prev,
+            address: address,
+        }))
+    }
+
     const handleLogoChange = (e) => {
         const file = e.target.files[0]
         if (file) {
@@ -240,7 +247,7 @@ function ShopManagerment() {
                                 </div>
                                 {isEditing && (
                                     <div className="mb-4">
-                                        <TomTomMap initialLocation={editedShopInfo.location} onLocationChange={handleLocationChange} />
+                                        <TomTomMap initialLocation={editedShopInfo.location} onLocationChange={handleLocationChange} setLocation={handleAddressChange} />
                                     </div>
                                 )}
                                 <div className="d-flex align-items-center">

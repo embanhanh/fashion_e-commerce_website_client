@@ -4,7 +4,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 
 function SelectAddressModal({ showAddress, handleCloseAddress, addresses, originalSelectedAddress, handleSelectAddress }) {
-    const [selectedAddress, setSelectedAddress] = useState(originalSelectedAddress)
+    const [selectedAddress, setSelectedAddress] = useState(originalSelectedAddress || {})
     return (
         <Modal show={showAddress} onHide={handleCloseAddress} centered>
             <Modal.Header closeButton>

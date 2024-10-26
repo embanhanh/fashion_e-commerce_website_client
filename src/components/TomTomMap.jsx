@@ -5,7 +5,7 @@ import '@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css'
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import SearchBox from '@tomtom-international/web-sdk-plugin-searchbox'
 
-const TomTomMap = ({ initialLocation, onLocationChange }) => {
+const TomTomMap = ({ initialLocation, onLocationChange, height = '400px', setLocation }) => {
     const mapElement = useRef()
     const mapInstance = useRef(null)
     const [searchBox, setSearchBox] = useState(null)
@@ -30,12 +30,31 @@ const TomTomMap = ({ initialLocation, onLocationChange }) => {
                     zoom: 14,
                 })
                 onLocationChange({ lng: lon, lat: lat })
+                fetchLocationInfo({ lng: lon, lat: lat })
             } else {
                 console.error('Tọa độ không hợp lệ:', lat, lon)
             }
         } else {
             console.log('Bản đồ chưa sẵn sàng hoặc không tìm thấy thông tin vị trí trong kết quả')
         }
+    }, [])
+
+    const fetchLocationInfo = useCallback((lngLat) => {
+        const apiKey = import.meta.env.VITE_API_KEY_TOMTOM_MAP
+        ttapi.services
+            .reverseGeocode({
+                key: apiKey,
+                position: lngLat,
+            })
+            .then((response) => {
+                if (response.addresses && response.addresses.length > 0) {
+                    const address = response.addresses[0]
+                    setLocation(address.address.freeformAddress)
+                }
+            })
+            .catch((error) => {
+                console.error('Lỗi khi lấy thông tin địa điểm:', error)
+            })
     }, [])
 
     useEffect(() => {
@@ -57,6 +76,7 @@ const TomTomMap = ({ initialLocation, onLocationChange }) => {
                 const lngLat = markerRef.current.getLngLat()
                 console.log('Tọa độ mới:', lngLat.lng, lngLat.lat)
                 onLocationChange(lngLat)
+                fetchLocationInfo(lngLat)
             })
 
             const ttSearchBox = new SearchBox(ttapi.services, {
@@ -116,7 +136,7 @@ const TomTomMap = ({ initialLocation, onLocationChange }) => {
 
     return (
         <div>
-            <div ref={mapElement} style={{ height: '400px', width: '100%' }} />
+            <div ref={mapElement} style={{ height: height, width: '100%' }} />
         </div>
     )
 }

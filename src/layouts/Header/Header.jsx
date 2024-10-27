@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState, useEffect, useMemo } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBagShopping, faEnvelope, faLocationDot, faPhone, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faBagShopping, faBell, faEnvelope, faLocationDot, faPhone, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { faSquareFacebook } from '@fortawesome/free-brands-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart } from '../../redux/slices/cartSlice'
@@ -11,6 +11,9 @@ import { fetchUser } from '../../redux/slices/userSlice'
 import LogoShop from '../../components/LogoShop'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import cartEmpty from '../../assets/image/default/cart-empty.jpg'
+import { collection, doc, onSnapshot } from 'firebase/firestore'
+import { db } from '../../firebase.config'
+import logoShop from '../../assets/image/logo/logo.png'
 
 function Header({ location }) {
     const navigate = useNavigate()
@@ -18,8 +21,9 @@ function Header({ location }) {
     const { isLoggedIn } = useSelector((state) => state.auth)
     const { user } = useSelector((state) => state.user)
     const { categories, status } = useSelector((state) => state.category)
-    const { cart, error } = useSelector((state) => state.cart)
+    const { cart, status: cartStatus } = useSelector((state) => state.cart)
     const [navOption, setNavOption] = useState('Trang chủ')
+    const [notifications, setNotifications] = useState([])
 
     useLayoutEffect(() => {
         window.scrollTo(0, 0)
@@ -32,6 +36,25 @@ function Header({ location }) {
         }
         dispatch(fetchCategories())
     }, [isLoggedIn, dispatch])
+
+    useEffect(() => {
+        if (user) {
+            let docs
+            if (user.role === 'admin') {
+                docs = doc(db, 'notifications', 'admin')
+            } else {
+                docs = doc(db, 'notifications', user._id)
+            }
+            const unsubscribe = onSnapshot(docs, (doc) => {
+                if (doc.exists()) {
+                    const notifs = doc.data().notifications || []
+                    setNotifications(notifs)
+                }
+            })
+
+            return () => unsubscribe()
+        }
+    }, [user])
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -117,11 +140,28 @@ function Header({ location }) {
                         {isLoggedIn ? (
                             <>
                                 <div className="d-flex align-items-center">
-                                    <div className="p-2 cart-container rounded-3 position-relative" onClick={() => navigate('/cart')}>
+                                    <div className="p-2 notification-container rounded-3 position-relative">
+                                        <FontAwesomeIcon className="fs-2" icon={faBell} />
+                                        <div className="notification-mini position-absolute shadow rounded-3 p-4">
+                                            <div className="mb-3 notification-item-container">
+                                                {notifications.length === 0 ? (
+                                                    <p className="fs-4 text-center">Không có thông báo nào</p>
+                                                ) : (
+                                                    notifications.map((notif, index) => (
+                                                        <div key={index} className="d-flex align-items-center py-3 px-2 border-bottom hover-icon">
+                                                            <img src={logoShop} alt="" width={32} height={32} />
+                                                            <p className="fs-4 ms-2">{notif.message}</p>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-2 cart-container rounded-3 position-relative mx-3" onClick={() => navigate('/cart')}>
                                         <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
                                         {cart && cart.items && cart.items.length > 0 && <span className="cart-count">{cart.items.length}</span>}
                                         <div className="cart-mini position-absolute shadow rounded-3 p-4">
-                                            {!cart ? (
+                                            {cartStatus === 'loading' ? (
                                                 <section className="dots-container mt-4">
                                                     <div className="dot"></div>
                                                     <div className="dot"></div>
@@ -132,14 +172,14 @@ function Header({ location }) {
                                             ) : (
                                                 <>
                                                     <div className="mb-3 cart-product-container">
-                                                        {cart && cart.items && cart.items.length === 0 && (
+                                                        {cartStatus === 'succeeded' && cart.items.length === 0 ? (
                                                             <div className="d-flex justify-content-center align-items-center">
                                                                 <img src={cartEmpty} alt="" style={{ width: 300, height: 300, objectFit: 'cover' }} />
                                                             </div>
-                                                        )}
-
-                                                        {cart &&
-                                                            cart.items &&
+                                                        ) : cartStatus === 'failed' ? (
+                                                            <p className="fs-4 fw-medium">Không thể lấy giỏ hàng</p>
+                                                        ) : (
+                                                            cartStatus === 'succeeded' &&
                                                             cart.items.map((item, index) => (
                                                                 <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
                                                                     <img src={item.variant.imageUrl || ''} className="me-4" alt="" width={50} height={50} />
@@ -150,11 +190,12 @@ function Header({ location }) {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                            ))}
+                                                            ))
+                                                        )}
                                                     </div>
-                                                    {cart && cart.items && cart.items.length > 0 && (
+                                                    {cartStatus === 'succeeded' && cart.items.length > 0 && (
                                                         <div className="d-flex justify-content-between align-items-center">
-                                                            <p className="fs-4 fw-medium">{cart ? cart.items.length : 0} sản phẩm có trong giỏ hàng</p>
+                                                            <p className="fs-4 fw-medium">{cart.items.length} sản phẩm có trong giỏ hàng</p>
                                                             <div className="primary-btn p-3 shadow-none" onClick={() => navigate('/cart')}>
                                                                 <p>Xem giỏ hàng</p>
                                                             </div>

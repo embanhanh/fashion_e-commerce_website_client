@@ -185,7 +185,11 @@ function DesignShop() {
                                         type="radio"
                                         value="deleteSelectedBanners"
                                         checked={bulkAction === 'deleteSelectedBanners'}
-                                        onChange={(e) => setBulkAction(e.target.value)}
+                                        onChange={(e) => {
+                                            if (selectedBanners.length > 0) {
+                                                setBulkAction(e.target.value)
+                                            }
+                                        }}
                                     />
                                     <label className="option" htmlFor="option-1-v2" data-txt="Xóa các banner đang chọn" />
                                 </div>

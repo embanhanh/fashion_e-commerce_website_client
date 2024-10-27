@@ -88,7 +88,7 @@ export const loginWithFirebase = async (token, type) => {
 
 export const getUser = async () => {
     try {
-        const response = await axios.get(API_URL + 'account/profile', {
+        const response = await axiosInstance.get(API_URL + 'account/profile', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
@@ -101,7 +101,7 @@ export const getUser = async () => {
 
 export const updateProfile = async (userData) => {
     try {
-        const response = await axios.put(API_URL + 'account/profile/edit', userData, {
+        const response = await axiosInstance.put(API_URL + 'account/profile/edit', userData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,  // Thêm token vào headers
                 'Content-Type': 'application/json', // Đảm bảo định dạng JSON
@@ -115,7 +115,7 @@ export const updateProfile = async (userData) => {
 }
 
 export const getAddressesUser = async () => {
-    const response = await axios.get(API_URL + 'account/address', {
+    const response = await axiosInstance.get(API_URL + 'account/address', {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

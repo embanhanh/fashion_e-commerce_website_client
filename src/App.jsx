@@ -66,14 +66,33 @@ function App() {
                             <Route
                                 key={index}
                                 element={
-                                    <PrivateRoute>
+                                    <PrivateRoute allowedRoles={route.allowedRoles}>
                                         <Layout>
                                             <Page />
                                         </Layout>
                                     </PrivateRoute>
                                 }
                                 path={route.path}
-                            />
+                            >
+                                {route.children?.map((child, idx) => {
+                                    const ChildLayout = child.layout ? child.layout : Layout
+                                    const ChildPage = child.element
+
+                                    return (
+                                        <Route
+                                            key={idx}
+                                            path={child.path}
+                                            element={
+                                                <PrivateRoute allowedRoles={child.allowedRoles || route.allowedRoles}>
+                                                    <ChildLayout>
+                                                        <ChildPage />
+                                                    </ChildLayout>
+                                                </PrivateRoute>
+                                            }
+                                        />
+                                    )
+                                })}
+                            </Route>
                         )
                     })}
                 </Routes>

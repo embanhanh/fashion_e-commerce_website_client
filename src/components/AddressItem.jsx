@@ -37,6 +37,7 @@ function AddressItem({ address, onAddressUpdated }) {
 
     const handleSetDefaultAddress = async () => {
         try {
+            console.log('Address:', address); // Log the address object
             if (address._id) {
                 await dispatch(setDefaultAddress(address._id)); // Gửi ID thay vì đối tượng
                 onAddressUpdated();

@@ -302,7 +302,8 @@ function ProductDetail() {
                                         disabled={
                                             availableQuantity === 0 ||
                                             !(!currentProduct.variants.some((variant) => variant.color) || selectedColor) ||
-                                            !(!currentProduct.variants.some((variant) => variant.size) || selectedSize)
+                                            !(!currentProduct.variants.some((variant) => variant.size) || selectedSize) ||
+                                            quantity > availableQuantity
                                         }
                                         className="cartBtn rounded-4 d-flex align-items-center justify-content-center p-4"
                                     >
@@ -346,8 +347,8 @@ function ProductDetail() {
                                 </div>
                                 <div className="col-9">
                                     <p className="fs-3 py-2">{currentProduct.categories.map((category) => category.name).join(', ')}</p>
-                                    <p className="fs-3 py-2">{currentProduct.material}</p>
-                                    <p className="fs-3 py-2">{currentProduct.brand}</p>
+                                    <p className="fs-3 py-2">{currentProduct.material || 'Không có'}</p>
+                                    <p className="fs-3 py-2">{currentProduct.brand || 'Không có'}</p>
                                     <p className="fs-3 py-2">...</p>
                                     <p className="fs-3 py-2">{currentProduct.stockQuantity}</p>
                                 </div>

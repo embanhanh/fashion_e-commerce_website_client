@@ -164,3 +164,12 @@ export const deleteAddressUser = async (address_id) => {
         throw new Error(error.response?.data?.message || error.message)
     }
 }
+
+export const getVouchersUser = async () => {
+    const response = await axios.get(API_URL + 'account/voucher', {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
+    return response.data
+}

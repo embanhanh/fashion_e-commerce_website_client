@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser } from '../../services/UserService'
-
-// import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '../../services/CartService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
     try {
@@ -54,7 +52,16 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
         const respone = await deleteAddressUser(address_id)
         return respone
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to update delete')
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+    }
+})
+
+export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
+    try {
+        const response = await getVouchersUser()
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
     }
 })
 
@@ -66,6 +73,7 @@ const userSlice = createSlice({
         loading: false,
         error: null,
         success: false,
+        vouchers: [],
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -148,6 +156,15 @@ const userSlice = createSlice({
                 state.loading = false
                 state.error = action.payload
                 console.error('Error deleting address:', action.payload) // Log the error
+            })
+            .addCase(fetchVouchers.pending, (state) => {
+                state.error = null
+            })
+            .addCase(fetchVouchers.fulfilled, (state, action) => {
+                state.vouchers = action.payload
+            })
+            .addCase(fetchVouchers.rejected, (state, action) => {
+                state.error = action.payload
             })
     },
 })

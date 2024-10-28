@@ -28,6 +28,10 @@ function Cart() {
     const [showAddress, setShowAddress] = useState(false)
     const [showPaymentMethod, setShowPaymentMethod] = useState(false)
     const [showShippingMethod, setShowShippingMethod] = useState(false)
+    const [discountValue, setDiscountValue] = useState({
+        value: 0,
+        shipping: 0,
+    })
     // state
     const [orderData, setOrderData] = useState({
         products: [],
@@ -85,21 +89,44 @@ function Cart() {
     }
 
     useEffect(() => {
-        if (orderData.vouchers.length > 0) {
-            const totalPrice =
-                orderData.totalPrice -
-                orderData.vouchers.reduce((total, voucher) => {
-                    if (voucher.discountType === 'percentage') {
-                        return total + (orderData.totalPrice * voucher.discountValue) / 100
+        let value = 0
+        let shipping = 0
+        const totalPrice =
+            orderData.productsPrice +
+            orderData.shippingPrice -
+            orderData.vouchers.reduce((total, voucher) => {
+                let originalValue = 0
+                let finalValue = 0
+                if (voucher.voucherType === 'shipping') {
+                    originalValue = orderData.shippingPrice
+                } else {
+                    originalValue = orderData.productsPrice + orderData.shippingPrice
+                }
+                if (voucher.discountType === 'percentage') {
+                    const valueDiscount = (originalValue * voucher.discountValue) / 100
+                    if (valueDiscount > voucher.maxDiscountValue) {
+                        finalValue = voucher.maxDiscountValue
                     } else {
-                        return total + voucher.discountValue
+                        finalValue = valueDiscount
                     }
-                }, 0)
-            setOrderData((pre) => ({
-                ...pre,
-                totalPrice,
-            }))
-        }
+                } else {
+                    finalValue = voucher.discountValue
+                }
+                if (voucher.voucherType === 'shipping') {
+                    shipping += finalValue
+                } else {
+                    value += finalValue
+                }
+                return total + finalValue
+            }, 0)
+        setOrderData((pre) => ({
+            ...pre,
+            totalPrice,
+        }))
+        setDiscountValue({
+            value,
+            shipping,
+        })
     }, [orderData.vouchers])
 
     useEffect(() => {
@@ -234,10 +261,15 @@ function Cart() {
         }
     }
 
-    const handleQuantityChange = (itemId, change) => {
+    const handleQuantityChange = async (itemId, change) => {
         const item = cart.items.find((i) => i._id === itemId)
         const newQuantity = Math.max(1, item.quantity + change)
-        dispatch(updateItemQuantity({ itemId, quantity: newQuantity }))
+        await dispatch(updateItemQuantity({ itemId, quantity: newQuantity })).unwrap()
+        setOrderData((prev) => ({
+            ...prev,
+            products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
+            productsPrice: prev.productsPrice + item.variant.price * change,
+        }))
     }
 
     const handleRemoveItem = (itemId) => {
@@ -364,7 +396,17 @@ function Cart() {
                                                 </div>
                                                 <div className="flex-grow-1 justify-content-center d-flex">
                                                     <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
-                                                        <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, -1)} style={{ cursor: 'pointer' }} />
+                                                        <FontAwesomeIcon
+                                                            icon={faMinus}
+                                                            size="lg"
+                                                            className="p-4"
+                                                            onClick={() => {
+                                                                if (item.quantity > 1) {
+                                                                    handleQuantityChange(item._id, -1)
+                                                                }
+                                                            }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
                                                         <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
                                                         <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
                                                     </div>
@@ -390,8 +432,14 @@ function Cart() {
                                 <p className="fs-3 fw-medium ">
                                     <FontAwesomeIcon icon={faTicket} className="fs-2" /> Mã giảm giá
                                 </p>
-                                <div className="primary-btn px-2 py-1 shadow-none" onClick={handleShowVoucher}>
-                                    <p>Chọn</p>
+                                <div className="d-flex align-items-center">
+                                    {discountValue.value > 0 && <p className="fs-4 fw-medium p-2 me-2 border border-primary-subtle text-info">{`${Math.round(discountValue.value / 1000)}K`}</p>}
+                                    {discountValue.shipping > 0 && (
+                                        <p className="fs-4 fw-medium p-2 border border-success-subtle text-success-emphasis me-2">{`${Math.round(discountValue.shipping / 1000)}K`}</p>
+                                    )}
+                                    <div className="primary-btn px-2 py-1 shadow-none" onClick={handleShowVoucher}>
+                                        <p>Chọn</p>
+                                    </div>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">

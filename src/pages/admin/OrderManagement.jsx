@@ -245,7 +245,20 @@ const OrderManagement = () => {
                         <p className="fs-4 fw-medium">Tìm</p>
                     </button>
 
-                    <button className="ms-3 py-1 px-4 rounded-2 border bg-white">
+                    <button
+                        className="ms-3 py-1 px-4 rounded-2 border bg-white"
+                        onClick={() => {
+                            const originalFilter = {
+                                productName: '',
+                                orderStartDate: null,
+                                orderEndDate: null,
+                                paymentMethod: 'paymentUponReceipt',
+                                shippingMethod: 'default',
+                            }
+                            setFilterLocal(originalFilter)
+                            dispatch(setFilter({ ...originalFilter, filterStatus }))
+                        }}
+                    >
                         <p className="fs-4 fw-medium">Nhập lại</p>
                     </button>
                 </div>
@@ -379,7 +392,7 @@ const OrderManagement = () => {
                                     </div>
                                     <div className="overflow-y-auto mt-5">
                                         <div className="d-inline-flex align-items-center w-100">
-                                            <img src={order.user?.urlImage} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                            <img src={order.user?.urlImage} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }} />
                                             <div className="ms-3 order-product-info">
                                                 <p className="fs-4 fw-medium overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
                                                     {order.user?.name}

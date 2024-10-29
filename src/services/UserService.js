@@ -173,3 +173,13 @@ export const getVouchersUser = async () => {
     })
     return response.data
 }
+
+export const getClients = async (clientFilters) => {
+    const response = await axios.get(API_URL + 'clients', {
+        params: clientFilters,
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
+    return response.data
+}

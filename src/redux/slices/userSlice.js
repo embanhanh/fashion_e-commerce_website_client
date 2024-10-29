@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser } from '../../services/UserService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser, getClients } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
     try {
@@ -65,6 +65,15 @@ export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { 
     }
 })
 
+export const fetchClients = createAsyncThunk('user/fetchClients', async (clientFilters, { rejectWithValue }) => {
+    try {
+        const response = await getClients(clientFilters)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+    }
+})
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -74,6 +83,15 @@ const userSlice = createSlice({
         error: null,
         success: false,
         vouchers: [],
+        clients: [],
+        clientsLoading: false,
+        clientFilters: {
+            name: '',
+            phone: '',
+            totalSpent: '',
+            orderCount: '',
+            clientType: '',
+        },
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -164,6 +182,17 @@ const userSlice = createSlice({
                 state.vouchers = action.payload
             })
             .addCase(fetchVouchers.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchClients.pending, (state) => {
+                state.clientsLoading = true
+            })
+            .addCase(fetchClients.fulfilled, (state, action) => {
+                state.clientsLoading = false
+                state.clients = action.payload
+            })
+            .addCase(fetchClients.rejected, (state, action) => {
+                state.clientsLoading = false
                 state.error = action.payload
             })
     },

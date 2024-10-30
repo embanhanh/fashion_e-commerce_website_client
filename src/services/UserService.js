@@ -183,3 +183,16 @@ export const getClients = async (clientFilters) => {
     })
     return response.data
 }
+
+export const blockClient = async (userId, reasons) => {
+    const response = await axiosInstance.put(
+        `clients/block/${userId}`,
+        { reasons },
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        }
+    )
+    return response.data
+}

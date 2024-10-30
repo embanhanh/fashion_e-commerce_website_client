@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser, getClients } from '../../services/UserService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser, getClients, blockClient } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
     try {
@@ -68,6 +68,15 @@ export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { 
 export const fetchClients = createAsyncThunk('user/fetchClients', async (clientFilters, { rejectWithValue }) => {
     try {
         const response = await getClients(clientFilters)
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+    }
+})
+
+export const blockClientAction = createAsyncThunk('user/blockClient', async ({ userId, reasons }, { rejectWithValue }) => {
+    try {
+        const response = await blockClient(userId, reasons)
         return response
     } catch (error) {
         return rejectWithValue(error.message || 'Có lỗi xảy ra')
@@ -193,6 +202,16 @@ const userSlice = createSlice({
             })
             .addCase(fetchClients.rejected, (state, action) => {
                 state.clientsLoading = false
+                state.error = action.payload
+            })
+            .addCase(blockClientAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(blockClientAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+            })
+            .addCase(blockClientAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

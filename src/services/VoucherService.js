@@ -79,3 +79,20 @@ export const deleteManyVoucher = async (voucherIds) => {
         throw error.response.data
     }
 }
+
+export const giveVoucher = async (userId, voucherIds, message) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'give/' + userId,
+            { voucherIds, message },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error.response.data
+    }
+}

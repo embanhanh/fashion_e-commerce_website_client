@@ -1,12 +1,15 @@
 import './CustomerManagement.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisVertical, faEye, faGift, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsisVertical, faEye, faGift, faBan, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { fetchClients } from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
+import Notification from '../../components/Notification'
+import BlockClientModal from '../../components/BlockClientModal'
+import Modal from 'react-bootstrap/Modal'
 
 function CustomerManagement() {
     const { clients, clientsLoading } = useSelector((state) => state.user)
@@ -19,6 +22,13 @@ function CustomerManagement() {
     })
     const [clientType, setClientType] = useState('')
     const [userIds, setUserIds] = useState([])
+    const [blockUserIds, setBlockUserIds] = useState([])
+    const [notification, setNotification] = useState({
+        show: false,
+        title: '',
+        description: '',
+        type: '',
+    })
 
     useEffect(() => {
         dispatch(fetchClients({ ...clientFilters, clientType }))
@@ -140,18 +150,17 @@ function CustomerManagement() {
                             <p className="fs-4 fw-medium text-center">Ngày sinh</p>
                             <p className="fs-4 fw-medium text-center">Tổng tiền mua hàng</p>
                             <p className="fs-4 fw-medium text-center">Số lần mua hàng ở shop</p>
+                            <p className="fs-4 fw-medium text-center">Trạng thái</p>
                             <div className="px-4"></div>
                         </div>
                         {clientsLoading ? (
-                            <div className="dot-spinner ms-4">
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                                <div className="dot-spinner__dot"></div>
-                            </div>
+                            <section className="dots-container mt-4">
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                            </section>
                         ) : (
                             clients.map((client) => (
                                 <div key={client._id} className="order-grid py-3 border-bottom">
@@ -180,21 +189,31 @@ function CustomerManagement() {
                                     <p className="fs-4 fw-medium text-center">{client.birthday ? new Date(client.birthday).toLocaleDateString('vi-VN') : 'Không có'}</p>
                                     <p className="fs-4 fw-medium text-center">{client.totalSpent}</p>
                                     <p className="fs-4 fw-medium text-center">{client.orderCount}</p>
+                                    <p className={`fs-4 fw-medium text-center ${client.isBlocked ? 'text-danger' : 'text-success'}`}>{client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}</p>
                                     <div className="px-2 dropdown-container">
                                         <FontAwesomeIcon icon={faEllipsisVertical} className="fs-3 p-2 hover-icon" color="#4a90e2" />
                                         <div className="dropdown-menu">
-                                            <div className="dropdown-item d-flex align-items-center">
-                                                <FontAwesomeIcon icon={faEye} className="fs-4 me-2" />
-                                                <p className="fs-5 m-0">Xem lịch sử mua hàng</p>
-                                            </div>
-                                            <div className="dropdown-item d-flex align-items-center" onClick={() => setUserIds([client._id])}>
-                                                <FontAwesomeIcon icon={faGift} className="fs-4 me-2" color="#4a90e2" />
-                                                <p className="fs-5 m-0">Tặng voucher</p>
-                                            </div>
-                                            <div className="dropdown-item d-flex align-items-center">
-                                                <FontAwesomeIcon icon={faBan} className="fs-4 me-2" color="#e74c3c" />
-                                                <p className="fs-5 m-0">Chặn khách hàng</p>
-                                            </div>
+                                            {!client.isBlocked ? (
+                                                <>
+                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setBlockUserIds([client._id])}>
+                                                        <FontAwesomeIcon icon={faBan} className="fs-4 me-2" color="#e74c3c" />
+                                                        <p className="fs-5 m-0">Chặn khách hàng</p>
+                                                    </div>
+                                                    <div className="dropdown-item d-flex align-items-center">
+                                                        <FontAwesomeIcon icon={faEye} className="fs-4 me-2" />
+                                                        <p className="fs-5 m-0">Xem lịch sử mua hàng</p>
+                                                    </div>
+                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setUserIds([client._id])}>
+                                                        <FontAwesomeIcon icon={faGift} className="fs-4 me-2" color="#4a90e2" />
+                                                        <p className="fs-5 m-0">Tặng voucher</p>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="dropdown-item d-flex align-items-center">
+                                                    <FontAwesomeIcon icon={faUnlockKeyhole} className="fs-4 me-2 text-success" />
+                                                    <p className="fs-5 m-0">Mở khóa khách hàng</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -203,7 +222,13 @@ function CustomerManagement() {
                     </div>
                 </div>
             </div>
-            {userIds.length > 0 && <GiveVoucher isOpen={true} onClose={() => setUserIds([])} userId={userIds} />}
+            {userIds.length > 0 && <GiveVoucher isOpen={true} onClose={() => setUserIds([])} userId={userIds} setNotification={setNotification} />}
+            {blockUserIds.length > 0 && <BlockClientModal show={true} onClose={() => setBlockUserIds([])} userIds={blockUserIds} setNotification={setNotification} />}
+            {notification.show && (
+                <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
+                    <Notification title={notification.title} description={notification.description} type={notification.type} />
+                </Modal>
+            )}
         </div>
     )
 }

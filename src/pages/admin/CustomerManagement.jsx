@@ -1,14 +1,15 @@
 import './CustomerManagement.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisVertical, faEye, faGift, faBan, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsisVertical, faEye, faGift, faBan, faUnlockKeyhole, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { fetchClients } from '../../redux/slices/userSlice'
+import { fetchClients, unblockClientAction, unblockManyClientAction } from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
 import Notification from '../../components/Notification'
 import BlockClientModal from '../../components/BlockClientModal'
+import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
 import Modal from 'react-bootstrap/Modal'
 
 function CustomerManagement() {
@@ -23,6 +24,9 @@ function CustomerManagement() {
     const [clientType, setClientType] = useState('')
     const [userIds, setUserIds] = useState([])
     const [blockUserIds, setBlockUserIds] = useState([])
+    const [updateClientType, setUpdateClientType] = useState([])
+    const [selectedClient, setSelectedClient] = useState([])
+    const [bulkAction, setBulkAction] = useState('')
     const [notification, setNotification] = useState({
         show: false,
         title: '',
@@ -51,6 +55,47 @@ function CustomerManagement() {
         }
         setClientFilters(defaultClientFilters)
         dispatch(fetchClients({ ...defaultClientFilters, clientType }))
+    }
+
+    const handleUnblockClient = async (userId) => {
+        try {
+            await dispatch(unblockClientAction({ userId })).unwrap()
+            setNotification({
+                show: true,
+                title: 'Thành công',
+                description: 'Khách hàng đã được mở khóa',
+                type: 'success',
+            })
+        } catch (error) {
+            setNotification({
+                show: true,
+                title: 'Thất bại',
+                description: error.message,
+                type: 'error',
+            })
+        }
+    }
+
+    const handleUnblockClients = async () => {
+        try {
+            await dispatch(unblockManyClientAction({ userIds: selectedClient })).unwrap()
+            setNotification({
+                show: true,
+                title: 'Thành công',
+                description: 'Những khách hàng đã được mở khóa',
+                type: 'success',
+            })
+            setSelectedClient([])
+        } catch (error) {
+            setNotification({
+                show: true,
+                title: 'Thất bại',
+                description: error.message,
+                type: 'error',
+            })
+        } finally {
+            setBulkAction('')
+        }
     }
 
     return (
@@ -134,13 +179,108 @@ function CustomerManagement() {
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">100 khách hàng</p>
+                    <div className="select ">
+                        <div
+                            className="selected"
+                            data-default="Công cụ xử lý hàng loạt"
+                            data-one="Chặn các khách hàng đang chọn"
+                            data-two="Mở khóa các khách hàng đang chọn"
+                            data-three="Thay đổi loại khách hàng các khách hàng đang chọn"
+                            data-four="Tặng voucher các khách hàng đang chọn"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                            </svg>
+                        </div>
+                        <div className="options">
+                            <div title="all">
+                                <input id="all-v2" name="option-v2" type="radio" value="" checked={bulkAction === ''} onChange={(e) => setBulkAction(e.target.value)} />
+                                <label className="option" htmlFor="all-v2" data-txt="Công cụ xử lý hàng loạt" />
+                            </div>
+                            <div title="option-1">
+                                <input
+                                    id="option-1-v2"
+                                    name="option-v2"
+                                    type="radio"
+                                    value="block"
+                                    checked={bulkAction === 'block'}
+                                    onChange={(e) => {
+                                        if (selectedClient.length > 0) {
+                                            setBulkAction(e.target.value)
+                                            setBlockUserIds(selectedClient)
+                                        }
+                                    }}
+                                />
+                                <label className="option" htmlFor="option-1-v2" data-txt="Chặn các khách hàng đang chọn" />
+                            </div>
+                            <div title="option-2">
+                                <input
+                                    id="option-2-v2"
+                                    name="option-v2"
+                                    type="radio"
+                                    value="unblock"
+                                    checked={bulkAction === 'unblock'}
+                                    onChange={(e) => {
+                                        if (selectedClient.length > 0) {
+                                            setBulkAction(e.target.value)
+                                            handleUnblockClients()
+                                        }
+                                    }}
+                                />
+                                <label className="option" htmlFor="option-2-v2" data-txt="Mở khóa các khách hàng đang chọn" />
+                            </div>
+                            <div title="option-3">
+                                <input
+                                    id="option-3-v2"
+                                    name="option-v2"
+                                    type="radio"
+                                    value="update"
+                                    checked={bulkAction === 'update'}
+                                    onChange={(e) => {
+                                        if (selectedClient.length > 0) {
+                                            setBulkAction(e.target.value)
+                                            setUpdateClientType(selectedClient)
+                                        }
+                                    }}
+                                />
+                                <label className="option" htmlFor="option-3-v2" data-txt="Thay đổi loại các khách hàng đang chọn" />
+                            </div>
+                            <div title="option-4">
+                                <input
+                                    id="option-4-v2"
+                                    name="option-v2"
+                                    type="radio"
+                                    value="give-voucher"
+                                    checked={bulkAction === 'give-voucher'}
+                                    onChange={(e) => {
+                                        if (selectedClient.length > 0) {
+                                            setBulkAction(e.target.value)
+                                            setUserIds(selectedClient)
+                                        }
+                                    }}
+                                />
+                                <label className="option" htmlFor="option-4-v2" data-txt="Tặng voucher các khách hàng đang chọn" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="p-3">
                     <div className="border rounded-2 p-3">
                         <div className="order-grid py-3 border-bottom">
                             <div className="checkbox-cell">
                                 <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" />
+                                    <input
+                                        type="checkbox"
+                                        className="input-checkbox"
+                                        checked={selectedClient.length === clients.length}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedClient(clients.map((client) => client._id))
+                                            } else {
+                                                setSelectedClient([])
+                                            }
+                                        }}
+                                    />
                                     <span className="custom-checkbox"></span>
                                 </label>
                             </div>
@@ -166,7 +306,18 @@ function CustomerManagement() {
                                 <div key={client._id} className="order-grid py-3 border-bottom">
                                     <div className="checkbox-cell">
                                         <label className="d-flex align-items-center">
-                                            <input type="checkbox" className="input-checkbox" />
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={selectedClient.includes(client._id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedClient([...selectedClient, client._id])
+                                                    } else {
+                                                        setSelectedClient(selectedClient.filter((id) => id !== client._id))
+                                                    }
+                                                }}
+                                            />
                                             <span className="custom-checkbox"></span>
                                         </label>
                                     </div>
@@ -207,9 +358,13 @@ function CustomerManagement() {
                                                         <FontAwesomeIcon icon={faGift} className="fs-4 me-2" color="#4a90e2" />
                                                         <p className="fs-5 m-0">Tặng voucher</p>
                                                     </div>
+                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setUpdateClientType([client._id])}>
+                                                        <FontAwesomeIcon icon={faArrowsRotate} className="fs-4 me-2" color="#4a90e2" />
+                                                        <p className="fs-5 m-0">Thay đổi loại khách hàng</p>
+                                                    </div>
                                                 </>
                                             ) : (
-                                                <div className="dropdown-item d-flex align-items-center">
+                                                <div className="dropdown-item d-flex align-items-center" onClick={() => handleUnblockClient(client._id)}>
                                                     <FontAwesomeIcon icon={faUnlockKeyhole} className="fs-4 me-2 text-success" />
                                                     <p className="fs-5 m-0">Mở khóa khách hàng</p>
                                                 </div>
@@ -222,8 +377,29 @@ function CustomerManagement() {
                     </div>
                 </div>
             </div>
-            {userIds.length > 0 && <GiveVoucher isOpen={true} onClose={() => setUserIds([])} userId={userIds} setNotification={setNotification} />}
-            {blockUserIds.length > 0 && <BlockClientModal show={true} onClose={() => setBlockUserIds([])} userIds={blockUserIds} setNotification={setNotification} />}
+            {userIds.length > 0 && (
+                <GiveVoucher isOpen={true} onClose={() => setUserIds([])} userId={userIds} setNotification={setNotification} setBulkAction={setBulkAction} setSelectedClient={setSelectedClient} />
+            )}
+            {blockUserIds.length > 0 && (
+                <BlockClientModal
+                    setBulkAction={setBulkAction}
+                    setSelectedClient={setSelectedClient}
+                    show={true}
+                    onClose={() => setBlockUserIds([])}
+                    userIds={blockUserIds}
+                    setNotification={setNotification}
+                />
+            )}
+            {updateClientType.length > 0 && (
+                <UpdateClientTypeModal
+                    setBulkAction={setBulkAction}
+                    setSelectedClient={setSelectedClient}
+                    show={true}
+                    onClose={() => setUpdateClientType([])}
+                    userIds={updateClientType}
+                    setNotification={setNotification}
+                />
+            )}
             {notification.show && (
                 <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
                     <Notification title={notification.title} description={notification.description} type={notification.type} />

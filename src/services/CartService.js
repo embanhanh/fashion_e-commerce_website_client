@@ -11,7 +11,7 @@ export const getCart = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -24,7 +24,7 @@ export const addToCart = async (productData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -41,7 +41,7 @@ export const updateCartItemQuantity = async (itemId, quantity) => {
         )
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -54,6 +54,6 @@ export const removeCartItem = async (itemId) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }

@@ -1,5 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, getVouchersUser, getClients, blockClient } from '../../services/UserService'
+import {
+    getAddressesUser,
+    getUser,
+    updateProfile,
+    createAddress,
+    updateAddressUser,
+    deleteAddressUser,
+    getVouchersUser,
+    getClients,
+    blockClient,
+    unblockClient,
+    updateClientType,
+    blockManyClient,
+    unblockManyClient,
+    updateManyClientType,
+} from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
     try {
@@ -16,7 +31,7 @@ export const updateUserProfile = createAsyncThunk('user/updateUserProfile', asyn
         const response = await updateProfile(userData)
         return response
     } catch (error) {
-        return rejectWithValue(error.message)
+        return rejectWithValue(error)
     }
 })
 
@@ -34,7 +49,7 @@ export const addNewAddress = createAsyncThunk('user/createAddress', async (addre
         const response = await createAddress(addressData) // Đảm bảo trả về response.data đúng cách
         return response // Không cần return response.data.data
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+        return rejectWithValue(error)
     }
 })
 
@@ -43,7 +58,7 @@ export const updateAddress = createAsyncThunk('user/updateAddress', async ({ add
         const respone = await updateAddressUser(address_id, addressData)
         return respone
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to update address')
+        return rejectWithValue(error)
     }
 })
 
@@ -52,7 +67,7 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
         const respone = await deleteAddressUser(address_id)
         return respone
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+        return rejectWithValue(error)
     }
 })
 
@@ -61,7 +76,7 @@ export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { 
         const response = await getVouchersUser()
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+        return rejectWithValue(error)
     }
 })
 
@@ -70,7 +85,7 @@ export const fetchClients = createAsyncThunk('user/fetchClients', async (clientF
         const response = await getClients(clientFilters)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+        return rejectWithValue(error)
     }
 })
 
@@ -79,7 +94,52 @@ export const blockClientAction = createAsyncThunk('user/blockClient', async ({ u
         const response = await blockClient(userId, reasons)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+        return rejectWithValue(error)
+    }
+})
+
+export const unblockClientAction = createAsyncThunk('user/unblockClient', async ({ userId }, { rejectWithValue }) => {
+    try {
+        const response = await unblockClient(userId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const updateClientTypeAction = createAsyncThunk('user/updateClientType', async ({ userId, clientType }, { rejectWithValue }) => {
+    try {
+        const response = await updateClientType(userId, clientType)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const updateManyClientTypeAction = createAsyncThunk('user/updateManyClientType', async ({ userIds, clientType }, { rejectWithValue }) => {
+    try {
+        const response = await updateManyClientType(userIds, clientType)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const blockManyClientAction = createAsyncThunk('user/blockManyClient', async ({ userIds, reasons }, { rejectWithValue }) => {
+    try {
+        const response = await blockManyClient(userIds, reasons)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const unblockManyClientAction = createAsyncThunk('user/unblockManyClient', async ({ userIds }, { rejectWithValue }) => {
+    try {
+        const response = await unblockManyClient(userIds)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
     }
 })
 
@@ -212,6 +272,56 @@ const userSlice = createSlice({
                 state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
             })
             .addCase(blockClientAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(unblockClientAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(unblockClientAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+            })
+            .addCase(unblockClientAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(updateClientTypeAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(updateClientTypeAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+            })
+            .addCase(updateClientTypeAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(updateManyClientTypeAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(updateManyClientTypeAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+            })
+            .addCase(updateManyClientTypeAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(blockManyClientAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(blockManyClientAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+            })
+            .addCase(blockManyClientAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(unblockManyClientAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(unblockManyClientAction.fulfilled, (state, action) => {
+                state.error = null
+                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+            })
+            .addCase(unblockManyClientAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

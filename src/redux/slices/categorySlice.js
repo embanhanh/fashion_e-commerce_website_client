@@ -6,7 +6,7 @@ export const fetchCategories = createAsyncThunk('category/fetchCategories', asyn
         const response = await getAllCategories()
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -15,8 +15,7 @@ export const addNewCategory = createAsyncThunk('category/addNewCategory', async 
         const response = await createCategory(categoryData)
         return response.category
     } catch (error) {
-        const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra'
-        return rejectWithValue(errorMessage)
+        return rejectWithValue(error)
     }
 })
 

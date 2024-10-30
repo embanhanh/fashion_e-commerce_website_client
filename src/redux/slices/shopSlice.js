@@ -6,7 +6,7 @@ export const getShopInfo = createAsyncThunk('shop/getInfo', async (_, { rejectWi
         const response = await getShop()
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -15,7 +15,7 @@ export const updateShopInfo = createAsyncThunk('shop/updateInfo', async (shopDat
         const response = await updateShop(shopData)
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 

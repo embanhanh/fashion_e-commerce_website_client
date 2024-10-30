@@ -6,7 +6,7 @@ export const createBannerAction = createAsyncThunk('banner/createBanner', async 
         const response = await createBanner(bannerData)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể tạo banner')
+        return rejectWithValue(error)
     }
 })
 
@@ -15,7 +15,7 @@ export const fetchBannerById = createAsyncThunk('banner/fetchBannerById', async 
         const response = await getBannerById(bannerId)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể lấy banner')
+        return rejectWithValue(error)
     }
 })
 
@@ -24,7 +24,7 @@ export const fetchBanners = createAsyncThunk('banner/fetchBanners', async (param
         const response = await getAllBanners(params)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể lấy danh sách banner')
+        return rejectWithValue(error)
     }
 })
 
@@ -33,7 +33,7 @@ export const updateBanner = createAsyncThunk('banner/updateBanner', async ({ ban
         const response = await editBanner(bannerId, bannerData)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể cập nhật banner')
+        return rejectWithValue(error)
     }
 })
 
@@ -42,7 +42,7 @@ export const deleteBanner = createAsyncThunk('banner/deleteBanner', async (banne
         const response = await removeBanner(bannerId)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể xóa banner')
+        return rejectWithValue(error)
     }
 })
 
@@ -51,7 +51,7 @@ export const deleteManyBanners = createAsyncThunk('banner/deleteManyBanners', as
         const response = await removeManyBanners(bannerIds)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Không thể xóa các banner')
+        return rejectWithValue(error)
     }
 })
 

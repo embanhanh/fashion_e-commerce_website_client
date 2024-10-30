@@ -75,10 +75,6 @@ export const loginWithFirebase = async (token, type) => {
             },
             body: JSON.stringify(token),
         })
-        if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.message)
-        }
 
         return response.json()
     } catch (error) {
@@ -95,7 +91,7 @@ export const getUser = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -110,17 +106,21 @@ export const updateProfile = async (userData) => {
 
         return response.data // Trả về dữ liệu từ response
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
 export const getAddressesUser = async () => {
-    const response = await axios.get(API_URL + 'account/address', {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-    return response.data
+    try {
+        const response = await axios.get(API_URL + 'account/address', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
 }
 
 export const createAddress = async (addresData) => {
@@ -133,7 +133,7 @@ export const createAddress = async (addresData) => {
         })
         return response.data // Trả về dữ liệu từ response
     } catch (error) {
-        throw new Error(error.response?.data?.message || error.message)
+        throw error
     }
 }
 
@@ -146,8 +146,7 @@ export const updateAddressUser = async (address_id, addressData) => {
         })
         return response.data
     } catch (error) {
-        console.error('Error updating address:', error.response?.data || error.message)
-        throw new Error(error.response?.data?.message || error.message)
+        throw error
     }
 }
 
@@ -160,39 +159,131 @@ export const deleteAddressUser = async (address_id) => {
         })
         return response
     } catch (error) {
-        console.error('Error delete address:', error.response?.data || error.message)
-        throw new Error(error.response?.data?.message || error.message)
+        throw error
     }
 }
 
 export const getVouchersUser = async () => {
-    const response = await axios.get(API_URL + 'account/voucher', {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-    return response.data
-}
-
-export const getClients = async (clientFilters) => {
-    const response = await axios.get(API_URL + 'clients', {
-        params: clientFilters,
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-    return response.data
-}
-
-export const blockClient = async (userId, reasons) => {
-    const response = await axiosInstance.put(
-        `clients/block/${userId}`,
-        { reasons },
-        {
+    try {
+        const response = await axios.get(API_URL + 'account/voucher', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-        }
-    )
-    return response.data
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getClients = async (clientFilters) => {
+    try {
+        const response = await axios.get(API_URL + 'clients', {
+            params: clientFilters,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const blockClient = async (userId, reasons) => {
+    try {
+        const response = await axiosInstance.put(
+            `clients/block/${userId}`,
+            { reasons },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const blockManyClient = async (userIds, reasons) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/block-many',
+            { userIds, reasons },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const unblockClient = async (userId) => {
+    try {
+        const response = await axiosInstance.put(`clients/unblock/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const unblockManyClient = async (userIds) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/unblock-many',
+            { userIds },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateClientType = async (userId, clientType) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'clients/update-client-type/' + userId,
+            { clientType },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateManyClientType = async (userIds, clientType) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/update-client-type-many',
+            { userIds, clientType },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
 }

@@ -12,7 +12,7 @@ export const createOrder = async (orderData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -25,7 +25,7 @@ export const getOrders = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -38,7 +38,7 @@ export const getOrderById = async (orderId) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -52,7 +52,7 @@ export const getAdminOrders = async (filters) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -69,6 +69,6 @@ export const updateOrderStatusMany = async (orderIds, status) => {
         )
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }

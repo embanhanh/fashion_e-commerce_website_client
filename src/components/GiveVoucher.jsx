@@ -1,11 +1,11 @@
 import Modal from 'react-bootstrap/Modal'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getVouchersAction, giveVoucherAction } from '../redux/slices/voucherSlice'
+import { getVouchersAction, giveVoucherAction, giveVoucherManyAction } from '../redux/slices/voucherSlice'
 import { ref, listAll, getDownloadURL } from 'firebase/storage'
 import { storage } from '../firebase.config'
 
-function GiveVoucher({ isOpen, onClose, userId, setNotification }) {
+function GiveVoucher({ isOpen, onClose, userId, setNotification, setBulkAction, setSelectedClient }) {
     const dispatch = useDispatch()
     const { vouchers, status } = useSelector((state) => state.voucher)
     const [filteredVouchers, setFilteredVouchers] = useState([])
@@ -35,7 +35,13 @@ function GiveVoucher({ isOpen, onClose, userId, setNotification }) {
     const handleGiveVoucher = async () => {
         try {
             setLoading(true)
-            await dispatch(giveVoucherAction({ userId: userId[0], voucherIds: giveVoucherData.voucher, message: giveVoucherData.message })).unwrap()
+            if (userId.length > 1) {
+                await dispatch(giveVoucherManyAction({ userIds: userId, voucherIds: giveVoucherData.voucher, message: giveVoucherData.message })).unwrap()
+                setBulkAction('')
+                setSelectedClient([])
+            } else {
+                await dispatch(giveVoucherAction({ userId: userId[0], voucherIds: giveVoucherData.voucher, message: giveVoucherData.message })).unwrap()
+            }
             onClose()
             setNotification({
                 show: true,
@@ -50,6 +56,9 @@ function GiveVoucher({ isOpen, onClose, userId, setNotification }) {
                 description: error.message,
                 type: 'error',
             })
+            if (userId.length > 1) {
+                setBulkAction('')
+            }
         } finally {
             setLoading(false)
         }

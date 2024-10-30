@@ -1,9 +1,9 @@
 import Modal from 'react-bootstrap/Modal'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { blockClientAction } from '../redux/slices/userSlice'
+import { blockClientAction, blockManyClientAction } from '../redux/slices/userSlice'
 
-export default function BlockClientModal({ show, onClose, userIds, setNotification }) {
+export default function BlockClientModal({ show, onClose, userIds, setNotification, setBulkAction, setSelectedClient }) {
     const dispatch = useDispatch()
     const [reason, setReason] = useState([])
     const [otherReason, setOtherReason] = useState('')
@@ -12,10 +12,16 @@ export default function BlockClientModal({ show, onClose, userIds, setNotificati
     const handleBlockClient = async () => {
         setLoading(true)
         try {
-            await dispatch(blockClientAction({ userId: userIds[0], reasons: otherReason ? [...reason, otherReason] : reason })).unwrap()
+            if (userIds.length > 1) {
+                await dispatch(blockManyClientAction({ userIds, reasons: otherReason ? [...reason, otherReason] : reason })).unwrap()
+                setBulkAction('')
+                setSelectedClient([])
+            } else {
+                await dispatch(blockClientAction({ userId: userIds[0], reasons: otherReason ? [...reason, otherReason] : reason })).unwrap()
+            }
             setNotification({
                 type: 'success',
-                description: 'Chặn khách hàng thành công',
+                description: `Chặn ${userIds.length > 1 ? 'các' : ''} khách hàng thành công`,
                 show: true,
                 title: 'Thành công',
             })
@@ -27,6 +33,9 @@ export default function BlockClientModal({ show, onClose, userIds, setNotificati
                 show: true,
                 title: 'Thất bại',
             })
+            if (userIds.length > 1) {
+                setBulkAction('')
+            }
         } finally {
             setLoading(false)
         }

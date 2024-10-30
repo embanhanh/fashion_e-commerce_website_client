@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createVoucher, getVouchers, updateVoucher, deleteVoucher, deleteManyVoucher, getVoucherById, giveVoucher } from '../../services/VoucherService'
+import { createVoucher, getVouchers, updateVoucher, deleteVoucher, deleteManyVoucher, getVoucherById, giveVoucher, giveVoucherMany } from '../../services/VoucherService'
 
 export const createVoucherAction = createAsyncThunk('voucher/createVoucher', async (voucherData, { rejectWithValue }) => {
     try {
@@ -49,6 +49,15 @@ export const deleteManyVoucherAction = createAsyncThunk('voucher/deleteManyVouch
 export const giveVoucherAction = createAsyncThunk('voucher/giveVoucher', async ({ userId, voucherIds, message }, { rejectWithValue }) => {
     try {
         const response = await giveVoucher(userId, voucherIds, message)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const giveVoucherManyAction = createAsyncThunk('voucher/giveVoucherMany', async ({ userIds, voucherIds, message }, { rejectWithValue }) => {
+    try {
+        const response = await giveVoucherMany(userIds, voucherIds, message)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -122,6 +131,15 @@ const voucherSlice = createSlice({
                 state.error = null
             })
             .addCase(giveVoucherAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(giveVoucherManyAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(giveVoucherManyAction.fulfilled, (state, action) => {
+                state.error = null
+            })
+            .addCase(giveVoucherManyAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

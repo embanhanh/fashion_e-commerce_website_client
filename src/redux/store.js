@@ -10,6 +10,7 @@ import bannerReducer from './slices/bannerSlice'
 import userReducer from './slices/userSlice'
 import voucherReducer from './slices/voucherSlice'
 import orderReducer from './slices/orderSilce'
+import promotionalComboReducer from './slices/promotionalComboSlice'
 const authPersistConfig = {
     key: 'auth',
     storage,
@@ -29,6 +30,7 @@ export const store = configureStore({
         banner: bannerReducer,
         voucher: voucherReducer,
         order: orderReducer,
+        promotionalCombo: promotionalComboReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

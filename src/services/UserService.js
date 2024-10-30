@@ -166,8 +166,19 @@ export const deleteAddressUser = async (address_id) => {
     }
 }
 
+export const getVouchersUser = async () => {
+    const response = await axios.get(API_URL + 'account/voucher', {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
+    return response.data
+}
+
 export const setDefaultAddressUser = async (address_id) => {
     try {
+        console.log(address_id);
+        
         const response = await axiosInstance.put(
             `account/address/setdefault/${address_id}`,
             {}, // Assuming you don't need to send any data in the request body

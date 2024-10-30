@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, setDefaultAddressUser } from '../../services/UserService'
+import { getAddressesUser, getUser, updateProfile, createAddress, updateAddressUser, deleteAddressUser, setDefaultAddressUser, getVouchersUser } from '../../services/UserService'
 
 // import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '../../services/CartService'
 
@@ -54,19 +54,31 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
         const respone = await deleteAddressUser(address_id)
         return respone
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to update delete')
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
+    }
+})
+
+export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
+    try {
+        const response = await getVouchersUser()
+        return response
+    } catch (error) {
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
     }
 
 })
 
 export const setDefaultAddress = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
     try {
+        console.log(address_id);
         const response = await setDefaultAddressUser(address_id)
+        
         return response
     } catch (error) {
         return rejectWithValue(error)
     }
 })
+
 
 const userSlice = createSlice({
     name: 'user',
@@ -76,6 +88,7 @@ const userSlice = createSlice({
         loading: false,
         error: null,
         success: false,
+        vouchers: [],
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -155,10 +168,34 @@ const userSlice = createSlice({
                 state.addresses = state.addresses.filter((address) => address.id !== action.payload.id)
             })
             .addCase(deleteAddress.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                console.error('Error deleting address:', action.payload); // Log the error
-            });
+                state.loading = false
+                state.error = action.payload
+                console.error('Error deleting address:', action.payload) // Log the error
+            })
+            .addCase(setDefaultAddress.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(setDefaultAddress.fulfilled, (state, action) => {
+                state.loading = false
+                const index = state.addresses.findIndex((address) => address.id === action.payload.id) // Tìm chỉ số địa chỉ cần cập nhật
+                if (index !== -1) {
+                    state.addresses[index] = action.payload // Cập nhật địa chỉ trong danh sách
+                }
+            })
+            .addCase(setDefaultAddress.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchVouchers.pending, (state) => {
+                state.error = null
+            })
+            .addCase(fetchVouchers.fulfilled, (state, action) => {
+                state.vouchers = action.payload
+            })
+            .addCase(fetchVouchers.rejected, (state, action) => {
+                state.error = action.payload
+            })
+        
     },
 })
 

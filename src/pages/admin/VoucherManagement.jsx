@@ -67,15 +67,14 @@ const VoucherManagement = () => {
     }
 
     const handleShowDetail = (voucher) => {
-        setSelectedVoucher(voucher); // Lưu voucher đã chọn
-        setShowDetailVoucher(true); // Mở modal
+        setSelectedVoucher(voucher) // Lưu voucher đã chọn
+        setShowDetailVoucher(true) // Mở modal
     }
 
     const handleCloseVoucher = () => {
-        setShowDetailVoucher(false); // Đóng modal
-        setSelectedVoucher(null); // Reset voucher đã chọn
+        setShowDetailVoucher(false) // Đóng modal
+        setSelectedVoucher(null) // Reset voucher đã chọn
     }
-
 
     const handleFilterChange = (name, value) => {
         setFilters({ ...filters, [name]: value })
@@ -141,38 +140,50 @@ const VoucherManagement = () => {
                     <Modal.Title className="fs-2 fw-bold text-primary">Chi tiết voucher giảm giá</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {selectedVoucher && (                        
+                    {selectedVoucher && (
                         <div className="voucher-details p-3 border rounded">
                             <div className="d-flex justify-content-between mb-3 fs-3">
-                                <strong className="text-secondary">Mã:</strong>
-                                <span>{selectedVoucher.code}</span>
+                                <img
+                                    src={
+                                        selectedVoucher.voucherType === 'all' && selectedVoucher.discountType === 'percentage'
+                                            ? voucherImages[3]
+                                            : selectedVoucher.voucherType === 'all' && selectedVoucher.discountType === 'fixedamount'
+                                            ? voucherImages[2]
+                                            : selectedVoucher.voucherType === 'product' && selectedVoucher.discountType === 'percentage'
+                                            ? voucherImages[1]
+                                            : selectedVoucher.voucherType === 'product' && selectedVoucher.discountType === 'fixedamount'
+                                            ? voucherImages[0]
+                                            : null
+                                    }
+                                    alt=""
+                                    style={{ width: '120px', height: '50px', objectFit: 'cover' }}
+                                />
+                                <span className="d-flex align-items-center">{selectedVoucher.code}</span>
                             </div>
                             <div className="d-flex justify-content-between mb-3 fs-4">
                                 <strong>Loại:</strong>
-                                <span>{selectedVoucher.voucherType === 'all' ? "Giảm giá toàn shop" : "Giảm giá theo sản phẩm"}</span>
+                                <span>{selectedVoucher.voucherType === 'all' ? 'Giảm giá toàn shop' : 'Giảm giá theo sản phẩm'}</span>
                             </div>
-                            {selectedVoucher.discountType === 'fixedamount' ?
+                            {selectedVoucher.discountType === 'fixedamount' ? (
                                 <div className="d-flex justify-content-between mb-3 fs-4">
                                     <strong>Giảm giá:</strong>
-                                    <span>{selectedVoucher.discountValue.toLocaleString("vi-VN")} đ
-                                    </span>
+                                    <span>{selectedVoucher.discountValue.toLocaleString('vi-VN')} đ</span>
                                 </div>
-                                : <div>
+                            ) : (
+                                <div>
                                     <div className="d-flex justify-content-between mb-3 fs-4">
                                         <strong>Mức giảm giá:</strong>
-                                        <span>{selectedVoucher.discountValue}%
-                                        </span>
+                                        <span>{selectedVoucher.discountValue}%</span>
                                     </div>
                                     <div className="d-flex justify-content-between mb-3 fs-4">
                                         <strong>Giảm tối đa:</strong>
-                                        <span>{selectedVoucher.maxDiscountValue.toLocaleString("vi-VN")} đ
-                                        </span>
+                                        <span>{selectedVoucher.maxDiscountValue.toLocaleString('vi-VN')} đ</span>
                                     </div>
                                 </div>
-                            }
+                            )}
                             <div className="d-flex justify-content-between mb-3 fs-4">
                                 <strong>Đơn tối thiểu:</strong>
-                                <span>{selectedVoucher.minOrderValue.toLocaleString("vi-VN")} đ</span>
+                                <span>{selectedVoucher.minOrderValue.toLocaleString('vi-VN')} đ</span>
                             </div>
                             <div className="d-flex justify-content-between mb-3 fs-4">
                                 <strong>Số lượng:</strong>
@@ -198,12 +209,11 @@ const VoucherManagement = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
+                              <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
                         <p>Đóng</p>
                     </div>
                 </Modal.Footer>
             </Modal>
-
 
             <div className=" pb-5">
                 <div className="bg-white border">
@@ -393,12 +403,12 @@ const VoucherManagement = () => {
                                                     voucher.voucherType === 'all' && voucher.discountType === 'percentage'
                                                         ? voucherImages[3]
                                                         : voucher.voucherType === 'all' && voucher.discountType === 'fixedamount'
-                                                            ? voucherImages[2]
-                                                            : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
-                                                                ? voucherImages[1]
-                                                                : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
-                                                                    ? voucherImages[0]
-                                                                    : null
+                                                        ? voucherImages[2]
+                                                        : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
+                                                        ? voucherImages[1]
+                                                        : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
+                                                        ? voucherImages[0]
+                                                        : null
                                                 }
                                                 alt=""
                                                 style={{ width: '120px', height: '50px', objectFit: 'cover' }}
@@ -413,12 +423,13 @@ const VoucherManagement = () => {
                                         <p className="fs-4 fw-medium text-center">{voucher.used}</p>
                                         <div>
                                             <p
-                                                className={`text-center fw-medium ${new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
-                                                    ? 'text-success'
-                                                    : new Date() > new Date(voucher.validUntil)
+                                                className={`text-center fw-medium ${
+                                                    new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
+                                                        ? 'text-success'
+                                                        : new Date() > new Date(voucher.validUntil)
                                                         ? 'text-danger'
                                                         : 'text-warning'
-                                                    }`}
+                                                }`}
                                             >
                                                 {(new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil) && 'Đang diễn ra') ||
                                                     (new Date() > new Date(voucher.validUntil) && 'Đã kết thúc') ||
@@ -460,7 +471,6 @@ const VoucherManagement = () => {
                     </Modal>
                 )}
             </div>
-
         </>
     )
 }

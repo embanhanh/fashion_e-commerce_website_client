@@ -39,7 +39,9 @@ function AddressItem({ address, onAddressUpdated }) {
         try {
             console.log('Address:', address); // Log the address object
             if (address._id) {
-                await dispatch(setDefaultAddress(address._id)); // Gửi ID thay vì đối tượng
+                await dispatch(setDefaultAddress({ address_id: address._id })); // Gửi ID thay vì đối tượng
+                console.log(address._id);
+                
                 onAddressUpdated();
             } else {
                 console.error('Address ID is undefined'); // Log error if ID is undefined

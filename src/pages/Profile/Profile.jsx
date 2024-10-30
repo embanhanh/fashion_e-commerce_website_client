@@ -156,7 +156,7 @@ function Profile() {
                                     </td>
                                     <td className="input-cell">
                                         <div className="input-group">
-                                            <input type="text" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                            <input type="number" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
                                         </div>
                                     </td>
                                 </tr>
@@ -168,15 +168,15 @@ function Profile() {
                                         <div className="radio-group">
                                             <label className="radio-option">
                                                 <input type="radio" name="gender" value="male" checked={gender === 'male'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio"></span> Nam
+                                                <span className="custom-radio me-2"></span> Nam
                                             </label>
                                             <label className="radio-option">
                                                 <input type="radio" name="gender" value="female" checked={gender === 'female'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio"></span> Nữ
+                                                <span className="custom-radio me-2"></span> Nữ
                                             </label>
                                             <label className="radio-option">
                                                 <input type="radio" name="gender" value="other" checked={gender === 'other'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio"></span> Khác
+                                                <span className="custom-radio me-2"></span> Khác
                                             </label>
                                         </div>
                                     </td>

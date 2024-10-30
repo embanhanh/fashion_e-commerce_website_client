@@ -6,31 +6,46 @@ import Modal from 'react-bootstrap/Modal'
 import { useState, useEffect, useLayoutEffect } from 'react'
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
+import { getShopInfo } from '../../redux/slices/shopSlice'
 import { createOrderAction } from '../../redux/slices/orderSilce'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import SelectAddressModal from '../../components/SelectAddressModal'
 import Notification from '../../components/Notification'
+import { calculateRouteDistance } from '../../utils/MapUtils'
+import ShippingMethodModal from '../../components/ShippingMethodModal'
+import VoucherModal from '../../components/VoucherModal'
 
 function Cart() {
     const dispatch = useDispatch()
     const { cart, status } = useSelector((state) => state.cart)
     const { addresses } = useSelector((state) => state.user)
+    const { shopInfo } = useSelector((state) => state.shop)
     const navigate = useNavigate()
 
     //modal
     const [showVoucher, setShowVoucher] = useState(false)
     const [showAddress, setShowAddress] = useState(false)
     const [showPaymentMethod, setShowPaymentMethod] = useState(false)
+    const [showShippingMethod, setShowShippingMethod] = useState(false)
+    const [discountValue, setDiscountValue] = useState({
+        value: 0,
+        shipping: 0,
+    })
     // state
     const [orderData, setOrderData] = useState({
         products: [],
         paymentMethod: 'paymentUponReceipt',
         productsPrice: 0,
-        shippingPrice: 30000,
+        shippingPrice: 0,
         totalPrice: 0,
         shippingAddress: {},
         vouchers: [],
+        shippingMethod: 'basic',
+        expectedDeliveryDate: {
+            startDate: null,
+            endDate: null,
+        },
     })
     // notification
     const [notification, setNotification] = useState({
@@ -43,15 +58,18 @@ function Cart() {
     useEffect(() => {
         dispatch(fetchCart())
         dispatch(fetchAddresses())
+        dispatch(getShopInfo())
     }, [dispatch])
 
     useEffect(() => {
         if (addresses.length > 0) {
             const defaultAddress = addresses.find((address) => address.default === true)
-            setOrderData({
-                ...orderData,
-                shippingAddress: defaultAddress,
-            })
+            if (defaultAddress) {
+                setOrderData({
+                    ...orderData,
+                    shippingAddress: defaultAddress,
+                })
+            }
         }
     }, [addresses])
 
@@ -62,6 +80,120 @@ function Cart() {
         })
     }
 
+    const confirmShippingMethod = (shippingMethod) => {
+        setOrderData({
+            ...orderData,
+            shippingMethod,
+        })
+        setShowShippingMethod(false)
+    }
+
+    useEffect(() => {
+        let value = 0
+        let shipping = 0
+        const totalPrice =
+            orderData.productsPrice +
+            orderData.shippingPrice -
+            orderData.vouchers.reduce((total, voucher) => {
+                let originalValue = 0
+                let finalValue = 0
+                if (voucher.voucherType === 'shipping') {
+                    originalValue = orderData.shippingPrice
+                } else {
+                    originalValue = orderData.productsPrice + orderData.shippingPrice
+                }
+                if (voucher.discountType === 'percentage') {
+                    const valueDiscount = (originalValue * voucher.discountValue) / 100
+                    if (valueDiscount > voucher.maxDiscountValue) {
+                        finalValue = voucher.maxDiscountValue
+                    } else {
+                        finalValue = valueDiscount
+                    }
+                } else {
+                    finalValue = voucher.discountValue
+                }
+                if (voucher.voucherType === 'shipping') {
+                    shipping += finalValue
+                } else {
+                    value += finalValue
+                }
+                return total + finalValue
+            }, 0)
+        setOrderData((pre) => ({
+            ...pre,
+            totalPrice,
+        }))
+        setDiscountValue({
+            value,
+            shipping,
+        })
+    }, [orderData.vouchers])
+
+    useEffect(() => {
+        calculateTotalShippingPrice()
+    }, [orderData.shippingAddress, orderData.shippingMethod, orderData.products])
+
+    const calculateTotalShippingPrice = async () => {
+        if (shopInfo && orderData.shippingAddress && addresses.length > 0) {
+            if (orderData.products.length > 0) {
+                console.log(' Tính toán  ')
+                const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
+                if (distance) {
+                    let price = 0
+                    const distanceValue = distance.distance
+                    if (distanceValue <= 500) {
+                        price += Math.ceil(distanceValue) * 100
+                    } else {
+                        price += 75000
+                    }
+                    if (orderData.products.length > 0) {
+                        const productsPrice = orderData.products.reduce((total, item) => {
+                            if (orderData.shippingMethod === 'basic') {
+                                return (
+                                    total +
+                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price * item.quantity
+                                )
+                            } else if (orderData.shippingMethod === 'fast') {
+                                return (
+                                    total +
+                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
+                                )
+                            } else {
+                                return (
+                                    total +
+                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price * item.quantity
+                                )
+                            }
+                        }, 0)
+                        price += productsPrice
+                    }
+                    const totalPrice = orderData.productsPrice + price
+                    setOrderData({
+                        ...orderData,
+                        shippingPrice: price,
+                        expectedDeliveryDate: {
+                            startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
+                            endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
+                        },
+                        totalPrice,
+                        vouchers: [],
+                    })
+                }
+            } else {
+                setOrderData({
+                    ...orderData,
+                    shippingPrice: 0,
+                    expectedDeliveryDate: {
+                        startDate: null,
+                        endDate: null,
+                    },
+                    totalPrice: 0,
+                    vouchers: [],
+                })
+            }
+        }
+    }
+
     const handleSelectItem = (itemId, quantity, price) => {
         setOrderData((prev) => {
             if (prev.products.some((product) => product.product === itemId)) {
@@ -70,7 +202,6 @@ function Cart() {
                     ...prev,
                     products: prev.products.filter((product) => product.product !== itemId),
                     productsPrice,
-                    totalPrice: productsPrice === 0 ? 0 : productsPrice + prev.shippingPrice,
                 }
             } else {
                 const productsPrice = prev.productsPrice + quantity * price
@@ -78,7 +209,6 @@ function Cart() {
                     ...prev,
                     products: [...prev.products, { product: itemId, quantity }],
                     productsPrice,
-                    totalPrice: productsPrice + prev.shippingPrice,
                 }
             }
         })
@@ -110,6 +240,7 @@ function Cart() {
             const finalOrderData = {
                 ...orderData,
                 shippingAddress: orderData.shippingAddress._id,
+                vouchers: orderData.vouchers.map((voucher) => voucher._id),
             }
             try {
                 await dispatch(createOrderAction(finalOrderData)).unwrap()
@@ -130,10 +261,15 @@ function Cart() {
         }
     }
 
-    const handleQuantityChange = (itemId, change) => {
+    const handleQuantityChange = async (itemId, change) => {
         const item = cart.items.find((i) => i._id === itemId)
         const newQuantity = Math.max(1, item.quantity + change)
-        dispatch(updateItemQuantity({ itemId, quantity: newQuantity }))
+        await dispatch(updateItemQuantity({ itemId, quantity: newQuantity })).unwrap()
+        setOrderData((prev) => ({
+            ...prev,
+            products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
+            productsPrice: prev.productsPrice + item.variant.price * change,
+        }))
     }
 
     const handleRemoveItem = (itemId) => {
@@ -162,156 +298,52 @@ function Cart() {
     return (
         <>
             <div className="container h-100 px-5 py-5">
-                {/* Modal Voucher */}
-                <Modal show={showVoucher} onHide={handleCloseVoucher} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fs-2">Chọn voucher giảm giá</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="">
-                            <div className="d-flex align-items-center pb-3 border-bottom">
-                                <p className="fs-3 ">Mã voucher</p>
-                                <div className="input-form d-flex align-items-center mx-3 flex-grow-1">
-                                    <input type="text" autoComplete="off" className="input-text w-100" placeholder="Nhập mã" />
-                                </div>
-                                <div className="primary-btn py-2 px-3 shadow-none">
-                                    <p>Áp dụng</p>
-                                </div>
-                            </div>
-                            <p className="fs-3 my-3">Mã của bạn</p>
-                            <div className="my-2" style={{ maxHeight: 260, overflowY: 'auto' }}>
-                                <div className="d-flex p-3 align-items-center my-2 border rounded-3">
-                                    <img src="" alt="" width={60} height={60} />
-                                    <div className="mx-3 flex-grow-1">
-                                        <p>
-                                            Giảm <strong>15%</strong>
-                                        </p>
-                                        <p>
-                                            Giảm tối đa <strong>20k</strong>
-                                        </p>
-                                        <p>
-                                            Đơn tối thiểu <strong>100k</strong>
-                                        </p>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <p>
-                                            Số lượng: <strong>10</strong>
-                                        </p>
-                                        <p>
-                                            HSD: <strong>30/09/2024</strong>
-                                        </p>
-                                    </div>
-                                    <label className="d-flex align-items-center ms-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                                <div className="d-flex p-3 align-items-center my-2 border rounded-3">
-                                    <img src="" alt="" width={60} height={60} />
-                                    <div className="mx-3 flex-grow-1">
-                                        <p>
-                                            Giảm <strong>15%</strong>
-                                        </p>
-                                        <p>
-                                            Giảm tối đa <strong>20k</strong>
-                                        </p>
-                                        <p>
-                                            Đơn tối thiểu <strong>100k</strong>
-                                        </p>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <p>
-                                            Số lượng: <strong>10</strong>
-                                        </p>
-                                        <p>
-                                            HSD: <strong>30/09/2024</strong>
-                                        </p>
-                                    </div>
-                                    <label className="d-flex align-items-center ms-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                                <div className="d-flex p-3 align-items-center my-2 border rounded-3">
-                                    <img src="" alt="" width={60} height={60} />
-                                    <div className="mx-3 flex-grow-1">
-                                        <p>
-                                            Giảm <strong>15%</strong>
-                                        </p>
-                                        <p>
-                                            Giảm tối đa <strong>20k</strong>
-                                        </p>
-                                        <p>
-                                            Đơn tối thiểu <strong>100k</strong>
-                                        </p>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <p>
-                                            Số lượng: <strong>10</strong>
-                                        </p>
-                                        <p>
-                                            HSD: <strong>30/09/2024</strong>
-                                        </p>
-                                    </div>
-                                    <label className="d-flex align-items-center ms-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
-                            <p>Đóng</p>
-                        </div>
-                        <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleCloseVoucher}>
-                            <p>Xác nhận</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
-                <SelectAddressModal
-                    showAddress={showAddress}
-                    handleCloseAddress={handleCloseAddress}
-                    addresses={addresses}
-                    originalSelectedAddress={orderData.shippingAddress}
-                    handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
-                />
+                {showAddress && (
+                    <SelectAddressModal
+                        showAddress={showAddress}
+                        handleCloseAddress={handleCloseAddress}
+                        addresses={addresses}
+                        originalSelectedAddress={orderData.shippingAddress}
+                        handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
+                    />
+                )}
                 {/* Modal Payment Method*/}
-                <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="">
-                            <div className="d-flex p-3 align-items-center border-bottom">
-                                <label className="d-flex align-items-center me-3">
-                                    <input type="checkbox" className="input-checkbox" />
-                                    <span className="custom-checkbox"></span>
-                                </label>
-                                <p className="fs-3">Thanh toán khi nhận hàng</p>
+                {showPaymentMethod && (
+                    <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="">
+                                <div className="d-flex p-3 align-items-center border-bottom">
+                                    <label className="d-flex align-items-center me-3">
+                                        <input type="checkbox" className="input-checkbox" />
+                                        <span className="custom-checkbox"></span>
+                                    </label>
+                                    <p className="fs-3">Thanh toán khi nhận hàng</p>
+                                </div>
+                                <div className="d-flex p-3 align-items-center border-bottom">
+                                    <label className="d-flex align-items-center me-3">
+                                        <input type="checkbox" className="input-checkbox" />
+                                        <span className="custom-checkbox"></span>
+                                    </label>
+                                    <p className="fs-3">Thanh toán bằng chuyển khoản</p>
+                                </div>
                             </div>
-                            <div className="d-flex p-3 align-items-center border-bottom">
-                                <label className="d-flex align-items-center me-3">
-                                    <input type="checkbox" className="input-checkbox" />
-                                    <span className="custom-checkbox"></span>
-                                </label>
-                                <p className="fs-3">Thanh toán bằng chuyển khoản</p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
+                                <p>Đóng</p>
                             </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
-                            <p>Đóng</p>
-                        </div>
-                        <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
-                            <p>Xác nhận</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
+                            <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
+                                <p>Xác nhận</p>
+                            </div>
+                        </Modal.Footer>
+                    </Modal>
+                )}
                 <p className="fw-bold fs-2">Giỏ hàng</p>
                 <div className="d-flex">
-                    <div className="mt-2 me-4" style={{ width: '70%' }}>
+                    <div className="mt-2 me-4" style={{ width: '60%' }}>
                         {status === 'failed' ? (
                             <p className="text-center fs-3">Lỗi khi lấy giỏ hàng</p>
                         ) : status === 'succeeded' && cart.items.length === 0 ? (
@@ -350,13 +382,13 @@ function Cart() {
                                                         />
                                                         <span className="custom-checkbox"></span>
                                                     </label>
-                                                    <img className="mx-3" src={item.variant.imageUrl} alt="" width={70} height={70} />
+                                                    <img className="mx-3" src={item.variant.product?.urlImage} alt="" width={70} height={70} />
                                                     <div className="flex-grow-1">
                                                         <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
-                                                            {item.variant.product.name}
+                                                            {item.variant.product?.name}
                                                         </p>
-                                                        <p className="fw-medium">Size: {item.variant.size}</p>
-                                                        <p className="fw-medium">Màu: {item.variant.color}</p>
+                                                        {item.variant.size && <p className="fw-medium">Size: {item.variant.size}</p>}
+                                                        {item.variant.color && <p className="fw-medium">Màu: {item.variant.color}</p>}
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
@@ -364,7 +396,17 @@ function Cart() {
                                                 </div>
                                                 <div className="flex-grow-1 justify-content-center d-flex">
                                                     <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
-                                                        <FontAwesomeIcon icon={faMinus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, -1)} style={{ cursor: 'pointer' }} />
+                                                        <FontAwesomeIcon
+                                                            icon={faMinus}
+                                                            size="lg"
+                                                            className="p-4"
+                                                            onClick={() => {
+                                                                if (item.quantity > 1) {
+                                                                    handleQuantityChange(item._id, -1)
+                                                                }
+                                                            }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
                                                         <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
                                                         <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
                                                     </div>
@@ -380,7 +422,7 @@ function Cart() {
                             )
                         )}
                     </div>
-                    <div className="p-4" style={{ width: '30%' }}>
+                    <div className="p-4" style={{ width: '40%' }}>
                         <div className="w-100 h-100 border p-3">
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium ">Tổng tiền hàng:</p>
@@ -390,21 +432,45 @@ function Cart() {
                                 <p className="fs-3 fw-medium ">
                                     <FontAwesomeIcon icon={faTicket} className="fs-2" /> Mã giảm giá
                                 </p>
-                                <div className="primary-btn px-2 py-1 shadow-none" onClick={handleShowVoucher}>
-                                    <p>Chọn</p>
+                                <div className="d-flex align-items-center">
+                                    {discountValue.value > 0 && <p className="fs-4 fw-medium p-2 me-2 border border-primary-subtle text-info">{`${Math.round(discountValue.value / 1000)}K`}</p>}
+                                    {discountValue.shipping > 0 && (
+                                        <p className="fs-4 fw-medium p-2 border border-success-subtle text-success-emphasis me-2">{`${Math.round(discountValue.shipping / 1000)}K`}</p>
+                                    )}
+                                    <div className="primary-btn px-2 py-1 shadow-none" onClick={handleShowVoucher}>
+                                        <p>Chọn</p>
+                                    </div>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
-                                <p className="fs-3 fw-medium ">Phí vận chuyển:</p>
-                                <p className="fs-3 ">30.000đ</p>
+                                <p className="fs-3 fw-medium text-wrap" style={{ maxWidth: 120 }}>
+                                    Phương thức vận chuyển:
+                                </p>
+                                <div className="d-flex align-items-center">
+                                    <div className="flex-grow-1">
+                                        <p className="fs-3 fw-medium text-end">
+                                            {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
+                                                (orderData.shippingMethod === 'fast' && 'Nhanh') ||
+                                                (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
+                                            <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
+                                        </p>
+                                        {orderData.expectedDeliveryDate.startDate && orderData.expectedDeliveryDate.endDate && (
+                                            <p className="fs-4">
+                                                Đảm bảo nhận hàng từ {orderData.expectedDeliveryDate.startDate.toLocaleDateString('vi-VN')} đến{' '}
+                                                {orderData.expectedDeliveryDate.endDate.toLocaleDateString('vi-VN')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={() => setShowShippingMethod(true)} />
+                                </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium text-nowrap">Địa chỉ:</p>
                                 <div className="d-flex align-items-center">
                                     <div className="ms-3">
-                                        <p className="fs-3">{orderData.shippingAddress.name}</p>
-                                        <p className="fs-3">{orderData.shippingAddress.phone}</p>
-                                        <p className="fs-3 fw-medium product-name">{orderData.shippingAddress.location}</p>
+                                        <p className="fs-3">{orderData.shippingAddress?.name}</p>
+                                        <p className="fs-3">{orderData.shippingAddress?.phone}</p>
+                                        <p className="fs-3 fw-medium product-name">{orderData.shippingAddress?.location}</p>
                                     </div>
                                     <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={handleShowAddress} />
                                 </div>
@@ -413,7 +479,7 @@ function Cart() {
                                 <p className="fs-3 fw-medium text-wrap" style={{ maxWidth: 120 }}>
                                     Phương thức thanh toán:
                                 </p>
-                                <div className="d-flex align-items-center flex-grow-1 justify-content-between">
+                                <div className="d-flex align-items-center">
                                     <p className="fs-3">{orderData.paymentMethod === 'paymentUponReceipt' && 'Khi nhận hàng'}</p>
                                     <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={handleShowPaymentMethod} />
                                 </div>
@@ -435,6 +501,20 @@ function Cart() {
                 <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
                     <Notification title={notification.title} description={notification.description} type={notification.type} />
                 </Modal>
+            )}
+            {showShippingMethod && (
+                <ShippingMethodModal
+                    showShippingMethod={showShippingMethod}
+                    setShowShippingMethod={setShowShippingMethod}
+                    orderData={orderData}
+                    cart={cart}
+                    confirmShippingMethod={confirmShippingMethod}
+                    originalShippingMethod={orderData.shippingMethod}
+                />
+            )}
+            {/* Modal Voucher */}
+            {showVoucher && (
+                <VoucherModal cart={cart} showVoucher={showVoucher} handleCloseVoucher={handleCloseVoucher} orderData={orderData} setOrderData={setOrderData} originalVouchers={orderData.vouchers} />
             )}
         </>
     )

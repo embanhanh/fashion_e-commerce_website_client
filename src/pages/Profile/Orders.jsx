@@ -33,10 +33,46 @@ function Orders() {
             statusMessage: 'Sản phẩm của bạn đang trong quá trình xử lý.',
             image: cotton_shirt,
         },
+        {
+            name: 'Váy in hình Moana cho bé gái màu hồng',
+            size: 'S',
+            quantity: 1,
+            price: 1920000,
+            status: 'delivered',
+            statusMessage: 'Sản phẩm của bạn đã được giao',
+            image: moana_dress, // Assuming you have a local image or a URL
+        },
+        {
+            name: 'Váy in hình Moana cho bé gái màu hồng',
+            size: 'S',
+            quantity: 1,
+            price: 1920000,
+            status: 'delivered',
+            statusMessage: 'Sản phẩm của bạn đã được giao',
+            image: moana_dress, // Assuming you have a local image or a URL
+        },
+        {
+            name: 'Váy in hình Moana cho bé gái màu hồng',
+            size: 'S',
+            quantity: 1,
+            price: 1920000,
+            status: 'delivered',
+            statusMessage: 'Sản phẩm của bạn đã được giao',
+            image: moana_dress, // Assuming you have a local image or a URL
+        },
+        {
+            name: 'Váy in hình Moana cho bé gái màu hồng',
+            size: 'S',
+            quantity: 1,
+            price: 1920000,
+            status: 'delivered',
+            statusMessage: 'Sản phẩm của bạn đã được giao',
+            image: moana_dress, // Assuming you have a local image or a URL
+        },  
     ]
 
     return (
-        <div className="container">
+        <div className="container mb-4">
             <div className="order-tabs mt-4 z-0 position-sticky">
                 <section className="QmO3Bu">
                     <h2 className="a11y-hidden"></h2>

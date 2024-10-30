@@ -19,14 +19,13 @@ const OrderManagement = () => {
         show: false,
         originalStatus: '',
         orderId: '',
-    })    
+    })
     const [showNotifyModal, setShowNotifyModal] = useState({
         show: false,
         description: '',
         title: '',
         type: '',
     })
-    const [showDetailOrder, setShowDetailOrder] = useState(false)
     // state
     const [filterStatus, setFilterStatus] = useState('')
     const [filterLocal, setFilterLocal] = useState({
@@ -38,6 +37,8 @@ const OrderManagement = () => {
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
     const [bulkAction, setBulkAction] = useState('')
+    const [selectedOrder, setSelectedOrder] = useState(null)
+    const [showDetailOrder, setShowDetailOrder] = useState(false)
 
     const debouncedFetchOrders = useCallback(
         debounce(() => {
@@ -101,6 +102,30 @@ const OrderManagement = () => {
         }
     }
 
+    const handleShowDetail = (order) => {
+        setSelectedOrder(order)
+        setShowDetailOrder(true)
+    }
+
+    const handleCloseOrder = () => {
+        setShowDetailOrder(false)
+    }
+
+    const formatISODate = (isoDateString) => {
+        const date = new Date(isoDateString)
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0') // Tháng bắt đầu từ 0
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+    }
+
+    const formatISOTime = (isoDateString) => {
+        const date = new Date(isoDateString)
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        return `${hours}:${minutes}`
+    }
+
     useEffect(() => {
         handleSubmitFilters()
     }, [filterStatus])
@@ -113,7 +138,7 @@ const OrderManagement = () => {
 
     useEffect(() => {
         if (orders) {
-            console.log(orders)
+            // console.log(orders)
         }
     }, [orders])
 
@@ -161,7 +186,7 @@ const OrderManagement = () => {
                         <p className="fs-4 fw-medium text-nowrap me-4 label-width ">Hình thức vận chuyển</p>
                         <div className="d-flex align-items-center">
                             <div className="select ">
-                                <div className="selected" data-default="Cơ bản" data-one="Nhanh" data-two="Hỏa tốc">
+                                <div className="selected" data-default="Cơ bản" data-one="Nhanh" data-two="Ha tốc">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
@@ -198,7 +223,7 @@ const OrderManagement = () => {
                                             value="express"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="option-2-v2" data-txt="Hỏa tốc" />
+                                        <label className="option" htmlFor="option-2-v2" data-txt="Ha tốc" />
                                     </div>
                                 </div>
                             </div>
@@ -408,18 +433,18 @@ const OrderManagement = () => {
                                     <p className="fs-4 text-center">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
                                     <p className="fs-4 text-center">{order.shippingMethod === 'default' ? 'Cơ bản' : order.shippingMethod === 'fast' ? 'Nhanh' : 'Hỏa tốc'}</p>
                                     <p className="fs-4 text-center">{order.paymentMethod === 'bankTransfer' ? 'Thanh toán chuyển khoản' : 'Thanh toán khi nhận hàng'}</p>
-                                    <p className="fs-4 text-center">{order.totalPrice}đ</p>
+                                    <p className="fs-4 text-center">{order.totalPrice.toLocaleString('vi-VN')}đ</p>
                                     <div className="text-center">
                                         <p className={`text-center ${order.status === 'cancelled' ? 'text-danger' : order.status === 'delivered' ? 'text-success' : 'text-warning'}`}>
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                    ? 'Đang xử lý'
-                                                    : order.status === 'delivering'
-                                                        ? 'Đang giao'
-                                                        : order.status === 'delivered'
-                                                            ? 'Đã giao'
-                                                            : 'Đã hủy'}
+                                                ? 'Đang xử lý'
+                                                : order.status === 'delivering'
+                                                ? 'Đang giao'
+                                                : order.status === 'delivered'
+                                                ? 'Đã giao'
+                                                : 'Đã hủy'}
                                         </p>
                                         <FontAwesomeIcon
                                             onClick={() => setShowChangeStatusModal({ show: true, originalStatus: order.status, orderId: order._id })}
@@ -429,7 +454,7 @@ const OrderManagement = () => {
                                         />
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
-                                        <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" />
+                                        <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => handleShowDetail(order)} />
                                         <p className="fs-5 text-primary hover-icon p-2" onClick={() => handlePrintInvoice(order)}>
                                             In hóa đơn
                                         </p>
@@ -453,6 +478,126 @@ const OrderManagement = () => {
             {showNotifyModal.show && (
                 <Modal show={showNotifyModal.show} onHide={() => setShowNotifyModal({ show: false, description: '', title: '', type: '' })} centered>
                     <Notification description={showNotifyModal.description} title={showNotifyModal.title} type={showNotifyModal.type} />
+                </Modal>
+            )}
+            {showDetailOrder && (
+                <Modal show={showDetailOrder} onHide={handleCloseOrder} centered size="lg">
+                    <Modal.Header closeButton>
+                        <p className="fs-2 fw-bold">Chi tiết đơn hàng</p>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="d-flex justify-content-between">
+                            <div className="col-8 pe-4">
+                                <div className="d-flex justify-content-between align-items-center shadow-none p-3 mb-3 bg-light rounded border">
+                                    <div className="text-start">
+                                        <span className="fs-3 fw-semibold">
+                                            Đơn hàng: <span className="text-primary fs-4 fw-normal text-nowrap">{selectedOrder._id}</span>
+                                        </span>
+                                        <div className="fs-5">
+                                            <span className="me-2">{formatISODate(selectedOrder.createdAt)}</span>
+                                            <span className="ms-2">{formatISOTime(selectedOrder.createdAt)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className={`text-center ${selectedOrder.status === 'cancelled' ? 'text-danger' : selectedOrder.status === 'delivered' ? 'text-success' : 'text-warning'}`}>
+                                            {selectedOrder.status === 'pending'
+                                                ? 'Chờ xác nhận'
+                                                : selectedOrder.status === 'processing'
+                                                ? 'Đang xử lý'
+                                                : selectedOrder.status === 'delivering'
+                                                ? 'Đang giao'
+                                                : selectedOrder.status === 'delivered'
+                                                ? 'Đã giao'
+                                                : 'Đã hủy'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="d-flex">
+                                    <div className="shadow-none p-3 mb-3 bg-white rounded border me-4" style={{ minWidth: '200px' }}>
+                                        <p className="fs-4 fw-semibold bg-light info-title">KHÁCH HÀNG</p>
+                                        <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
+                                    </div>
+                                    <div className="shadow-none p-3 mb-3 bg-white rounded border" style={{ flexGrow: 1 }}>
+                                        <p className="fs-4 fw-semibold bg-light info-title">NGƯỜI NHẬN</p>
+                                        <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.shippingAddress?.location}</p>
+                                    </div>
+                                </div>
+
+                                <div className="d-flex py-3 border-bottom">
+                                    <div className="fs-4 fw-medium text-center" style={{ width: '5%' }}>
+                                        STT
+                                    </div>
+                                    <div className="fs-4 fw-medium text-start ms-3" style={{ width: '40%' }}>
+                                        Tên sản phẩm
+                                    </div>
+                                    <div className="fs-4 fw-medium text-center" style={{ width: '20%' }}>
+                                        Giá
+                                    </div>
+                                    <div className="fs-4 fw-medium text-center" style={{ width: '15%' }}>
+                                        Số lượng
+                                    </div>
+                                    <div className="fs-4 fw-medium text-center" style={{ width: '20%' }}>
+                                        Tổng tiền
+                                    </div>
+                                </div>
+
+                                {selectedOrder?.products.map((product, index) => (
+                                    <div key={index} className="d-flex align-items-center py-2 border-bottom">
+                                        <div className="text-center" style={{ width: '5%' }}>
+                                            {index + 1}
+                                        </div>
+                                        <div className="text-start" style={{ width: '40%' }}>
+                                            <div className="ms-3 d-flex align-items-center">
+                                                <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center" style={{ maxWidth: '100%' }}>
+                                                    {product.product?.product?.name}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-center fs-5 d-flex flex-column" style={{ width: '20%' }}>
+                                            <span>{product?.product?.price.toLocaleString('vi-VN')}đ</span>
+                                            {product?.product?.product?.originalPrice && (
+                                                <span style={{ textDecoration: 'line-through', color: 'gray', fontSize: '0.9em', marginLeft: '5px' }}>
+                                                    {product?.product?.product?.originalPrice?.toLocaleString('vi-VN')}đ
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="text-center fs-5" style={{ width: '15%' }}>
+                                            {product.quantity}
+                                        </div>
+
+                                        <div className="text-center fs-5" style={{ width: '20%' }}>
+                                            <span>{(product?.product?.price * product?.quantity).toLocaleString('vi-VN')}đ</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="col-4">
+                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
+                                    <p className="fs-4 fw-semibold bg-light info-title">PHƯƠNG THỨC THANH TOÁN</p>
+                                    <div className="d-flex justify-content-between">
+                                        <p className="fs-5 fw-normal">{ selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng' : 'Thanh toán chuyển khoản'}</p>
+                                        <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
+                                    </div>                                    
+                                </div>
+                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
+                                    
+                                    <div className="d-flex justify-content-between" style={{height: '100px'}}>
+                                        <p className="fs-5 fw-normal">Tạm tính</p>
+                                        <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseOrder}>
+                            <p>Đóng</p>
+                        </div>
+                    </Modal.Footer>
                 </Modal>
             )}
         </div>

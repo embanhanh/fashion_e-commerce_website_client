@@ -92,32 +92,32 @@
     }
 
     .custom-radio {
-        width: 14px; /* Matches the size of the circles */
-        height: 14px;
-        border: 2px solid #999; /* Gray border for the radio button */
-        border-radius: 50%; /* Makes the circle round */
-        margin-right: 8px; /* Space between the circle and the label */
+        margin-left: 5px;
         display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #333;
+        border-radius: 4px;
         position: relative;
+        cursor: pointer;
     }
 
     /* When the radio button is checked, show the filled circle */
-    input[type='radio']:checked + .custom-radio {
-        background-color: #333; /* Darker color for the selected state */
-        border-color: #333; /* Matches the circle's background color */
+    input[type='radio']:checked + .custom-radio::after {
+        opacity: 1;
     }
 
-    /* Circle inside the custom radio when checked */
-    input[type='radio']:checked + .custom-radio::before {
+    ::after {
         content: '';
-        width: 6px;
-        height: 6px;
-        background-color: white;
-        border-radius: 50%;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        background-color: #333;
+        border-radius: 2px;
+        opacity: 0;
     }
 
     &:hover .custom-radio {

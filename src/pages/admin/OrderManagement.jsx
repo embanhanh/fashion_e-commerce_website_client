@@ -111,21 +111,6 @@ const OrderManagement = () => {
         setShowDetailOrder(false)
     }
 
-    const formatISODate = (isoDateString) => {
-        const date = new Date(isoDateString)
-        const day = String(date.getDate()).padStart(2, '0')
-        const month = String(date.getMonth() + 1).padStart(2, '0') // Tháng bắt đầu từ 0
-        const year = date.getFullYear()
-        return `${day}/${month}/${year}`
-    }
-
-    const formatISOTime = (isoDateString) => {
-        const date = new Date(isoDateString)
-        const hours = String(date.getHours()).padStart(2, '0')
-        const minutes = String(date.getMinutes()).padStart(2, '0')
-        return `${hours}:${minutes}`
-    }
-
     useEffect(() => {
         handleSubmitFilters()
     }, [filterStatus])
@@ -494,8 +479,8 @@ const OrderManagement = () => {
                                             Đơn hàng: <span className="text-primary fs-4 fw-normal text-nowrap">{selectedOrder._id}</span>
                                         </span>
                                         <div className="fs-5">
-                                            <span className="me-2">{formatISODate(selectedOrder.createdAt)}</span>
-                                            <span className="ms-2">{formatISOTime(selectedOrder.createdAt)}</span>
+                                            <span className="me-2">{new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}</span>
+                                            <span className="ms-2">{new Date(selectedOrder.createdAt).toLocaleTimeString('vi-VN')}</span>
                                         </div>
                                     </div>
                                     <div className="text-center">
@@ -578,17 +563,20 @@ const OrderManagement = () => {
                             <div className="col-4">
                                 <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
                                     <p className="fs-4 fw-semibold bg-light info-title">PHƯƠNG THỨC THANH TOÁN</p>
-                                    <div className="d-flex justify-content-between">
+                                    <div className="d-flex justify-content-between mt-3">
                                         <p className="fs-5 fw-normal">{ selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng' : 'Thanh toán chuyển khoản'}</p>
                                         <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
                                     </div>                                    
                                 </div>
-                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
-                                    
-                                    <div className="d-flex justify-content-between" style={{height: '100px'}}>
+                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>                                    
+                                    <div className="d-flex justify-content-between">
                                         <p className="fs-5 fw-normal">Tạm tính</p>
+                                        <p className="fs-5 fw-normal">{ selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
+                                    </div>    
+                                    <div className="d-flex justify-content-between">
+                                        <p className="fs-5 fw-normal">Khuyến mãi</p>
                                         <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
-                                    </div>                                    
+                                    </div>    
                                 </div>
                             </div>
                         </div>

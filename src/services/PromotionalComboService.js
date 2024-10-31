@@ -11,7 +11,7 @@ export const createPromotionalCombo = async (promotionalComboData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -24,7 +24,7 @@ export const getPromotionalCombos = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -37,7 +37,7 @@ export const getPromotionalComboById = async (combo_id) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -50,7 +50,7 @@ export const updatePromotionalCombo = async (combo_id, promotionalComboData) => 
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -67,6 +67,6 @@ export const deleteManyPromotionalCombos = async (comboIds) => {
         )
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }

@@ -7,7 +7,7 @@ export const createProduct = async (productData) => {
         const response = await axios.post(API_URL + 'create', productData)
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -16,7 +16,7 @@ export const getAllProducts = async (params) => {
         const response = await axios.get(API_URL, { params })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -25,7 +25,7 @@ export const getProductByProductName = async (product_name) => {
         const response = await axios.get(API_URL + product_name)
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -34,7 +34,7 @@ export const updateProduct = async (product_name, productData) => {
         const response = await axios.put(`${API_URL}edit/${product_name}`, productData)
         return response.data
     } catch (error) {
-        throw error.response ? error.response.data : new Error('Network Error')
+        throw error
     }
 }
 
@@ -43,7 +43,7 @@ export const deleteProduct = async (product_name) => {
         const response = await axios.delete(`${API_URL}delete/${product_name}`)
         return response.data
     } catch (error) {
-        throw error.response ? error.response.data : new Error('Network Error')
+        throw error
     }
 }
 
@@ -60,6 +60,6 @@ export const deleteManyProducts = async (product_names) => {
         )
         return response.data
     } catch (error) {
-        throw error.response ? error.response.data : new Error('Network Error')
+        throw error
     }
 }

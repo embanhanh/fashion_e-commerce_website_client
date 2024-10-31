@@ -17,7 +17,7 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async (pa
         const response = await getAllProducts(params)
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -26,7 +26,7 @@ export const fetchProductByProductName = createAsyncThunk('product/fetchProductB
         const response = await getProductByProductName(product_name)
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -35,7 +35,7 @@ export const updateProductAction = createAsyncThunk('product/updateProduct', asy
         const response = await updateProduct(product_name, productData)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to update product')
+        return rejectWithValue(error)
     }
 })
 
@@ -44,7 +44,7 @@ export const deleteProductAction = createAsyncThunk('product/deleteProduct', asy
         const response = await deleteProduct(product_name)
         return { product_name, message: response.message }
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to delete product')
+        return rejectWithValue(error)
     }
 })
 
@@ -53,7 +53,7 @@ export const deleteManyProductsAction = createAsyncThunk('product/deleteManyProd
         const response = await deleteManyProducts(product_names)
         return response
     } catch (error) {
-        return rejectWithValue(error.message || 'Failed to delete products')
+        return rejectWithValue(error)
     }
 })
 

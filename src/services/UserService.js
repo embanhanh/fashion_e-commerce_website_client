@@ -75,10 +75,6 @@ export const loginWithFirebase = async (token, type) => {
             },
             body: JSON.stringify(token),
         })
-        if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.message)
-        }
 
         return response.json()
     } catch (error) {
@@ -95,7 +91,7 @@ export const getUser = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -110,7 +106,7 @@ export const updateProfile = async (userData) => {
 
         return response.data  // Trả về dữ liệu từ response
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -134,7 +130,7 @@ export const createAddress = async (addresData) => {
         })
         return response.data // Trả về dữ liệu từ response
     } catch (error) {
-        throw new Error(error.response?.data?.message || error.message)
+        throw error
     }
 }
 

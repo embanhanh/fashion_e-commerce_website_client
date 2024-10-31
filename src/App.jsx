@@ -18,7 +18,7 @@ function App() {
                                 key={index}
                                 element={
                                     <Layout>
-                                        <Page></Page>
+                                        <Page key={route.path}></Page>
                                     </Layout>
                                 }
                                 path={route.path}
@@ -33,7 +33,7 @@ function App() {
                                             path={child.path}
                                             element={
                                                 <ChildLayout>
-                                                    <ChildPage />
+                                                    <ChildPage key={child.path} />
                                                 </ChildLayout>
                                             }
                                         >
@@ -47,7 +47,7 @@ function App() {
                                                         path={subChild.path}
                                                         element={
                                                             <SubChildLayout>
-                                                                <SubChildPage />
+                                                                <SubChildPage key={subChild.path} />
                                                             </SubChildLayout>
                                                         }
                                                     />

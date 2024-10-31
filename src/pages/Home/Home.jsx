@@ -11,7 +11,6 @@ import { Rating } from 'react-simple-star-rating'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
-import TomTomMap from '../../components/TomTomMap'
 
 function Home() {
     const swiperCategory = useRef(null)
@@ -20,7 +19,7 @@ function Home() {
     const { banners } = useSelector((state) => state.banner)
 
     useEffect(() => {
-        dispatch(fetchBanners({ isActive: true }))
+        dispatch(fetchBanners())
     }, [dispatch])
 
     useEffect(() => {

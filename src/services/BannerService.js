@@ -11,7 +11,7 @@ export const createBanner = async (bannerData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -24,7 +24,7 @@ export const getBannerById = async (bannerId) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -33,7 +33,7 @@ export const getAllBanners = async (params) => {
         const response = await axios.get(API_URL, { params })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -46,7 +46,7 @@ export const editBanner = async (bannerId, bannerData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -59,7 +59,7 @@ export const removeBanner = async (bannerId) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -76,6 +76,6 @@ export const removeManyBanners = async (bannerIds) => {
         )
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }

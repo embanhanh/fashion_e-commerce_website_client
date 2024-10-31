@@ -105,6 +105,18 @@ function Adminlayout({ children }) {
                             Tạo combo khuyến mãi
                         </Link>
                     </Accordion>
+                    <Accordion
+                        data={[
+                            {
+                                title: 'Quản lý khách hàng',
+                            },
+                        ]}
+                        isOpen={true}
+                    >
+                        <Link className="fs-4 seller-option" to={'/seller/customers'}>
+                            Tất cả khách hàng
+                        </Link>
+                    </Accordion>
                 </div>
                 <div className="h-100 p-4 w-100" style={{ marginLeft: '20%', minHeight: '100vh' }}>
                     {children}

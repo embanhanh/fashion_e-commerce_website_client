@@ -1,0 +1,36 @@
+.order-grid {
+    display: grid;
+    grid-template-columns: auto 4fr 3fr 2fr 2fr 2fr 2fr 2fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.dropdown-container {
+    position: relative;
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: none;
+        z-index: 1000;
+        min-width: 150px;
+
+        .dropdown-item {
+            padding: 8px 16px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f5f5f5;
+            }
+        }
+    }
+
+    &:hover .dropdown-menu {
+        display: block;
+    }
+}

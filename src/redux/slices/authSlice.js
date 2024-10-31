@@ -6,7 +6,7 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
         const response = await login(credentials)
         return response.user
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -15,7 +15,7 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
         const response = await register(userData)
         return response
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 
@@ -25,7 +25,7 @@ export const loginWithFirebaseAction = createAsyncThunk('auth/loginWithFirebase'
         localStorage.setItem('token', response.token)
         return response.user
     } catch (error) {
-        return rejectWithValue(error.response.data)
+        return rejectWithValue(error)
     }
 })
 

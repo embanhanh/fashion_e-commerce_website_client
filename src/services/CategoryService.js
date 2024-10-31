@@ -7,7 +7,7 @@ export const createCategory = async (categoryData) => {
         const response = await axios.post(API_URL + 'create', categoryData)
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -16,6 +16,6 @@ export const getAllCategories = async () => {
         const response = await axios.get(API_URL)
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }

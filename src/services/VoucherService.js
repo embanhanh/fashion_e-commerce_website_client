@@ -11,7 +11,7 @@ export const createVoucher = async (voucherData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -24,7 +24,7 @@ export const getVouchers = async () => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -37,7 +37,7 @@ export const updateVoucher = async (voucherId, voucherData) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -46,7 +46,7 @@ export const deleteVoucher = async (voucherId) => {
         const response = await axios.delete(API_URL + 'delete/' + voucherId)
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -59,7 +59,7 @@ export const getVoucherById = async (voucherId) => {
         })
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
     }
 }
 
@@ -76,6 +76,40 @@ export const deleteManyVoucher = async (voucherIds) => {
         )
         return response.data
     } catch (error) {
-        throw error.response.data
+        throw error
+    }
+}
+
+export const giveVoucher = async (userId, voucherIds, message) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'give/' + userId,
+            { voucherIds, message },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const giveVoucherMany = async (userIds, voucherIds, message) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'give-many',
+            { userIds, voucherIds, message },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
     }
 }

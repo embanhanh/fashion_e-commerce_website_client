@@ -132,7 +132,7 @@ export default function BlockClientModal({ show, onClose, userIds, setNotificati
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <button className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleBlockClient} disabled={loading}>
+                <button disabled={loading || (reason.length === 0 && otherReason === '')} className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleBlockClient}>
                     <p>Chặn</p>
                     {loading && (
                         <div className="dot-spinner ms-4">

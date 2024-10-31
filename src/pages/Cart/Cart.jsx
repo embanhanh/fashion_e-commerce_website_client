@@ -134,9 +134,8 @@ function Cart() {
     }, [orderData.shippingAddress, orderData.shippingMethod, orderData.products])
 
     const calculateTotalShippingPrice = async () => {
-        if (shopInfo && orderData.shippingAddress && addresses.length > 0) {
+        if (shopInfo && Object.keys(orderData.shippingAddress).length > 0 && addresses.length > 0) {
             if (orderData.products.length > 0) {
-                console.log(' Tính toán  ')
                 const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
                 if (distance) {
                     let price = 0
@@ -191,6 +190,13 @@ function Cart() {
                     vouchers: [],
                 })
             }
+        } else {
+            if (orderData.vouchers.length > 0) {
+                setOrderData({
+                    ...orderData,
+                    vouchers: [],
+                })
+            }
         }
     }
 
@@ -202,6 +208,7 @@ function Cart() {
                     ...prev,
                     products: prev.products.filter((product) => product.product !== itemId),
                     productsPrice,
+                    totalPrice: productsPrice + prev.shippingPrice,
                 }
             } else {
                 const productsPrice = prev.productsPrice + quantity * price
@@ -209,6 +216,7 @@ function Cart() {
                     ...prev,
                     products: [...prev.products, { product: itemId, quantity }],
                     productsPrice,
+                    totalPrice: productsPrice + prev.shippingPrice,
                 }
             }
         })
@@ -468,9 +476,15 @@ function Cart() {
                                 <p className="fs-3 fw-medium text-nowrap">Địa chỉ:</p>
                                 <div className="d-flex align-items-center">
                                     <div className="ms-3">
-                                        <p className="fs-3">{orderData.shippingAddress?.name}</p>
-                                        <p className="fs-3">{orderData.shippingAddress?.phone}</p>
-                                        <p className="fs-3 fw-medium product-name">{orderData.shippingAddress?.location}</p>
+                                        {Object.keys(orderData.shippingAddress).length > 0 ? (
+                                            <>
+                                                <p className="fs-3">{orderData.shippingAddress?.name}</p>
+                                                <p className="fs-3">{orderData.shippingAddress?.phone}</p>
+                                                <p className="fs-3 fw-medium product-name">{orderData.shippingAddress?.location}</p>
+                                            </>
+                                        ) : (
+                                            <p className="fs-3 text-danger">Chưa chọn địa chỉ</p>
+                                        )}
                                     </div>
                                     <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={handleShowAddress} />
                                 </div>
@@ -489,7 +503,13 @@ function Cart() {
                                 <p className="fs-3 fw-bolder">{orderData.totalPrice}đ</p>
                             </div>
                             <div className="text-center py-3">
-                                <button disabled={orderData.products.length === 0} className="primary-btn shadow-none px-5 py-3" onClick={handleOrder}>
+                                <button
+                                    disabled={
+                                        orderData.products.length === 0 || orderData.shippingAddress === null || Object.keys(orderData.shippingAddress).length === 0 || orderData.paymentMethod === null
+                                    }
+                                    className="primary-btn shadow-none px-5 py-3"
+                                    onClick={handleOrder}
+                                >
                                     <p>Đặt hàng</p>
                                 </button>
                             </div>

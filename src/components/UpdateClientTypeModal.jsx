@@ -68,7 +68,7 @@ function UpdateClientTypeModal({ userIds, show, onClose, setNotification, setBul
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <button className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleUpdateClientType} disabled={loading}>
+                <button disabled={loading || clientType === ''} className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleUpdateClientType}>
                     <p>Cập nhật</p>
                     {loading && (
                         <div className="dot-spinner ms-4">

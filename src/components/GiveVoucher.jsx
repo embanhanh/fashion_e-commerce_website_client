@@ -188,7 +188,7 @@ function GiveVoucher({ isOpen, onClose, userId, setNotification, setBulkAction, 
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <button disabled={loading} className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleGiveVoucher}>
+                    <button disabled={loading || giveVoucherData.voucher.length === 0} className="primary-btn shadow-none rounded-0 px-3 py-2" onClick={handleGiveVoucher}>
                         <p>Tặng</p>
                         {loading && (
                             <div className="dot-spinner ms-4">

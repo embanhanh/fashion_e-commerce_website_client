@@ -73,7 +73,7 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
     }, [vouchers])
 
     useEffect(() => {
-        setVoucherList(vouchers.filter((voucher) => voucher.code.includes(searchVoucher)))
+        setVoucherList(vouchers.filter((voucher) => voucher.voucher.code.includes(searchVoucher)))
     }, [searchVoucher])
 
     return (
@@ -92,18 +92,18 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                     <p className="fs-3 my-3">Mã của bạn</p>
                     <div className="my-2" style={{ maxHeight: 260, overflowY: 'auto' }}>
                         {voucherList.map((voucher) => {
-                            const isValid = isVoucherValid(voucher)
+                            const isValid = isVoucherValid(voucher.voucher)
                             return (
-                                <div key={voucher._id} className="d-flex p-3 align-items-center my-2 border rounded-3" style={{ opacity: isValid ? 1 : 0.5 }}>
+                                <div key={voucher.voucher?._id} className="d-flex p-3 align-items-center my-2 border rounded-3" style={{ opacity: isValid ? 1 : 0.5 }}>
                                     <img
                                         src={
-                                            voucher.voucherType === 'all' && voucher.discountType === 'percentage'
+                                            voucher.voucher?.voucherType === 'all' && voucher.voucher?.discountType === 'percentage'
                                                 ? voucherImages[3]
-                                                : voucher.voucherType === 'all' && voucher.discountType === 'fixedamount'
+                                                : voucher.voucher?.voucherType === 'all' && voucher.voucher?.discountType === 'fixedamount'
                                                 ? voucherImages[2]
-                                                : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
+                                                : voucher.voucher?.voucherType === 'product' && voucher.voucher?.discountType === 'percentage'
                                                 ? voucherImages[1]
-                                                : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
+                                                : voucher.voucher?.voucherType === 'product' && voucher.voucher?.discountType === 'fixedamount'
                                                 ? voucherImages[0]
                                                 : null
                                         }
@@ -112,21 +112,21 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                                         height={50}
                                     />
                                     <div className="mx-4 flex-grow-1">
-                                        {voucher.discountType === 'percentage' && (
+                                        {voucher.voucher?.discountType === 'percentage' && (
                                             <p className="fs-4 ">
-                                                Giảm <strong>{voucher.discountValue}%</strong> giảm tối đa <strong>{voucher.maxDiscountValue}đ </strong>
+                                                Giảm <strong>{voucher.voucher?.discountValue}%</strong> giảm tối đa <strong>{voucher.voucher?.maxDiscountValue}đ </strong>
                                             </p>
                                         )}
-                                        {voucher.discountType === 'fixedamount' && (
+                                        {voucher.voucher?.discountType === 'fixedamount' && (
                                             <p className="fs-4 ">
-                                                Giảm tối đa <strong>{voucher.discountValue}đ </strong>
+                                                Giảm tối đa <strong>{voucher.voucher?.discountValue}đ </strong>
                                             </p>
                                         )}
                                         <p className="fs-4 ">
-                                            Đơn tối thiểu <strong>{voucher.minOrderValue}đ </strong>
+                                            Đơn tối thiểu <strong>{voucher.voucher?.minOrderValue}đ </strong>
                                         </p>
                                         <p className="fs-5 text-body-tertiary">
-                                            HSD: đến hết <strong className="text-dark">{new Date(voucher.validUntil).toLocaleDateString('vi-VN')} </strong>
+                                            HSD: đến hết <strong className="text-dark">{new Date(voucher.voucher?.validUntil).toLocaleDateString('vi-VN')} </strong>
                                         </p>
                                     </div>
                                     <label className="d-flex align-items-center ms-3">
@@ -134,8 +134,8 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                                             type="checkbox"
                                             className="input-checkbox"
                                             disabled={!isValid}
-                                            checked={!!voucherSelected.find((v) => v._id === voucher._id)}
-                                            onChange={(e) => handleSelectVoucher(e, voucher)}
+                                            checked={!!voucherSelected.find((v) => v._id === voucher.voucher?._id)}
+                                            onChange={(e) => handleSelectVoucher(e, voucher.voucher)}
                                         />
                                         <span className="custom-checkbox"></span>
                                     </label>

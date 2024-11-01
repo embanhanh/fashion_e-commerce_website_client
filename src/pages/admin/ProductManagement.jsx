@@ -257,21 +257,16 @@ function ProductManagement() {
                                         />
                                         <label className="option" htmlFor="option-1-v2" data-txt="Xóa các sản phẩm đang chọn" />
                                     </div>
-                                    <div title="option-2">
+                                    {/* <div title="option-2">
                                         <input
                                             id="option-2-v2"
                                             name="option-v2"
                                             type="radio"
                                             value="addNewProducts"
                                             checked={bulkAction === 'addNewProducts'}
-                                            onChange={(e) => {
-                                                if (selectedProducts.length > 0) {
-                                                    setBulkAction(e.target.value)
-                                                }
-                                            }}
                                         />
                                         <label className="option" htmlFor="option-2-v2" data-txt="Thêm các sản phẩm mới" />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="select mx-3">

@@ -27,6 +27,8 @@ import InvoicePage from '../pages/Invoice/InvoicePage.jsx'
 import PromotionalCombos from '../pages/admin/PromotionalCombos.jsx'
 import CreatePromotionalCombos from '../pages/admin/CreatePromotionalCombos.jsx'
 import CustomerManagement from '../pages/admin/CustomerManagement.jsx'
+import RatingDemo from '../components/RatingDemo.jsx'
+
 const publicRoutes = [
     { path: '/', element: Home },
     { path: '/cart', element: Cart },
@@ -70,6 +72,7 @@ const publicRoutes = [
     { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
     { path: '/seller/customers', element: CustomerManagement, layout: Adminlayout },
     { path: '/invoice', element: InvoicePage, layout: Fragment },
+    { path: '/rating', element: RatingDemo, layout: Fragment },
     { path: '*', element: NotFound, layout: Fragment },
 ]
 const privateRoutes = []

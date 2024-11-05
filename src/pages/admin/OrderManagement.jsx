@@ -550,7 +550,7 @@ const OrderManagement = () => {
                                         <div className="text-start" style={{ width: '40%' }}>
                                             <div className="ms-3 d-flex align-items-center">
                                                 <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                                <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center" style={{ maxWidth: '100%' }}>
+                                                <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2" style={{ maxWidth: '100%' }}>
                                                     {product.product?.product?.name}
                                                 </p>
                                             </div>
@@ -577,19 +577,29 @@ const OrderManagement = () => {
                                 <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
                                     <p className="fs-4 fw-semibold bg-light info-title">PHƯƠNG THỨC THANH TOÁN</p>
                                     <div className="d-flex justify-content-between mt-3">
-                                        <p className="fs-5 fw-normal">{ selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng' : 'Thanh toán chuyển khoản'}</p>
-                                        <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
-                                    </div>                                    
+                                        <p className="fs-5 fw-normal">{selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng' : 'Thanh toán chuyển khoản'}</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
+                                    </div>
                                 </div>
-                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>                                    
+                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px', minHeight: '200px' }}>
                                     <div className="d-flex justify-content-between">
                                         <p className="fs-5 fw-normal">Tạm tính</p>
-                                        <p className="fs-5 fw-normal">{ selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
-                                    </div>    
+                                        <p className="fs-5 fw-normal">{selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
+                                    </div>
                                     <div className="d-flex justify-content-between">
                                         <p className="fs-5 fw-normal">Khuyến mãi</p>
-                                        <p className="fs-5 fw-normal">{ selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
-                                    </div>    
+                                        {console.log(selectedOrder)}
+                                        {selectedOrder.products
+                                            ?.reduce((total, item) => {
+                                                const originalPrice = item?.product?.product?.originalPrice || 0
+                                                const discountedPrice = item?.product?.product?.price || 0
+                                                const quantity = item?.quantity || 1
+
+                                                return total + (originalPrice - discountedPrice) * quantity
+                                            }, 0)
+                                            .toLocaleString('vi-VN')}{' '}
+                                        đ
+                                    </div>
                                 </div>
                             </div>
                         </div>

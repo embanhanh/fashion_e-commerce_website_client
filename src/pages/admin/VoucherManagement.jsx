@@ -74,7 +74,7 @@ const VoucherManagement = () => {
         }
     }
 
-    const handleShowDetail = (_id) => {        
+    const handleShowDetail = (_id) => {
         setVoucherId(_id)
         setShowDetailVoucher(true)
     }
@@ -149,118 +149,6 @@ const VoucherManagement = () => {
 
     return (
         <>
-            {currentVoucher && (
-                <Modal show={showDetailVoucher} onHide={handleCloseVoucher} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fs-2 fw-bold text-primary">Chi tiết voucher giảm giá</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {status === 'loading' ? (
-                            <div className="text-center">
-                                <div className="spinner-border" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="voucher-details p-3 border rounded ">
-                                <div className="d-flex justify-content-between mb-3 fs-3">
-                                    <img
-                                        src={
-                                            currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'percentage'
-                                                ? voucherImages[3]
-                                                : currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'fixedamount'
-                                                ? voucherImages[2]
-                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'percentage'
-                                                ? voucherImages[1]
-                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'fixedamount'
-                                                ? voucherImages[0]
-                                                : null
-                                        }
-                                        alt=""
-                                        style={{ width: '120px', height: '50px', objectFit: 'cover' }}
-                                    />
-                                    <span className="d-flex align-items-center">{currentVoucher.code}</span>
-                                </div>
-                                {currentVoucher.voucherType === 'all' ? (
-                                    <div className="d-flex justify-content-between mb-3 fs-4">
-                                        <strong>Loại:</strong>
-                                        <span>Giảm giá toàn shop</span>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <div className="d-flex justify-content-between mb-3 fs-4">
-                                            <strong>Loại:</strong>
-                                            <span>Giảm giá theo sản phẩm</span>
-                                        </div>
-
-                                        <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
-                                            <strong className="fs-4 mb-3">Danh sách sản phẩm: </strong>
-                                            {currentVoucher.applicableProducts?.map((product) => (
-                                                <div key={product._id} className="d-flex flex-column my-2">
-                                                    <div className="d-flex align-items-center">
-                                                        <img src={product.urlImage[0]} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                                        <p className="fs-4 fw-medium overflow-hidden text-nowrap ms-2" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
-                                                            {product.name}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {currentVoucher.discountType === 'fixedamount' ? (
-                                    <div className="d-flex justify-content-between mb-3 fs-4">
-                                        <strong>Giảm giá:</strong>
-                                        <span>{currentVoucher.discountValue.toLocaleString('vi-VN')} đ</span>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <div className="d-flex justify-content-between mb-3 fs-4">
-                                            <strong>Mức giảm giá:</strong>
-                                            <span>{currentVoucher.discountValue}%</span>
-                                        </div>
-                                        <div className="d-flex justify-content-between mb-3 fs-4">
-                                            <strong>Giảm tối đa:</strong>
-                                            <span>{currentVoucher.maxDiscountValue.toLocaleString('vi-VN')} đ</span>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="d-flex justify-content-between mb-3 fs-4">
-                                    <strong>Đơn tối thiểu:</strong>
-                                    <span>{currentVoucher.minOrderValue.toLocaleString('vi-VN')} đ</span>
-                                </div>
-                                <div className="d-flex justify-content-between mb-3 fs-4">
-                                    <strong>Số lượng:</strong>
-                                    <span>{currentVoucher.usageLimit}</span>
-                                </div>
-                                <div className="d-flex justify-content-between mb-3 fs-4">
-                                    <strong>Số người đã sử dụng voucher:</strong>
-                                    <span>{currentVoucher.used}</span>
-                                </div>
-                                <div className="d-flex justify-content-between mb-3 fs-4">
-                                    <strong>Ngày bắt đầu:</strong>
-                                    <span>{new Date(currentVoucher.validFrom).toLocaleDateString()}</span>
-                                </div>
-                                <div className="d-flex justify-content-between fs-4">
-                                    <strong>Ngày hết hạn:</strong>
-                                    <span>{new Date(currentVoucher.validUntil).toLocaleDateString()}</span>
-                                </div>
-                                {/* <div className="d-flex justify-content-between mb-3 fs-4">
-                                <strong>Trạng thái:</strong>
-                                <span>{currentVoucher.}</span>
-                            </div> */}
-                            </div>
-                        )}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
-                            <p>Đóng</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
-            )}
-
             <div className=" pb-5">
                 <div className="bg-white border">
                     <p className="fs-3 fw-medium p-3 border-bottom">Quản lý Voucher</p>
@@ -517,6 +405,121 @@ const VoucherManagement = () => {
                     </Modal>
                 )}
             </div>
+            {showDetailVoucher && (
+                <Modal show={showDetailVoucher} onHide={handleCloseVoucher} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fs-2 fw-bold text-primary">Chi tiết voucher giảm giá</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {status === 'loading' ? (
+                            <div className="text-center">
+                                <div className="spinner-border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        ) : currentVoucher ? (
+                            <div className="voucher-details p-3 border rounded ">
+                                <div className="d-flex justify-content-between mb-3 fs-3">
+                                    <img
+                                        src={
+                                            currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'percentage'
+                                                ? voucherImages[3]
+                                                : currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'fixedamount'
+                                                ? voucherImages[2]
+                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'percentage'
+                                                ? voucherImages[1]
+                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'fixedamount'
+                                                ? voucherImages[0]
+                                                : null
+                                        }
+                                        alt=""
+                                        style={{ width: '120px', height: '50px', objectFit: 'cover' }}
+                                    />
+                                    <span className="d-flex align-items-center">{currentVoucher.code}</span>
+                                </div>
+                                {currentVoucher.voucherType === 'all' ? (
+                                    <div className="d-flex justify-content-between mb-3 fs-4">
+                                        <strong>Loại:</strong>
+                                        <span>Giảm giá toàn shop</span>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="d-flex justify-content-between mb-3 fs-4">
+                                            <strong>Loại:</strong>
+                                            <span>Giảm giá theo sản phẩm</span>
+                                        </div>
+
+                                        <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
+                                            <strong className="fs-4 mb-3">Danh sách sản phẩm: </strong>
+                                            {currentVoucher.applicableProducts?.map((product) => (
+                                                <div key={product._id} className="d-flex flex-column my-2">
+                                                    <div className="d-flex align-items-center">
+                                                        <img src={product.urlImage[0]} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                        <p className="fs-4 fw-medium overflow-hidden text-nowrap ms-2" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                            {product.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentVoucher.discountType === 'fixedamount' ? (
+                                    <div className="d-flex justify-content-between mb-3 fs-4">
+                                        <strong>Giảm giá:</strong>
+                                        <span>{currentVoucher.discountValue.toLocaleString('vi-VN')} đ</span>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="d-flex justify-content-between mb-3 fs-4">
+                                            <strong>Mức giảm giá:</strong>
+                                            <span>{currentVoucher.discountValue}%</span>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-3 fs-4">
+                                            <strong>Giảm tối đa:</strong>
+                                            <span>{currentVoucher.maxDiscountValue.toLocaleString('vi-VN')} đ</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Đơn tối thiểu:</strong>
+                                    <span>{currentVoucher.minOrderValue.toLocaleString('vi-VN')} đ</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Số lượng:</strong>
+                                    <span>{currentVoucher.usageLimit}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Số người đã sử dụng voucher:</strong>
+                                    <span>{currentVoucher.used}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Ngày bắt đầu:</strong>
+                                    <span>{new Date(currentVoucher.validFrom).toLocaleDateString()}</span>
+                                </div>
+                                <div className="d-flex justify-content-between fs-4">
+                                    <strong>Ngày hết hạn:</strong>
+                                    <span>{new Date(currentVoucher.validUntil).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <section className="dots-container mt-4">
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                            </section>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
+                            <p>Đóng</p>
+                        </div>
+                    </Modal.Footer>
+                </Modal>
+            )}
         </>
     )
 }

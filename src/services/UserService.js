@@ -99,25 +99,28 @@ export const updateProfile = async (userData) => {
     try {
         const response = await axiosInstance.put(API_URL + 'account/profile/edit', userData, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,  // Thêm token vào headers
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào headers
                 'Content-Type': 'application/json', // Đảm bảo định dạng JSON
             },
         })
 
-        return response.data  // Trả về dữ liệu từ response
+        return response.data // Trả về dữ liệu từ response
     } catch (error) {
         throw error
     }
 }
 
 export const getAddressesUser = async () => {
-    const response = await axiosInstance.get(API_URL + 'account/address', {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-    console.log(response.data) // Kiểm tra dữ liệu nhận được
-    return response.data
+    try {
+        const response = await axiosInstance.get(API_URL + 'account/address', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
 }
 
 export const createAddress = async (addresData) => {
@@ -140,13 +143,12 @@ export const updateAddressUser = async (address_id, addressData) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
             },
-        });
-        return response.data;
+        })
+        return response.data
     } catch (error) {
-        console.error('Error updating address:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || error.message);
+        throw error
     }
-};
+}
 
 export const deleteAddressUser = async (address_id) => {
     try {
@@ -154,38 +156,166 @@ export const deleteAddressUser = async (address_id) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, // Gửi token trong header
             },
-        });
-        return response;
+        })
+        return response
     } catch (error) {
-        console.error('Error delete address:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || error.message);
+        throw error
     }
 }
 
 export const getVouchersUser = async () => {
-    const response = await axios.get(API_URL + 'account/voucher', {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-    return response.data
+    try {
+        const response = await axiosInstance.get(API_URL + 'account/voucher', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getClients = async (clientFilters) => {
+    try {
+        const response = await axios.get(API_URL + 'clients', {
+            params: clientFilters,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const blockClient = async (userId, reasons) => {
+    try {
+        const response = await axiosInstance.put(
+            `clients/block/${userId}`,
+            { reasons },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const blockManyClient = async (userIds, reasons) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/block-many',
+            { userIds, reasons },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const unblockClient = async (userId) => {
+    try {
+        const response = await axiosInstance.put(`clients/unblock/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const unblockManyClient = async (userIds) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/unblock-many',
+            { userIds },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateClientType = async (userId, clientType) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'clients/update-client-type/' + userId,
+            { clientType },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateManyClientType = async (userIds, clientType) => {
+    try {
+        const response = await axiosInstance.patch(
+            'clients/update-client-type-many',
+            { userIds, clientType },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
 }
 
 export const setDefaultAddressUser = async (address_id) => {
     try {
-        console.log(address_id);
-        
         const response = await axiosInstance.put(
             `account/address/setdefault/${address_id}`,
-            {}, // Assuming you don't need to send any data in the request body
+            {},
             {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`, // Send token in header
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             }
         );
-        return response;
+        return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || error.message); // Fix typo 'respone' to 'response'
+        throw new Error(error.response?.data?.message || error.message);
     }
-};
+}
+
+export const getOrderUser = async (status) => {
+    try {
+        const response = await axiosInstance.get('purchase', {
+            params: { filterStatus: status },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+    }
+}

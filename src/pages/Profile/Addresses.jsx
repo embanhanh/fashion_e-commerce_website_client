@@ -29,17 +29,30 @@ function Addresses() {
     const handleSetShowModal = () => {
         setShowAddressModal(true)
     }
-    
+
 
     const onAddressUpdated = () => {
         dispatch(fetchAddresses()) // Gọi lại để lấy danh sách địa chỉ mới
     }
 
-    if (loading) return <p>Loading...</p>
+    if (loading) return (
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+            <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    )
     if (error) {
         return <div>{error.message}</div> // Render message từ object `Error`.
 
     }
+
+    // Sort addresses to move the default address to the top
+    const sortedAddresses = [...addresses].sort((a, b) => {
+        if (a.default && !b.default) return -1; // Move 'true' to the top
+        if (!a.default && b.default) return 1;  // Move 'false' to the bottom
+        return 0; // Keep the order for other addresses
+    });
 
     return (
         <div className="container">
@@ -67,7 +80,7 @@ function Addresses() {
 
             <div className="address-container">
                 <div className="address-title">Địa chỉ</div>
-                {addresses.map((address, index) => (
+                {sortedAddresses.map((address, index) => (
                     <AddressItem key={index} address={address} onAddressUpdated={onAddressUpdated} />
                 ))}
             </div>

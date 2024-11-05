@@ -1,30 +1,43 @@
 import './OrderCard.scss'
 
-function OrderCart({ product }) {
+function OrderCard({ order }) {
     return (
         <div className="order-cart">
-            <div className="d-flex justify-content-between">
-                <div className="order-image">
-                    <img src={product.image} alt={product.name} />
+            <div className="d-flex flex-column justify-content-between">
+                <div className="d-flex flex-column">
+                    {order?.products.map((product, index) => (
+                        <div key={index} className="d-flex justify-content-between border-bottom p-4">
+                            <div className="d-flex">
+                                <img src={product.product.imageUrl} alt="error" style={{ width: "50px", height: "50px" }} />
+                                <div className="d-flex flex-column ms-4">
+                                    <p className="fs-4 text-wrap">Tên sản phẩm: {product.product.product.name}</p>
+                                    <p>Số lượng: {product.quantity}</p>
+                                    <div className="d-flex">
+                                        <p>Phân loại hàng: </p>
+                                        {product.product.product.categories.map((categorie, index) => (
+                                            <p key={index} className="ms-2">{categorie.name}</p>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="">
+                                <span className="fs-5 text-decoration-line-through text-secondary mx-2">{product.product.product.originalPrice.toLocaleString('vi-VN')}đ</span>
+                                <span className="fs-4 text-body">{product.product.product.originalPrice.toLocaleString('vi-VN')}đ</span>
+                            </div>
+
+                        </div>
+                    ))}
                 </div>
-                <div className="order-details">
-                    <h4 className="product-name">{product.name}</h4>
-                    <p className="product-size">Size: {product.size}</p>
-                    <p className="product-quantity">Số lượng: {product.quantity}</p>
+                <div className="border-bottom p-5 d-flex flex-row-reverse">
+                    <span className="fs-4 fw-normal text-center p-1 ms-4 ">{order.productsPrice.toLocaleString('vi-VN')}đ</span>
+                    <strong className="fs-3 fw-normal">Thành tiền:</strong>
+
                 </div>
-                <div className="order-price align-self-center">
-                    <p>{product.price.toLocaleString()}đ</p>
-                </div>
-                <div className="order-action align-self-center">
-                    {product.status === 'delivered' ? <button className="btn-order rate-btn">Đánh Giá</button> : <button className="btn-order cancel-btn">Hủy Đơn Hàng</button>}
-                </div>
-            </div>
-            <div className="d-flex justify-content-left">
-                {product.status === 'delivered' ? <p className="delivered-status me-4">Đã giao hàng</p> : <p className="process-status me-4">Đang xử lý</p>}
-                <p className="statusMessage">{product.statusMessage}</p>
+
+
             </div>
         </div>
     )
 }
 
-export default OrderCart
+export default OrderCard;

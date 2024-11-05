@@ -6,13 +6,13 @@ import { useDispatch } from 'react-redux'
 
 function AddressItem({ address, onAddressUpdated }) {
     const dispatch = useDispatch()
-    const [showEditModal, setShowEditModal] = useState(false) // State để quản lý modal
+    const [showEditModal, setShowEditModal] = useState(false)
 
     const handleEditAddress = async (updatedAddress) => {
         if (address._id) {
             try {
                 await dispatch(updateAddress({ address_id: address._id, addressData: updatedAddress }))
-                onAddressUpdated() // Gọi callback để thông báo đã cập nhật
+                onAddressUpdated()
                 setShowEditModal(false)
             } catch (error) {
                 console.error('Error updating address:', error)
@@ -24,7 +24,7 @@ function AddressItem({ address, onAddressUpdated }) {
 
     const handleDeleteAddress = async () => {
         try {
-            if (address._id) {  // Ensure address._id exists before calling the API
+            if (address._id) {
                 await dispatch(deleteAddress({ address_id: address._id }))
                 onAddressUpdated()
             } else {
@@ -37,20 +37,16 @@ function AddressItem({ address, onAddressUpdated }) {
 
     const handleSetDefaultAddress = async () => {
         try {
-            console.log('Address:', address); // Log the address object
             if (address._id) {
-                await dispatch(setDefaultAddress({ address_id: address._id })); // Gửi ID thay vì đối tượng
-                console.log(address._id);
-                
-                onAddressUpdated();
+                await dispatch(setDefaultAddress({ address_id: address._id }))
+                onAddressUpdated()
             } else {
-                console.error('Address ID is undefined'); // Log error if ID is undefined
+                console.error('Address ID is undefined')
             }
         } catch (error) {
-            console.error('Error setting default address:', error);
+            console.error('Error setting default address:', error)
         }
     }
-
 
     return (
         <div className="address-item-container">
@@ -68,9 +64,11 @@ function AddressItem({ address, onAddressUpdated }) {
                     <div className="address-actions">
                         <button className="btn-update fs-5" onClick={() => setShowEditModal(true)}>Cập nhật</button> {/* Mở modal khi nhấn nút */}
                     </div>
-                    <div className="address-actions">
-                        <button className="btn-update fs-5" onClick={handleDeleteAddress}>Xóa</button>
-                    </div>
+                    {!address.default && (
+                        <div className="address-actions">
+                            <button className="btn-update fs-5" onClick={handleDeleteAddress}>Xóa</button>
+                        </div>
+                    )}
                 </div>
                 <div role="heading" className="address-content d-flex">
                     <div className="address-details">

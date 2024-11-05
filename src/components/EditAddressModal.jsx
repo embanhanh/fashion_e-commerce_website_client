@@ -157,23 +157,23 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
                     </Form.Group>
 
                     <Form.Group className="mb-3 fs-4">
-                        <Form.Check
-                            type="checkbox"
-                            name="isDefault"
-                            label="Đặt làm địa chỉ mặc định"
-                            checked={isDefault}
-                            onChange={(e) => setIsDefault(e.target.checked)}
-                        />
+                        <div className="checkbox-cell">
+                            <label className="d-flex align-items-center">
+                                <input type="checkbox" className="input-checkbox" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
+                                <span className="custom-checkbox" />
+                                <span className="ms-2">Đặt làm địa chỉ mặc định.</span>
+                            </label>
+                        </div>
                     </Form.Group>
                 </Form>
             </Modal.Body>
             <Modal.Footer>
                 {errors.submit && <p className="text-danger">{errors.submit}</p>}
                 <div className="d-flex flex-row  mb-3">
-                    <Button className="close-btn mx-3" variant="danger" onClick={handleClose}>
+                    <Button className="btn btn-outline-danger mx-3" onClick={handleClose}>
                         Trở lại
                     </Button>
-                    <Button className="success-btn mx-3" variant="success" onClick={handleSubmit}>
+                    <Button className="btn btn-outline-success mx-3" style={{ minWidth: '130px' }} onClick={handleSubmit}>
                         Hoàn thành
                     </Button>
                 </div>

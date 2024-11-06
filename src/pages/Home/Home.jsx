@@ -11,6 +11,7 @@ import { Rating } from 'react-simple-star-rating'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
+import Chatbot from '../../components/Chatbot'
 
 function Home() {
     const swiperCategory = useRef(null)
@@ -28,6 +29,7 @@ function Home() {
 
     return (
         <>
+            <Chatbot />
             <div className="container h-100">
                 <div className="slidesshow-container w-100">
                     <Swiper

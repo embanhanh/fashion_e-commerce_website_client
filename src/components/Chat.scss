@@ -52,13 +52,14 @@
                 overflow: hidden;
 
                 .chat-name {
+                    font-size: 1.4rem;
                     font-weight: 500;
                     margin-bottom: 5px;
                 }
 
                 .chat-last-message {
                     color: #6c757d;
-                    font-size: 0.9em;
+                    font-size: 1.2rem;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -82,14 +83,15 @@
             align-items: center;
 
             .chat-avatar {
-                width: 40px;
-                height: 40px;
+                width: 50px;
+                height: 50px;
                 border-radius: 50%;
                 margin-right: 10px;
             }
 
             .chat-name {
                 font-weight: 500;
+                font-size: 1.6rem;
             }
         }
 
@@ -103,27 +105,40 @@
 
             .message {
                 max-width: 70%;
-                padding: 10px 15px;
-                border-radius: 15px;
                 position: relative;
 
                 &.user {
                     align-self: flex-start;
-                    background: #f1f0f0;
+                    .message-content {
+                        background: #f1f0f0;
+                    }
+                    .message-time {
+                        margin-left: 10px;
+                        text-align: left;
+                    }
                 }
 
                 &.admin {
                     align-self: flex-end;
-                    background: #007bff;
-                    color: white;
+                    .message-content {
+                        background: #007bff;
+                        color: white;
+                    }
+                    .message-time {
+                        margin-right: 10px;
+                        text-align: right;
+                    }
                 }
 
                 .message-content {
+                    padding: 10px 15px;
                     margin-bottom: 5px;
+                    border-radius: 15px;
+                    font-size: 1.4rem;
                 }
 
                 .message-time {
-                    font-size: 0.8em;
+                    font-size: 1rem;
                     opacity: 0.7;
                 }
             }
@@ -151,5 +166,43 @@
         justify-content: center;
         height: 100%;
         color: #6c757d;
+    }
+
+    .message-card-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .message-card {
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #f8f9fa;
+        }
+
+        .message-card-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+        }
+
+        .message-card-content {
+            margin-left: 10px;
+            overflow: hidden;
+            align-self: center;
+
+            h5 {
+                font-size: 1.4rem;
+                font-weight: 500;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
     }
 }

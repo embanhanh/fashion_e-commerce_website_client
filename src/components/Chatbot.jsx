@@ -23,6 +23,12 @@ function Chatbot() {
                     messages: [],
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
+                    user: {
+                        _id: user._id,
+                        name: user.name,
+                        avatar: user.urlImage,
+                        email: user.email,
+                    },
                 })
             }
         } catch (error) {
@@ -40,14 +46,7 @@ function Chatbot() {
 
             const messageObjects = messages.map((message) => ({
                 message,
-                user: isUserMessage
-                    ? {
-                          _id: user._id,
-                          name: user.name,
-                          avatar: user.urlImage,
-                          email: user.email,
-                      }
-                    : null,
+                user: isUserMessage ? 'client' : null,
                 timestamp: new Date().toISOString(),
             }))
 

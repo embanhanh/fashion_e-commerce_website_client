@@ -22,6 +22,7 @@ function Chatbot() {
                 await setDoc(chatHistoryRef, {
                     messages: [],
                     createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
                 })
             }
         } catch (error) {
@@ -52,6 +53,7 @@ function Chatbot() {
 
             await updateDoc(chatHistoryRef, {
                 messages: arrayUnion(...messageObjects),
+                updatedAt: serverTimestamp(),
             })
         } catch (error) {
             console.error('Lỗi khi lưu tin nhắn:', error)

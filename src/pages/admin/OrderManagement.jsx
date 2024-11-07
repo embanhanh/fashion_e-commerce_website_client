@@ -110,12 +110,6 @@ const OrderManagement = () => {
         }
     }, [bulkAction])
 
-    useEffect(() => {
-        if (orders) {
-            console.log(orders)
-        }
-    }, [orders])
-
     return (
         <div className="pb-5">
             <div className="bg-white border">

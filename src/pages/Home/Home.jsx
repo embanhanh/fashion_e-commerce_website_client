@@ -23,10 +23,6 @@ function Home() {
         dispatch(fetchBanners())
     }, [dispatch])
 
-    useEffect(() => {
-        console.log(banners)
-    }, [banners])
-
     return (
         <>
             <Chatbot />

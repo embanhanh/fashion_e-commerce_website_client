@@ -1,10 +1,15 @@
-import { useEffect, memo } from 'react'
+import { useEffect, memo, useState } from 'react'
 import { db } from '../firebase.config'
 import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore'
 import { useSelector } from 'react-redux'
+import './Chat.scss'
 
 function Chatbot() {
     const { user } = useSelector((state) => state.auth)
+    const [chatMode, setChatMode] = useState({
+        show: false,
+        mode: 'ai',
+    })
 
     const initChatHistory = async () => {
         if (!user) return
@@ -55,7 +60,9 @@ function Chatbot() {
 
     useEffect(() => {
         initChatHistory()
+        console.log(chatMode.mode)
         const handleDfMessengerResponse = (event) => {
+            console.log('save chat message')
             if (event.type === 'df-user-input-entered') {
                 // Lưu tin nhắn của người dùng
                 saveChatMessage(
@@ -73,17 +80,49 @@ function Chatbot() {
             }
         }
 
+        const handleDfRequestSent = (event) => {
+            if (chatMode.mode === 'human') {
+                event.preventDefault()
+            }
+        }
+
+        const handleChatOpenChanged = (event) => {
+            setChatMode((prev) => ({
+                ...prev,
+                show: event.detail.isOpen,
+            }))
+        }
+
+        window.addEventListener('df-chat-open-changed', handleChatOpenChanged)
         window.addEventListener('df-user-input-entered', handleDfMessengerResponse)
         window.addEventListener('df-response-received', handleDfMessengerResponse)
+        window.addEventListener('df-request-sent', handleDfRequestSent)
 
         return () => {
             window.removeEventListener('df-user-input-entered', handleDfMessengerResponse)
             window.removeEventListener('df-response-received', handleDfMessengerResponse)
+            window.removeEventListener('df-chat-open-changed', handleChatOpenChanged)
+            window.removeEventListener('df-request-sent', handleDfRequestSent)
         }
-    }, [])
-
+    }, [chatMode.mode])
     return (
         <>
+            {chatMode.show && (
+                <button
+                    className="primary-btn shadow-none rounded-5 position-fixed btn-switch-chat"
+                    onClick={() =>
+                        setChatMode((prev) => {
+                            const dfMessenger = document.querySelector('df-messenger')
+                            if (dfMessenger) {
+                                dfMessenger.renderCustomText(`Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`, true)
+                            }
+                            return { ...prev, mode: chatMode.mode === 'ai' ? 'human' : 'ai' }
+                        })
+                    }
+                >
+                    <p>Chat với {chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}</p>
+                </button>
+            )}
             <df-messenger
                 location={import.meta.env.VITE_DIALOGFLOW_LOCATION}
                 project-id={import.meta.env.VITE_DIALOGFLOW_PROJECT_ID}
@@ -91,7 +130,7 @@ function Chatbot() {
                 language-code="vi"
                 max-query-length="-1"
             >
-                <df-messenger-chat-bubble chat-title="ai-for-clothes-store"></df-messenger-chat-bubble>
+                <df-messenger-chat-bubble chat-title={chatMode.mode === 'ai' ? `Trợ lý AI Heartie` : `Nhân viên Heartie`}></df-messenger-chat-bubble>
             </df-messenger>
         </>
     )

@@ -63,7 +63,7 @@ function Chat() {
                         text: newMessage,
                     },
                     timestamp: new Date().toISOString(),
-                    user: null,
+                    user: 'admin',
                 }),
                 updatedAt: serverTimestamp(),
             })

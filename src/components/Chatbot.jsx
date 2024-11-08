@@ -1,6 +1,6 @@
-import { useEffect, memo, useState } from 'react'
+import { useEffect, memo, useState, useRef } from 'react'
 import { db } from '../firebase.config'
-import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore'
+import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot } from 'firebase/firestore'
 import { useSelector } from 'react-redux'
 import './Chat.scss'
 
@@ -10,17 +10,69 @@ function Chatbot() {
         show: false,
         mode: 'ai',
     })
+    const historyLoadedRef = useRef(false)
 
-    const initChatHistory = async () => {
+    useEffect(() => {
         if (!user) return
 
-        try {
-            const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
-            const chatDoc = await getDoc(chatHistoryRef)
+        const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
+        const unsubscribe = onSnapshot(chatHistoryRef, (doc) => {
+            if (doc.exists()) {
+                const data = doc.data()
+                const messages = data.messages || []
+                const dfMessenger = document.querySelector('df-messenger')
+                if (dfMessenger) {
+                    if (!historyLoadedRef.current) {
+                        console.log('Vào load lịch sử: ', messages)
+                        dfMessenger.clearStorage()
+                        messages.forEach((message) => {
+                            message.message.type === 'text'
+                                ? dfMessenger.renderCustomText(message.message.text, message.user === 'admin' || !message.user)
+                                : dfMessenger.renderCustomCard([message.message])
+                        })
+                        historyLoadedRef.current = true
+                    } else {
+                        const lastMessage = messages[messages.length - 1]
+                        if (lastMessage && lastMessage.user === 'admin') {
+                            // const dfMessengerChatBubble = document.querySelector('df-messenger-chat-bubble')
+                            // if (dfMessengerChatBubble) {
+                            //     dfMessengerChatBubble.openMinChat({
+                            //         anchor: 'top-left',
+                            //     })
+                            // }
+                            lastMessage.message.type === 'text' ? dfMessenger.renderCustomText(lastMessage.message.text, true) : dfMessenger.renderCustomCard([lastMessage.message])
+                        }
+                    }
+                }
+            }
+        })
 
-            if (!chatDoc.exists()) {
+        return () => unsubscribe()
+    }, [user])
+
+    useEffect(() => {
+        const dfMessenger = document.querySelector('df-messenger')
+        if (dfMessenger) {
+            dfMessenger.clearStorage()
+        }
+        historyLoadedRef.current = false
+    }, [user?._id])
+
+    const saveChatMessage = async (messages, isUserMessage) => {
+        try {
+            if (!user) return
+
+            const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
+
+            const chatHistory = await getDoc(chatHistoryRef)
+            const messageObjects = messages.map((message) => ({
+                message,
+                user: isUserMessage ? 'client' : null,
+                timestamp: new Date().toISOString(),
+            }))
+            if (!chatHistory.exists()) {
                 await setDoc(chatHistoryRef, {
-                    messages: [],
+                    messages: messageObjects,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                     user: {
@@ -30,82 +82,81 @@ function Chatbot() {
                         email: user.email,
                     },
                 })
+            } else {
+                await updateDoc(chatHistoryRef, {
+                    messages: arrayUnion(...messageObjects),
+                    updatedAt: serverTimestamp(),
+                })
             }
-        } catch (error) {
-            console.error('Lỗi khởi tạo chat history:', error)
-        }
-    }
-
-    const saveChatMessage = async (messages, isUserMessage) => {
-        try {
-            if (!user) return
-
-            const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
-
-            const chatHistory = await getDoc(chatHistoryRef)
-
-            const messageObjects = messages.map((message) => ({
-                message,
-                user: isUserMessage ? 'client' : null,
-                timestamp: new Date().toISOString(),
-            }))
-
-            await updateDoc(chatHistoryRef, {
-                messages: arrayUnion(...messageObjects),
-                updatedAt: serverTimestamp(),
-            })
         } catch (error) {
             console.error('Lỗi khi lưu tin nhắn:', error)
         }
     }
 
+    const handleDfMessengerResponse = (event) => {
+        console.log('save chat message')
+        if (event.type === 'df-user-input-entered') {
+            // Lưu tin nhắn của người dùng
+            saveChatMessage(
+                [
+                    {
+                        type: 'text',
+                        text: event.detail.input,
+                    },
+                ],
+                true
+            )
+        } else if (event.type === 'df-response-received') {
+            // Lưu tin nhắn từ chatbot
+            saveChatMessage(event.detail.messages, false)
+        }
+    }
+
+    const handleDfRequestSent = (event) => {
+        console.log('handleDfRequestSent: ', chatMode.mode)
+        if (chatMode.mode === 'human') {
+            event.preventDefault()
+        }
+    }
+
     useEffect(() => {
-        initChatHistory()
-        console.log(chatMode.mode)
-        const handleDfMessengerResponse = (event) => {
-            console.log('save chat message')
-            if (event.type === 'df-user-input-entered') {
-                // Lưu tin nhắn của người dùng
-                saveChatMessage(
-                    [
-                        {
-                            type: 'text',
-                            text: event.detail.input,
-                        },
-                    ],
-                    true
-                )
-            } else if (event.type === 'df-response-received') {
-                // Lưu tin nhắn từ chatbot
-                saveChatMessage(event.detail.messages, false)
-            }
-        }
+        console.log('chatMode: ', chatMode.mode)
+    }, [chatMode.mode])
 
-        const handleDfRequestSent = (event) => {
-            if (chatMode.mode === 'human') {
-                event.preventDefault()
-            }
-        }
+    const handleChatOpenChanged = (event) => {
+        setChatMode((prev) => ({
+            ...prev,
+            show: event.detail.isOpen,
+        }))
+    }
 
-        const handleChatOpenChanged = (event) => {
-            setChatMode((prev) => ({
-                ...prev,
-                show: event.detail.isOpen,
-            }))
-        }
+    const handleChipClick = (event) => {
+        saveChatMessage(
+            [
+                {
+                    type: 'text',
+                    text: event.detail.text,
+                },
+            ],
+            true
+        )
+    }
 
+    useEffect(() => {
         window.addEventListener('df-chat-open-changed', handleChatOpenChanged)
         window.addEventListener('df-user-input-entered', handleDfMessengerResponse)
         window.addEventListener('df-response-received', handleDfMessengerResponse)
         window.addEventListener('df-request-sent', handleDfRequestSent)
-
+        window.addEventListener('df-chip-clicked', handleChipClick)
         return () => {
             window.removeEventListener('df-user-input-entered', handleDfMessengerResponse)
             window.removeEventListener('df-response-received', handleDfMessengerResponse)
             window.removeEventListener('df-chat-open-changed', handleChatOpenChanged)
             window.removeEventListener('df-request-sent', handleDfRequestSent)
+            window.removeEventListener('df-chip-clicked', handleChipClick)
         }
     }, [chatMode.mode])
+
     return (
         <>
             {chatMode.show && (

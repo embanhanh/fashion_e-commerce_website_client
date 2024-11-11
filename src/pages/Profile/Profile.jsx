@@ -104,8 +104,10 @@ function Profile() {
 
     if (loading && isLoading)
         return (
-            <div className="spinner-border" role="status">
-                <span className="visually-hidden">Loading...</span>
+            <div class="d-flex justify-content-center" style={{ height: "100vh" }}>
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
         )
     if (error) {
@@ -130,82 +132,119 @@ function Profile() {
             <div className="profile-body">
                 <div className="profile-form col-8">
                     <form onSubmit={handleSubmit}>
-                        <table className="table-content">
-                            <tbody>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Email</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="readonly-input">{email}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Tên</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="input-wrapper">
-                                            <input type="text" className="form-control" value={userName} onChange={(e) => setUserName(e.target.value)} />
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Số điện thoại</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="input-group">
-                                            <input type="number" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Giới tính</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="radio-group">
-                                            <label className="radio-option">
-                                                <input type="radio" name="gender" value="male" checked={gender === 'male'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio me-2"></span> Nam
-                                            </label>
-                                            <label className="radio-option">
-                                                <input type="radio" name="gender" value="female" checked={gender === 'female'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio me-2"></span> Nữ
-                                            </label>
-                                            <label className="radio-option">
-                                                <input type="radio" name="gender" value="other" checked={gender === 'other'} onChange={(e) => setGender(e.target.value)} />
-                                                <span className="custom-radio me-2"></span> Khác
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell">
-                                        <label>Ngày sinh</label>
-                                    </td>
-                                    <td className="input-cell">
-                                        <div className="input-group">
+                        <div className="form-content">
+                            <div className="row mb-3">
+                                <div className="col-4 label-cell">
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Email</label>
+                                </div>
+                                <div className="col-8 input-cell">
+                                    <div className="readonly-input">{email}</div>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-4 label-cell">
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Tên</label>
+                                </div>
+                                <div className="col-8 input-cell">
+                                    <div className="input-form d-flex align-items-center w-100">
+                                        <input
+                                            type="text"
+                                            className="input-text w-100"
+                                            placeholder="Tên"
+                                            value={userName}
+                                            onChange={(e) => setUserName(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-4 label-cell">
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Số điện thoại</label>
+                                </div>
+                                <div className="col-8 input-cell">
+                                    <div className="input-form d-flex align-items-center w-100">
+                                        <input
+                                            type="number"
+                                            className="input-text w-100"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-4 label-cell">
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Giới tính</label>
+                                </div>
+                                <div className="col-8 input-cell">
+                                    <div className="radio-group">
+                                        <label className="radio-option">
                                             <input
-                                                type="date"
-                                                className="form-control"
-                                                value={birth}
-                                                onChange={(e) => setBirth(e.target.value)} // Gán giá trị khi thay đổi
+                                                type="radio"
+                                                name="gender"
+                                                value="male"
+                                                checked={gender === 'male'}
+                                                onChange={(e) => setGender(e.target.value)}
                                             />
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="label-cell"></td>
-                                    <td className="input-cell">
-                                        <button type="submit" className="btn edit-btn">
-                                            Lưu
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            <span className="custom-radio me-2"></span> Nam
+                                        </label>
+                                        <label className="radio-option ms-3">
+                                            <input
+                                                type="radio"
+                                                name="gender"
+                                                value="female"
+                                                checked={gender === 'female'}
+                                                onChange={(e) => setGender(e.target.value)}
+                                            />
+                                            <span className="custom-radio me-2"></span> Nữ
+                                        </label>
+                                        <label className="radio-option ms-3">
+                                            <input
+                                                type="radio"
+                                                name="gender"
+                                                value="other"
+                                                checked={gender === 'other'}
+                                                onChange={(e) => setGender(e.target.value)}
+                                            />
+                                            <span className="custom-radio me-2"></span> Khác
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-4 label-cell">
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Ngày sinh</label>
+                                </div>
+                                <div className="col-8 input-cell">
+                                    <div className="input-form d-flex align-items-center w-100">
+                                        <input
+                                            type="date"
+                                            className="date-input w-100"
+                                            value={birth}
+                                            onChange={(e) => setBirth(e.target.value)}
+                                            max={new Date().toISOString().split('T')[0]}
+                                            placeholder="DD/MM/YYYY"
+                                            pattern="\d{2}/\d{2}/\d{4}"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col-4"></div>
+                                <div className="col-8 input-cell">
+                                    <button type="submit" className="btn edit-btn">
+                                        Lưu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </form>
                 </div>
                 <div className="profile-avatar col-4 border-start">

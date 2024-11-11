@@ -265,7 +265,8 @@ function PromotionalCombos() {
                                 <div className="dot"></div>
                             </section>
                         ) : status === 'failed' ? (
-                            <p>{error}</p>
+                            // <p>{error}</p>
+                            <p>{notification.title}</p>
                         ) : filteredPromotionalCombos.length == 0 ? (
                             <p className="fs-3 fw-medium text-center">Không có combo nào</p>
                         ) : (
@@ -297,13 +298,12 @@ function PromotionalCombos() {
                                         ))}
                                     </div>
                                     <p
-                                        className={`fs-4 fw-medium text-center ${
-                                            new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
-                                                ? 'text-success'
-                                                : new Date() > new Date(combo.endDate)
+                                        className={`fs-4 fw-medium text-center ${new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
+                                            ? 'text-success'
+                                            : new Date() > new Date(combo.endDate)
                                                 ? 'text-danger'
                                                 : 'text-warning'
-                                        }`}
+                                            }`}
                                     >
                                         {(new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate) && 'Đang diễn ra') ||
                                             (new Date() > new Date(combo.endDate) && 'Đã kết thúc') ||

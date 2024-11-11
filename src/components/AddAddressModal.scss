@@ -1,10 +1,73 @@
 .button-close {
     background-color: #fff;
-    color: black;    
+    color: black;
 }
 
 .button-success {
     background-color: #fff;
     color: black;
     min-width: 140px;
+}
+
+.select {
+    position: relative;
+    width: 200px; // Adjust width as needed
+
+    .selected {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        background: white;
+
+        span {
+            margin-right: 8px;
+        }
+
+        .arrow {
+            width: 12px;
+            height: 12px;
+            fill: #666;
+        }
+    }
+
+    .options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        display: none;
+        z-index: 1000;
+
+        div {
+            padding: 8px 12px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f5f5f5;
+            }
+
+            input {
+                display: none;
+            }
+
+            label {
+                cursor: pointer;
+                display: block;
+                width: 100%;
+            }
+        }
+    }
+
+    &:hover .options,
+    &:focus-within .options {
+        display: block;
+    }
 }

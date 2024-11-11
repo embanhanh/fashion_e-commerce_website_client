@@ -208,7 +208,7 @@ const OrderManagement = () => {
                                             value="express"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="option-2-v2" data-txt="Ha tốc" />
+                                        <label className="option" htmlFor="option-2-v2" data-txt="Hỏa tốc" />
                                     </div>
                                 </div>
                             </div>
@@ -437,12 +437,12 @@ const OrderManagement = () => {
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : order.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : order.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : order.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : order.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
                                         <FontAwesomeIcon
                                             onClick={() => setShowChangeStatusModal({ show: true, originalStatus: order.status, orderId: order._id })}
@@ -501,12 +501,12 @@ const OrderManagement = () => {
                                             {selectedOrder.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : selectedOrder.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : selectedOrder.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : selectedOrder.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : selectedOrder.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : selectedOrder.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
                                     </div>
                                 </div>

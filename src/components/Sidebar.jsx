@@ -45,8 +45,10 @@ function Sidebar() {
 
     // Hiển thị loading nếu đang tải dữ liệu
     if (loading) {
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     }
 
@@ -57,20 +59,20 @@ function Sidebar() {
 
     return (
         <nav className="sidebar-nav mt-4">
-            <div className="avartar-profile d-flex flex-row align-items-center bg-light p-3 border-bottom">
+            <div className="d-flex flex-row align-items-center p-3 border-bottom text-start">
                 <img
                     src={user?.urlImage || 'https://via.placeholder.com/80'} // Đường dẫn avatar từ Redux store hoặc ảnh mặc định
                     alt="User Avatar"
                     className="avatar-img rounded-circle mb-2 me-4"
-                    style={{ width: '69px', height: '69px' }}
+                    style={{ width: '50px', height: '50px' }}
                 />
-                
-                <div className="greeting-text">
-                    <h5 className="m-0">Xin chào, </h5> 
-                    <h2 className="mt-2">{user?.name || 'Người dùng'}</h2>
+
+                <div className="fs-2 fw-medium">
+                    <p className="">Xin chào, </p>
+                    <p className="mt-2 fs-2">{user?.name || 'Người dùng'}</p>
                 </div>
             </div>
-            <div className="d-flex flex-column bg-light d-inline-flex  h-100">
+            <div className="d-flex flex-column d-inline-flex">
                 <ul className="nav nav-pills flex-column mb-auto">
                     {menuItem.map((item, index) => (
                         <li key={index} className="nav-item">

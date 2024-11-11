@@ -21,7 +21,13 @@ function Mainlayout({ children }) {
         <>
             <Header location={location} />
 
-            <div className="h-100 shop-body" style={{ marginTop: location.pathname == '/' ? 'var(--header-height)' : '0px' }}>
+            <div
+                className="h-100 shop-body"
+                style={{
+                    marginTop: location.pathname == '/' ? 'var(--header-height)' : '0px',
+                    backgroundColor: location.pathname.includes('/account') ? '#f5f5f5' : 'transparent'
+                }}
+            >
                 {children}
             </div>
             <footer className=" bg-black text-white">

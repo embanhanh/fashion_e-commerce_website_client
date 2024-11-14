@@ -1,16 +1,18 @@
-
 .profile-container {
     display: flex;
     flex-direction: column;
-    margin-left: 20px;    
+    margin-left: 20px;
+    background-color: #fff;
+    margin-top: 16px;
 }
 
 .profile-avatar {
     height: 200px;
 }
+
 .profile-header {
     border-bottom: 1px solid #efefef;
-    padding: 18px 0px;
+    padding: 18px 10px;
 }
 
 .profile-title {
@@ -75,53 +77,59 @@
     font-size: 1.3rem;
     text-decoration: underline;
 }
+
 .radio-group {
     display: flex;
-    gap: 20px; /* Adds space between the radio options */
-    align-items: center; /* Aligns radio buttons and text vertically */
+    gap: 20px;
+    /* Adds space between the radio options */
+    align-items: center;
+    /* Aligns radio buttons and text vertically */
 }
 
 .radio-option {
     display: flex;
     align-items: center;
-    font-size: 14px; /* Adjusts text size to match the design */
+    font-size: 14px;
+    /* Adjusts text size to match the design */
     cursor: pointer;
 
     input[type='radio'] {
-        display: none; /* Hide the default radio button */
+        display: none;
+        /* Hide the default radio button */
     }
 
     .custom-radio {
-        width: 14px; /* Matches the size of the circles */
-        height: 14px;
-        border: 2px solid #999; /* Gray border for the radio button */
-        border-radius: 50%; /* Makes the circle round */
-        margin-right: 8px; /* Space between the circle and the label */
+        margin-left: 5px;
         display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #333;
+        border-radius: 4px;
         position: relative;
+        cursor: pointer;
     }
 
     /* When the radio button is checked, show the filled circle */
-    input[type='radio']:checked + .custom-radio {
-        background-color: #333; /* Darker color for the selected state */
-        border-color: #333; /* Matches the circle's background color */
+    input[type='radio']:checked+.custom-radio::after {
+        opacity: 1;
     }
 
-    /* Circle inside the custom radio when checked */
-    input[type='radio']:checked + .custom-radio::before {
+    ::after {
         content: '';
-        width: 6px;
-        height: 6px;
-        background-color: white;
-        border-radius: 50%;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        background-color: #333;
+        border-radius: 2px;
+        opacity: 0;
     }
 
     &:hover .custom-radio {
-        border-color: #666; /* Darken border on hover */
+        border-color: #666;
+        /* Darken border on hover */
     }
 }
 
@@ -157,10 +165,12 @@
 }
 
 .edit-btn {
-    display: inline-block;
+    width: 100px;
+    display: block;
+    margin-left: auto;
     padding: 6px 12px;
     font-size: 14px;
-    cursor: pointer;    
+    cursor: pointer;
     border-radius: 4px;
     color: #efefef;
     background-color: #000;
@@ -172,4 +182,51 @@
     }
 }
 
+.choosefile-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #555;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
 
+    &:hover {
+        background-color: #212529;
+        color: white;
+    }
+}
+
+.date-input {
+    padding: 0 10px;
+    border: none;
+    height: 100%;
+    font-size: 1.6rem;
+    color: #333;
+    transition: border-color 0.2s;
+
+    // Tùy chỉnh icon calendar
+    &::-webkit-calendar-picker-indicator {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000000' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 2px;
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+    }
+
+
+    // Tùy chỉnh màu placeholder
+    &::placeholder {
+        color: #999;
+    }
+
+    // Tùy chỉnh style khi disabled
+    &:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
+}

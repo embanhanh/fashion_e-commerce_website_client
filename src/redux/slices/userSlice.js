@@ -6,6 +6,7 @@ import {
     createAddress,
     updateAddressUser,
     deleteAddressUser,
+    setDefaultAddressUser,
     getVouchersUser,
     getClients,
     blockClient,
@@ -14,6 +15,7 @@ import {
     blockManyClient,
     unblockManyClient,
     updateManyClientType,
+    getOrderUser,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -71,12 +73,31 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
     }
 })
 
+export const setDefaultAddress = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
+    try {
+        const response = await setDefaultAddressUser(address_id)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const fetchOrderUser = createAsyncThunk('user/fetchOrderUser', async (_, { getState, rejectWithValue }) => {
+    try {
+        const { user } = getState()
+        const response = await getOrderUser(user.orderFilters.status)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
     try {
         const response = await getVouchersUser()
         return response
     } catch (error) {
-        return rejectWithValue(error)
+        return rejectWithValue(error.message || 'Có lỗi xảy ra')
     }
 })
 
@@ -152,6 +173,10 @@ const userSlice = createSlice({
         error: null,
         success: false,
         vouchers: [],
+        orders: [],
+        orderFilters: {
+            status: '',
+        },
         clients: [],
         clientsLoading: false,
         clientFilters: {
@@ -162,7 +187,11 @@ const userSlice = createSlice({
             clientType: '',
         },
     },
-    reducers: {},
+    reducers: {
+        setOrderFilters: (state, action) => {
+            state.orderFilters = action.payload
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchUser.pending, (state) => {
@@ -209,7 +238,14 @@ const userSlice = createSlice({
             })
             .addCase(addNewAddress.fulfilled, (state, action) => {
                 state.loading = false
-                state.addresses.push(action.payload) // Thêm địa chỉ mới vào danh sách
+
+                // Reset all addresses to not default
+                state.addresses.forEach(address => {
+                    address.default = false;
+                });
+
+                // Add the new address to the list
+                state.addresses.push(action.payload); // Assuming action.payload contains the new address
             })
             .addCase(addNewAddress.rejected, (state, action) => {
                 state.loading = false
@@ -243,6 +279,34 @@ const userSlice = createSlice({
                 state.loading = false
                 state.error = action.payload
                 console.error('Error deleting address:', action.payload) // Log the error
+            })
+            .addCase(setDefaultAddress.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(setDefaultAddress.fulfilled, (state, action) => {
+                state.loading = false
+                const index = state.addresses.findIndex((address) => address.id === action.payload.id) // Tìm chỉ số địa chỉ cần cập nhật
+                if (index !== -1) {
+                    state.addresses[index] = action.payload // Cập nhật địa chỉ trong danh sách
+                }
+            })
+            .addCase(setDefaultAddress.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchOrderUser.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchOrderUser.fulfilled, (state, action) => {
+                state.loading = false
+                state.orders = action.payload
+                console.log('Fetched orders:', action.payload) // Kiểm tra dữ liệu
+            })
+            .addCase(fetchOrderUser.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+                console.error('Error fetching orders:', action.payload) // Log lỗi
             })
             .addCase(fetchVouchers.pending, (state) => {
                 state.error = null
@@ -327,4 +391,5 @@ const userSlice = createSlice({
     },
 })
 
+export const { setOrderFilters } = userSlice.actions
 export default userSlice.reducer

@@ -84,7 +84,7 @@ export const loginWithFirebase = async (token, type) => {
 
 export const getUser = async () => {
     try {
-        const response = await axios.get(API_URL + 'account/profile', {
+        const response = await axiosInstance.get(API_URL + 'account/profile', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
@@ -97,7 +97,7 @@ export const getUser = async () => {
 
 export const updateProfile = async (userData) => {
     try {
-        const response = await axios.put(API_URL + 'account/profile/edit', userData, {
+        const response = await axiosInstance.put(API_URL + 'account/profile/edit', userData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào headers
                 'Content-Type': 'application/json', // Đảm bảo định dạng JSON
@@ -112,7 +112,7 @@ export const updateProfile = async (userData) => {
 
 export const getAddressesUser = async () => {
     try {
-        const response = await axios.get(API_URL + 'account/address', {
+        const response = await axiosInstance.get(API_URL + 'account/address', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
@@ -165,7 +165,7 @@ export const deleteAddressUser = async (address_id) => {
 
 export const getVouchersUser = async () => {
     try {
-        const response = await axios.get(API_URL + 'account/voucher', {
+        const response = await axiosInstance.get(API_URL + 'account/voucher', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
@@ -285,5 +285,37 @@ export const updateManyClientType = async (userIds, clientType) => {
         return response.data
     } catch (error) {
         throw error
+    }
+}
+
+export const setDefaultAddressUser = async (address_id) => {
+    try {
+        const response = await axiosInstance.put(
+            `account/address/setdefault/${address_id}`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || error.message);
+    }
+}
+
+export const getOrderUser = async (status) => {
+    try {
+        const response = await axiosInstance.get('purchase', {
+            params: { filterStatus: status },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
     }
 }

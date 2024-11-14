@@ -91,7 +91,7 @@ button:disabled {
     opacity: 0;
 }
 
-.input-checkbox:checked + .custom-checkbox::after {
+.input-checkbox:checked+.custom-checkbox::after {
     opacity: 1;
 }
 
@@ -163,6 +163,7 @@ input[type='number'] {
 
     .page-item {
         margin: 0 5px;
+
         .page-link {
             height: 35px;
             width: 35px;
@@ -201,6 +202,7 @@ input[type='number'] {
     transition: 300ms;
     color: #000;
     font-weight: 500;
+
     &:hover {
         .options {
             z-index: 1;
@@ -246,12 +248,12 @@ input[type='number'] {
     z-index: -1;
 }
 
-.select:hover > .options {
+.select:hover>.options {
     opacity: 1;
     top: 0;
 }
 
-.select:hover > .selected .arrow {
+.select:hover>.selected .arrow {
     transform: rotate(0deg);
 }
 
@@ -263,6 +265,7 @@ input[type='number'] {
     width: 100%;
     font-size: 15px;
 }
+
 .option:hover {
     background-color: #000;
     color: white;
@@ -275,15 +278,16 @@ input[type='number'] {
 .options label {
     display: inline-block;
 }
+
 .options label::before {
     content: attr(data-txt);
 }
 
-.options input[type='radio']:checked + label {
+.options input[type='radio']:checked+label {
     display: none;
 }
 
-.options input[type='radio']#all:checked + label {
+.options input[type='radio']#all:checked+label {
     display: none;
 }
 
@@ -292,21 +296,25 @@ input[type='number'] {
 .select:has(.options input[type='radio']#all-v3:checked) .selected::before {
     content: attr(data-default);
 }
+
 .select:has(.options input[type='radio']#option-1:checked) .selected::before,
 .select:has(.options input[type='radio']#option-1-v2:checked) .selected::before,
 .select:has(.options input[type='radio']#option-1-v3:checked) .selected::before {
     content: attr(data-one);
 }
+
 .select:has(.options input[type='radio']#option-2:checked) .selected::before,
 .select:has(.options input[type='radio']#option-2-v2:checked) .selected::before,
 .select:has(.options input[type='radio']#option-2-v3:checked) .selected::before {
     content: attr(data-two);
 }
+
 .select:has(.options input[type='radio']#option-3:checked) .selected::before,
 .select:has(.options input[type='radio']#option-3-v2:checked) .selected::before,
 .select:has(.options input[type='radio']#option-3-v3:checked) .selected::before {
     content: attr(data-three);
 }
+
 .select:has(.options input[type='radio']#option-4:checked) .selected::before,
 .select:has(.options input[type='radio']#option-4-v2:checked) .selected::before,
 .select:has(.options input[type='radio']#option-4-v3:checked) .selected::before {
@@ -389,4 +397,10 @@ textarea {
 
 .theme-checkbox:checked {
     background-position: 100%;
+}
+
+//close, success button
+.btn-outline-danger,
+.btn-outline-success {
+    color: #000;
 }

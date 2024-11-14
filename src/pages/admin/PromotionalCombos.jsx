@@ -5,14 +5,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faCircleInfo, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { getPromotionalCombosAction, deleteManyPromotionalCombosAction } from '../../redux/slices/promotionalComboSlice'
+import { getPromotionalCombosAction, deleteManyPromotionalCombosAction, getPromotionalComboByIdAction } from '../../redux/slices/promotionalComboSlice'
 import Modal from 'react-bootstrap/Modal'
 import Notification from '../../components/Notification'
 
 function PromotionalCombos() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { promotionalCombos, status } = useSelector((state) => state.promotionalCombo)
+    const { promotionalCombos, promotionalCombo, status } = useSelector((state) => state.promotionalCombo)
     const [filteredPromotionalCombos, setFilteredPromotionalCombos] = useState([])
     const [filter, setFilter] = useState({
         name: '',
@@ -22,6 +22,8 @@ function PromotionalCombos() {
     })
     const [selectedCombos, setSelectedCombos] = useState([])
     const [selectedComboIds, setSelectedComboIds] = useState([])
+    const [showDetailCombo, setShowDetailCombo] = useState(false)
+    const [comboVoucherId, setComboVoucherId] = useState(null)
     const [bulkAction, setBulkAction] = useState('')
     const [notification, setNotification] = useState({
         show: false,
@@ -85,6 +87,30 @@ function PromotionalCombos() {
             }
         }
     }
+
+    const handleShowDetailCombo = (id) => {
+        setComboVoucherId(id)
+        setShowDetailCombo(true)
+    }
+
+    const handleCloseCombo = () => {
+        setComboVoucherId(null)
+        setShowDetailCombo(false)
+    }
+
+    const fetchComboVoucherById = async (combo_id) => {
+        try {
+            await dispatch(getPromotionalComboByIdAction(combo_id))
+        } catch (error) {
+            console.error('Error fetching combo voucher:', error)
+        }
+    }
+
+    useEffect(() => {
+        if (comboVoucherId) {
+            fetchComboVoucherById(comboVoucherId)
+        }
+    }, [comboVoucherId])
 
     useEffect(() => {
         dispatch(getPromotionalCombosAction())
@@ -239,7 +265,8 @@ function PromotionalCombos() {
                                 <div className="dot"></div>
                             </section>
                         ) : status === 'failed' ? (
-                            <p>{error}</p>
+                            // <p>{error}</p>
+                            <p>{notification.title}</p>
                         ) : filteredPromotionalCombos.length == 0 ? (
                             <p className="fs-3 fw-medium text-center">Không có combo nào</p>
                         ) : (
@@ -271,13 +298,12 @@ function PromotionalCombos() {
                                         ))}
                                     </div>
                                     <p
-                                        className={`fs-4 fw-medium text-center ${
-                                            new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
-                                                ? 'text-success'
-                                                : new Date() > new Date(combo.endDate)
+                                        className={`fs-4 fw-medium text-center ${new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
+                                            ? 'text-success'
+                                            : new Date() > new Date(combo.endDate)
                                                 ? 'text-danger'
                                                 : 'text-warning'
-                                        }`}
+                                            }`}
                                     >
                                         {(new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate) && 'Đang diễn ra') ||
                                             (new Date() > new Date(combo.endDate) && 'Đã kết thúc') ||
@@ -288,7 +314,7 @@ function PromotionalCombos() {
                                     </p>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon icon={faPen} className="fs-3 my-2 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/combo/edit/${combo._id}`)} />
-                                        <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" />
+                                        <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => handleShowDetailCombo(combo._id)} />
                                         <FontAwesomeIcon icon={faTrash} className="fs-3 my-2 p-2 hover-icon text-danger" onClick={() => setSelectedComboIds([combo._id])} />
                                     </div>
                                 </div>
@@ -314,6 +340,82 @@ function PromotionalCombos() {
             {notification.show && (
                 <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
                     <Notification type={notification.type} title={notification.title} description={notification.description} />
+                </Modal>
+            )}
+            {showDetailCombo && (
+                <Modal show={showDetailCombo} onHide={handleCloseCombo} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fs-2 fw-bold text-dark">Chi tiết voucher giảm giá</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {status === 'loading' ? (
+                            <div className="text-center">
+                                <div className="spinner-border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        ) : promotionalCombo ? (
+                            <div className="voucher-details p-3 border rounded ">
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Tên combo voucher:</strong>
+                                    <span className="fs-4 fw-normal">{promotionalCombo.name}</span>
+                                </div>
+                                <div className="">
+                                    <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
+                                        <strong className="fs-4 mb-3">Danh sách sản phẩm: </strong>
+                                        {promotionalCombo.products?.map((product) => (
+                                            <div key={product._id} className="d-flex flex-column my-2 ms-4">
+                                                <div className="d-flex align-items-center">
+                                                    <img src={product.urlImage[0]} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                    <p className="fs-4 fw-medium overflow-hidden text-nowrap ms-2" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                        {product.name}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="d-flex justify-content-between my-2 fs-4">
+                                    <strong>Giới hạn sử dụng combo cho 1 đơn hàng:</strong>
+                                    <span>{promotionalCombo.limitCombo}</span>
+                                </div>
+                                <div className="d-flex flex-column justify-content-start mb-3 fs-4">
+                                    <strong>Chi tiết giảm giá:</strong>
+                                    <div className="ms-4">
+                                        {promotionalCombo.discountCombos.map((discount) => (
+                                            <p key={discount._id} className="fs-4 fw-medium">
+                                                Mua {discount.quantity} sản phẩm để được giảm {discount.discountValue}
+                                                {promotionalCombo.comboType === 'percentage' ? '%' : 'đ'}
+                                            </p>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="d-flex justify-content-between mb-3 fs-4">
+                                    <strong>Ngày bắt đầu:</strong>
+                                    <span>{new Date(promotionalCombo.startDate).toLocaleDateString()}</span>
+                                </div>
+                                <div className="d-flex justify-content-between fs-4">
+                                    <strong>Ngày hết hạn:</strong>
+                                    <span>{new Date(promotionalCombo.endDate).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <section className="dots-container mt-4">
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                                <div className="dot"></div>
+                            </section>
+                        )}
+                        {console.log(promotionalCombo)}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseCombo}>
+                            <p>Đóng</p>
+                        </div>
+                    </Modal.Footer>
                 </Modal>
             )}
         </div>

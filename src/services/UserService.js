@@ -319,3 +319,19 @@ export const getOrderUser = async (status) => {
         throw error;
     }
 }
+
+export const getOrdersByUserId = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`purchase/orders/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        throw error;
+    }
+}
+
+

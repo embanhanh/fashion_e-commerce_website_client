@@ -63,3 +63,17 @@ export const deleteManyProducts = async (product_names) => {
         throw error
     }
 }
+
+export const ratingProduct = async (productId, ratingData) => {
+    try {
+        const response = await axios.post(`${API_URL}rating/${productId}`, ratingData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

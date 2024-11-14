@@ -16,6 +16,7 @@ import {
     unblockManyClient,
     updateManyClientType,
     getOrderUser,
+    getOrdersByUserId,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -92,6 +93,8 @@ export const fetchOrderUser = createAsyncThunk('user/fetchOrderUser', async (_, 
     }
 })
 
+
+
 export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
     try {
         const response = await getVouchersUser()
@@ -164,6 +167,18 @@ export const unblockManyClientAction = createAsyncThunk('user/unblockManyClient'
     }
 })
 
+export const fetchOrdersByUserId = createAsyncThunk(
+    'user/fetchOrdersByUserId',
+    async (userId, { rejectWithValue }) => {
+        try {
+            const response = await getOrdersByUserId(userId)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -186,6 +201,7 @@ const userSlice = createSlice({
             orderCount: '',
             clientType: '',
         },
+        userOrders: [],
     },
     reducers: {
         setOrderFilters: (state, action) => {
@@ -387,6 +403,19 @@ const userSlice = createSlice({
             })
             .addCase(unblockManyClientAction.rejected, (state, action) => {
                 state.error = action.payload
+            })
+            .addCase(fetchOrdersByUserId.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchOrdersByUserId.fulfilled, (state, action) => {
+                state.loading = false
+                state.userOrders = action.payload
+            })
+            .addCase(fetchOrdersByUserId.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+                console.error('Error fetching user orders:', action.payload)
             })
     },
 })

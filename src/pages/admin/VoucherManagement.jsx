@@ -337,12 +337,12 @@ const VoucherManagement = () => {
                                                     voucher.voucherType === 'all' && voucher.discountType === 'percentage'
                                                         ? voucherImages[3]
                                                         : voucher.voucherType === 'all' && voucher.discountType === 'fixedamount'
-                                                        ? voucherImages[2]
-                                                        : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
-                                                        ? voucherImages[1]
-                                                        : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
-                                                        ? voucherImages[0]
-                                                        : null
+                                                            ? voucherImages[2]
+                                                            : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
+                                                                ? voucherImages[1]
+                                                                : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
+                                                                    ? voucherImages[0]
+                                                                    : null
                                                 }
                                                 alt=""
                                                 style={{ width: '120px', height: '50px', objectFit: 'cover' }}
@@ -357,13 +357,12 @@ const VoucherManagement = () => {
                                         <p className="fs-4 fw-medium text-center">{voucher.used}</p>
                                         <div>
                                             <p
-                                                className={`text-center fw-medium ${
-                                                    new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
+                                                className={`text-center fw-medium ${new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
                                                         ? 'text-success'
                                                         : new Date() > new Date(voucher.validUntil)
-                                                        ? 'text-danger'
-                                                        : 'text-warning'
-                                                }`}
+                                                            ? 'text-danger'
+                                                            : 'text-warning'
+                                                    }`}
                                             >
                                                 {(new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil) && 'Đang diễn ra') ||
                                                     (new Date() > new Date(voucher.validUntil) && 'Đã kết thúc') ||
@@ -408,7 +407,7 @@ const VoucherManagement = () => {
             {showDetailVoucher && (
                 <Modal show={showDetailVoucher} onHide={handleCloseVoucher} centered>
                     <Modal.Header closeButton>
-                        <Modal.Title className="fs-2 fw-bold text-primary">Chi tiết voucher giảm giá</Modal.Title>
+                        <Modal.Title className="fs-2 fw-bold">Chi tiết voucher giảm giá</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {status === 'loading' ? (
@@ -425,12 +424,12 @@ const VoucherManagement = () => {
                                             currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'percentage'
                                                 ? voucherImages[3]
                                                 : currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'fixedamount'
-                                                ? voucherImages[2]
-                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'percentage'
-                                                ? voucherImages[1]
-                                                : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'fixedamount'
-                                                ? voucherImages[0]
-                                                : null
+                                                    ? voucherImages[2]
+                                                    : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'percentage'
+                                                        ? voucherImages[1]
+                                                        : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'fixedamount'
+                                                            ? voucherImages[0]
+                                                            : null
                                         }
                                         alt=""
                                         style={{ width: '120px', height: '50px', objectFit: 'cover' }}

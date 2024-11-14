@@ -108,13 +108,16 @@ function Adminlayout({ children }) {
                     <Accordion
                         data={[
                             {
-                                title: 'Quản lý khách hàng',
+                                title: 'Chăm sóc khách hàng',
                             },
                         ]}
                         isOpen={true}
                     >
                         <Link className="fs-4 seller-option" to={'/seller/customers'}>
                             Tất cả khách hàng
+                        </Link>
+                        <Link className="fs-4 seller-option" to={'/seller/chat'}>
+                            Chat với khách hàng
                         </Link>
                     </Accordion>
                 </div>

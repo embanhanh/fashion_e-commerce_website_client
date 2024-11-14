@@ -50,7 +50,7 @@ const orderSlice = createSlice({
     name: 'order',
     initialState: {
         orders: [],
-        currentOrder: null,        
+        currentOrder: null,
         filters: {
             status: '',
             productName: '',

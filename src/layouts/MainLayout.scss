@@ -11,7 +11,23 @@
 }
 
 .admin-body {
-    margin-top: var(--header-admin-height);
+    padding-top: var(--header-admin-height);
+}
+
+.admin-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    top: var(--header-admin-height);
+}
+
+.admin-content {
+    margin-left: var(--admin-sidebar-width);
+    min-height: calc(100vh - var(--header-admin-height));
 }
 
 .nav-wrapper {

@@ -32,7 +32,6 @@ import RatingDemo from '../components/RatingDemo.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
-    { path: '/cart', element: Cart },
     {
         path: '/products',
         element: ProductList,
@@ -43,9 +42,14 @@ const publicRoutes = [
     },
     { path: '/user/login', element: Auth, layout: Fragment },
     { path: '/user/signup', element: Auth, layout: Fragment },
+    { path: '/404', element: NotFound, layout: Fragment },
+    { path: '*', element: NotFound, layout: Fragment },
+]
+const privateRoutes = [
     {
         path: '/user/account',
         element: ProfileLayout,
+        allowedRoles: ['user', 'admin'],
         children: [
             { path: 'profile', element: Profile, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
@@ -56,28 +60,27 @@ const publicRoutes = [
             { path: 'settings', element: Settings, layout: Fragment },
         ],
     },
-    { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout },
-    { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout },
-    { path: '/seller/products', element: ProductManagement, layout: Adminlayout },
-    { path: '/seller/shop/infomation', element: ShopManagerment, layout: Adminlayout },
-    { path: '/seller/shop/banner', element: DesignShop, layout: Adminlayout },
-    { path: '/seller/shop/banner/create', element: CreateBanner, layout: Adminlayout },
-    { path: '/seller/shop/banner/edit/:banner_id', element: CreateBanner, layout: Adminlayout },
-    { path: '/seller', element: MainManager, layout: Adminlayout },
-    { path: '/seller/voucher', element: VoucherManagement, layout: Adminlayout },
-    { path: '/seller/voucher/edit/:voucher_id', element: CreateVoucher, layout: Adminlayout },
-    { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout },
-    { path: '/seller/combo', element: PromotionalCombos, layout: Adminlayout },
-    { path: '/seller/combo/create', element: CreatePromotionalCombos, layout: Adminlayout },
-    { path: '/seller/combo/edit/:combo_id', element: CreatePromotionalCombos, layout: Adminlayout },
-    { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
-    { path: '/seller/customers', element: CustomerManagement, layout: Adminlayout },
-    { path: '/seller/chat/:user_id', element: Chat, layout: Adminlayout },
-    { path: '/seller/chat', element: Chat, layout: Adminlayout },
-    { path: '/invoice', element: InvoicePage, layout: Fragment },
-    { path: '/rating', element: RatingDemo, layout: Fragment },
-    { path: '*', element: NotFound, layout: Fragment },
+    { path: '/cart', element: Cart, allowedRoles: ['user', 'admin'] },
+    { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/products', element: ProductManagement, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/shop/infomation', element: ShopManagerment, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/shop/banner', element: DesignShop, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/shop/banner/create', element: CreateBanner, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/shop/banner/edit/:banner_id', element: CreateBanner, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller', element: MainManager, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/voucher', element: VoucherManagement, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/voucher/edit/:voucher_id', element: CreateVoucher, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/voucher/create', element: CreateVoucher, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/combo', element: PromotionalCombos, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/combo/create', element: CreatePromotionalCombos, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/combo/edit/:combo_id', element: CreatePromotionalCombos, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/orders', element: OrderManagement, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/customers', element: CustomerManagement, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/chat/:user_id', element: Chat, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/chat', element: Chat, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/invoice', element: InvoicePage, layout: Fragment, allowedRoles: ['user', 'admin'] },
+    { path: '/rating', element: RatingDemo, layout: Fragment, allowedRoles: ['user', 'admin'] },
 ]
-const privateRoutes = []
 
 export { publicRoutes, privateRoutes }

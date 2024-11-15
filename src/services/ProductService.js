@@ -4,7 +4,11 @@ const API_URL = 'http://localhost:5000/product/'
 
 export const createProduct = async (productData) => {
     try {
-        const response = await axios.post(API_URL + 'create', productData)
+        const response = await axios.post(API_URL + 'create', productData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error
@@ -31,7 +35,11 @@ export const getProductByProductName = async (product_name) => {
 
 export const updateProduct = async (product_name, productData) => {
     try {
-        const response = await axios.put(`${API_URL}edit/${product_name}`, productData)
+        const response = await axios.put(`${API_URL}edit/${product_name}`, productData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error
@@ -40,7 +48,11 @@ export const updateProduct = async (product_name, productData) => {
 
 export const deleteProduct = async (product_name) => {
     try {
-        const response = await axios.delete(`${API_URL}delete/${product_name}`)
+        const response = await axios.delete(`${API_URL}delete/${product_name}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error

@@ -12,12 +12,14 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
 import Chatbot from '../../components/Chatbot'
-
+import { useNavigate } from 'react-router-dom'
 function Home() {
+    const navigate = useNavigate()
     const swiperCategory = useRef(null)
     const swiperReview = useRef(null)
     const dispatch = useDispatch()
     const { banners } = useSelector((state) => state.banner)
+    const { user } = useSelector((state) => state.auth)
 
     useEffect(() => {
         dispatch(fetchBanners())
@@ -25,7 +27,7 @@ function Home() {
 
     return (
         <>
-            <Chatbot />
+            {user?.role !== 'admin' && <Chatbot />}
             <div className="container h-100">
                 <div className="slidesshow-container w-100">
                     <Swiper
@@ -59,7 +61,15 @@ function Home() {
                                 ></div>
                                 <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                                 {banner.elements.button && (
-                                    <button style={{ position: 'absolute', top: `${banner.elements.button.top}%`, left: `${banner.elements.button.left}%` }} className="primary-btn py-3 px-5">
+                                    <button
+                                        onClick={() => {
+                                            if (banner.linkUrl) {
+                                                navigate(banner.linkUrl)
+                                            }
+                                        }}
+                                        style={{ position: 'absolute', top: `${banner.elements.button.top}%`, left: `${banner.elements.button.left}%` }}
+                                        className="primary-btn py-3 px-5"
+                                    >
                                         <p className="fs-1 fw-medium">
                                             {banner.buttonText} <FontAwesomeIcon icon={faArrowRight} />
                                         </p>

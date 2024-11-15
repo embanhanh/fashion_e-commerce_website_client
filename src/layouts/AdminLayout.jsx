@@ -3,38 +3,20 @@ import './MainLayout.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import Accordion from '../components/Accordion'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useLayoutEffect } from 'react'
+import Header from './Header/Header'
 
 function Adminlayout({ children }) {
     const navigate = useNavigate()
+    const location = useLocation()
     useLayoutEffect(() => {
         window.scrollTo(0, 0)
     }, [navigate])
     return (
         <>
             <div className="admin-layout">
-                <div className="position-fixed top-0 start-0 end-0 shadow header-admin">
-                    <div className="container d-flex align-items-center justify-content-between h-100">
-                        <div className="h-100">
-                            <LogoShop type={'dark'} />
-                        </div>
-                        <div className="user-actions-container position-relative d-flex align-items-center">
-                            <img src="" alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
-                            <p className="fs-4 fw-medium me-5 ">Trần Trung Thông</p>
-                            <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
-                                <p className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Tài khoản của tôi</p>
-                                <p className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</p>
-                                <p className="user-action fs-4 fw-medium py-3 px-2 border-bottom" onClick={() => navigate('/system/products')}>
-                                    Quản lý cửa hàng
-                                </p>
-                                <p className="user-action fs-4 fw-medium py-3 px-2">
-                                    <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Header location={location} />
                 <div className="admin-body d-flex bg-body-tertiary">
                     <div className="p-3 bg-white shadow position-fixed start-0 bottom-0 admin-sidebar">
                         <Accordion

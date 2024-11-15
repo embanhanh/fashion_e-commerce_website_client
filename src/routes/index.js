@@ -72,6 +72,7 @@ const publicRoutes = [
     { path: '/seller/combo/edit/:combo_id', element: CreatePromotionalCombos, layout: Adminlayout },
     { path: '/seller/orders', element: OrderManagement, layout: Adminlayout },
     { path: '/seller/customers', element: CustomerManagement, layout: Adminlayout },
+    { path: '/seller/chat/:user_id', element: Chat, layout: Adminlayout },
     { path: '/seller/chat', element: Chat, layout: Adminlayout },
     { path: '/invoice', element: InvoicePage, layout: Fragment },
     { path: '/rating', element: RatingDemo, layout: Fragment },

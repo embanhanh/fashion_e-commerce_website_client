@@ -11,8 +11,10 @@ import Notification from '../../components/Notification'
 import BlockClientModal from '../../components/BlockClientModal'
 import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
 import Modal from 'react-bootstrap/Modal'
+import { useNavigate } from 'react-router-dom'
 
 function CustomerManagement() {
+    const navigate = useNavigate()
     const { clients, clientsLoading } = useSelector((state) => state.user)
     const dispatch = useDispatch()
     const [clientFilters, setClientFilters] = useState({
@@ -333,7 +335,23 @@ function CustomerManagement() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <FontAwesomeIcon icon={faComment} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                                        <FontAwesomeIcon
+                                            icon={faComment}
+                                            onClick={() =>
+                                                navigate(`/seller/chat/${client._id}`, {
+                                                    state: {
+                                                        user: {
+                                                            _id: client._id,
+                                                            name: client.name || client.email.split('@')[0],
+                                                            email: client.email,
+                                                            avatar: client.urlImage,
+                                                        },
+                                                    },
+                                                })
+                                            }
+                                            className="fs-3 p-2 hover-icon"
+                                            color="#4a90e2"
+                                        />
                                     </div>
                                     <p className="fs-4 fw-medium text-center">{client.phone || 'Không có'}</p>
                                     <p className="fs-4 fw-medium text-center">{client.gender || 'Không có'}</p>

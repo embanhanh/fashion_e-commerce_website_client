@@ -83,13 +83,11 @@ function Chatbot() {
                         email: user.email,
                     },
                     unreadCount: 0,
-                    lastMessage: messageObjects[messageObjects.length - 1],
                 })
             } else {
                 await updateDoc(chatHistoryRef, {
                     messages: arrayUnion(...messageObjects),
                     updatedAt: serverTimestamp(),
-                    lastMessage: messageObjects[messageObjects.length - 1],
                     unreadCount: chatMode.mode === 'ai' ? chatHistory.data().unreadCount : increment(1),
                 })
             }

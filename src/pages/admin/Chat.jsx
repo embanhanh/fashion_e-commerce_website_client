@@ -156,6 +156,7 @@ function Chat() {
                                 setSelectedChat(chat)
                                 navigate(`/seller/chat/${chat.user?._id}`, { replace: true })
                                 if (chat.unreadCount > 0) {
+                                    console.log('Đánh dấu tin nhắn đã đọc')
                                     markMessagesAsRead(chat.user?._id)
                                 }
                             }}
@@ -165,7 +166,7 @@ function Chat() {
                                 <div className="chat-name">{chat.user?.name || chat.user?.email?.split('@')[0] || 'Khách hàng'}</div>
                                 <div className="chat-last-message">{convertLastMessage(chat.messages[chat.messages.length - 1]) || 'Chưa có tin nhắn'}</div>
                             </div>
-                            {chat.unreadCount > 0 && <div className="p-1 bg-danger text-white rounded-pill">{chat.unreadCount}</div>}
+                            {chat.unreadCount > 0 && <div className="chat-unread-count">{chat.unreadCount}</div>}
                         </div>
                     ))}
             </div>

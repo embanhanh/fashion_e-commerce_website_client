@@ -1,5 +1,5 @@
 import { db } from '../firebase.config'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, arrayUnion, serverTimestamp, where, getDocs } from 'firebase/firestore'
+import { getDoc, collection, query, orderBy, onSnapshot, doc, updateDoc, setDoc, arrayUnion, serverTimestamp, where, getDocs } from 'firebase/firestore'
 
 // Constants
 const CHAT_COLLECTION = 'chatAIHistory'
@@ -17,7 +17,7 @@ export const createNewChat = async (userData) => {
         updatedAt: serverTimestamp(),
     }
 
-    const docRef = await addDoc(doc(db, CHAT_COLLECTION, userData._id), newChat)
+    const docRef = await setDoc(doc(db, CHAT_COLLECTION, userData._id), newChat)
     return {
         id: docRef.id,
         ...newChat,

@@ -17,9 +17,27 @@ export const createNewChat = async (userData) => {
         updatedAt: serverTimestamp(),
     }
 
-    const docRef = await addDoc(collection(db, CHAT_COLLECTION), newChat)
+    const docRef = await addDoc(doc(db, CHAT_COLLECTION, userData._id), newChat)
     return {
         id: docRef.id,
         ...newChat,
+    }
+}
+
+export const markMessagesAsRead = async (userId) => {
+    const chatRef = doc(db, CHAT_COLLECTION, userId)
+    const chatDoc = await getDoc(chatRef)
+
+    if (chatDoc.exists()) {
+        const chat = chatDoc.data()
+        const updatedMessages = chat.messages.map((msg) => ({
+            ...msg,
+            read: true,
+        }))
+
+        await updateDoc(chatRef, {
+            messages: updatedMessages,
+            unreadCount: 0,
+        })
     }
 }

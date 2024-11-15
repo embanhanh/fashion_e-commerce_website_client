@@ -6,7 +6,7 @@ import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { createNewChat } from '../../utils/firebaseUtils'
+import { createNewChat, markMessagesAsRead } from '../../utils/firebaseUtils'
 import '../../components/Chat.scss'
 function Chat() {
     const [chats, setChats] = useState([])
@@ -46,6 +46,8 @@ function Chat() {
                 setSelectedChat(chatList[0])
                 // Cập nhật URL với user_id của chat đầu tiên
                 navigate(`/seller/chat/${chatList[0].user?._id}`, { replace: true })
+            } else if (selectedChat && selectedChat.unreadCount > 0) {
+                markMessagesAsRead(selectedChat.user?._id)
             }
         })
 
@@ -147,12 +149,23 @@ function Chat() {
                 <h5 className="chat-list-header">Danh sách chat</h5>
                 {chats.length > 0 &&
                     chats.map((chat) => (
-                        <div key={chat.id} className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`} onClick={() => setSelectedChat(chat)}>
+                        <div
+                            key={chat.id}
+                            className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+                            onClick={() => {
+                                setSelectedChat(chat)
+                                navigate(`/seller/chat/${chat.user?._id}`, { replace: true })
+                                if (chat.unreadCount > 0) {
+                                    markMessagesAsRead(chat.user?._id)
+                                }
+                            }}
+                        >
                             <img src={chat.user?.avatar || defaultAvatar} alt="avatar" className="chat-avatar" />
                             <div className="chat-info">
                                 <div className="chat-name">{chat.user?.name || chat.user?.email?.split('@')[0] || 'Khách hàng'}</div>
                                 <div className="chat-last-message">{convertLastMessage(chat.messages[chat.messages.length - 1]) || 'Chưa có tin nhắn'}</div>
                             </div>
+                            {chat.unreadCount > 0 && <div className="p-1 bg-danger text-white rounded-pill">{chat.unreadCount}</div>}
                         </div>
                     ))}
             </div>

@@ -28,6 +28,7 @@ import PromotionalCombos from '../pages/admin/PromotionalCombos.jsx'
 import CreatePromotionalCombos from '../pages/admin/CreatePromotionalCombos.jsx'
 import CustomerManagement from '../pages/admin/CustomerManagement.jsx'
 import Chat from '../pages/admin/Chat.jsx'
+import Statistic from '../pages/admin/Statistic.jsx'
 import RatingDemo from '../components/RatingDemo.jsx'
 
 const publicRoutes = [
@@ -79,6 +80,7 @@ const privateRoutes = [
     { path: '/seller/customers', element: CustomerManagement, layout: Adminlayout, allowedRoles: ['admin'] },
     { path: '/seller/chat/:user_id', element: Chat, layout: Adminlayout, allowedRoles: ['admin'] },
     { path: '/seller/chat', element: Chat, layout: Adminlayout, allowedRoles: ['admin'] },
+    { path: '/seller/statistic', element: Statistic, layout: Adminlayout, allowedRoles: ['admin'] },
     { path: '/invoice', element: InvoicePage, layout: Fragment, allowedRoles: ['user', 'admin'] },
     { path: '/rating', element: RatingDemo, layout: Fragment, allowedRoles: ['user', 'admin'] },
 ]

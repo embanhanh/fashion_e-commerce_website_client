@@ -480,3 +480,17 @@ textarea {
     background-color: #fff8e7;
     color: #ffb020;
 }
+
+// Tab button
+.tab-button.active,
+.tab-button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.tab-button {
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+    background-color: var(--sub-primary-color);
+    color: #fff;
+}

@@ -103,6 +103,18 @@ function Adminlayout({ children }) {
                                 Chat với khách hàng
                             </Link>
                         </Accordion>
+                        <Accordion
+                            data={[
+                                {
+                                    title: 'Dữ liệu thống kê',
+                                },
+                            ]}
+                            isOpen={true}
+                        >
+                            <Link className="fs-4 seller-option" to={'/seller/statistic'}>
+                                Phân tích doanh thu
+                            </Link>
+                        </Accordion>
                     </div>
                     <div className="h-100 p-4 w-100 admin-content">{children}</div>
                 </div>

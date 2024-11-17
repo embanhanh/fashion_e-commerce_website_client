@@ -91,7 +91,7 @@ button:disabled {
     opacity: 0;
 }
 
-.input-checkbox:checked+.custom-checkbox::after {
+.input-checkbox:checked + .custom-checkbox::after {
     opacity: 1;
 }
 
@@ -248,12 +248,12 @@ input[type='number'] {
     z-index: -1;
 }
 
-.select:hover>.options {
+.select:hover > .options {
     opacity: 1;
     top: 0;
 }
 
-.select:hover>.selected .arrow {
+.select:hover > .selected .arrow {
     transform: rotate(0deg);
 }
 
@@ -283,11 +283,11 @@ input[type='number'] {
     content: attr(data-txt);
 }
 
-.options input[type='radio']:checked+label {
+.options input[type='radio']:checked + label {
     display: none;
 }
 
-.options input[type='radio']#all:checked+label {
+.options input[type='radio']#all:checked + label {
     display: none;
 }
 
@@ -330,6 +330,7 @@ input[type='number'] {
     text-overflow: ellipsis;
     line-height: 1.6;
     max-height: calc(1.6em * 2);
+    text-wrap: wrap;
 }
 
 .ellipsis {
@@ -403,4 +404,79 @@ textarea {
 .btn-outline-danger,
 .btn-outline-success {
     color: #000;
+}
+
+// Table
+.page-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    /* overflow: hidden; */
+    border: 1px solid #e5e7eb;
+}
+
+.page-table th,
+.page-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.page-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.page-table th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.page-table th {
+    background-color: var(--sub-primary-color);
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.page-table td {
+    font-size: 1.4rem;
+}
+
+.page-table tbody td {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-table tbody tr {
+    height: 50px;
+}
+
+.table__status {
+    padding: 4px 6px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 1.4rem;
+    overflow: hidden;
+    font-weight: 500;
+}
+
+.table__status.success {
+    background-color: #e7f8f0;
+    color: #41c588;
+}
+
+.table__status.processing {
+    background-color: #e8f1fd;
+    color: #448df2;
+}
+
+.table__status.error {
+    background-color: #feeceb;
+    color: #f36960;
+}
+
+.table__status.warning {
+    background-color: #fff8e7;
+    color: #ffb020;
 }

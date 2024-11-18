@@ -13,6 +13,7 @@ function PromotionalCombos() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { promotionalCombos, promotionalCombo, status } = useSelector((state) => state.promotionalCombo)
+
     const [filteredPromotionalCombos, setFilteredPromotionalCombos] = useState([])
     const [filter, setFilter] = useState({
         name: '',
@@ -105,6 +106,13 @@ function PromotionalCombos() {
             console.error('Error fetching combo voucher:', error)
         }
     }
+
+    useEffect(() => {
+        if (comboVoucherId) {
+            fetchComboVoucherById(comboVoucherId)
+        }
+    }, [comboVoucherId])
+
 
     useEffect(() => {
         if (comboVoucherId) {

@@ -89,6 +89,7 @@ export const getUser = async () => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         })
+
         return response.data
     } catch (error) {
         throw error

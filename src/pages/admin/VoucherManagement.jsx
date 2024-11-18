@@ -358,10 +358,10 @@ const VoucherManagement = () => {
                                         <div>
                                             <p
                                                 className={`text-center fw-medium ${new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
-                                                        ? 'text-success'
-                                                        : new Date() > new Date(voucher.validUntil)
-                                                            ? 'text-danger'
-                                                            : 'text-warning'
+                                                    ? 'text-success'
+                                                    : new Date() > new Date(voucher.validUntil)
+                                                        ? 'text-danger'
+                                                        : 'text-warning'
                                                     }`}
                                             >
                                                 {(new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil) && 'Đang diễn ra') ||

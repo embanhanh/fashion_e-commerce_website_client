@@ -128,8 +128,8 @@ function CreatePromotionalCombos() {
     }
 
     return (
-        <div className="w-75 pb-5">
-            <div className="bg-white border">
+        <div className="d-flex flex-column gap-4 align-items-center pb-5">
+            <div className="bg-white rounded-4 shadow-sm create-promotional-combos-container">
                 <p className="fs-3 fw-medium p-3 border-bottom">Tạo Combo khuyến mãi</p>
                 <div className="p-4">
                     <div className="d-flex mt-5  align-items-center">
@@ -286,7 +286,7 @@ function CreatePromotionalCombos() {
                     </div>
                 </div>
             </div>
-            <div className="bg-white border mt-3">
+            <div className="bg-white rounded-4 shadow-sm create-promotional-combos-container">
                 <p className="fs-3 fw-medium p-3 border-bottom">Sản phẩm của Combo khuyến mãi</p>
                 <div className="p-4">
                     <p className="fs-4">Đã có {comboData.products.length} sản phẩm được chọn</p>
@@ -301,7 +301,7 @@ function CreatePromotionalCombos() {
             <section className="d-flex flex-row-reverse mt-4">
                 <div className="">
                     <div className="d-flex flex-row-reverse">
-                        <button className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0" onClick={handleSubmit}>
+                        <button className="primary-btn px-4 py-2 shadow-none ms-4 rounded-4" onClick={handleSubmit}>
                             <p>Xác nhận</p>
                             {loading && (
                                 <div className="dot-spinner ms-4">
@@ -315,7 +315,7 @@ function CreatePromotionalCombos() {
                                 </div>
                             )}
                         </button>
-                        <button className="border px-3 ms-4 bg-white" onClick={() => navigate(-1)}>
+                        <button className="border px-4 py-2 ms-4 bg-white rounded-4" onClick={() => navigate(-1)}>
                             <p>Hủy</p>
                         </button>
                     </div>

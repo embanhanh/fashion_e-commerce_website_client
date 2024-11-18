@@ -27,10 +27,10 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/products'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/products' ? 'active' : ''}`} to={'/seller/products'}>
                                 Tất cả sản phẩm
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/products/create'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/products/create' ? 'active' : ''}`} to={'/seller/products/create'}>
                                 Thêm sản phẩm
                             </Link>
                         </Accordion>
@@ -42,11 +42,13 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/orders'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/orders' ? 'active' : ''}`} to={'/seller/orders'}>
                                 Tất cả đơn hàng
                             </Link>
                             <Link className="fs-4 seller-option">Đơn hủy</Link>
-                            <Link className="fs-4 seller-option">Trả hàng/hoàn tiền</Link>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/orders/refund' ? 'active' : ''}`} to={'/seller/orders/refund'}>
+                                Trả hàng/hoàn tiền
+                            </Link>
                             <Link className="fs-4 seller-option">Cài đặt vận chuyển</Link>
                         </Accordion>
                         <Accordion
@@ -57,13 +59,13 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/shop/infomation'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/shop/infomation' ? 'active' : ''}`} to={'/seller/shop/infomation'}>
                                 Hồ sơ Shop
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/shop/banner'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/shop/banner' ? 'active' : ''}`} to={'/seller/shop/banner'}>
                                 Banner của Shop
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/shop/banner/create'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/shop/banner/create' ? 'active' : ''}`} to={'/seller/shop/banner/create'}>
                                 Tạo banner
                             </Link>
                         </Accordion>
@@ -75,16 +77,16 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/voucher'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/voucher' ? 'active' : ''}`} to={'/seller/voucher'}>
                                 Mã khuyến mãi của Shop
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/voucher/create'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/voucher/create' ? 'active' : ''}`} to={'/seller/voucher/create'}>
                                 Tạo mã khuyến mãi
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/combo'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/combo' ? 'active' : ''}`} to={'/seller/combo'}>
                                 Combo khuyến mãi
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/combo/create'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/combo/create' ? 'active' : ''}`} to={'/seller/combo/create'}>
                                 Tạo combo khuyến mãi
                             </Link>
                         </Accordion>
@@ -96,10 +98,10 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/customers'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/customers' ? 'active' : ''}`} to={'/seller/customers'}>
                                 Tất cả khách hàng
                             </Link>
-                            <Link className="fs-4 seller-option" to={'/seller/chat'}>
+                            <Link className={`fs-4 seller-option ${location.pathname.includes('/seller/chat') ? 'active' : ''}`} to={'/seller/chat'}>
                                 Chat với khách hàng
                             </Link>
                         </Accordion>
@@ -111,7 +113,7 @@ function Adminlayout({ children }) {
                             ]}
                             isOpen={true}
                         >
-                            <Link className="fs-4 seller-option" to={'/seller/statistic'}>
+                            <Link className={`fs-4 seller-option ${location.pathname === '/seller/statistic' ? 'active' : ''}`} to={'/seller/statistic'}>
                                 Phân tích doanh thu
                             </Link>
                         </Accordion>

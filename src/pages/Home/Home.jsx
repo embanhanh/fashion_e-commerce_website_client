@@ -1,7 +1,6 @@
-import './Home.scss'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Navigation, Pagination } from 'swiper/modules'
-import banner1 from '../../assets/image/banner/banner1.png'
+import model1 from '../../assets/image/brand/person-1.png'
 import banner2 from '../../assets/image/banner/banner2.png'
 import cay1 from '../../assets/image/category_image/men_wear_category.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -13,6 +12,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
 import Chatbot from '../../components/Chatbot'
 import { useNavigate } from 'react-router-dom'
+import './Home.scss'
+
 function Home() {
     const navigate = useNavigate()
     const swiperCategory = useRef(null)
@@ -28,11 +29,11 @@ function Home() {
     return (
         <>
             {user?.role !== 'admin' && <Chatbot />}
-            <div className="container h-100">
-                <div className="slidesshow-container w-100">
+            <div className="slideshow-background w-100">
+                <div className="slideshow-container container">
                     <Swiper
                         style={{
-                            '--swiper-pagination-color': '#fff',
+                            '--swiper-pagination-color': 'var(--theme-color-1)',
                         }}
                         pagination={{
                             clickable: true,
@@ -40,86 +41,60 @@ function Home() {
                         modules={[Autoplay, Pagination, Navigation]}
                         className="mySwiper"
                         autoplay={{
-                            delay: 2000,
+                            delay: 5000,
                             disableOnInteraction: false,
                         }}
                         loop={true}
                     >
                         {banners.map((banner) => (
                             <SwiperSlide key={banner._id}>
-                                <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={banner.imageUrl} loading="lazy" />
-                                <div
-                                    className="banner-overlay"
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        height: '100%',
-                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)',
-                                    }}
-                                ></div>
+                                <img className="banner-image" src={model1} loading="lazy" />
+                                <div></div>
                                 <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                {banner.elements.button && (
-                                    <button
-                                        onClick={() => {
-                                            if (banner.linkUrl) {
-                                                navigate(banner.linkUrl)
-                                            }
-                                        }}
-                                        style={{ position: 'absolute', top: `${banner.elements.button.top}%`, left: `${banner.elements.button.left}%` }}
-                                        className="primary-btn py-3 px-5"
-                                    >
-                                        <p className="fs-1 fw-medium">
-                                            {banner.buttonText} <FontAwesomeIcon icon={faArrowRight} />
-                                        </p>
-                                    </button>
-                                )}
-                                {banner.elements.title && (
-                                    <h2
-                                        className="text-white fw-bold"
-                                        style={{
-                                            padding: 8,
-                                            fontSize: '4.8rem',
-                                            maxWidth: '600px',
-                                            textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
-                                            position: 'absolute',
-                                            top: `${banner.elements.title.top}%`,
-                                            left: `${banner.elements.title.left}%`,
-                                        }}
-                                    >
-                                        {banner.title}
-                                    </h2>
-                                )}
-                                {banner.elements.description && (
-                                    <p
-                                        className="text-white fw-medium"
-                                        style={{
-                                            fontSize: '3rem',
-                                            padding: 8,
-                                            maxWidth: '600px',
-                                            textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
-                                            position: 'absolute',
-                                            top: `${banner.elements.description.top}%`,
-                                            left: `${banner.elements.description.left}%`,
-                                        }}
-                                    >
-                                        {banner.description}
+                                <button onClick={() => {}} className="primary-btn py-3 px-5 rounded-5 banner-button">
+                                    <p className="fs-1 fw-bold">
+                                        Khám phá ngay <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
                                     </p>
-                                )}
+                                </button>
+                                <h2 className="banner-title">Phong cách độc đáo - giá cực tốt</h2>
+                                <p className="banner-description">
+                                    Thời trang phong cách với mức giá không thể bỏ lỡ. Mua sắm ngay hôm nay! asd asd á d á d asd á d á da sd á d a dsa d á dá d asd á d á d asdas á dá á sa á dá dá á da
+                                </p>
                             </SwiperSlide>
                         ))}
                     </Swiper>
+                    <div className="slideshow-img-content">
+                        <div className="water-drops">
+                            {[...Array(20)].map((_, index) => (
+                                <div key={`sparkle-${index}`} className={`sparkle sparkle-${index + 1}`} />
+                            ))}
+
+                            <div className="ripple" />
+                            <div className="ripple" />
+                            <div className="ripple" />
+                            {[...Array(8)].map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`drop-${index + 1}`}
+                                    style={{
+                                        animationDelay: `${index * 0.5}s`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div className="container h-100">
                 <div className=" container max-md p-5">
                     <div className="content-category w-100 py-5">
                         <div className="header-category d-flex justify-content-between align-items-center">
                             <p className="shop-sm-title">Danh Mục</p>
-                            <div className="d-flex">
-                                <div className="primary-btn btn-ssm" onClick={() => swiperCategory.current.swiper.slidePrev()}>
+                            <div className="d-flex gap-3">
+                                <div className="primary-btn px-3 rounded-4" onClick={() => swiperCategory.current.swiper.slidePrev()}>
                                     <FontAwesomeIcon icon={faArrowLeft} size="xl" />
                                 </div>
-                                <div className="primary-btn btn-ssm ms-3" onClick={() => swiperCategory.current.swiper.slideNext()}>
+                                <div className="primary-btn px-3 rounded-4" onClick={() => swiperCategory.current.swiper.slideNext()}>
                                     <FontAwesomeIcon icon={faArrowRight} size="xl" />
                                 </div>
                             </div>

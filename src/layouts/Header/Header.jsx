@@ -25,6 +25,24 @@ function Header({ location }) {
     const { shopInfo } = useSelector((state) => state.shop)
     const [navOption, setNavOption] = useState('Trang chủ')
     const [notifications, setNotifications] = useState([])
+    const [isScrollPastHero, setIsScrollPastHero] = useState(false)
+    const [isHeaderFixed, setIsHeaderFixed] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const heroSection = document.querySelector('.slideshow-background')
+            if (heroSection) {
+                const heroBottom = heroSection.offsetTop + heroSection.offsetHeight
+                const scrollPosition = window.scrollY
+                setIsScrollPastHero(scrollPosition > heroBottom - 100) // -100 để transition mượt hơn
+                setIsHeaderFixed(scrollPosition >= heroBottom)
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
     useLayoutEffect(() => {
         window.scrollTo(0, 0)
     }, [navigate])
@@ -93,7 +111,12 @@ function Header({ location }) {
 
     return (
         <>
-            <div className={`header d-flex  ${(location.pathname === '/' || location.pathname.includes('/seller')) && 'position-fixed top-0 end-0 start-0 '} shadow`}>
+            <div
+                className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
+            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''} ${
+                    location.pathname.includes('/seller') ? 'header-fixed shadow' : ''
+                }`}
+            >
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">
                         <Link to={'/'} className="d-flex h-100 align-items-center">
@@ -116,7 +139,7 @@ function Header({ location }) {
                                     </Link>
                                 ))}
                                 {location.pathname !== '/products' && (
-                                    <div className="nav-shop-category z-3 max-md row g-2 rounded-4 px-4 py-3 shadow-lg ">
+                                    <div className="nav-shop-category max-md row g-2 rounded-4 px-4 py-3 shadow-lg ">
                                         {status === 'loading' ? (
                                             <div className="dots-container mt-4">
                                                 <div className="dot"></div>
@@ -146,12 +169,12 @@ function Header({ location }) {
                     <div className="header-section d-flex">
                         {isLoggedIn ? (
                             <>
-                                <div className="d-flex align-items-center">
-                                    <div className="p-2 notification-container rounded-3 position-relative">
+                                <div className="d-flex align-items-center gap-3">
+                                    <div className="p-2 notification-container  rounded-3 position-relative">
                                         <FontAwesomeIcon className="fs-2" icon={faBell} />
                                         {notifications.length > 0 && <span className="notification-count">{notifications.length}</span>}
-                                        <div className="notification-mini position-absolute shadow rounded-3 p-4">
-                                            <div className="mb-3 notification-item-container">
+                                        <div className="notification-mini position-absolute shadow rounded-4 p-4">
+                                            <div className="mb-3 notification-item-container scrollbar-y">
                                                 {notifications.length === 0 ? (
                                                     <p className="fs-4 text-center">Không có thông báo nào</p>
                                                 ) : (
@@ -169,7 +192,7 @@ function Header({ location }) {
                                         <div className="p-2 cart-container rounded-3 position-relative mx-3" onClick={() => navigate('/cart')}>
                                             <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
                                             {cart && cart.items && cart.items.length > 0 && <span className="cart-count">{cart.items.length}</span>}
-                                            <div className="cart-mini position-absolute shadow rounded-3 p-4">
+                                            <div className="cart-mini position-absolute shadow rounded-4 p-4">
                                                 {cartStatus === 'loading' ? (
                                                     <section className="dots-container mt-4">
                                                         <div className="dot"></div>
@@ -180,7 +203,7 @@ function Header({ location }) {
                                                     </section>
                                                 ) : (
                                                     <>
-                                                        <div className="mb-3 cart-product-container">
+                                                        <div className="mb-3 cart-product-container scrollbar-y">
                                                             {cartStatus === 'succeeded' && cart.items.length === 0 ? (
                                                                 <div className="d-flex justify-content-center align-items-center">
                                                                     <img src={cartEmpty} alt="" style={{ width: 300, height: 300, objectFit: 'cover' }} />
@@ -205,8 +228,8 @@ function Header({ location }) {
                                                         {cartStatus === 'succeeded' && cart.items.length > 0 && (
                                                             <div className="d-flex justify-content-between align-items-center">
                                                                 <p className="fs-4 fw-medium">{cart.items.length} sản phẩm có trong giỏ hàng</p>
-                                                                <div className="primary-btn p-3 shadow-none" onClick={() => navigate('/cart')}>
-                                                                    <p>Xem giỏ hàng</p>
+                                                                <div className="primary-btn fs-3 p-3 shadow-none" onClick={() => navigate('/cart')}>
+                                                                    Xem giỏ hàng
                                                                 </div>
                                                             </div>
                                                         )}
@@ -217,7 +240,7 @@ function Header({ location }) {
                                     )}
                                     <div className="user-actions-container position-relative d-flex align-items-center" style={{ minWidth: 200 }}>
                                         <img src={user?.urlImage || defaultAvatar} alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
-                                        <p className="fs-4 fw-medium me-5 ">{user?.name || user?.email.split('@')[0]}</p>
+                                        <p className="fs-4 fw-bold me-5 ">{user?.name || user?.email.split('@')[0]}</p>
                                         <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
                                             <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/profile'}>
                                                 Tài khoản của tôi
@@ -237,7 +260,7 @@ function Header({ location }) {
                             </>
                         ) : (
                             <div
-                                className="primary-btn btn-sm"
+                                className="primary-btn btn-sm fw-bold"
                                 onClick={() => {
                                     navigate('/user/login')
                                 }}

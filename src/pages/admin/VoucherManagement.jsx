@@ -149,8 +149,8 @@ const VoucherManagement = () => {
 
     return (
         <>
-            <div className=" pb-5">
-                <div className="bg-white border">
+            <div className=" pb-5 px-4 d-flex flex-column gap-4">
+                <div className="bg-white rounded-4 shadow-sm">
                     <p className="fs-3 fw-medium p-3 border-bottom">Quản lý Voucher</p>
                     <div className="row p-3 g-4">
                         <div className="col-6 d-flex align-items-center">
@@ -196,7 +196,7 @@ const VoucherManagement = () => {
                         </button>
                     </div>
                 </div>
-                <div className="bg-white border mt-3">
+                <div className="bg-white rounded-4 shadow-sm">
                     <p className="fs-3 fw-medium p-3 border-bottom">Danh sách voucher</p>
                     <div className="p-3 d-flex align-items-center justify-content-between">
                         <p className="fs-3 fw-medium">{filteredVouchers.length} voucher</p>

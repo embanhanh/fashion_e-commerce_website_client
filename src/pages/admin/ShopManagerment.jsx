@@ -155,21 +155,21 @@ function ShopManagerment() {
     ]
 
     return (
-        <div className=" pb-5">
-            <div className="bg-white border">
-                {loading ? (
-                    <div className="dot-spinner ms-4">
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                        <div className="dot-spinner__dot"></div>
-                    </div>
-                ) : (
-                    <>
+        <div className="pb-5 px-4 d-flex flex-column gap-4">
+            {loading ? (
+                <div className="dot-spinner ms-4">
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                    <div className="dot-spinner__dot"></div>
+                </div>
+            ) : (
+                <>
+                    <div className="bg-white rounded-4 shadow-sm">
                         <div className="d-flex justify-content-between align-items-center border-bottom p-3 position-relative">
                             <p className="fs-3 fw-medium  ">Hồ sơ Shop</p>
                         </div>
@@ -279,130 +279,136 @@ function ShopManagerment() {
                                     </div>
                                 </div>
                             </div>
-                            <p className="fs-4 fw-medium">Mạng xã hội</p>
-                            <div className="p-5 ms-5">
-                                <div className="d-flex align-items-center">
-                                    <p className="fs-4 fw-medium form-label">Facebook</p>
-                                    <div className="input-form d-flex align-items-center w-100">
-                                        <input
-                                            type="text"
-                                            name="facebook"
-                                            className="input-text w-100"
-                                            placeholder="Url Facebook"
-                                            value={editedShopInfo?.socialMedia?.facebook}
-                                            onChange={(e) => handleNestedInputChange('socialMedia', 'facebook', e.target.value)}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="d-flex align-items-center my-4">
-                                    <p className="fs-4 fw-medium form-label">Instagram</p>
-                                    <div className="input-form d-flex align-items-center w-100">
-                                        <input
-                                            type="text"
-                                            name="instagram"
-                                            className="input-text w-100"
-                                            placeholder="Url Instagram"
-                                            value={editedShopInfo?.socialMedia?.instagram}
-                                            onChange={(e) => handleNestedInputChange('socialMedia', 'instagram', e.target.value)}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                    <p className="fs-4 fw-medium form-label">Twitter</p>
-                                    <div className="input-form d-flex align-items-center w-100">
-                                        <input
-                                            type="text"
-                                            name="twitter"
-                                            className="input-text w-100"
-                                            placeholder="Url Twitter"
-                                            value={editedShopInfo?.socialMedia?.twitter}
-                                            onChange={(e) => handleNestedInputChange('socialMedia', 'twitter', e.target.value)}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-4 shadow-sm">
+                        <p className="fs-4 fw-medium p-3">Mạng xã hội</p>
+                        <div className="p-5 ms-5">
+                            <div className="d-flex align-items-center">
+                                <p className="fs-4 fw-medium form-label">Facebook</p>
+                                <div className="input-form d-flex align-items-center w-100">
+                                    <input
+                                        type="text"
+                                        name="facebook"
+                                        className="input-text w-100"
+                                        placeholder="Url Facebook"
+                                        value={editedShopInfo?.socialMedia?.facebook}
+                                        onChange={(e) => handleNestedInputChange('socialMedia', 'facebook', e.target.value)}
+                                        disabled={!isEditing}
+                                    />
                                 </div>
                             </div>
-                            <p className="fs-4 fw-medium">Chính sách</p>
-                            <div className="p-5 ms-5">
-                                <div className="d-flex align-items-start">
-                                    <p className="fs-4 fw-medium form-label">Chính sách vận chuyển</p>
-                                    <div className="input-form w-100 h-auto">
-                                        <textarea
-                                            type="text"
-                                            name="shippingPolicy"
-                                            className="input-text w-100 py-2 h-100"
-                                            rows={5}
-                                            placeholder="Chính sách vận chuyển"
-                                            value={editedShopInfo?.shippingPolicy}
-                                            onChange={handleInputChange}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="d-flex align-items-start my-4">
-                                    <p className="fs-4 fw-medium form-label">Chính sách đổi trả</p>
-                                    <div className="input-form w-100 h-auto">
-                                        <textarea
-                                            type="text"
-                                            name="returnPolicy"
-                                            className="input-text w-100 py-2 h-100"
-                                            rows={5}
-                                            placeholder="Chính sách đổi trả"
-                                            value={editedShopInfo?.returnPolicy}
-                                            onChange={handleInputChange}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="d-flex align-items-start">
-                                    <p className="fs-4 fw-medium form-label">Chính sách khuyến mãi</p>
-                                    <div className="input-form w-100 h-auto">
-                                        <textarea
-                                            type="text"
-                                            name="promotionPolicy"
-                                            className="input-text w-100 py-2 h-100"
-                                            rows={5}
-                                            placeholder="Chính sách khuyến mãi"
-                                            value={editedShopInfo?.promotionPolicy}
-                                            onChange={handleInputChange}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
+                            <div className="d-flex align-items-center my-4">
+                                <p className="fs-4 fw-medium form-label">Instagram</p>
+                                <div className="input-form d-flex align-items-center w-100">
+                                    <input
+                                        type="text"
+                                        name="instagram"
+                                        className="input-text w-100"
+                                        placeholder="Url Instagram"
+                                        value={editedShopInfo?.socialMedia?.instagram}
+                                        onChange={(e) => handleNestedInputChange('socialMedia', 'instagram', e.target.value)}
+                                        disabled={!isEditing}
+                                    />
                                 </div>
                             </div>
-                            <p className="fs-4 fw-medium">Giờ làm việc</p>
-                            <div className="px-5 py-3 ms-5">
-                                {daysOfWeek.map(({ key, label }) => (
-                                    <div className="d-flex align-items-center my-3" key={key}>
-                                        <p className="fs-4 fw-medium form-label">{label}</p>
-                                        <div className="input-form d-flex align-items-center">
-                                            <input
-                                                type="time"
-                                                className="input-text px-3"
-                                                value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].open : '08:00'}
-                                                onChange={(e) => handleWorkingHoursChange(key, 'open', e.target.value)}
-                                                disabled={!isEditing}
-                                            />
-                                        </div>
-                                        <span className="mx-3">-</span>
-                                        <div className="input-form d-flex align-items-center">
-                                            <input
-                                                type="time"
-                                                className="input-text px-3"
-                                                value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].close : '22:00'}
-                                                onChange={(e) => handleWorkingHoursChange(key, 'close', e.target.value)}
-                                                disabled={!isEditing}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="d-flex align-items-center">
+                                <p className="fs-4 fw-medium form-label">Twitter</p>
+                                <div className="input-form d-flex align-items-center w-100">
+                                    <input
+                                        type="text"
+                                        name="twitter"
+                                        className="input-text w-100"
+                                        placeholder="Url Twitter"
+                                        value={editedShopInfo?.socialMedia?.twitter}
+                                        onChange={(e) => handleNestedInputChange('socialMedia', 'twitter', e.target.value)}
+                                        disabled={!isEditing}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </>
-                )}
-            </div>
+                    </div>
+                    <div className="bg-white rounded-4 shadow-sm">
+                        <p className="fs-4 fw-medium p-3">Chính sách</p>
+                        <div className="p-5 ms-5">
+                            <div className="d-flex align-items-start">
+                                <p className="fs-4 fw-medium form-label">Chính sách vận chuyển</p>
+                                <div className="input-form w-100 h-auto">
+                                    <textarea
+                                        type="text"
+                                        name="shippingPolicy"
+                                        className="input-text w-100 py-2 h-100"
+                                        rows={5}
+                                        placeholder="Chính sách vận chuyển"
+                                        value={editedShopInfo?.shippingPolicy}
+                                        onChange={handleInputChange}
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                            </div>
+                            <div className="d-flex align-items-start my-4">
+                                <p className="fs-4 fw-medium form-label">Chính sách đổi trả</p>
+                                <div className="input-form w-100 h-auto">
+                                    <textarea
+                                        type="text"
+                                        name="returnPolicy"
+                                        className="input-text w-100 py-2 h-100"
+                                        rows={5}
+                                        placeholder="Chính sách đổi trả"
+                                        value={editedShopInfo?.returnPolicy}
+                                        onChange={handleInputChange}
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                            </div>
+                            <div className="d-flex align-items-start">
+                                <p className="fs-4 fw-medium form-label">Chính sách khuyến mãi</p>
+                                <div className="input-form w-100 h-auto">
+                                    <textarea
+                                        type="text"
+                                        name="promotionPolicy"
+                                        className="input-text w-100 py-2 h-100"
+                                        rows={5}
+                                        placeholder="Chính sách khuyến mãi"
+                                        value={editedShopInfo?.promotionPolicy}
+                                        onChange={handleInputChange}
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-4 shadow-sm">
+                        <p className="fs-4 fw-medium p-3">Giờ làm việc</p>
+                        <div className="px-5 py-3 ms-5">
+                            {daysOfWeek.map(({ key, label }) => (
+                                <div className="d-flex align-items-center my-3" key={key}>
+                                    <p className="fs-4 fw-medium form-label">{label}</p>
+                                    <div className="input-form d-flex align-items-center">
+                                        <input
+                                            type="time"
+                                            className="input-text px-3"
+                                            value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].open : '08:00'}
+                                            onChange={(e) => handleWorkingHoursChange(key, 'open', e.target.value)}
+                                            disabled={!isEditing}
+                                        />
+                                    </div>
+                                    <span className="mx-3">-</span>
+                                    <div className="input-form d-flex align-items-center">
+                                        <input
+                                            type="time"
+                                            className="input-text px-3"
+                                            value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].close : '22:00'}
+                                            onChange={(e) => handleWorkingHoursChange(key, 'close', e.target.value)}
+                                            disabled={!isEditing}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
             <Modal show={showToast} onHide={() => setShowToast(false)} centered>
                 <Notification type={toastVariant} title="Thông báo" description={toastMessage} />
             </Modal>

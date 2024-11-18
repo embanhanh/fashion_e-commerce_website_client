@@ -1,12 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
     font-weight: 400;
-    --primary-color: #1877f2;
-    --header-height: 100px;
-    --header-admin-height: 100px;
+    font-style: normal;
+    --primary-color: #0b6477;
+    --header-height: 60px;
+    --header-admin-height: 60px;
     --admin-sidebar-width: 20%;
     --sub-primary-color: #35a2eb80;
+    --theme-color: #aee1e1;
+    --theme-color-1: #0b6477;
+    --theme-color-2: #14919b;
+    --theme-color-3: #0ad1c8;
 }
 
 #root {
@@ -16,7 +26,6 @@
 
 html {
     box-sizing: border-box;
-    font-size: 16px;
     scroll-behavior: smooth;
     font-size: 62.5%;
 }
@@ -61,4 +70,10 @@ input:focus {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.itim-regular {
+    font-family: 'Itim', serif;
+    font-weight: 400;
+    font-style: normal;
 }

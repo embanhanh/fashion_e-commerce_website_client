@@ -24,8 +24,7 @@ function Mainlayout({ children }) {
             <div
                 className="h-100 shop-body"
                 style={{
-                    marginTop: location.pathname == '/' ? 'var(--header-height)' : '0px',
-                    backgroundColor: location.pathname.includes('/account') ? '#f5f5f5' : 'transparent'
+                    backgroundColor: location.pathname.includes('/account') ? '#f5f5f5' : 'transparent',
                 }}
             >
                 {children}

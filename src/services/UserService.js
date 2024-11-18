@@ -47,20 +47,8 @@ export const login = async (user) => {
 
 export const register = async (user) => {
     try {
-        const response = await fetch(API_URL + 'register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user),
-        })
-
-        if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.message)
-        }
-
-        return response.json()
+        const response = await axiosInstance.post('register', user)
+        return response.data
     } catch (error) {
         throw error
     }
@@ -68,15 +56,8 @@ export const register = async (user) => {
 
 export const loginWithFirebase = async (token, type) => {
     try {
-        const response = await fetch(API_URL + `login/${type}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(token),
-        })
-
-        return response.json()
+        const response = await axiosInstance.post(`login/${type}`, token)
+        return response.data
     } catch (error) {
         throw error
     }
@@ -299,10 +280,10 @@ export const setDefaultAddressUser = async (address_id) => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             }
-        );
-        return response.data;
+        )
+        return response.data
     } catch (error) {
-        throw new Error(error.response?.data?.message || error.message);
+        throw error
     }
 }
 
@@ -313,11 +294,10 @@ export const getOrderUser = async (status) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-        });
-        return response.data;
+        })
+        return response.data
     } catch (error) {
-        console.error('Error fetching orders:', error);
-        throw error;
+        throw error
     }
 }
 

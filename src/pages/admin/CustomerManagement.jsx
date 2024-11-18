@@ -11,9 +11,11 @@ import Notification from '../../components/Notification'
 import BlockClientModal from '../../components/BlockClientModal'
 import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
 import Modal from 'react-bootstrap/Modal'
+import { useNavigate } from 'react-router-dom'
 
 function CustomerManagement() {
-    const { clients, clientsLoading, user, userOrders } = useSelector((state) => state.user)
+    const navigate = useNavigate()
+    const { clients, clientsLoading } = useSelector((state) => state.user)
     const dispatch = useDispatch()
     const [clientFilters, setClientFilters] = useState({
         name: '',
@@ -346,7 +348,23 @@ function CustomerManagement() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <FontAwesomeIcon icon={faComment} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                                        <FontAwesomeIcon
+                                            icon={faComment}
+                                            onClick={() =>
+                                                navigate(`/seller/chat/${client._id}`, {
+                                                    state: {
+                                                        user: {
+                                                            _id: client._id,
+                                                            name: client.name || client.email.split('@')[0],
+                                                            email: client.email,
+                                                            avatar: client.urlImage,
+                                                        },
+                                                    },
+                                                })
+                                            }
+                                            className="fs-3 p-2 hover-icon"
+                                            color="#4a90e2"
+                                        />
                                     </div>
                                     <p className="fs-4 fw-medium text-center">{client.phone || 'Không có'}</p>
                                     <p className="fs-4 fw-medium text-center">{client.gender || 'Không có'}</p>
@@ -420,9 +438,7 @@ function CustomerManagement() {
             )}
             <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title className="fs-4">
-                        Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}
-                    </Modal.Title>
+                    <Modal.Title className="fs-4">Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="p-3 overflow-y-auto" style={{ maxHeight: '500px' }}>
@@ -435,18 +451,25 @@ function CustomerManagement() {
                                         <p className="fs-4">Ngày đặt: {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
                                     </div>
                                     <div className="mb-2">
-                                        <p className="fs-4">Trạng thái: <span className="ps-2 text-uppercase me-3 fs-4">{order.status === 'processing'
-                                            ? <span className="text-warning">Đang xử lý</span>
-                                            : order.status === 'pending'
-                                                ? <span className="text-pending ">Chờ xác nhận</span>
-                                                : order.status === 'delivering'
-                                                    ? <span className="text-delivering">Đang giao hàng</span>
-                                                    : order.status === 'delivered' ?
-                                                        <span className="text-delivered">Đã giao</span>
-                                                        : order.status === 'cancelled' ?
-                                                            <span className="text-cancelled">Đã hủy</span> : null} </span>
+                                        <p className="fs-4">
+                                            Trạng thái:{' '}
+                                            <span className="ps-2 text-uppercase me-3 fs-4">
+                                                {order.status === 'processing' ? (
+                                                    <span className="text-warning">Đang xử lý</span>
+                                                ) : order.status === 'pending' ? (
+                                                    <span className="text-pending ">Chờ xác nhận</span>
+                                                ) : order.status === 'delivering' ? (
+                                                    <span className="text-delivering">Đang giao hàng</span>
+                                                ) : order.status === 'delivered' ? (
+                                                    <span className="text-delivered">Đã giao</span>
+                                                ) : order.status === 'cancelled' ? (
+                                                    <span className="text-cancelled">Đã hủy</span>
+                                                ) : null}{' '}
+                                            </span>
                                         </p>
-                                        <p className="fs-4">Tổng tiền: <span className="fw-medium">{order.productsPrice.toLocaleString('vi-VN')}đ</span></p>
+                                        <p className="fs-4">
+                                            Tổng tiền: <span className="fw-medium">{order.productsPrice.toLocaleString('vi-VN')}đ</span>
+                                        </p>
                                     </div>
                                     <div className="d-flex justify-content-between">
                                         <div className="w-50">
@@ -454,18 +477,18 @@ function CustomerManagement() {
                                                 <p className="fs-4 fw-medium overflow-y-hidden">Sản phẩm:</p>
                                                 {order.products.map((item, index) => (
                                                     <div key={index} className="d-flex align-items-center mb-2">
-                                                        <img
-                                                            src={item.product.imageUrl}
-                                                            alt="Product image"
-                                                            style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                            className="me-3"
-                                                        />
+                                                        <img src={item.product.imageUrl} alt="Product image" style={{ width: '50px', height: '50px', objectFit: 'cover' }} className="me-3" />
                                                         <div>
                                                             <p className="fs-4">{item.product.product.name}</p>
                                                             <p className="fs-4">Số lượng: {item.quantity}</p>
-                                                            <p className="fs-4">Phân loại hàng: {item.product.product.categories.map((categorie, index) => (
-                                                                <span key={index} className="ms-2">{categorie.name}</span>
-                                                            ))}</p>
+                                                            <p className="fs-4">
+                                                                Phân loại hàng:{' '}
+                                                                {item.product.product.categories.map((categorie, index) => (
+                                                                    <span key={index} className="ms-2">
+                                                                        {categorie.name}
+                                                                    </span>
+                                                                ))}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -474,9 +497,15 @@ function CustomerManagement() {
                                         <div className="w-50 ps-4 border-start">
                                             <div className="mb-3">
                                                 <p className="fs-4 fw-medium">Thông tin giao hàng:</p>
-                                                <p className="fs-4 fw-medium">Người nhận: <span className="fw-normal">{order.shippingAddress?.name}</span></p>
-                                                <p className="fs-4 fw-medium">SĐT: <span className="fw-normal">{order.shippingAddress?.phone}</span></p>
-                                                <p className="fs-4 fw-medium">Địa chỉ: <span className="fw-normal">{order.shippingAddress?.location}</span></p>
+                                                <p className="fs-4 fw-medium">
+                                                    Người nhận: <span className="fw-normal">{order.shippingAddress?.name}</span>
+                                                </p>
+                                                <p className="fs-4 fw-medium">
+                                                    SĐT: <span className="fw-normal">{order.shippingAddress?.phone}</span>
+                                                </p>
+                                                <p className="fs-4 fw-medium">
+                                                    Địa chỉ: <span className="fw-normal">{order.shippingAddress?.location}</span>
+                                                </p>
                                             </div>
 
                                             <div className="mb-3">
@@ -484,9 +513,7 @@ function CustomerManagement() {
                                                 <p className="fs-4">Phương thức: {order.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán sau khi nhận hàng.' : 'Thanh toán qua thẻ.'}</p>
                                                 <p className="fs-4">Tạm tính: {order.productsPrice?.toLocaleString('vi-VN')}đ</p>
                                                 <p className="fs-4">Phí vận chuyển: {order.shippingPrice?.toLocaleString('vi-VN')}đ</p>
-                                                {order.vouchers?.length > 0 && (
-                                                    <p className="fs-4">Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ</p>
-                                                )}
+                                                {order.vouchers?.length > 0 && <p className="fs-4">Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ</p>}
                                                 <p className="fs-4 fw-medium">Tổng cộng: {order.totalPrice?.toLocaleString('vi-VN')}đ</p>
                                             </div>
                                         </div>

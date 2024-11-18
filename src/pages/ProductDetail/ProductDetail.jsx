@@ -41,7 +41,16 @@ function ProductDetail() {
     const [toastVariant, setToastVariant] = useState('success')
 
     useEffect(() => {
-        dispatch(fetchProductByProductName(product_name))
+        const fetchProduct = async () => {
+            try {
+                await dispatch(fetchProductByProductName(product_name)).unwrap()
+            } catch (error) {
+                if (error.status === 404) {
+                    navigate('/404')
+                }
+            }
+        }
+        fetchProduct()
     }, [dispatch, product_name])
 
     useEffect(() => {
@@ -303,7 +312,8 @@ function ProductDetail() {
                                             availableQuantity === 0 ||
                                             !(!currentProduct.variants.some((variant) => variant.color) || selectedColor) ||
                                             !(!currentProduct.variants.some((variant) => variant.size) || selectedSize) ||
-                                            quantity > availableQuantity
+                                            quantity > availableQuantity ||
+                                            user?.role === 'admin'
                                         }
                                         className="cartBtn rounded-4 d-flex align-items-center justify-content-center p-4"
                                     >

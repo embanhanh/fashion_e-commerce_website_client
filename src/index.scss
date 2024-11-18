@@ -1,11 +1,12 @@
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-
     line-height: 1.5;
     font-weight: 400;
     --primary-color: #1877f2;
     --header-height: 100px;
-    --header-admin-height: 60px;
+    --header-admin-height: 100px;
+    --admin-sidebar-width: 20%;
+    --sub-primary-color: #35a2eb80;
 }
 
 #root {
@@ -56,4 +57,8 @@ input:-webkit-autofill {
 
 input:focus {
     outline: none;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }

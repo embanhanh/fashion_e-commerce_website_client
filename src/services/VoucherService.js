@@ -43,7 +43,11 @@ export const updateVoucher = async (voucherId, voucherData) => {
 
 export const deleteVoucher = async (voucherId) => {
     try {
-        const response = await axios.delete(API_URL + 'delete/' + voucherId)
+        const response = await axios.delete(API_URL + 'delete/' + voucherId, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error

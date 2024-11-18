@@ -5,8 +5,9 @@ import { useSelector } from 'react-redux'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { createNewChat, markMessagesAsRead } from '../../utils/firebaseUtils'
 import '../../components/Chat.scss'
-import { useNavigate } from 'react-router-dom'
 function Chat() {
     const [chats, setChats] = useState([])
     const [selectedChat, setSelectedChat] = useState(null)
@@ -14,28 +15,44 @@ function Chat() {
     const messagesEndRef = useRef(null)
     const { user } = useSelector((state) => state.auth)
     const navigate = useNavigate()
+    const { user_id } = useParams()
+    const location = useLocation()
+    const userData = location.state?.user
 
     // Lấy danh sách chat từ Firestore
     useEffect(() => {
         const q = query(collection(db, 'chatAIHistory'), orderBy('updatedAt', 'desc'))
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            console.log('change')
+        const unsubscribe = onSnapshot(q, async (snapshot) => {
             const chatList = []
             snapshot.forEach((doc) => {
                 chatList.push({ id: doc.id, ...doc.data() })
             })
-            console.log(chatList)
             setChats(chatList)
 
             // Chọn chat đầu tiên nếu chưa có chat nào được chọn
-            if (!selectedChat && chatList.length > 0) {
+            if (user_id && chatList.length > 0) {
+                const targetChat = chatList.find((chat) => chat.user?._id === user_id)
+                if (targetChat) {
+                    setSelectedChat(targetChat)
+                    // Cập nhật URL với user_id của chat được chọn
+                    navigate(`/seller/chat/${user_id}`, { replace: true })
+                } else if (userData) {
+                    const newChat = await createNewChat(userData)
+                    setSelectedChat(newChat)
+                }
+            } else if (!selectedChat && chatList.length > 0) {
+                // Nếu không có user_id, chọn chat đầu tiên
                 setSelectedChat(chatList[0])
+                // Cập nhật URL với user_id của chat đầu tiên
+                navigate(`/seller/chat/${chatList[0].user?._id}`, { replace: true })
+            } else if (selectedChat && selectedChat.unreadCount > 0) {
+                markMessagesAsRead(selectedChat.user?._id)
             }
         })
 
         return () => unsubscribe()
-    }, [])
+    }, [user_id])
 
     // Cuộn xuống tin nhắn mới nhất
     const scrollToBottom = () => {
@@ -132,12 +149,24 @@ function Chat() {
                 <h5 className="chat-list-header">Danh sách chat</h5>
                 {chats.length > 0 &&
                     chats.map((chat) => (
-                        <div key={chat.id} className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`} onClick={() => setSelectedChat(chat)}>
+                        <div
+                            key={chat.id}
+                            className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+                            onClick={() => {
+                                setSelectedChat(chat)
+                                navigate(`/seller/chat/${chat.user?._id}`, { replace: true })
+                                if (chat.unreadCount > 0) {
+                                    console.log('Đánh dấu tin nhắn đã đọc')
+                                    markMessagesAsRead(chat.user?._id)
+                                }
+                            }}
+                        >
                             <img src={chat.user?.avatar || defaultAvatar} alt="avatar" className="chat-avatar" />
                             <div className="chat-info">
                                 <div className="chat-name">{chat.user?.name || chat.user?.email?.split('@')[0] || 'Khách hàng'}</div>
                                 <div className="chat-last-message">{convertLastMessage(chat.messages[chat.messages.length - 1]) || 'Chưa có tin nhắn'}</div>
                             </div>
+                            {chat.unreadCount > 0 && <div className="chat-unread-count">{chat.unreadCount}</div>}
                         </div>
                     ))}
             </div>

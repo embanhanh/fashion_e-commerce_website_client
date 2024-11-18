@@ -1,6 +1,6 @@
 import { useEffect, memo, useState, useRef } from 'react'
 import { db } from '../firebase.config'
-import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot } from 'firebase/firestore'
+import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore'
 import { useSelector } from 'react-redux'
 import './Chat.scss'
 
@@ -69,6 +69,7 @@ function Chatbot() {
                 message,
                 user: isUserMessage ? 'client' : null,
                 timestamp: new Date().toISOString(),
+                read: chatMode.mode === 'ai' ? true : false,
             }))
             if (!chatHistory.exists()) {
                 await setDoc(chatHistoryRef, {
@@ -81,11 +82,13 @@ function Chatbot() {
                         avatar: user.urlImage,
                         email: user.email,
                     },
+                    unreadCount: 0,
                 })
             } else {
                 await updateDoc(chatHistoryRef, {
                     messages: arrayUnion(...messageObjects),
                     updatedAt: serverTimestamp(),
+                    unreadCount: chatMode.mode === 'ai' ? chatHistory.data().unreadCount : increment(1),
                 })
             }
         } catch (error) {
@@ -118,10 +121,6 @@ function Chatbot() {
             event.preventDefault()
         }
     }
-
-    useEffect(() => {
-        console.log('chatMode: ', chatMode.mode)
-    }, [chatMode.mode])
 
     const handleChatOpenChanged = (event) => {
         setChatMode((prev) => ({

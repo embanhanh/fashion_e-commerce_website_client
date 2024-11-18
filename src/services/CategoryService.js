@@ -4,7 +4,11 @@ const API_URL = 'http://localhost:5000/category/'
 
 export const createCategory = async (categoryData) => {
     try {
-        const response = await axios.post(API_URL + 'create', categoryData)
+        const response = await axios.post(API_URL + 'create', categoryData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error

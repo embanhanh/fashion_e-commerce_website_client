@@ -11,9 +11,9 @@ import { auth, fbProvider, ggProvider } from '../../firebase.config'
 import brand1 from '../../assets/image/brand/brand-1.png'
 import brand2 from '../../assets/image/brand/brand-2.png'
 import Notification from '../../components/Notification'
-import LogoShop from '../../components/LogoShop'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginWithFirebaseAction, registerUser, loginUser } from '../../redux/slices/authSlice'
+import { getShopInfo } from '../../redux/slices/shopSlice'
 
 function Auth() {
     const dispatch = useDispatch()
@@ -22,6 +22,13 @@ function Auth() {
     const mode = location.pathname == '/user/signup' ? 'signup' : 'login'
     const { from } = location.state || { from: '/' }
     const { isLoggedIn, loading } = useSelector((state) => state.auth)
+    const { shopInfo } = useSelector((state) => state.shop)
+
+    useEffect(() => {
+        if (!shopInfo) {
+            dispatch(getShopInfo())
+        }
+    }, [shopInfo])
 
     useEffect(() => {
         setAuthError('')
@@ -158,16 +165,23 @@ function Auth() {
                         </div>
                     </>
                 )}
-                <div className="w-100 bg-white header h-100">
+                <div className="w-100 bg-white header shadow-sm h-100">
                     <div className="container max-md d-flex justify-content-between align-items-center" style={{ height: 84 }}>
-                        <LogoShop type={'dark'} />
+                        <Link to={'/'} className="h-100">
+                            <img src={shopInfo?.logo} alt="logo" className="h-100" />
+                        </Link>
                         <Link to={'/support'} style={{ cursor: 'pointer' }}>
                             Bạn cần giúp đỡ?
                         </Link>
                     </div>
                 </div>
                 <div className="auth-content w-100 d-flex align-items-center justify-content-center">
-                    <div className="content-container d-flex align-items-center" style={{ width: '800px', backgroundColor: '#fff', height: '500px', boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)' }}>
+                    <div className="auth-water-drops">
+                        {[...Array(12)].map((_, index) => (
+                            <div key={`drop-${index + 1}`} className={`auth-drop-${index + 1}`} />
+                        ))}
+                    </div>
+                    <div className=" d-flex align-items-center" style={{ width: '800px', backgroundColor: '#fff', height: '500px', boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)', zIndex: 100 }}>
                         <div className=" w-50 h-100">
                             <Swiper
                                 style={{

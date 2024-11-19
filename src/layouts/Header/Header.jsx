@@ -8,7 +8,6 @@ import { logout } from '../../redux/slices/authSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { fetchUser } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
-import LogoShop from '../../components/LogoShop'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import cartEmpty from '../../assets/image/default/cart-empty.jpg'
 import { collection, doc, onSnapshot } from 'firebase/firestore'
@@ -114,7 +113,7 @@ function Header({ location }) {
             <div
                 className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
             ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''} ${
-                    location.pathname.includes('/seller') ? 'header-fixed shadow' : ''
+                    location.pathname.includes('/seller') || location.pathname.includes('/products/') ? 'header-fixed shadow' : ''
                 }`}
             >
                 <div className="container d-flex align-items-center justify-content-between">

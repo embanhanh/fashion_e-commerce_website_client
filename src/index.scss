@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Quicksand', sans-serif;
+    // color: var(--theme-color-1);
 }
 
 :root {
@@ -17,6 +18,14 @@
     --theme-color-1: #0b6477;
     --theme-color-2: #14919b;
     --theme-color-3: #0ad1c8;
+    --success-color: #269b24;
+    --error-color: #d10d0d;
+    --warning-color: #db970e;
+    --info-color: #124fff;
+    --success-color-dark: #1e8a1e;
+    --error-color-dark: #b80b0b;
+    --warning-color-dark: #c48609;
+    --info-color-dark: #0e3ecc;
 }
 
 #root {

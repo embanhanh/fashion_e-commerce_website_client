@@ -10,9 +10,9 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
 
     useEffect(() => {
         if (isOpen) {
-            setHeight(`${contentRef.current.scrollHeight}px`)
+            setHeight(`${contentRef.current.scrollHeight + 1}px`)
         } else {
-            setHeight(`${contentRef.current.scrollHeight}px`)
+            setHeight(`${contentRef.current.scrollHeight + 1}px`)
             requestAnimationFrame(() => {
                 setHeight('0px')
             })

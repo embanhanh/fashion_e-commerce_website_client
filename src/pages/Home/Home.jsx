@@ -89,7 +89,7 @@ function Home() {
                 <div className=" container max-md p-5">
                     <div className="content-category w-100 py-5">
                         <div className="header-category d-flex justify-content-between align-items-center">
-                            <p className="shop-sm-title">Danh Mục</p>
+                            <p className="shop-sm-title theme-color">Danh Mục Sản phẩm</p>
                             <div className="d-flex gap-3">
                                 <div className="primary-btn px-3 rounded-4" onClick={() => swiperCategory.current.swiper.slidePrev()}>
                                     <FontAwesomeIcon icon={faArrowLeft} size="xl" />
@@ -103,69 +103,46 @@ function Home() {
                             <Swiper
                                 ref={swiperCategory}
                                 style={{
-                                    '--swiper-pagination-color': '#fff',
+                                    '--swiper-pagination-color': 'var(--theme-color-1)',
                                 }}
                                 pagination={{
                                     clickable: true,
                                 }}
-                                spaceBetween={40}
-                                slidesPerView={4}
+                                spaceBetween={15}
+                                slidesPerView={5}
                                 modules={[Autoplay, Pagination, Navigation]}
                                 className="mySwiper"
                             >
-                                <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                    <div className="primary-btn btn-sm btn-category mb-3 light">
-                                        <p>Mặc giản dị</p>
-                                    </div>
-                                    <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                    <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                    <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                    <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                    <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                </SwiperSlide>
+                                {[...Array(8)].map((_, index) => (
+                                    <SwiperSlide key={index}>
+                                        <img className="rounded-4" style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
+                                        <div className="position-absolute category-item-content ">
+                                            <p className="text-nowrap home-category-title">Thời trang nam</p>
+                                            <button className="primary-btn full-color px-4 py-2 rounded-4">
+                                                <p className="text-nowrap">Khám phá ngay</p>
+                                            </button>
+                                        </div>
+                                        <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                                    </SwiperSlide>
+                                ))}
                             </Swiper>
                         </div>
                     </div>
                     <div className="content-bestseller py-5">
-                        <p className="shop-sm-title text-center">Bán Chạy Nhất</p>
+                        <p className="shop-sm-title text-center theme-color">Bán Chạy Nhất</p>
                         <div className="row">
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
-                                <ProductCard name={'Giày thể thao hhhhhhhhhh jasdasd jasdasda'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
-                                <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.15} rating={5} />
-                            </div>
+                            {[...Array(8)].map((_, index) => (
+                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
+                                    <ProductCard
+                                        url={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNeJa_l26MBy8VuAnFG5ff2SIBCpEP5RdIVA&s'}
+                                        name={'Giày thể thao hhhhhhhhhh jasdasd jasdasda'}
+                                        originalPrice={150000}
+                                        discount={15}
+                                        rating={5}
+                                        isFeature={true}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
 

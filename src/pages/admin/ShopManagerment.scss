@@ -3,9 +3,10 @@
 }
 
 .sticky-button-container {
-    position: sticky;
+    position: fixed;
     top: 90px;
-    z-index: 2;
+    right: 40px;
+    z-index: 100;
     display: flex;
     justify-content: flex-end;
     background-color: transparent; // Semi-transparent background

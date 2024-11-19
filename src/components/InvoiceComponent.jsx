@@ -83,7 +83,7 @@ const InvoiceComponent = ({ orders, shop }) => {
                     <View style={styles.contentContainer}>
                         <View style={styles.titleContainer}>
                             <View style={{ ...styles.titleItem, alignItems: 'center' }}>
-                                <Image style={styles.logo} src={logo} />
+                                <Image style={styles.logo} src={shop?.logo} />
                                 <Text style={styles.reportTitle}>{shop?.name}</Text>
                             </View>
                             <View style={styles.titleItem}>

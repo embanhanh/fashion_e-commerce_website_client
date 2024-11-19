@@ -6,7 +6,7 @@
     padding: 30px;
     width: 400px;
     border-radius: 4px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow: hidden;
 }
 
 .auth-content {
@@ -15,6 +15,9 @@
     background-position: center;
     background-size: cover;
     flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
 }
 
 .auth-container button {
@@ -237,5 +240,97 @@
     50% {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+.auth-water-drops {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+// Tạo 12 giọt nước với các kích thước và vị trí khác nhau
+@for $i from 1 through 12 {
+    .auth-drop-#{$i} {
+        position: absolute;
+        background-color: rgba(11, 100, 119, 0.15);
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+
+        @if $i == 1 {
+            width: 120px;
+            height: 120px;
+            top: -10%;
+            left: 10%;
+            transform: rotate(45deg);
+        } @else if $i == 2 {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 10%;
+            transform: rotate(120deg);
+        } @else if $i == 3 {
+            width: 150px;
+            height: 150px;
+            bottom: -70px;
+            left: 10%;
+            transform: rotate(190deg);
+        } @else if $i == 4 {
+            width: 100px;
+            height: 100px;
+            top: -50px;
+            right: 15%;
+            transform: rotate(250deg);
+        } @else if $i == 5 {
+            width: 90px;
+            height: 90px;
+            bottom: 10%;
+            right: 10%;
+            transform: rotate(30deg);
+        } @else if $i == 6 {
+            width: 130px;
+            height: 130px;
+            bottom: -40px;
+            right: 20%;
+            transform: rotate(160deg);
+        } @else if $i == 7 {
+            width: 70px;
+            height: 70px;
+            top: 40%;
+            left: 10%;
+            transform: rotate(80deg);
+        } @else if $i == 8 {
+            width: 110px;
+            height: 110px;
+            top: 40%;
+            right: -55px;
+            transform: rotate(220deg);
+        } @else if $i == 9 {
+            width: 95px;
+            height: 95px;
+            bottom: -30px;
+            left: 40%;
+            transform: rotate(145deg);
+        } @else if $i == 10 {
+            width: 85px;
+            height: 85px;
+            top: -40px;
+            left: 35%;
+            transform: rotate(75deg);
+        } @else if $i == 11 {
+            width: 140px;
+            height: 140px;
+            bottom: -50px;
+            right: -40px;
+            transform: rotate(290deg);
+        } @else if $i == 12 {
+            width: 75px;
+            height: 75px;
+            top: 15%;
+            left: -25px;
+            transform: rotate(180deg);
+        }
     }
 }

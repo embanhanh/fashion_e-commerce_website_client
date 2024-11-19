@@ -171,7 +171,7 @@ function ShopManagerment() {
                 <>
                     <div className="bg-white rounded-4 shadow-sm">
                         <div className="d-flex justify-content-between align-items-center border-bottom p-3 position-relative">
-                            <p className="fs-3 fw-medium  ">Hồ sơ Shop</p>
+                            <p className="fs-3 fw-medium">Hồ sơ Shop</p>
                         </div>
                         <div className="p-3 position-relative">
                             <p className="fs-4 fw-medium d-inline-block" style={{ width: '90%' }}>
@@ -179,11 +179,11 @@ function ShopManagerment() {
                             </p>
                             <div className="sticky-button-container d-inline-block ">
                                 {isEditing && (
-                                    <button className="me-2 py-2 px-3 border bg-white d-inline-flex align-items-center gap-2" onClick={() => setIsEditing(false)}>
+                                    <button className="me-2 py-2 px-4 rounded-4 border bg-white d-inline-flex align-items-center gap-2" onClick={() => setIsEditing(false)}>
                                         <p className="fs-4 fw-medium">Hủy</p>
                                     </button>
                                 )}
-                                <button className=" py-2 px-3 border bg-white d-inline-flex align-items-center gap-2" onClick={isEditing ? handleSave : handleEdit}>
+                                <button className=" py-2 px-4 rounded-4 primary-btn" onClick={isEditing ? handleSave : handleEdit}>
                                     <p className="fs-4 fw-medium">{isEditing ? 'Lưu' : 'Chỉnh sửa'}</p>
                                     <FontAwesomeIcon icon={isEditing ? faSave : faPen} />
                                 </button>

@@ -1,7 +1,4 @@
-import LogoShop from '../components/LogoShop'
 import './MainLayout.scss'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import Accordion from '../components/Accordion'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useLayoutEffect } from 'react'
@@ -34,14 +31,7 @@ function Adminlayout({ children }) {
                                 Thêm sản phẩm
                             </Link>
                         </Accordion>
-                        <Accordion
-                            data={[
-                                {
-                                    title: 'Quản lý đơn hàng',
-                                },
-                            ]}
-                            isOpen={true}
-                        >
+                        <Accordion data={[{ title: 'Quản lý đơn hàng' }]} isOpen={true}>
                             <Link className={`fs-4 seller-option ${location.pathname === '/seller/orders' ? 'active' : ''}`} to={'/seller/orders'}>
                                 Tất cả đơn hàng
                             </Link>

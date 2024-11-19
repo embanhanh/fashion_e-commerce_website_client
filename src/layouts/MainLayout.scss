@@ -378,3 +378,20 @@
         }
     }
 }
+
+// Footer
+.main-footer {
+    background-color: var(--theme-color);
+    color: var(--theme-color-1);
+    display: flex;
+    justify-content: center;
+}
+
+.footer-link {
+    color: var(--theme-color-1);
+    transition: all 0.3s ease;
+
+    &:hover {
+        font-weight: 600;
+    }
+}

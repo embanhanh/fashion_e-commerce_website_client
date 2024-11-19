@@ -1,4 +1,16 @@
 // Primary Button
+.theme-color {
+    color: var(--theme-color-1) !important;
+}
+
+.border-theme {
+    border-color: var(--theme-color-1) !important;
+}
+
+.bg-theme {
+    background-color: var(--theme-color-1) !important;
+}
+
 .primary-btn {
     background-color: var(--theme-color-1);
     border: 2px solid var(--theme-color-1);
@@ -13,10 +25,13 @@
     font-weight: 600;
     transition: all 0.3s ease;
 
+    p {
+        font-size: 1.6rem;
+    }
+
     &:hover {
         background-color: transparent;
         color: var(--theme-color-1);
-        transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -27,31 +42,68 @@
     .fa-arrow-left {
         transition: transform 0.3s ease;
     }
+
+    &.success-btn {
+        background-color: var(--success-color);
+        border: 2px solid var(--success-color);
+
+        &:hover {
+            background-color: var(--success-color-dark);
+            border: 2px solid var(--success-color-dark);
+            color: #fff;
+        }
+    }
+
+    &.error-btn {
+        background-color: var(--error-color);
+        border: 2px solid var(--error-color);
+
+        &:hover {
+            background-color: var(--error-color-dark);
+            border: 2px solid var(--error-color-dark);
+        }
+    }
+
+    &.warning-btn {
+        background-color: var(--warning-color);
+        border: 2px solid var(--warning-color);
+
+        &:hover {
+            background-color: var(--warning-color-dark);
+            border: 2px solid var(--warning-color-dark);
+            color: #fff;
+        }
+    }
+
+    &.info-btn {
+        background-color: var(--info-color);
+        border: 2px solid var(--info-color);
+
+        &:hover {
+            background-color: var(--info-color-dark);
+            border: 2px solid var(--info-color-dark);
+            color: #fff;
+        }
+    }
+
+    &.full-color {
+        &:hover {
+            background-color: var(--theme-color-2);
+            color: #fff;
+            border: 2px solid var(--theme-color-2);
+        }
+    }
 }
 
 .primary-btn.light {
     background-color: #fff;
-    border: #fff;
-    color: #000;
-}
-
-.primary-btn p {
-    font-size: 1.6rem;
+    border: var(--theme-color-1);
+    color: var(--theme-color-1);
 }
 
 .primary-btn.light:hover {
-    background-color: #000;
+    background-color: var(--theme-color-1);
     color: #fff;
-}
-
-.primary-btn.btn-sm {
-    min-width: 80px;
-    padding: 8px 12px;
-}
-
-.primary-btn.btn-ssm {
-    min-width: 50px;
-    padding: 8px 12px;
 }
 
 button:disabled {
@@ -102,11 +154,6 @@ button:disabled {
 
 .swiper {
     height: 100%;
-}
-
-.shop-sm-title {
-    font-size: 2.4rem;
-    font-weight: 700;
 }
 
 // Ẩn 2 mũi tên
@@ -663,3 +710,12 @@ textarea {
     border-color: var(--theme-color) !important;
 }
 //#endregion
+
+// Modal
+
+.modal-content {
+    border-radius: 12px !important;
+    border: none !important;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}

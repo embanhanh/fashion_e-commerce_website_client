@@ -15,10 +15,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 8px;
 }
 
 .mySwiper-sub img:hover {
-    border: 1px solid #000;
+    border: 1px solid var(--theme-color-1);
 }
 
 .mySwiper-sub .swiper-button-next,
@@ -39,7 +40,12 @@
 }
 
 .product-color:hover {
-    border: 1px solid #000 !important;
+    border: 1px solid var(--theme-color-1) !important;
+}
+
+.size-selected {
+    background-color: var(--theme-color-1);
+    color: #fff;
 }
 
 .cartBtn {
@@ -47,10 +53,12 @@
     color: white;
     font-weight: 500;
     position: relative;
-    background-color: rgb(29, 29, 29);
+    background-color: var(--theme-color-1);
     transition: all 0.3s ease-in-out;
     cursor: pointer;
     overflow: hidden;
+    padding: 20px 30px;
+    border-radius: 20px;
 }
 
 .cart {
@@ -66,8 +74,8 @@
     width: 12px;
     border-radius: 3px;
     content: '';
-    left: 20px;
-    bottom: 26px;
+    left: 34px;
+    bottom: 32px;
     opacity: 0;
     z-index: 1;
     fill: rgb(211, 211, 211);
@@ -108,16 +116,27 @@
 .tooltip-cartbtn {
     position: absolute;
     top: 20px;
-    left: 5px;
+    left: 38px;
     transform: translateX(50%) translateY(-50%);
     color: #fff;
     padding: 6px 10px;
     border-radius: 6px;
     opacity: 0;
     visibility: hidden;
-    font-size: 14px;
+    font-size: 1.4rem;
     transition: all 0.3s ease;
-    background-color: #000;
+    background-color: var(--theme-color-2);
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -8px;
+        transform: translateY(-50%);
+        border-width: 8px 12px 8px 0;
+        border-style: solid;
+        border-color: transparent var(--theme-color-2) transparent transparent;
+    }
 }
 
 .cartBtn:disabled:hover + .tooltip-cartbtn {

@@ -362,7 +362,7 @@ function PromotionalCombos() {
                                     <span className="fs-4 fw-normal">{promotionalCombo.name}</span>
                                 </div>
                                 <div className="">
-                                    <div className="overflow-y-auto scrollbar-y" style={{ maxHeight: '150px' }}>
+                                    <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
                                         <strong className="fs-4 mb-3">Danh sách sản phẩm: </strong>
                                         {promotionalCombo.products?.map((product) => (
                                             <div key={product._id} className="d-flex flex-column my-2 ms-4">

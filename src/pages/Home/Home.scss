@@ -347,8 +347,30 @@
     max-height: calc(1.6em * 4);
 }
 
-.content-policy {
-}
+// Content Policy
+.home-policy-item {
+    background-color: var(--theme-color);
+    padding: 60px 10px 0px;
+    color: var(--theme-color-1);
+    border-radius: 10px;
+    gap: 20px;
+    height: 300px;
+    .home-policy-item-icon {
+        width: 100px;
+        height: 100px;
+        top: -50px;
+        z-index: 1;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 
-.content-formsupport {
+    .home-policy-item-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+
+    .home-policy-item-description {
+        font-size: 1.6rem;
+        font-weight: 500;
+    }
 }

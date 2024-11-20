@@ -1,17 +1,21 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Navigation, Pagination } from 'swiper/modules'
-import model1 from '../../assets/image/brand/person-1.png'
-import banner2 from '../../assets/image/banner/banner2.png'
-import cay1 from '../../assets/image/category_image/men_wear_category.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faArrowRight, faCreditCard, faDollarSign, faHeadset, faTruckFast } from '@fortawesome/free-solid-svg-icons'
-import ProductCard from '../../components/ProductCard'
 import { Rating } from 'react-simple-star-rating'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
-import Chatbot from '../../components/Chatbot'
 import { useNavigate } from 'react-router-dom'
+import ProductCard from '../../components/ProductCard'
+import Chatbot from '../../components/Chatbot'
+import cay1 from '../../assets/image/category_image/men_wear_category.jpg'
+import model1 from '../../assets/image/brand/person-1.png'
+import truck from '../../assets/image/icons/tracking.png'
+import refund from '../../assets/image/icons/cashback.png'
+import headset from '../../assets/image/icons/headphone.png'
+import promotion from '../../assets/image/icons/shopping-bag.png'
+
 import './Home.scss'
 
 function Home() {
@@ -256,26 +260,44 @@ function Home() {
                 </div>
             </div>
             <div className="container max-md p-5">
-                <div className="row w-100 pb-5">
-                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
-                        <FontAwesomeIcon icon={faTruckFast} size="3x" color="#000" />
-                        <p className="shop-sm-title my-3">Miễn phí vận chuyển</p>
-                        <p className="">Miễn phí vận chuyển đối với những đơn hàng lớn hơn 500.000đ</p>
+                <div className="row w-100 pb-5 ">
+                    <div className="col-12 col-sm-6 g-5 col-md-4 col-lg-3 ">
+                        <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
+                            <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
+                                <img src={truck} alt="truck" className="m-auto" />
+                            </div>
+                            <p className="home-policy-item-title my-3">Miễn phí vận chuyển</p>
+                            <p className="home-policy-item-description text-center">Miễn phí vận chuyển đối với những đơn hàng lớn hơn 500.000đ</p>
+                        </div>
                     </div>
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
-                        <FontAwesomeIcon icon={faDollarSign} size="3x" color="#000" />
-                        <p className="shop-sm-title my-3">Hoàn tiền 100%</p>
-                        <p className="">Khách hàng có thể đổi/trả hàng trong vòng 7 ngày kể từ ngày nhận hàng</p>
+                        <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
+                            <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
+                                <img src={refund} alt="refund" className="m-auto" />
+                            </div>
+                            <p className="home-policy-item-title my-3">Hoàn tiền 100%</p>
+                            <p className="home-policy-item-description text-center">Khách hàng có thể đổi/trả hàng trong vòng 7 ngày kể từ ngày nhận hàng</p>
+                        </div>
                     </div>
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
-                        <FontAwesomeIcon icon={faHeadset} size="3x" color="#000" />
-                        <p className="shop-sm-title my-3">Hỗ trợ 24/7</p>
-                        <p className="">Cung cấp dịch vụ tư vấn miễn phí về lựa chọn sản phẩm phù hợp với nhu cầu và phong cách thời trang của khách hàng</p>
+                        <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
+                            <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
+                                <img src={headset} alt="headset" className="m-auto" />
+                            </div>
+                            <p className="home-policy-item-title my-3">Hỗ trợ 24/7</p>
+                            <p className="home-policy-item-description text-center">
+                                Cung cấp dịch vụ tư vấn miễn phí về lựa chọn sản phẩm phù hợp với nhu cầu và phong cách thời trang của khách hàng
+                            </p>
+                        </div>
                     </div>
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
-                        <FontAwesomeIcon icon={faCreditCard} size="3x" color="#000" />
-                        <p className="shop-sm-title my-3">Thanh toán linh hoạt</p>
-                        <p className="">Hỗ trợ thanh toán bằng nhiều hình thức khác nhau</p>
+                        <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
+                            <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
+                                <img src={promotion} alt="promotion" className="m-auto" />
+                            </div>
+                            <p className="home-policy-item-title my-3">Khuyến mãi hấp dẫn</p>
+                            <p className="home-policy-item-description text-center">Khách hàng sẽ được hưởng nhiều ưu đãi khi mua sắm tại website</p>
+                        </div>
                     </div>
                 </div>
             </div>

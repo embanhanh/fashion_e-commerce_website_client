@@ -1,13 +1,13 @@
 import React, { useId } from 'react'
 import './Rating.scss'
 
-export const Rating = ({
+export default function Rating({
     initialRating = 0, // Giá trị rating ban đầu
     gap = 10, // Khoảng cách giữa các ngôi sao
     size = 30, // Kích thước ngôi sao
     readonly = false, // Chế độ chỉ đọc
     onRate, // Callback khi rating thay đổi
-}) => {
+}) {
     const id = useId()
 
     const handleRatingChange = (value) => {

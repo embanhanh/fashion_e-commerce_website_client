@@ -78,7 +78,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                     address: address,
                 }
                 await onAddAddress(newAddressData)
-                handleClose() // Đóng modal sau khi thêm thành công
+                handleClose()
             } catch (error) {
                 setErrors({ submit: 'Có lỗi xảy ra khi thêm địa chỉ' })
                 console.log(error)
@@ -98,13 +98,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         <Form.Control type="text" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} /> */}
                         <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Họ và tên:</p>
                         <div className="input-form d-flex align-items-center w-100">
-                            <input
-                                type="text"
-                                className="input-text w-100"
-                                placeholder="Họ và tên"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
+                            <input type="text" className="input-text w-100" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} />
                         </div>
                         {errors.name && <p className="text-danger">{errors.name}</p>}
                     </Form.Group>
@@ -112,16 +106,9 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                     <Form.Group className="mb-3 fs-4">
                         <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Số điện thoại:</p>
                         <div className="input-form d-flex align-items-center w-100">
-                            <input
-                                type="text"
-                                className="input-text w-100"
-                                placeholder="Số điện thoại"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                            />
+                            <input type="text" className="input-text w-100" placeholder="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} />
                         </div>
                         {errors.phone && <p className="text-danger">{errors.phone}</p>}
-
                     </Form.Group>
 
                     <Form.Group className="mb-3 fs-4">
@@ -163,25 +150,11 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                             </div>
                             <div className="options">
                                 <div title="home">
-                                    <input
-                                        id="home-address"
-                                        name="address-type"
-                                        type="radio"
-                                        checked={type === 'home'}
-                                        value="home"
-                                        onChange={(e) => setType(e.target.value)}
-                                    />
+                                    <input id="home-address" name="address-type" type="radio" checked={type === 'home'} value="home" onChange={(e) => setType(e.target.value)} />
                                     <label className="option" htmlFor="home-address" data-txt="Nhà riêng" />
                                 </div>
                                 <div title="work">
-                                    <input
-                                        id="work-address"
-                                        name="address-type"
-                                        type="radio"
-                                        checked={type === 'work'}
-                                        value="work"
-                                        onChange={(e) => setType(e.target.value)}
-                                    />
+                                    <input id="work-address" name="address-type" type="radio" checked={type === 'work'} value="work" onChange={(e) => setType(e.target.value)} />
                                     <label className="option" htmlFor="work-address" data-txt="Cơ quan" />
                                 </div>
                             </div>
@@ -191,13 +164,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                     <Form.Group className="mb-3 fs-4">
                         <div className="checkbox-cell">
                             <label className="d-flex align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="input-checkbox"
-                                    name="isDefault"
-                                    checked={isDefault}
-                                    onChange={(e) => setIsDefault(e.target.checked)}
-                                />
+                                <input type="checkbox" className="input-checkbox" name="isDefault" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
                                 <span className="custom-checkbox" />
                                 <span className="ms-2">Đặt làm địa chỉ mặc định.</span>
                             </label>

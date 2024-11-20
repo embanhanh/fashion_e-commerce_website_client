@@ -306,49 +306,6 @@ function Cart() {
     return (
         <>
             <div className="container h-100 px-5 py-5">
-                {showAddress && (
-                    <SelectAddressModal
-                        showAddress={showAddress}
-                        handleCloseAddress={handleCloseAddress}
-                        addresses={addresses}
-                        originalSelectedAddress={orderData.shippingAddress}
-                        handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
-                    />
-                )}
-                {/* Modal Payment Method*/}
-                {showPaymentMethod && (
-                    <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <div className="">
-                                <div className="d-flex p-3 align-items-center border-bottom">
-                                    <label className="d-flex align-items-center me-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <p className="fs-3">Thanh toán khi nhận hàng</p>
-                                </div>
-                                <div className="d-flex p-3 align-items-center border-bottom">
-                                    <label className="d-flex align-items-center me-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <p className="fs-3">Thanh toán bằng chuyển khoản</p>
-                                </div>
-                            </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
-                                <p>Đóng</p>
-                            </div>
-                            <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
-                                <p>Xác nhận</p>
-                            </div>
-                        </Modal.Footer>
-                    </Modal>
-                )}
                 <p className="fw-bold fs-2">Giỏ hàng</p>
                 <div className="d-flex">
                     <div className="mt-2 me-4" style={{ width: '60%' }}>
@@ -535,6 +492,49 @@ function Cart() {
             {/* Modal Voucher */}
             {showVoucher && (
                 <VoucherModal cart={cart} showVoucher={showVoucher} handleCloseVoucher={handleCloseVoucher} orderData={orderData} setOrderData={setOrderData} originalVouchers={orderData.vouchers} />
+            )}
+            {showAddress && (
+                <SelectAddressModal
+                    showAddress={showAddress}
+                    handleCloseAddress={handleCloseAddress}
+                    addresses={addresses}
+                    originalSelectedAddress={orderData.shippingAddress}
+                    handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
+                />
+            )}
+            {/* Modal Payment Method*/}
+            {showPaymentMethod && (
+                <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="">
+                            <div className="d-flex p-3 align-items-center border-bottom">
+                                <label className="d-flex align-items-center me-3">
+                                    <input type="checkbox" className="input-checkbox" />
+                                    <span className="custom-checkbox"></span>
+                                </label>
+                                <p className="fs-3">Thanh toán khi nhận hàng</p>
+                            </div>
+                            <div className="d-flex p-3 align-items-center border-bottom">
+                                <label className="d-flex align-items-center me-3">
+                                    <input type="checkbox" className="input-checkbox" />
+                                    <span className="custom-checkbox"></span>
+                                </label>
+                                <p className="fs-3">Thanh toán bằng chuyển khoản</p>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
+                            <p>Đóng</p>
+                        </div>
+                        <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
+                            <p>Xác nhận</p>
+                        </div>
+                    </Modal.Footer>
+                </Modal>
             )}
         </>
     )

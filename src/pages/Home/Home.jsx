@@ -1,20 +1,22 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeft, faArrowRight, faCreditCard, faDollarSign, faHeadset, faTruckFast } from '@fortawesome/free-solid-svg-icons'
-import { Rating } from 'react-simple-star-rating'
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
 import { useNavigate } from 'react-router-dom'
 import ProductCard from '../../components/ProductCard'
 import Chatbot from '../../components/Chatbot'
+import Rating from '../../components/Rating'
 import cay1 from '../../assets/image/category_image/men_wear_category.jpg'
 import model1 from '../../assets/image/brand/person-1.png'
 import truck from '../../assets/image/icons/tracking.png'
 import refund from '../../assets/image/icons/cashback.png'
 import headset from '../../assets/image/icons/headphone.png'
 import promotion from '../../assets/image/icons/shopping-bag.png'
+import quote from '../../assets/image/icons/quote.png'
+import avatar from '../../assets/image/default/default-avatar.png'
 
 import './Home.scss'
 
@@ -92,17 +94,17 @@ function Home() {
             <div className="container h-100">
                 <div className=" container max-md p-5">
                     <div className="content-category w-100 py-5">
-                        <div className="header-category d-flex justify-content-between align-items-center">
-                            <p className="shop-sm-title theme-color">Danh Mục Sản phẩm</p>
-                            <div className="d-flex gap-3">
+                        {/* <div className="header-category d-flex justify-content-between align-items-center"> */}
+                        <p className="shop-sm-title theme-color text-center">Danh Mục Sản phẩm</p>
+                        {/* <div className="d-flex gap-3">
                                 <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slidePrev()}>
                                     <FontAwesomeIcon icon={faArrowLeft} size="xl" />
                                 </div>
                                 <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slideNext()}>
                                     <FontAwesomeIcon icon={faArrowRight} size="xl" />
                                 </div>
-                            </div>
-                        </div>
+                            </div> */}
+                        {/* </div> */}
                         <div className="list-category mt-5">
                             <Swiper
                                 ref={swiperCategory}
@@ -153,25 +155,16 @@ function Home() {
                     <div className="content-policy"></div>
                 </div>
             </div>
-            <div className="pb-5 " style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
-                <div className="d-flex max-md container justify-content-between align-items-center p-5">
-                    <p className="shop-sm-title ps-4" style={{ fontWeight: '500' }}>
-                        Đánh giá của khách hàng
-                    </p>
-                    <div className="d-flex pe-4">
-                        <div className="primary-btn" onClick={() => swiperReview.current.swiper.slidePrev()}>
-                            <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-                        </div>
-                        <div className="primary-btn ms-3" onClick={() => swiperReview.current.swiper.slideNext()}>
-                            <FontAwesomeIcon icon={faArrowRight} size="xl" />
-                        </div>
-                    </div>
-                </div>
-                <div className="container max-md px-5 " style={{ height: 250 }}>
+            <div className="py-5 home-customer-review">
+                {[...Array(15)].map((_, index) => (
+                    <div key={`bubble-${index}`} className={`bubble bubble-${index + 1}`} />
+                ))}
+                <p className="shop-sm-title text-center customer-review-title my-3">Đánh giá của khách hàng</p>
+                <div className="container max-md px-5 " style={{ height: 330 }}>
                     <Swiper
                         ref={swiperReview}
                         style={{
-                            '--swiper-pagination-color': '#fff',
+                            '--swiper-pagination-color': 'var(--theme-color-2)',
                         }}
                         pagination={{
                             clickable: true,
@@ -181,81 +174,26 @@ function Home() {
                         modules={[Autoplay, Pagination, Navigation]}
                         className="mySwiper"
                     >
-                        <SwiperSlide>
-                            <img src={''} loading="lazy" />
-                            <div className="customer-review bg-white rounded-4 shadow py-4 px-4 d-flex flex-column">
-                                <Rating initialValue={5} readonly={true} size={25} />
-                                <p className="customer-review-text mt-4">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <p className="fw-medium ms-4 fs-4">Trần Trung Thông</p>
+                        {[...Array(6)].map((_, index) => (
+                            <SwiperSlide key={index}>
+                                <img src={''} loading="lazy" />
+                                <div className="customer-review shadow rounded-5 d-flex flex-column">
+                                    <img src={quote} alt="quote" className="customer-review-quote" />
+                                    <p className="customer-review-text mt-4">
+                                        Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản
+                                        phẩm phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
+                                    </p>
+                                    <div className="d-flex align-items-center gap-3 justify-self-end mt-auto">
+                                        <img src={avatar} alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
+                                        <div className="d-flex flex-column">
+                                            <p className="fw-bold fs-3 theme-color">Trần Trung Thông</p>
+                                            <Rating initialRating={5} readonly gap={4} size={14} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={''} loading="lazy" />
-                            <div className="customer-review bg-white rounded-4 shadow py-4 px-4 d-flex flex-column">
-                                <Rating initialValue={5} readonly={true} size={25} />
-                                <p className="customer-review-text mt-4">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <p className="fw-medium ms-4 fs-4">Trần Trung Thông</p>
-                                </div>
-                            </div>
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={''} loading="lazy" />
-                            <div className="customer-review bg-white rounded-4 shadow py-4 px-4 d-flex flex-column">
-                                <Rating initialValue={5} readonly={true} size={25} />
-                                <p className="customer-review-text mt-4">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <p className="fw-medium ms-4 fs-4">Trần Trung Thông</p>
-                                </div>
-                            </div>
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={''} loading="lazy" />
-                            <div className="customer-review bg-white rounded-4 shadow py-4 px-4 d-flex flex-column">
-                                <Rating initialValue={5} readonly={true} size={25} />
-                                <p className="customer-review-text mt-4">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <p className="fw-medium ms-4 fs-4">Trần Trung Thông</p>
-                                </div>
-                            </div>
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={''} loading="lazy" />
-                            <div className="customer-review bg-white rounded-4 shadow py-4 px-4 d-flex flex-column">
-                                <Rating initialValue={5} readonly={true} size={25} />
-                                <p className="customer-review-text mt-4">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <p className="fw-medium ms-4 fs-4">Trần Trung Thông</p>
-                                </div>
-                            </div>
-                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                        </SwiperSlide>
+                                <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                            </SwiperSlide>
+                        ))}
                     </Swiper>
                 </div>
             </div>

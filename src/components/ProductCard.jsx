@@ -1,7 +1,8 @@
 import './ProductCard.scss'
 import React, { useState } from 'react'
-import { Rating } from './Rating'
+import Rating from './Rating'
 import { convertMoney } from '../utils/StringUtil'
+import cart from '../assets/image/icons/shopping-cart.png'
 
 function ProductCard({ name, url, originalPrice, discount, rating, isFeature }) {
     const price = originalPrice - (originalPrice * discount) / 100
@@ -24,6 +25,9 @@ function ProductCard({ name, url, originalPrice, discount, rating, isFeature }) 
                     </div>
                     <div className="d-inline-flex justify-content-between align-items-center px-3">
                         <Rating initialRating={rating} readonly gap={4} size={18} />
+                        <button className="product-card__cart-btn">
+                            <img className="cart-icon__img" src={cart} alt="cart" />
+                        </button>
                     </div>
                 </div>
             </div>

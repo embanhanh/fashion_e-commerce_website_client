@@ -327,26 +327,6 @@
     }
 }
 
-// Content Review
-.customer-review {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-}
-
-.customer-review-text {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.6;
-    max-height: calc(1.6em * 4);
-}
-
 // Content Policy
 .home-policy-item {
     background-color: var(--theme-color);
@@ -373,4 +353,161 @@
         font-size: 1.6rem;
         font-weight: 500;
     }
+}
+
+// Content Customer Review
+.home-customer-review {
+    background-color: #f5f5f5;
+    position: relative;
+    overflow: hidden;
+
+    .customer-review-title {
+        color: var(--theme-color-2);
+    }
+
+    .bubble {
+        position: absolute;
+        background-color: var(--theme-color);
+        border-radius: 50%;
+        opacity: 0.8;
+        animation: float 8s ease-in-out infinite;
+        // z-index: 100;
+    }
+
+    // Bên trái
+    .bubble-1 {
+        width: 60px;
+        height: 60px;
+        left: 5%;
+        top: 20%;
+    }
+    .bubble-2 {
+        width: 100px;
+        height: 100px;
+        left: 8%;
+        top: 60%;
+    }
+    .bubble-3 {
+        width: 60px;
+        height: 60px;
+        left: 35%;
+        top: 30%;
+    }
+    .bubble-4 {
+        width: 50px;
+        height: 50px;
+        left: 38%;
+        top: 70%;
+    }
+    .bubble-5 {
+        width: 30px;
+        height: 30px;
+        left: 10%;
+        top: 40%;
+    }
+
+    // Giữa (ít hơn)
+    .bubble-6 {
+        width: 35px;
+        height: 35px;
+        left: 60%;
+        top: 25%;
+    }
+    .bubble-7 {
+        width: 40px;
+        height: 40px;
+        left: 62%;
+        top: 75%;
+    }
+
+    // Bên phải
+    .bubble-8 {
+        width: 200px;
+        height: 200px;
+        right: 0%;
+        top: 90%;
+    }
+    .bubble-9 {
+        width: 60px;
+        height: 60px;
+        left: 85%;
+        top: 35%;
+    }
+    .bubble-10 {
+        width: 45px;
+        height: 45px;
+        left: 92%;
+        top: 55%;
+    }
+    .bubble-11 {
+        width: 40px;
+        height: 40px;
+        left: 88%;
+        top: 15%;
+    }
+    .bubble-12 {
+        width: 50px;
+        height: 50px;
+        left: 82%;
+        top: 85%;
+    }
+    .bubble-13 {
+        width: 300px;
+        height: 300px;
+        left: 20%;
+        top: -50%;
+    }
+    .bubble-14 {
+        width: 65px;
+        height: 65px;
+        left: 5%;
+        top: 90%;
+    }
+    .bubble-15 {
+        width: 30px;
+        height: 30px;
+        right: 2%;
+        top: 25%;
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+    50% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+}
+
+.customer-review-quote {
+    width: 40px;
+}
+
+.customer-review {
+    padding: 30px 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    border-bottom: 4px solid rgba(20, 145, 155, 0.6);
+    background-color: #fefefe;
+}
+
+.customer-review-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.6rem;
+    line-height: 1.6;
+    max-height: calc(1.6em * 4);
+    font-weight: 600;
+    color: #646464;
 }

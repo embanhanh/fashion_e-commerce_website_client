@@ -95,10 +95,10 @@ function Home() {
                         <div className="header-category d-flex justify-content-between align-items-center">
                             <p className="shop-sm-title theme-color">Danh Mục Sản phẩm</p>
                             <div className="d-flex gap-3">
-                                <div className="primary-btn px-3 rounded-4" onClick={() => swiperCategory.current.swiper.slidePrev()}>
+                                <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slidePrev()}>
                                     <FontAwesomeIcon icon={faArrowLeft} size="xl" />
                                 </div>
-                                <div className="primary-btn px-3 rounded-4" onClick={() => swiperCategory.current.swiper.slideNext()}>
+                                <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slideNext()}>
                                     <FontAwesomeIcon icon={faArrowRight} size="xl" />
                                 </div>
                             </div>
@@ -159,10 +159,10 @@ function Home() {
                         Đánh giá của khách hàng
                     </p>
                     <div className="d-flex pe-4">
-                        <div className="primary-btn btn-ssm" onClick={() => swiperReview.current.swiper.slidePrev()}>
+                        <div className="primary-btn" onClick={() => swiperReview.current.swiper.slidePrev()}>
                             <FontAwesomeIcon icon={faArrowLeft} size="xl" />
                         </div>
-                        <div className="primary-btn btn-ssm ms-3" onClick={() => swiperReview.current.swiper.slideNext()}>
+                        <div className="primary-btn ms-3" onClick={() => swiperReview.current.swiper.slideNext()}>
                             <FontAwesomeIcon icon={faArrowRight} size="xl" />
                         </div>
                     </div>

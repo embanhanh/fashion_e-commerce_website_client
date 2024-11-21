@@ -11,6 +11,7 @@ import { fetchCategories } from '../../redux/slices/categorySlice'
 import { removeDiacritics } from '../../utils/StringUtil'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
+import Rating from '../../components/Rating'
 
 function ProductList() {
     const navigate = useNavigate()
@@ -96,6 +97,10 @@ function ProductList() {
         [dispatch]
     )
 
+    const handleRatingChange = (value) => {
+        dispatch(setFilters({ rating: value }))
+    }
+
     return (
         <>
             <div className="container h-100 py-5">
@@ -166,6 +171,22 @@ function ProductList() {
                                 >
                                     <p>Áp dụng</p>
                                 </button>
+                            </div>
+                        </Accordion>
+                        <div className=" w-100 border-bottom mt-2"></div>
+                        <Accordion
+                            data={[
+                                {
+                                    title: 'Lọc theo đánh giá',
+                                },
+                            ]}
+                            isOpen={true}
+                        >
+                            <div className="d-flex align-items-center flex-column">
+                                <div className="mb-2 py-2 d-flex">
+                                    <Rating initialRating={0} size={16} gap={4} onRate={handleRatingChange} />
+                                    <p className="ms-2 align-self-end">Trở lên</p>
+                                </div>
                             </div>
                         </Accordion>
                         <div className=" w-100 border-bottom mt-2"></div>

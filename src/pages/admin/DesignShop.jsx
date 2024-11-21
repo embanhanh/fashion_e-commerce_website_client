@@ -38,8 +38,8 @@ function DesignShop() {
         setShowConfirmDelete({ show: true, bannerId: [bannerId] })
     }
 
-    const handleViewBanner = (bannerId) => {
-        dispatch(fetchBannerById(bannerId))
+    const handleViewBanner = async (bannerId) => {
+        await dispatch(fetchBannerById(bannerId))
         setShowViewBanner(true)
     }
 
@@ -257,12 +257,18 @@ function DesignShop() {
                                         </label>
                                     </div>
                                     <div className="product-info">
-                                        <img src={banner.imageUrl} alt="" className="product-image" style={{ width: '130px', height: '60px', objectFit: 'cover' }} />
+                                        <img src={banner.imageUrl} alt="" className="product-image" style={{ width: '100px', height: '200px', objectFit: 'cover' }} />
                                     </div>
                                     <p className="fs-4 fw-medium text-center">{banner.title}</p>
                                     <p className="fs-4 fw-medium text-center">{new Date(banner.displayStartTime).toLocaleDateString()}</p>
                                     <p className="fs-4 fw-medium text-center">{new Date(banner.displayEndTime).toLocaleDateString()}</p>
-                                    <p className="fs-4 fw-medium text-center">{banner.isActive ? 'Đang hoạt động' : 'Đã hết hạn'}</p>
+                                    <p className="fs-4 fw-medium text-center">
+                                        {new Date(banner.displayStartTime) < new Date() && new Date(banner.displayEndTime) > new Date()
+                                            ? 'Đang hoạt động'
+                                            : new Date(banner.displayStartTime) > new Date()
+                                            ? 'Sắp diễn ra'
+                                            : 'Đã hết hạn'}
+                                    </p>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon icon={faEye} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => handleViewBanner(banner._id)} />
                                         <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/shop/banner/edit/${banner._id}`)} />
@@ -288,67 +294,7 @@ function DesignShop() {
                     <Notification type={notificationType} title={notificationType === 'success' ? 'Thành công' : 'Lỗi'} description={notificationMessage} />
                 </Modal>
             )}
-            {showViewBanner && (
-                <Modal show={showViewBanner} onHide={() => setShowViewBanner(false)} centered className="view-banner-modal d-flex align-items-center justify-content-center">
-                    {loading ? (
-                        <div className="dot-spinner ms-4">
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                            <div className="dot-spinner__dot"></div>
-                        </div>
-                    ) : (
-                        <div className="d-flex align-items-center justify-content-center position-relative" style={{ height: '500px', width: '1000px' }}>
-                            <img src={currentBanner.imageUrl} alt="" className="product-image" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            {currentBanner.elements.button && (
-                                <button
-                                    style={{ position: 'absolute', top: `${currentBanner.elements.button.top}%`, left: `${currentBanner.elements.button.left}%` }}
-                                    className="primary-btn py-2 px-5"
-                                >
-                                    <p className="fs-2 fw-medium">
-                                        {currentBanner.buttonText} <FontAwesomeIcon icon={faArrowRight} />
-                                    </p>
-                                </button>
-                            )}
-                            {currentBanner.elements.title && (
-                                <h2
-                                    className="text-white fw-bold"
-                                    style={{
-                                        padding: 8,
-                                        fontSize: '3.8rem',
-                                        maxWidth: '450px',
-                                        textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
-                                        position: 'absolute',
-                                        top: `${currentBanner.elements.title.top}%`,
-                                        left: `${currentBanner.elements.title.left}%`,
-                                    }}
-                                >
-                                    {currentBanner.title}
-                                </h2>
-                            )}
-                            {currentBanner.elements.description && (
-                                <p
-                                    className="text-white fw-medium"
-                                    style={{
-                                        fontSize: '2.2rem',
-                                        padding: 8,
-                                        maxWidth: '450px',
-                                        textShadow: '4px 4px 8px rgba(0, 0, 0, 0.7)',
-                                        position: 'absolute',
-                                        top: `${currentBanner.elements.description.top}%`,
-                                        left: `${currentBanner.elements.description.left}%`,
-                                    }}
-                                >
-                                    {currentBanner.description}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </Modal>
-            )}
+            {showViewBanner && <></>}
             {showConfirmDelete.show && (
                 <Modal show={showConfirmDelete.show} onHide={() => setShowConfirmDelete({ show: false, bannerId: [] })} centered>
                     <Notification type="warning" title="Bạn có chắc chắn muốn xóa (các) banner này?" description="Bạn sẽ không thể hoàn tác sau khi xóa">

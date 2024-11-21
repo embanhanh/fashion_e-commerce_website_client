@@ -9,7 +9,7 @@ function ProductCard({ name, url, originalPrice, discount, rating, isFeature }) 
 
     return (
         <>
-            <div className="product-card d-flex flex-column w-100 shadow rounded-4 h-100">
+            <div className="product-card d-flex flex-column w-100 shadow rounded-5 h-100">
                 {discount > 0 && <div className="product-badge discount-badge">-{discount}%</div>}
 
                 {isFeature && <div className="product-badge hot-badge">HOT</div>}

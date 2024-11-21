@@ -23,6 +23,19 @@
     transition: fill 0.3s ease;
 }
 
+.rating-container > input.rating-0 + label > svg {
+    fill: #ccc;
+    width: 0.9em;
+}
+
+.rating-container > input.rating-0:checked + label > svg {
+    fill: #ff9e0b;
+}
+
+.rating-container > input.rating-0:hover + label > svg {
+    fill: #ff9e0b;
+}
+
 .rating-container > label::before,
 .rating-container > label::after {
     content: '';
@@ -57,22 +70,11 @@
 
 .rating-container > label:hover {
     transform: scale(1.2);
-    animation: pulse 0.6s infinite alternate;
 }
 
 .rating-container > input:hover + label > svg,
 .rating-container > input:hover + label ~ label > svg {
     fill: #ff9e0b;
-    animation: pulse 0.8s infinite alternate;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(1.1);
-    }
 }
 
 @keyframes particle-explosion {

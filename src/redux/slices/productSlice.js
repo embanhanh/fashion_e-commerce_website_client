@@ -81,6 +81,8 @@ const productSlice = createSlice({
             stockQuantity: { min: 0, max: Infinity },
             soldQuantity: { min: 0, max: Infinity },
             search: '',
+            rating: 0,
+            brand: [],
         },
         sortOption: '',
         status: 'idle',

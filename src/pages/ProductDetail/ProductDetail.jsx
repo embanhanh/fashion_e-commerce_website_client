@@ -1,20 +1,23 @@
-import './ProductDetail.scss'
 import React, { useState, useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/thumbs'
-import { Rating } from 'react-simple-star-rating'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { Modal, Button, Toast } from 'react-bootstrap'
+
 import { fetchProductByProductName } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
+
+import product1 from '../../assets/image/product_image/product_image_1.png'
+import Rating from '../../components/Rating'
 import ProductCard from '../../components/ProductCard'
-import { Modal, Button, Toast } from 'react-bootstrap'
 import Notification from '../../components/Notification'
+import './ProductDetail.scss'
 
 function ProductDetail() {
     const { product_name } = useParams()
@@ -34,6 +37,7 @@ function ProductDetail() {
     const [selectedSize, setSelectedSize] = useState('')
     const [availableQuantity, setAvailableQuantity] = useState(0)
     const [quantity, setQuantity] = useState(1)
+    const [displayPrice, setDisplayPrice] = useState(0)
     // confirm and notification
     const [showLoginModal, setShowLoginModal] = useState(false)
     const [showToast, setShowToast] = useState(false)
@@ -67,6 +71,7 @@ function ProductDetail() {
                 }, [])
             setUniqueColors(colors)
             setAvailableQuantity(currentProduct.stockQuantity)
+            setDisplayPrice(currentProduct.originalPrice)
         }
     }, [currentProduct])
 
@@ -82,8 +87,13 @@ function ProductDetail() {
                 filteredVariants = filteredVariants.filter((v) => v.size === selectedSize)
             }
 
-            const totalQuantity = filteredVariants.reduce((sum, variant) => sum + variant.stockQuantity, 0)
-            setAvailableQuantity(totalQuantity)
+            if (filteredVariants.length > 0) {
+                const totalQuantity = filteredVariants.reduce((sum, variant) => sum + variant.stockQuantity, 0)
+                setAvailableQuantity(totalQuantity)
+                setDisplayPrice(filteredVariants[0].price)
+            } else {
+                setDisplayPrice(currentProduct.originalPrice)
+            }
         } else if (currentProduct) {
             setAvailableQuantity(currentProduct.stockQuantity)
         }
@@ -220,7 +230,7 @@ function ProductDetail() {
                                                         objectFit: 'cover',
                                                         width: '100%',
                                                         cursor: 'pointer',
-                                                        border: activeIndex === index ? '2px solid var(--theme-color-1)' : 'none',
+                                                        border: activeIndex === index ? '2px solid var(--theme-color)' : 'none',
                                                     }}
                                                     src={product}
                                                     alt={`Product ${index + 1}`}
@@ -239,16 +249,19 @@ function ProductDetail() {
                             </div>
                             <div style={{ width: '60%' }} className="px-5 py-1 ms-5">
                                 <p className="fs-1 lh-1 fw-bold theme-color">{currentProduct.name}</p>
-                                <div className="d-flex py-3">
-                                    <p className="fs-3 lh-1 fw-medium d-flex align-items-center">
-                                        <span className="me-2 fs-3 fw-medium">{currentProduct.rating} </span> <Rating initialValue={currentProduct.rating} readonly={true} size={25} className="mx-3" />{' '}
-                                        (100 đánh giá)
-                                    </p>
+                                <div className="d-flex py-3 gap-3">
+                                    <p className="me-2 fs-2  fw-medium align-self-end">{currentProduct.rating} </p>{' '}
+                                    <Rating initialRating={currentProduct.rating} readonly={true} size={24} className="mx-3" />
+                                    <p className="fs-3 align-self-end">(100 đánh giá)</p>
                                 </div>
-                                <div className="d-flex align-items-center p-4 bg-body-tertiary rounded-2">
-                                    <p className="fs-1 fw-medium me-4">{currentProduct.originalPrice - (currentProduct.originalPrice * currentProduct.discount) / 100}đ</p>
-                                    <p className="fs-2 fw-medium text-decoration-line-through text-body-tertiary">{currentProduct.originalPrice}đ</p>
-                                    <p className="fs-2 ms-4 fw-medium text-danger">Giảm {currentProduct.discount}% </p>
+                                <div className="d-flex gap-5 align-items-center p-4 bg-body-tertiary rounded-4 bg-theme">
+                                    <p className="fs-1 fw-medium theme-color">{displayPrice - (displayPrice * currentProduct.discount) / 100}đ</p>
+                                    {/* {currentProduct.discount > 0 && (
+                                        <> */}
+                                    <p className="fs-2 fw-medium text-decoration-line-through text-body-tertiary">{displayPrice}đ</p>
+                                    <div className="product-badge discount-badge position-static ms-auto">- {currentProduct.discount}% </div>
+                                    {/* </>
+                                    )} */}
                                 </div>
                                 {currentProduct.variants.some((variant) => variant.color) && <p className="fs-3 lh-1 my-4 theme-color fw-semibold">Màu Sắc</p>}
                                 <div className="row g-3">
@@ -360,71 +373,32 @@ function ProductDetail() {
                         </div>
                         <div className="rounded-4 bg-white shadow p-5">
                             <p className="fs-2 fw-medium py-2">Đánh giá của khách hàng</p>
-                            <div className="pe-5 me-5 my-4 border-bottom py-4 ">
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <div className="ms-3">
-                                        <p className="fw-medium  fs-3">Trần Trung Thông</p>
-                                        <Rating initialValue={5} readonly={true} size={20} className="" />
+                            {Array.from({ length: 2 }).map((_, index) => (
+                                <div className="pe-5 me-5 my-4 border-bottom py-4 " key={index}>
+                                    <div className="d-flex align-items-center justify-self-end mt-auto">
+                                        <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
+                                        <div className="ms-3">
+                                            <p className="fw-medium  fs-3">Trần Trung Thông</p>
+                                            <Rating initialRating={5} readonly={true} size={18} />
+                                        </div>
                                     </div>
+                                    <p className="my-2 ps-5 ms-5 text-body-tertiary"> 2024-22-9 10:00</p>
+                                    <p className="fs-3 ps-5 ms-5">
+                                        Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản
+                                        phẩm phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
+                                    </p>
                                 </div>
-                                <p className="my-2 ps-5 ms-5 text-body-tertiary"> 2024-22-9 10:00</p>
-                                <p className="fs-3 ps-5 ms-5">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                            </div>
-                            <div className="pe-5 me-5 my-4 border-bottom py-4">
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <div className="ms-3">
-                                        <p className="fw-medium  fs-3">Trần Trung Thông</p>
-                                        <Rating initialValue={5} readonly={true} size={20} className="" />
-                                    </div>
-                                </div>
-                                <p className="my-2 ps-5 ms-5 text-body-tertiary"> 2024-22-9 10:00</p>
-                                <p className="fs-3 ps-5 ms-5">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                            </div>
-                            <div className="pe-5 me-5 my-4 border-bottom py-4">
-                                <div className="d-flex align-items-center justify-self-end mt-auto">
-                                    <img src="" alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
-                                    <div className="ms-3">
-                                        <p className="fw-medium  fs-3">Trần Trung Thông</p>
-                                        <Rating initialValue={5} readonly={true} size={20} className="" />
-                                    </div>
-                                </div>
-                                <p className="my-2 ps-5 ms-5 text-body-tertiary"> 2024-22-9 10:00</p>
-                                <p className="fs-3 ps-5 ms-5">
-                                    Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản phẩm
-                                    phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
-                                </p>
-                            </div>
+                            ))}
                         </div>
 
-                        <div className="mt-5 pt-5">
-                            <p className="fs-2 fw-medium">Sản phẩm liên quan</p>
+                        <div className="pt-4">
+                            <p className="fs-1 theme-color fw-medium">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3">
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2 ">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-2">
-                                    <ProductCard name={'Giày thể thao'} originalPrice={150000} discount={0.2} rating={5} />
-                                </div>
+                                {Array.from({ length: 6 }).map((_, index) => (
+                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 " key={index}>
+                                        <ProductCard url={product1} name={'Giày thể thao'} originalPrice={150000} discount={20} rating={5} />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </>

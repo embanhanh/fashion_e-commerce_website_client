@@ -54,18 +54,16 @@ function Home() {
                     >
                         {banners.map((banner) => (
                             <SwiperSlide key={banner._id}>
-                                <img className="banner-image" src={model1} loading="lazy" />
+                                <img className="banner-image" src={banner.imageUrl} loading="lazy" />
                                 <div></div>
                                 <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                                 <button onClick={() => {}} className="primary-btn py-3 px-5 rounded-5 banner-button">
                                     <p className="fs-1 fw-bold">
-                                        Khám phá ngay <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
+                                        {banner.buttonText} <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
                                     </p>
                                 </button>
-                                <h2 className="banner-title">Phong cách độc đáo - giá cực tốt</h2>
-                                <p className="banner-description">
-                                    Thời trang phong cách với mức giá không thể bỏ lỡ. Mua sắm ngay hôm nay! asd asd á d á d asd á d á da sd á d a dsa d á dá d asd á d á d asdas á dá á sa á dá dá á da
-                                </p>
+                                <h2 className="banner-title">{banner.title}</h2>
+                                <p className="banner-description">{banner.description}</p>
                             </SwiperSlide>
                         ))}
                     </Swiper>
@@ -121,7 +119,7 @@ function Home() {
                             >
                                 {[...Array(8)].map((_, index) => (
                                     <SwiperSlide key={index}>
-                                        <img className="rounded-4" style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
+                                        <img className="rounded-5" style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
                                         <div className="position-absolute category-item-content ">
                                             <p className="text-nowrap home-category-title">Thời trang nam</p>
                                             <button className="primary-btn full-color px-4 py-2 rounded-4">

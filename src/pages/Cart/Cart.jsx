@@ -54,6 +54,7 @@ function Cart() {
         type: '',
         title: '',
     })
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         dispatch(fetchCart())
@@ -251,6 +252,7 @@ function Cart() {
                 vouchers: orderData.vouchers.map((voucher) => voucher._id),
             }
             try {
+                setIsLoading(true)
                 await dispatch(createOrderAction(finalOrderData)).unwrap()
                 setNotification({
                     show: true,
@@ -265,6 +267,8 @@ function Cart() {
                     type: 'error',
                     title: 'Lỗi',
                 })
+            } finally {
+                setIsLoading(false)
             }
         }
     }
@@ -462,11 +466,27 @@ function Cart() {
                             <div className="text-center py-3">
                                 <button
                                     disabled={
-                                        orderData.products.length === 0 || orderData.shippingAddress === null || Object.keys(orderData.shippingAddress).length === 0 || orderData.paymentMethod === null
+                                        orderData.products.length === 0 ||
+                                        orderData.shippingAddress === null ||
+                                        Object.keys(orderData.shippingAddress).length === 0 ||
+                                        orderData.paymentMethod === null ||
+                                        isLoading
                                     }
                                     className="primary-btn shadow-none px-5 py-3"
                                     onClick={handleOrder}
                                 >
+                                    {isLoading && (
+                                        <div className="dot-spinner ms-4">
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                        </div>
+                                    )}
                                     <p>Đặt hàng</p>
                                 </button>
                             </div>

@@ -1,16 +1,16 @@
 import './ProductList.scss'
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { debounce } from 'lodash'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useNavigate } from 'react-router-dom'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
-import { removeDiacritics } from '../../utils/StringUtil'
-import { debounce } from 'lodash'
-import { useNavigate } from 'react-router-dom'
+import { removeDiacritics, removeVietnameseTones } from '../../utils/StringUtil'
 import Rating from '../../components/Rating'
 
 function ProductList() {
@@ -233,7 +233,13 @@ function ProductList() {
                         </Accordion>
                     </div>
                     <div style={{ width: '80%' }} className="px-5 py-2">
-                        <div className="d-flex align-items-center justify-content-end border-bottom pb-3">
+                        <div className="d-flex align-items-center justify-content-between border-bottom pb-3 gap-3">
+                            <div className="flex-grow-1">
+                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4">
+                                    <input type="text" className="input-text w-100" placeholder="Tìm kiếm" onChange={(e) => handleFilterChange('search', e.target.value)} value={filters.search} />
+                                    <FontAwesomeIcon icon={faSearch} size="xl" className="theme-color p-2" />
+                                </div>
+                            </div>
                             <div className="d-flex align-items-center">
                                 <p className="fw-medium me-4 fs-3">Sắp xếp theo</p>
                                 <div className="select">

@@ -21,3 +21,12 @@ export const removeDiacritics = (str) => {
     str = str.replace(/\s+/g, ' ')
     return str.trim()
 }
+
+export function removeVietnameseTones(str) {
+    return str
+        .normalize('NFD') // Chuyển chuỗi về dạng Normal Form Decomposition
+        .replace(/[\u0300-\u036f]/g, '') // Loại bỏ các dấu
+        .replace(/đ/g, 'd') // Chuyển 'đ' thành 'd'
+        .replace(/Đ/g, 'D') // Chuyển 'Đ' thành 'D'
+        .replace(/[^a-zA-Z0-9\s]/g, '') // Loại bỏ các ký tự đặc biệt nếu cần
+}

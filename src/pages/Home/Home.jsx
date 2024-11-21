@@ -53,17 +53,17 @@ function Home() {
                         loop={true}
                     >
                         {banners.map((banner) => (
-                            <SwiperSlide key={banner._id}>
-                                <img className="banner-image" src={banner.imageUrl} loading="lazy" />
+                            <SwiperSlide key={banner?._id}>
+                                <img className="banner-image" src={banner?.imageUrl} loading="lazy" />
                                 <div></div>
                                 <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                                 <button onClick={() => {}} className="primary-btn py-3 px-5 rounded-5 banner-button">
                                     <p className="fs-1 fw-bold">
-                                        {banner.buttonText} <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
+                                        {banner?.buttonText} <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
                                     </p>
                                 </button>
-                                <h2 className="banner-title">{banner.title}</h2>
-                                <p className="banner-description">{banner.description}</p>
+                                <h2 className="banner-title">{banner?.title}</h2>
+                                <p className="banner-description">{banner?.description}</p>
                             </SwiperSlide>
                         ))}
                     </Swiper>

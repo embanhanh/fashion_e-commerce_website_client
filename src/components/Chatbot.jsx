@@ -155,10 +155,9 @@ function Chatbot() {
             window.removeEventListener('df-chip-clicked', handleChipClick)
         }
     }, [chatMode.mode])
-
     return (
         <>
-            {chatMode.show && (
+            {chatMode.show && user && (
                 <button
                     className="primary-btn shadow-none rounded-5 position-fixed btn-switch-chat"
                     onClick={() =>

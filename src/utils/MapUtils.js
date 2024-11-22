@@ -2,7 +2,6 @@ import * as tt from '@tomtom-international/web-sdk-services'
 
 export const calculateRouteDistance = async (start, end) => {
     const apiKey = import.meta.env.VITE_API_KEY_TOMTOM_MAP
-    console.log(start)
 
     try {
         const routeResponse = await tt.services.calculateRoute({

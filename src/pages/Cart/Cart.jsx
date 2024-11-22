@@ -1,20 +1,23 @@
-import './Cart.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
+import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useLayoutEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
 import { createOrderAction } from '../../redux/slices/orderSilce'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
+
+import { calculateRouteDistance } from '../../utils/MapUtils'
 import SelectAddressModal from '../../components/SelectAddressModal'
 import Notification from '../../components/Notification'
-import { calculateRouteDistance } from '../../utils/MapUtils'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
+import './Cart.scss'
+import { set } from 'lodash'
 
 function Cart() {
     const dispatch = useDispatch()
@@ -54,7 +57,23 @@ function Cart() {
         type: '',
         title: '',
     })
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState({
+        shipping: false,
+        order: false,
+    })
+    const [comboDiscounts, setComboDiscounts] = useState([])
+    useEffect(() => {
+        const fetchCombos = async () => {
+            const promises = cart.items.map((item) => dispatch(getPromotionalComboByProductIdAction(item.variant.product._id)))
+            const results = await Promise.all(promises)
+            const comboDiscounts = results.map((result) => result.payload)
+            const finalCombos = [...new Set(comboDiscounts)]
+            setComboDiscounts(finalCombos)
+        }
+        if (cart.items?.length > 0) {
+            fetchCombos()
+        }
+    }, [cart.items])
 
     useEffect(() => {
         dispatch(fetchCart())
@@ -137,47 +156,67 @@ function Cart() {
     const calculateTotalShippingPrice = async () => {
         if (shopInfo && Object.keys(orderData.shippingAddress).length > 0 && addresses.length > 0) {
             if (orderData.products.length > 0) {
-                const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
-                if (distance) {
-                    let price = 0
-                    const distanceValue = distance.distance
-                    if (distanceValue <= 500) {
-                        price += Math.ceil(distanceValue) * 100
-                    } else {
-                        price += 75000
+                try {
+                    setIsLoading((pre) => ({
+                        ...pre,
+                        shipping: true,
+                    }))
+                    const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
+                    if (distance) {
+                        let price = 0
+                        const distanceValue = distance.distance
+                        if (distanceValue <= 500) {
+                            price += Math.ceil(distanceValue) * 100
+                        } else {
+                            price += 75000
+                        }
+                        if (orderData.products.length > 0) {
+                            const productsPrice = orderData.products.reduce((total, item) => {
+                                if (orderData.shippingMethod === 'basic') {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price *
+                                            item.quantity
+                                    )
+                                } else if (orderData.shippingMethod === 'fast') {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
+                                    )
+                                } else {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price *
+                                            item.quantity
+                                    )
+                                }
+                            }, 0)
+                            price += productsPrice
+                        }
+                        const totalPrice = orderData.productsPrice + price
+                        setOrderData({
+                            ...orderData,
+                            shippingPrice: price,
+                            expectedDeliveryDate: {
+                                startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
+                                endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
+                            },
+                            totalPrice,
+                            vouchers: [],
+                        })
                     }
-                    if (orderData.products.length > 0) {
-                        const productsPrice = orderData.products.reduce((total, item) => {
-                            if (orderData.shippingMethod === 'basic') {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price * item.quantity
-                                )
-                            } else if (orderData.shippingMethod === 'fast') {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
-                                )
-                            } else {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price * item.quantity
-                                )
-                            }
-                        }, 0)
-                        price += productsPrice
-                    }
-                    const totalPrice = orderData.productsPrice + price
-                    setOrderData({
-                        ...orderData,
-                        shippingPrice: price,
-                        expectedDeliveryDate: {
-                            startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
-                            endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
-                        },
-                        totalPrice,
-                        vouchers: [],
+                } catch (error) {
+                    setNotification({
+                        show: true,
+                        description: error.message,
+                        type: 'error',
+                        title: 'Lỗi',
                     })
+                } finally {
+                    setIsLoading((pre) => ({
+                        ...pre,
+                        shipping: false,
+                    }))
                 }
             } else {
                 setOrderData({
@@ -252,7 +291,10 @@ function Cart() {
                 vouchers: orderData.vouchers.map((voucher) => voucher._id),
             }
             try {
-                setIsLoading(true)
+                setIsLoading((pre) => ({
+                    ...pre,
+                    order: true,
+                }))
                 await dispatch(createOrderAction(finalOrderData)).unwrap()
                 setNotification({
                     show: true,
@@ -268,7 +310,10 @@ function Cart() {
                     title: 'Lỗi',
                 })
             } finally {
-                setIsLoading(false)
+                setIsLoading((pre) => ({
+                    ...pre,
+                    order: false,
+                }))
             }
         }
     }
@@ -305,6 +350,26 @@ function Cart() {
                 <div className="dot"></div>
             </section>
         )
+    }
+
+    const handleComboDiscountValue = (item) => {
+        const combo = comboDiscounts.find((combo) => combo.products.includes(item.variant.product._id))
+        if (combo) {
+            if (item.quantity <= combo.quantity) {
+                let discountValue = 0
+                for (let i = 0; i < combo.discountCombos.length; i++) {
+                    if (item.quantity >= combo.discountCombos[i].quantity) {
+                        discountValue = combo.discountCombos[i].discountValue
+                    }
+                }
+                if (combo.comboType === 'percentage') {
+                    return item.quantity * item.variant.price * (1 - discountValue / 100)
+                } else {
+                    return item.quantity * item.variant.price - discountValue
+                }
+            }
+        }
+        return item.quantity * item.variant.price
     }
 
     return (
@@ -347,7 +412,9 @@ function Cart() {
                                                             type="checkbox"
                                                             className="input-checkbox"
                                                             checked={orderData.products.some((product) => product.product === item.variant._id)}
-                                                            onChange={() => handleSelectItem(item.variant._id, item.quantity, item.variant.price)}
+                                                            onChange={(e) => {
+                                                                handleSelectItem(item.variant._id, item.quantity, item.variant.price)
+                                                            }}
                                                         />
                                                         <span className="custom-checkbox"></span>
                                                     </label>
@@ -369,7 +436,7 @@ function Cart() {
                                                             icon={faMinus}
                                                             size="lg"
                                                             className="p-4"
-                                                            onClick={() => {
+                                                            onClick={(e) => {
                                                                 if (item.quantity > 1) {
                                                                     handleQuantityChange(item._id, -1)
                                                                 }
@@ -377,13 +444,28 @@ function Cart() {
                                                             style={{ cursor: 'pointer' }}
                                                         />
                                                         <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
-                                                        <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
+                                                        <FontAwesomeIcon
+                                                            icon={faPlus}
+                                                            size="lg"
+                                                            className="p-4"
+                                                            onClick={(e) => {
+                                                                handleQuantityChange(item._id, 1)
+                                                            }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
-                                                    <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
+                                                    <p className="text-center fs-3">{handleComboDiscountValue(item)}đ</p>
                                                 </div>
-                                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 hover-icon" color="#ff7262" onClick={() => handleRemoveItem(item._id)} />
+                                                <FontAwesomeIcon
+                                                    icon={faTrashCan}
+                                                    className="fs-3 p-2 hover-icon"
+                                                    color="#ff7262"
+                                                    onClick={(e) => {
+                                                        handleRemoveItem(item._id)
+                                                    }}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -417,12 +499,23 @@ function Cart() {
                                 </p>
                                 <div className="d-flex align-items-center">
                                     <div className="flex-grow-1">
-                                        <p className="fs-3 fw-medium text-end">
-                                            {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
-                                                (orderData.shippingMethod === 'fast' && 'Nhanh') ||
-                                                (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
-                                            <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
-                                        </p>
+                                        {isLoading.shipping ? (
+                                            <section className="dots-container ">
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                            </section>
+                                        ) : (
+                                            <>
+                                                <p className="fs-3 fw-medium text-end">
+                                                    {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
+                                                        (orderData.shippingMethod === 'fast' && 'Nhanh') ||
+                                                        (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
+                                                    <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
+                                                </p>
+                                            </>
+                                        )}
                                         {orderData.expectedDeliveryDate.startDate && orderData.expectedDeliveryDate.endDate && (
                                             <p className="fs-4">
                                                 Đảm bảo nhận hàng từ {orderData.expectedDeliveryDate.startDate.toLocaleDateString('vi-VN')} đến{' '}
@@ -470,12 +563,13 @@ function Cart() {
                                         orderData.shippingAddress === null ||
                                         Object.keys(orderData.shippingAddress).length === 0 ||
                                         orderData.paymentMethod === null ||
-                                        isLoading
+                                        isLoading.order ||
+                                        isLoading.shipping
                                     }
                                     className="primary-btn shadow-none px-5 py-3"
                                     onClick={handleOrder}
                                 >
-                                    {isLoading && (
+                                    {isLoading.order && (
                                         <div className="dot-spinner ms-4">
                                             <div className="dot-spinner__dot"></div>
                                             <div className="dot-spinner__dot"></div>

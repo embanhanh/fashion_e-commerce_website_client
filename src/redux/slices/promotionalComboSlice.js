@@ -1,5 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createPromotionalCombo, getPromotionalCombos, getPromotionalComboById, updatePromotionalCombo, deleteManyPromotionalCombos } from '../../services/PromotionalComboService'
+import {
+    createPromotionalCombo,
+    getPromotionalCombos,
+    getPromotionalComboById,
+    updatePromotionalCombo,
+    deleteManyPromotionalCombos,
+    getPromotionalComboByProductId,
+} from '../../services/PromotionalComboService'
 
 export const createPromotionalComboAction = createAsyncThunk('promotionalCombo/createPromotionalCombo', async (promotionalComboData, { rejectWithValue }) => {
     try {
@@ -46,6 +53,15 @@ export const deleteManyPromotionalCombosAction = createAsyncThunk('promotionalCo
     }
 })
 
+export const getPromotionalComboByProductIdAction = createAsyncThunk('promotionalCombo/getPromotionalComboByProductId', async (productId, { rejectWithValue }) => {
+    try {
+        const response = await getPromotionalComboByProductId(productId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const promotionalComboSlice = createSlice({
     name: 'promotionalCombo',
     initialState: {
@@ -53,6 +69,7 @@ const promotionalComboSlice = createSlice({
         promotionalCombo: null,
         status: 'idle',
         error: null,
+        promotionalComboByProduct: null,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -103,6 +120,15 @@ const promotionalComboSlice = createSlice({
                 state.promotionalCombos = state.promotionalCombos.filter((combo) => !action.payload.includes(combo._id))
             })
             .addCase(deleteManyPromotionalCombosAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getPromotionalComboByProductIdAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(getPromotionalComboByProductIdAction.fulfilled, (state, action) => {
+                state.promotionalComboByProduct = action.payload
+            })
+            .addCase(getPromotionalComboByProductIdAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

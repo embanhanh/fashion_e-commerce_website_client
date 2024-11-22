@@ -12,6 +12,7 @@ import { Modal, Button, Toast } from 'react-bootstrap'
 
 import { fetchProductByProductName } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
+import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
 
 import product1 from '../../assets/image/product_image/product_image_1.png'
 import Rating from '../../components/Rating'
@@ -26,6 +27,7 @@ function ProductDetail() {
     const location = useLocation()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
     const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
+    const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
     // state ...
     const { currentProduct } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
@@ -59,6 +61,7 @@ function ProductDetail() {
 
     useEffect(() => {
         if (currentProduct) {
+            dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
             const images = [...currentProduct.urlImage, ...currentProduct.variants.map((variant) => variant.imageUrl)]
             setAllImages(images)
             const colors = currentProduct.variants
@@ -254,7 +257,7 @@ function ProductDetail() {
                                     <Rating initialRating={currentProduct.rating} readonly={true} size={24} className="mx-3" />
                                     <p className="fs-3 align-self-end">(100 đánh giá)</p>
                                 </div>
-                                <div className="d-flex gap-5 align-items-center p-4 bg-body-tertiary rounded-4 bg-theme">
+                                <div className="d-flex gap-5 align-items-center p-4 shadow-sm rounded-4 bg-theme">
                                     <p className="fs-1 fw-medium theme-color">{displayPrice - (displayPrice * currentProduct.discount) / 100}đ</p>
                                     {/* {currentProduct.discount > 0 && (
                                         <> */}
@@ -348,6 +351,24 @@ function ProductDetail() {
                                         <p>Bạn phải chọn phân loại hàng trước khi thêm vào giỏ hàng</p>
                                     </div>
                                 </div>
+                                {promotionalComboByProduct && (
+                                    <div className="p-4 rounded-4 combo-info-container mt-4 shadow-sm">
+                                        <p className="fs-4">
+                                            {promotionalComboByProduct.discountCombos.map((combo, index) => (
+                                                <span key={combo._id} className="lh-1">
+                                                    Mua <strong className="theme-color fs-3">{combo.quantity}</strong> sản phẩm sẽ được giảm{' '}
+                                                    <strong className="theme-color fs-3">
+                                                        {combo.discountValue} {promotionalComboByProduct.comboType === 'percentage' ? '%' : 'đ'}{' '}
+                                                    </strong>
+                                                    {index < promotionalComboByProduct.discountCombos.length - 1 && ' hoặc '}
+                                                </span>
+                                            ))}
+                                        </p>
+                                        <p className="fs-4">
+                                            Giới hạn sản phẩm để nhận combo là <strong className="theme-color fs-3">{promotionalComboByProduct.limitCombo}</strong>
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="pe-5 rounded-4 bg-white shadow p-5">

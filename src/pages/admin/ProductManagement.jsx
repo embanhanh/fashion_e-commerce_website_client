@@ -116,6 +116,7 @@ function ProductManagement() {
     }, [bulkAction])
 
     const renderProductItem = (product, index) => {
+        console.log(product)
         if (viewMode === 'list') {
             return (
                 <div key={index} className="product-grid product-row">
@@ -129,7 +130,7 @@ function ProductManagement() {
                         <img src={product.urlImage[0]} alt="" className="product-image" />
                         <p className="fs-4 fw-medium">{product.name}</p>
                     </div>
-                    <p className="fs-4 fw-medium text-center">{product.categories.map((category) => categories.find((c) => c._id === category).name).join(', ')}</p>
+                    <p className="fs-4 fw-medium text-center">{product.categories.map((category) => category.name).join(', ')}</p>
                     <p className="fs-4 fw-medium text-center">{product.originalPrice - (product.originalPrice * product.discount) / 100}</p>
                     <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
                     <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>

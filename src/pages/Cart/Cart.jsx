@@ -240,21 +240,21 @@ function Cart() {
         }
     }
 
-    const handleSelectItem = (itemId, quantity, price) => {
+    const handleSelectItem = (item) => {
         setOrderData((prev) => {
-            if (prev.products.some((product) => product.product === itemId)) {
-                const productsPrice = prev.productsPrice - quantity * price
+            if (prev.products.some((product) => product.product === item.variant._id)) {
+                const productsPrice = prev.productsPrice - handleComboDiscountValue(item)
                 return {
                     ...prev,
-                    products: prev.products.filter((product) => product.product !== itemId),
+                    products: prev.products.filter((product) => product.product !== item.variant._id),
                     productsPrice,
                     totalPrice: productsPrice + prev.shippingPrice,
                 }
             } else {
-                const productsPrice = prev.productsPrice + quantity * price
+                const productsPrice = prev.productsPrice + handleComboDiscountValue(item)
                 return {
                     ...prev,
-                    products: [...prev.products, { product: itemId, quantity }],
+                    products: [...prev.products, { product: item.variant._id, quantity: item.quantity }],
                     productsPrice,
                     totalPrice: productsPrice + prev.shippingPrice,
                 }
@@ -270,8 +270,8 @@ function Cart() {
                     product: item.variant._id,
                     quantity: item.quantity,
                 })),
-                productsPrice: cart.items.reduce((total, item) => total + item.variant.price * item.quantity, 0),
-                totalPrice: cart.items.reduce((total, item) => total + item.variant.price * item.quantity, 0) + prev.shippingPrice,
+                productsPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0),
+                totalPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0) + prev.shippingPrice,
             }))
         } else {
             setOrderData((prev) => ({
@@ -318,19 +318,29 @@ function Cart() {
         }
     }
 
-    const handleQuantityChange = async (itemId, change) => {
-        const item = cart.items.find((i) => i._id === itemId)
+    const handleQuantityChange = async (item, change) => {
+        const oldValue = handleComboDiscountValue(item)
         const newQuantity = Math.max(1, item.quantity + change)
-        await dispatch(updateItemQuantity({ itemId, quantity: newQuantity })).unwrap()
-        setOrderData((prev) => ({
-            ...prev,
-            products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
-            productsPrice: prev.productsPrice + item.variant.price * change,
-        }))
+        await dispatch(updateItemQuantity({ itemId: item._id, quantity: newQuantity })).unwrap()
+        console.log(handleComboDiscountValue(item, newQuantity), orderData.productsPrice, oldValue, newQuantity)
+        if (orderData.products.some((product) => product.product === item.variant._id)) {
+            setOrderData((prev) => ({
+                ...prev,
+                products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
+                productsPrice: prev.productsPrice - oldValue + handleComboDiscountValue(item, newQuantity),
+            }))
+        }
     }
 
-    const handleRemoveItem = (itemId) => {
-        dispatch(removeItemFromCart(itemId))
+    const handleRemoveItem = async (item) => {
+        await dispatch(removeItemFromCart(item._id)).unwrap()
+        if (orderData.products.some((product) => product.product === item.variant._id)) {
+            setOrderData((prev) => ({
+                ...prev,
+                products: prev.products.filter((product) => product.product !== item.variant._id),
+                productsPrice: prev.productsPrice - handleComboDiscountValue(item),
+            }))
+        }
     }
 
     const handleCloseVoucher = () => setShowVoucher(false)
@@ -352,24 +362,24 @@ function Cart() {
         )
     }
 
-    const handleComboDiscountValue = (item) => {
+    const handleComboDiscountValue = (item, newQuantity = null) => {
         const combo = comboDiscounts.find((combo) => combo.products.includes(item.variant.product._id))
         if (combo) {
-            if (item.quantity <= combo.quantity) {
+            if (newQuantity ? newQuantity <= combo.limitCombo : item.quantity <= combo.limitCombo) {
                 let discountValue = 0
                 for (let i = 0; i < combo.discountCombos.length; i++) {
-                    if (item.quantity >= combo.discountCombos[i].quantity) {
+                    if (newQuantity ? newQuantity >= combo.discountCombos[i].quantity : item.quantity >= combo.discountCombos[i].quantity) {
                         discountValue = combo.discountCombos[i].discountValue
                     }
                 }
                 if (combo.comboType === 'percentage') {
-                    return item.quantity * item.variant.price * (1 - discountValue / 100)
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - discountValue / 100)
                 } else {
-                    return item.quantity * item.variant.price - discountValue
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price - discountValue
                 }
             }
         }
-        return item.quantity * item.variant.price
+        return (newQuantity ? newQuantity : item.quantity) * item.variant.price
     }
 
     return (
@@ -413,7 +423,7 @@ function Cart() {
                                                             className="input-checkbox"
                                                             checked={orderData.products.some((product) => product.product === item.variant._id)}
                                                             onChange={(e) => {
-                                                                handleSelectItem(item.variant._id, item.quantity, item.variant.price)
+                                                                handleSelectItem(item)
                                                             }}
                                                         />
                                                         <span className="custom-checkbox"></span>
@@ -438,7 +448,7 @@ function Cart() {
                                                             className="p-4"
                                                             onClick={(e) => {
                                                                 if (item.quantity > 1) {
-                                                                    handleQuantityChange(item._id, -1)
+                                                                    handleQuantityChange(item, -1)
                                                                 }
                                                             }}
                                                             style={{ cursor: 'pointer' }}
@@ -449,7 +459,7 @@ function Cart() {
                                                             size="lg"
                                                             className="p-4"
                                                             onClick={(e) => {
-                                                                handleQuantityChange(item._id, 1)
+                                                                handleQuantityChange(item, 1)
                                                             }}
                                                             style={{ cursor: 'pointer' }}
                                                         />
@@ -463,7 +473,7 @@ function Cart() {
                                                     className="fs-3 p-2 hover-icon"
                                                     color="#ff7262"
                                                     onClick={(e) => {
-                                                        handleRemoveItem(item._id)
+                                                        handleRemoveItem(item)
                                                     }}
                                                 />
                                             </div>

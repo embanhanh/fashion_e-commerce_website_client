@@ -18,6 +18,7 @@ import product1 from '../../assets/image/product_image/product_image_1.png'
 import Rating from '../../components/Rating'
 import ProductCard from '../../components/ProductCard'
 import Notification from '../../components/Notification'
+import CheckoutProcess from '../../components/CheckoutProcess'
 import './ProductDetail.scss'
 
 function ProductDetail() {
@@ -42,6 +43,7 @@ function ProductDetail() {
     const [displayPrice, setDisplayPrice] = useState(0)
     // confirm and notification
     const [showLoginModal, setShowLoginModal] = useState(false)
+    const [showCheckoutProcess, setShowCheckoutProcess] = useState(false)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
     const [toastVariant, setToastVariant] = useState('success')
@@ -356,8 +358,8 @@ function ProductDetail() {
                                         <p className="fs-4">
                                             {promotionalComboByProduct.discountCombos.map((combo, index) => (
                                                 <span key={combo._id} className="lh-1">
-                                                    Mua <strong className="theme-color fs-3">{combo.quantity}</strong> sản phẩm sẽ được giảm{' '}
-                                                    <strong className="theme-color fs-3">
+                                                    Mua <strong className="theme-color-2 fs-3">{combo.quantity}</strong> sản phẩm sẽ được giảm{' '}
+                                                    <strong className="theme-color-2 fs-3">
                                                         {combo.discountValue} {promotionalComboByProduct.comboType === 'percentage' ? '%' : 'đ'}{' '}
                                                     </strong>
                                                     {index < promotionalComboByProduct.discountCombos.length - 1 && ' hoặc '}
@@ -365,7 +367,7 @@ function ProductDetail() {
                                             ))}
                                         </p>
                                         <p className="fs-4">
-                                            Giới hạn sản phẩm để nhận combo là <strong className="theme-color fs-3">{promotionalComboByProduct.limitCombo}</strong>
+                                            Giới hạn sản phẩm để nhận combo là <strong className="theme-color-2 fs-3">{promotionalComboByProduct.limitCombo}</strong>
                                         </p>
                                     </div>
                                 )}
@@ -426,9 +428,15 @@ function ProductDetail() {
                 )}
             </div>
             <Modal show={showLoginModal} onHide={() => setShowLoginModal(false)} centered>
-                <Notification type="info" title="Thông báo" description="Vui lòng đăng nhập để tiếp tục mua hàng">
+                <Notification type="info" title="Thông báo" description="Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?">
                     <div className="d-flex gap-4 align-items-center justify-content-center bg-white">
-                        <button className=" border px-4 py-2 bg-white rounded-4" onClick={() => setShowLoginModal(false)}>
+                        <button
+                            className=" border px-4 py-2 bg-white rounded-4"
+                            onClick={() => {
+                                setShowLoginModal(false)
+                                setShowCheckoutProcess(true)
+                            }}
+                        >
                             <p className="fs-4">Hủy</p>
                         </button>
                         <button className="primary-btn info-btn py-2 px-4 rounded-4" onClick={handleLoginRedirect}>
@@ -440,6 +448,7 @@ function ProductDetail() {
             <Modal show={showToast} onHide={() => setShowToast(false)} centered>
                 <Notification type={toastVariant} title="Thông báo" description={toastMessage} />
             </Modal>
+            {showCheckoutProcess && <CheckoutProcess onClose={() => setShowCheckoutProcess(false)} />}
         </>
     )
 }

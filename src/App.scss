@@ -3,12 +3,20 @@
     color: var(--theme-color-1) !important;
 }
 
+.theme-color-2 {
+    color: var(--theme-color-2) !important;
+}
+
 .border-theme {
     border-color: var(--theme-color) !important;
 }
 
 .bg-theme {
     background-color: var(--theme-color) !important;
+}
+
+.bg-theme-2 {
+    background-color: var(--theme-color-2) !important;
 }
 
 .primary-btn {

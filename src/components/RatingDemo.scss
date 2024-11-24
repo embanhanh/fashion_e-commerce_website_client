@@ -1,0 +1,16 @@
+.rating-preview__container {
+    &:hover {
+        .rating-preview__btn-close {
+            display: block;
+        }
+    }
+
+    .rating-preview__btn-close {
+        display: none;
+        padding: 10px;
+        border-bottom-left-radius: 8px;
+        border-top-right-radius: 8px;
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+}

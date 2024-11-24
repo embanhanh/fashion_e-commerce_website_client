@@ -1,0 +1,74 @@
+.checkout-process {
+    &_container {
+        position: relative;
+        margin: 0 50px;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #e0e0e0;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .process-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 2px;
+            background-color: var(--theme-color-1);
+            transform: translateY(-50%);
+            transition: width 0.5s ease-in-out;
+            z-index: 1;
+        }
+    }
+
+    &_step {
+        position: relative;
+        z-index: 2;
+        background-color: white;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+
+        &.active {
+            background-color: var(--theme-color-1);
+            border-color: var(--theme-color-1);
+            color: white;
+        }
+
+        &.completed {
+            background-color: var(--theme-color-1);
+            border-color: var(--theme-color-1);
+            color: white;
+        }
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    &_label {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 1.4rem;
+        color: #666;
+
+        &.active {
+            color: var(--theme-color-1);
+            font-weight: bold;
+        }
+    }
+}

@@ -211,28 +211,29 @@ input[type='number'] {
 
     .page-item {
         margin: 0 5px;
-
         .page-link {
             height: 35px;
             width: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1.6rem;
             background-color: #fff;
-            color: #000;
-            border: 1.5px solid #000;
+            color: var(--theme-color-2);
+            border: 1.5px solid var(--theme-color-2);
         }
 
         .page-link:hover {
-            background-color: black;
+            background-color: var(--theme-color-2);
+            border-color: var(--theme-color-2);
             color: white;
         }
     }
 
     .active .page-link {
-        background-color: black;
+        background-color: var(--theme-color-2);
+        border-color: var(--theme-color-2);
         color: white;
     }
 

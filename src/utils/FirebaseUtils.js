@@ -17,9 +17,8 @@ export const createNewChat = async (userData) => {
         updatedAt: serverTimestamp(),
     }
 
-    const docRef = await setDoc(doc(db, CHAT_COLLECTION, userData._id), newChat)
+    await setDoc(doc(db, CHAT_COLLECTION, userData._id), newChat)
     return {
-        id: docRef.id,
         ...newChat,
     }
 }

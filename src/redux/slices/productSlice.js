@@ -13,7 +13,6 @@ import _ from 'lodash'
 
 export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params, { rejectWithValue }) => {
     try {
-        console.log(params)
         const response = await getAllProducts(params)
         return response
     } catch (error) {

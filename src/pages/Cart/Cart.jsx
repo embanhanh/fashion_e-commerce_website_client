@@ -373,13 +373,13 @@ function Cart() {
                     }
                 }
                 if (combo.comboType === 'percentage') {
-                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - discountValue / 100)
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - discountValue / 100) * (1 - item.variant.product.discount / 100)
                 } else {
-                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price - discountValue
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price - discountValue * (1 - item.variant.product.discount / 100)
                 }
             }
         }
-        return (newQuantity ? newQuantity : item.quantity) * item.variant.price
+        return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - item.variant.product.discount / 100)
     }
 
     return (

@@ -4,6 +4,7 @@ import Pagination from 'react-bootstrap/Pagination'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
@@ -273,63 +274,57 @@ function ProductList() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="row" style={{ minHeight: '200px' }}>
-                            {status === 'loading' ? (
-                                <section className="dots-container mt-4">
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                </section>
-                            ) : (
-                                <>
-                                    {products.map((product, index) => (
-                                        <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
-                                            <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
-                                        </div>
-                                    ))}
-                                    {products.length === 0 && (
-                                        <div className="d-flex justify-content-center align-items-center">
-                                            <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
-                                        </div>
-                                    )}
-                                </>
-                            )}
+                        <div className="" style={{ minHeight: '1200px' }}>
+                            <div className="row">
+                                {status === 'loading' ? (
+                                    <section className="dots-container mt-4">
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                    </section>
+                                ) : (
+                                    <>
+                                        {products.map((product, index) => (
+                                            <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
+                                                <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
+                                            </div>
+                                        ))}
+                                        {products.length === 0 && (
+                                            <div className="d-flex justify-content-center align-items-center">
+                                                <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className="">
-                            {/* <Pagination>
+                            <Pagination>
                                 <Pagination.Prev
                                     onClick={() => {
                                         window.scrollTo(0, 0)
-                                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                        handlePageChange(currentPage - 1)
                                     }}
                                     disabled={currentPage === 1}
                                 >
                                     <FontAwesomeIcon icon={faCaretLeft} size="lg" />
                                 </Pagination.Prev>
                                 {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => paginate(index + 1)}>
+                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
                                         {index + 1}
                                     </Pagination.Item>
                                 ))}
                                 <Pagination.Next
                                     onClick={() => {
                                         window.scrollTo(0, 0)
-                                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                        handlePageChange(currentPage + 1)
                                     }}
                                     disabled={currentPage === totalPages}
                                 >
                                     <FontAwesomeIcon icon={faCaretRight} size="lg" />
                                 </Pagination.Next>
-                            </Pagination> */}
-                            <Pagination>
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
-                                        {index + 1}
-                                    </Pagination.Item>
-                                ))}
                             </Pagination>
                         </div>
                     </div>

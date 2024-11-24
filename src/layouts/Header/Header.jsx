@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState, useEffect, useMemo } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBagShopping, faBell, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { updateDoc } from 'firebase/firestore'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart } from '../../redux/slices/cartSlice'
 import { logout } from '../../redux/slices/authSlice'
@@ -17,8 +18,7 @@ import logoShop from '../../assets/image/logo/logo.png'
 function Header({ location }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { isLoggedIn } = useSelector((state) => state.auth)
-    const { user } = useSelector((state) => state.user)
+    const { isLoggedIn, user } = useSelector((state) => state.auth)
     const { categories, status } = useSelector((state) => state.category)
     const { cart, status: cartStatus } = useSelector((state) => state.cart)
     const { shopInfo } = useSelector((state) => state.shop)
@@ -65,14 +65,43 @@ function Header({ location }) {
             }
             const unsubscribe = onSnapshot(docs, (doc) => {
                 if (doc.exists()) {
-                    const notifs = doc.data().notifications || []
-                    setNotifications(notifs)
+                    const allNotifs = doc.data().notifications || []
+
+                    const recentNotifs = Array.from(allNotifs).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    setNotifications(recentNotifs)
                 }
             })
 
             return () => unsubscribe()
         }
     }, [user])
+
+    const handleReadNotification = async () => {
+        try {
+            const notificationRef = doc(db, 'notifications', user.role === 'admin' ? 'admin' : user._id)
+
+            // Tìm các thông báo chưa đọc
+            const unreadNotifications = notifications.filter((notif) => !notif.read)
+
+            // Nếu không có thông báo nào chưa đọc thì return
+            if (unreadNotifications.length === 0) return
+
+            // Tạo mảng notifications mới, chỉ cập nhật những thông báo chưa đọc
+            const updatedNotifications = notifications.map((notif) => {
+                if (!notif.read) {
+                    return { ...notif, read: true }
+                }
+                return notif
+            })
+
+            // Cập nhật vào Firestore
+            await updateDoc(notificationRef, {
+                notifications: updatedNotifications,
+            })
+        } catch (error) {
+            console.error('Lỗi khi đánh dấu đã đọc:', error)
+        }
+    }
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -170,21 +199,33 @@ function Header({ location }) {
                             <>
                                 <div className="d-flex align-items-center gap-3">
                                     <div className="p-2 notification-container  rounded-3 position-relative">
-                                        <FontAwesomeIcon className="fs-2" icon={faBell} />
-                                        {notifications.length > 0 && <span className="notification-count">{notifications.length}</span>}
+                                        <FontAwesomeIcon className="fs-2" icon={faBell} onMouseEnter={() => handleReadNotification()} />
+                                        {notifications.length > 0 && <span className="notification-count">{notifications.filter((notif) => !notif.read).length}</span>}
                                         <div className="notification-mini position-absolute shadow rounded-4 p-4">
                                             <div className="mb-3 notification-item-container scrollbar-y">
                                                 {notifications.length === 0 ? (
                                                     <p className="fs-4 text-center">Không có thông báo nào</p>
                                                 ) : (
                                                     notifications.map((notif, index) => (
-                                                        <div key={index} className="d-flex align-items-center py-3 px-2 border-bottom hover-icon">
-                                                            <img src={logoShop} alt="" width={32} height={32} />
+                                                        <div
+                                                            key={index}
+                                                            className="d-flex align-items-center py-3 px-2 border-bottom hover-icon"
+                                                            style={{ cursor: 'pointer', backgroundColor: notif.read ? 'transparent' : '#f0f0f0' }}
+                                                            onClick={() => {
+                                                                navigate(notif.link)
+                                                            }}
+                                                        >
+                                                            <img src={shopInfo?.logo} alt="" height={32} />
                                                             <p className="fs-4 ms-2">{notif.message}</p>
                                                         </div>
                                                     ))
                                                 )}
                                             </div>
+                                            {notifications.length > 0 && (
+                                                <div className="d-flex w-100">
+                                                    <button className="primary-btn mt-3 mx-auto fs-3 py-2">Xem tất cả</button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     {user?.role !== 'admin' && (

@@ -285,6 +285,9 @@
         max-height: 300px;
         overflow-y: auto;
         padding-right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
 
         .border-bottom {
             border-color: rgba(174, 225, 225, 0.3) !important;

@@ -1,14 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createVoucher, getVouchers, updateVoucher, deleteVoucher, deleteManyVoucher, getVoucherById, giveVoucher, giveVoucherMany } from '../../services/VoucherService'
+import {
+    createVoucher,
+    getVouchers,
+    updateVoucher,
+    deleteVoucher,
+    deleteManyVoucher,
+    getVoucherById,
+    giveVoucher,
+    giveVoucherMany,
+    getVoucherByCode,
+} from '../../services/VoucherService'
 
-export const createVoucherAction = createAsyncThunk('voucher/createVoucher', async (voucherData, { rejectWithValue }) => {
-    try {
-        const response = await createVoucher(voucherData)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const createVoucherAction = createAsyncThunk(
+    'voucher/createVoucher',
+    async (voucherData, { rejectWithValue }) => {
+        try {
+            const response = await createVoucher(voucherData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 export const getVouchersAction = createAsyncThunk('voucher/getVouchers', async (_, { rejectWithValue }) => {
     try {
@@ -19,50 +32,77 @@ export const getVouchersAction = createAsyncThunk('voucher/getVouchers', async (
     }
 })
 
-export const getVoucherByIdAction = createAsyncThunk('voucher/getVoucherById', async (voucherId, { rejectWithValue }) => {
-    try {
-        const response = await getVoucherById(voucherId)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const getVoucherByIdAction = createAsyncThunk(
+    'voucher/getVoucherById',
+    async (voucherId, { rejectWithValue }) => {
+        try {
+            const response = await getVoucherById(voucherId)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const updateVoucherAction = createAsyncThunk('voucher/updateVoucher', async ({ voucherId, voucherData }, { rejectWithValue }) => {
-    try {
-        const response = await updateVoucher(voucherId, voucherData)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateVoucherAction = createAsyncThunk(
+    'voucher/updateVoucher',
+    async ({ voucherId, voucherData }, { rejectWithValue }) => {
+        try {
+            const response = await updateVoucher(voucherId, voucherData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const deleteManyVoucherAction = createAsyncThunk('voucher/deleteManyVoucher', async (voucherIds, { rejectWithValue }) => {
-    try {
-        const response = await deleteManyVoucher(voucherIds)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const deleteManyVoucherAction = createAsyncThunk(
+    'voucher/deleteManyVoucher',
+    async (voucherIds, { rejectWithValue }) => {
+        try {
+            const response = await deleteManyVoucher(voucherIds)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const giveVoucherAction = createAsyncThunk('voucher/giveVoucher', async ({ userId, voucherIds, message }, { rejectWithValue }) => {
-    try {
-        const response = await giveVoucher(userId, voucherIds, message)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const giveVoucherAction = createAsyncThunk(
+    'voucher/giveVoucher',
+    async ({ userId, voucherIds, message }, { rejectWithValue }) => {
+        try {
+            const response = await giveVoucher(userId, voucherIds, message)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const giveVoucherManyAction = createAsyncThunk('voucher/giveVoucherMany', async ({ userIds, voucherIds, message }, { rejectWithValue }) => {
-    try {
-        const response = await giveVoucherMany(userIds, voucherIds, message)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const giveVoucherManyAction = createAsyncThunk(
+    'voucher/giveVoucherMany',
+    async ({ userIds, voucherIds, message }, { rejectWithValue }) => {
+        try {
+            const response = await giveVoucherMany(userIds, voucherIds, message)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
+
+export const getVoucherByCodeAction = createAsyncThunk(
+    'voucher/getVoucherByCode',
+    async (voucherCode, { rejectWithValue }) => {
+        try {
+            const response = await getVoucherByCode(voucherCode)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
 
 const voucherSlice = createSlice({
     name: 'voucher',
@@ -110,7 +150,9 @@ const voucherSlice = createSlice({
                 state.error = null
             })
             .addCase(updateVoucherAction.fulfilled, (state, action) => {
-                state.vouchers = state.vouchers.map((voucher) => (voucher._id === action.payload._id ? action.payload : voucher))
+                state.vouchers = state.vouchers.map((voucher) =>
+                    voucher._id === action.payload._id ? action.payload : voucher
+                )
             })
             .addCase(updateVoucherAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -140,6 +182,15 @@ const voucherSlice = createSlice({
                 state.error = null
             })
             .addCase(giveVoucherManyAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getVoucherByCodeAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(getVoucherByCodeAction.fulfilled, (state, action) => {
+                state.currentVoucher = action.payload
+            })
+            .addCase(getVoucherByCodeAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

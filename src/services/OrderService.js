@@ -72,3 +72,12 @@ export const updateOrderStatusMany = async (orderIds, status) => {
         throw error
     }
 }
+
+export const createOrderFromGuest = async (orderData, address) => {
+    try {
+        const response = await axios.post(API_URL + 'create-from-guest', { orderData, address })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

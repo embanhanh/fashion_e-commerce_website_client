@@ -117,3 +117,12 @@ export const giveVoucherMany = async (userIds, voucherIds, message) => {
         throw error
     }
 }
+
+export const getVoucherByCode = async (voucherCode) => {
+    try {
+        const response = await axios.get(API_URL + 'get-by-code/' + voucherCode)
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

@@ -1,5 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createOrder, getOrders, getAdminOrders, updateOrderStatusMany, getOrderById } from '../../services/OrderService'
+import {
+    createOrder,
+    getOrders,
+    getAdminOrders,
+    updateOrderStatusMany,
+    getOrderById,
+    createOrderFromGuest,
+} from '../../services/OrderService'
 
 export const createOrderAction = createAsyncThunk('order/createOrder', async (orderData, { rejectWithValue }) => {
     try {
@@ -37,20 +44,35 @@ export const getAdminOrdersAction = createAsyncThunk('order/getAdminOrders', asy
     }
 })
 
-export const updateOrderStatusManyAction = createAsyncThunk('order/updateOrderStatusMany', async ({ orderIds, status }, { rejectWithValue }) => {
-    try {
-        const response = await updateOrderStatusMany(orderIds, status)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateOrderStatusManyAction = createAsyncThunk(
+    'order/updateOrderStatusMany',
+    async ({ orderIds, status }, { rejectWithValue }) => {
+        try {
+            const response = await updateOrderStatusMany(orderIds, status)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
+
+export const createOrderFromGuestAction = createAsyncThunk(
+    'order/createOrderFromGuest',
+    async ({ orderData, address }, { rejectWithValue }) => {
+        try {
+            const response = await createOrderFromGuest(orderData, address)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
 
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
         orders: [],
-        currentOrder: null,        
+        currentOrder: null,
         filters: {
             status: '',
             productName: '',
@@ -104,7 +126,9 @@ const orderSlice = createSlice({
                 state.error = null
             })
             .addCase(updateOrderStatusManyAction.fulfilled, (state, action) => {
-                state.orders = state.orders.map((order) => (action.payload.orderIds.includes(order._id) ? { ...order, status: action.payload.status } : order))
+                state.orders = state.orders.map((order) =>
+                    action.payload.orderIds.includes(order._id) ? { ...order, status: action.payload.status } : order
+                )
             })
             .addCase(updateOrderStatusManyAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -116,6 +140,15 @@ const orderSlice = createSlice({
                 state.currentOrder = action.payload
             })
             .addCase(getOrderByIdAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(createOrderFromGuestAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(createOrderFromGuestAction.fulfilled, (state, action) => {
+                state.orders.push(action.payload)
+            })
+            .addCase(createOrderFromGuestAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

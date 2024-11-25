@@ -17,7 +17,6 @@ import Notification from '../../components/Notification'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
 import './Cart.scss'
-import { set } from 'lodash'
 
 function Cart() {
     const dispatch = useDispatch()
@@ -64,7 +63,9 @@ function Cart() {
     const [comboDiscounts, setComboDiscounts] = useState([])
     useEffect(() => {
         const fetchCombos = async () => {
-            const promises = cart.items.map((item) => dispatch(getPromotionalComboByProductIdAction(item.variant.product._id)))
+            const promises = cart.items.map((item) =>
+                dispatch(getPromotionalComboByProductIdAction(item.variant.product._id))
+            )
             const results = await Promise.all(promises)
             const comboDiscounts = results.map((result) => result.payload)
             const finalCombos = [...new Set(comboDiscounts)]
@@ -175,18 +176,28 @@ function Cart() {
                                 if (orderData.shippingMethod === 'basic') {
                                     return (
                                         total +
-                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price *
+                                        cart.items
+                                            .find((cartItem) => cartItem.variant._id === item.product)
+                                            ?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')
+                                            ?.price *
                                             item.quantity
                                     )
                                 } else if (orderData.shippingMethod === 'fast') {
                                     return (
                                         total +
-                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
+                                        cart.items
+                                            .find((cartItem) => cartItem.variant._id === item.product)
+                                            ?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')
+                                            ?.price *
+                                            item.quantity
                                     )
                                 } else {
                                     return (
                                         total +
-                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price *
+                                        cart.items
+                                            .find((cartItem) => cartItem.variant._id === item.product)
+                                            ?.variant.product?.shippingInfo?.find((info) => info.type === 'express')
+                                            ?.price *
                                             item.quantity
                                     )
                                 }
@@ -199,7 +210,7 @@ function Cart() {
                             shippingPrice: price,
                             expectedDeliveryDate: {
                                 startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
-                                endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
+                                endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 2)),
                             },
                             totalPrice,
                             vouchers: [],
@@ -271,7 +282,8 @@ function Cart() {
                     quantity: item.quantity,
                 })),
                 productsPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0),
-                totalPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0) + prev.shippingPrice,
+                totalPrice:
+                    cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0) + prev.shippingPrice,
             }))
         } else {
             setOrderData((prev) => ({
@@ -326,7 +338,9 @@ function Cart() {
         if (orderData.products.some((product) => product.product === item.variant._id)) {
             setOrderData((prev) => ({
                 ...prev,
-                products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
+                products: prev.products.map((product) =>
+                    product.product === item.variant._id ? { ...product, quantity: newQuantity } : product
+                ),
                 productsPrice: prev.productsPrice - oldValue + handleComboDiscountValue(item, newQuantity),
             }))
         }
@@ -368,18 +382,32 @@ function Cart() {
             if (newQuantity ? newQuantity <= combo.limitCombo : item.quantity <= combo.limitCombo) {
                 let discountValue = 0
                 for (let i = 0; i < combo.discountCombos.length; i++) {
-                    if (newQuantity ? newQuantity >= combo.discountCombos[i].quantity : item.quantity >= combo.discountCombos[i].quantity) {
+                    if (
+                        newQuantity
+                            ? newQuantity >= combo.discountCombos[i].quantity
+                            : item.quantity >= combo.discountCombos[i].quantity
+                    ) {
                         discountValue = combo.discountCombos[i].discountValue
                     }
                 }
                 if (combo.comboType === 'percentage') {
-                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - discountValue / 100) * (1 - item.variant.product.discount / 100)
+                    return (
+                        (newQuantity ? newQuantity : item.quantity) *
+                        item.variant.price *
+                        (1 - discountValue / 100) *
+                        (1 - item.variant.product.discount / 100)
+                    )
                 } else {
-                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price - discountValue * (1 - item.variant.product.discount / 100)
+                    return (
+                        (newQuantity ? newQuantity : item.quantity) * item.variant.price -
+                        discountValue * (1 - item.variant.product.discount / 100)
+                    )
                 }
             }
         }
-        return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - item.variant.product.discount / 100)
+        return (
+            (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - item.variant.product.discount / 100)
+        )
     }
 
     return (
@@ -393,7 +421,10 @@ function Cart() {
                         ) : status === 'succeeded' && cart.items.length === 0 ? (
                             <div className="text-center">
                                 <p className="fs-3 fw-medium">Giỏ hàng của bạn còn trống</p>
-                                <button className="primary-btn px-4 py-2 shadow-none mt-3" onClick={() => navigate('/products')}>
+                                <button
+                                    className="primary-btn px-4 py-2 shadow-none mt-3"
+                                    onClick={() => navigate('/products')}
+                                >
                                     <p>Mua ngay</p>
                                 </button>
                             </div>
@@ -404,7 +435,12 @@ function Cart() {
                                     <div className="d-flex pb-3 border-bottom">
                                         <div className="d-flex" style={{ width: '40%' }}>
                                             <label className="d-flex align-items-center">
-                                                <input type="checkbox" className="input-checkbox" onChange={handleSelectAll} checked={orderData.products.length === cart.items.length} />
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    onChange={handleSelectAll}
+                                                    checked={orderData.products.length === cart.items.length}
+                                                />
                                                 <span className="custom-checkbox"></span>
                                             </label>
                                             <p className="fs-3 ms-3 fw-medium ">Sản phẩm</p>
@@ -415,26 +451,44 @@ function Cart() {
                                     </div>
                                     <div className="" style={{ maxHeight: 1000, overflowY: 'auto' }}>
                                         {cart.items.map((item) => (
-                                            <div key={item._id} className="d-flex py-3 border-bottom align-items-center">
+                                            <div
+                                                key={item._id}
+                                                className="d-flex py-3 border-bottom align-items-center"
+                                            >
                                                 <div className="d-flex align-items-center" style={{ width: '40%' }}>
                                                     <label className="d-flex align-items-center">
                                                         <input
                                                             type="checkbox"
                                                             className="input-checkbox"
-                                                            checked={orderData.products.some((product) => product.product === item.variant._id)}
+                                                            checked={orderData.products.some(
+                                                                (product) => product.product === item.variant._id
+                                                            )}
                                                             onChange={(e) => {
                                                                 handleSelectItem(item)
                                                             }}
                                                         />
                                                         <span className="custom-checkbox"></span>
                                                     </label>
-                                                    <img className="mx-3" src={item.variant.product?.urlImage} alt="" width={70} height={70} />
+                                                    <img
+                                                        className="mx-3"
+                                                        src={item.variant.product?.urlImage}
+                                                        alt=""
+                                                        width={70}
+                                                        height={70}
+                                                    />
                                                     <div className="flex-grow-1">
-                                                        <p className="fs-3 fw-medium product-name" style={{ maxWidth: '80%' }}>
+                                                        <p
+                                                            className="fs-3 fw-medium product-name"
+                                                            style={{ maxWidth: '80%' }}
+                                                        >
                                                             {item.variant.product?.name}
                                                         </p>
-                                                        {item.variant.size && <p className="fw-medium">Size: {item.variant.size}</p>}
-                                                        {item.variant.color && <p className="fw-medium">Màu: {item.variant.color}</p>}
+                                                        {item.variant.size && (
+                                                            <p className="fw-medium">Size: {item.variant.size}</p>
+                                                        )}
+                                                        {item.variant.color && (
+                                                            <p className="fw-medium">Màu: {item.variant.color}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
@@ -466,7 +520,9 @@ function Cart() {
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
-                                                    <p className="text-center fs-3">{handleComboDiscountValue(item)}đ</p>
+                                                    <p className="text-center fs-3">
+                                                        {handleComboDiscountValue(item)}đ
+                                                    </p>
                                                 </div>
                                                 <FontAwesomeIcon
                                                     icon={faTrashCan}
@@ -494,9 +550,15 @@ function Cart() {
                                     <FontAwesomeIcon icon={faTicket} className="fs-2" /> Mã giảm giá
                                 </p>
                                 <div className="d-flex align-items-center">
-                                    {discountValue.value > 0 && <p className="fs-4 fw-medium p-2 me-2 border border-primary-subtle text-info">{`${Math.round(discountValue.value / 1000)}K`}</p>}
+                                    {discountValue.value > 0 && (
+                                        <p className="fs-4 fw-medium p-2 me-2 border border-primary-subtle text-info">{`${Math.round(
+                                            discountValue.value / 1000
+                                        )}K`}</p>
+                                    )}
                                     {discountValue.shipping > 0 && (
-                                        <p className="fs-4 fw-medium p-2 border border-success-subtle text-success-emphasis me-2">{`${Math.round(discountValue.shipping / 1000)}K`}</p>
+                                        <p className="fs-4 fw-medium p-2 border border-success-subtle text-success-emphasis me-2">{`${Math.round(
+                                            discountValue.shipping / 1000
+                                        )}K`}</p>
                                     )}
                                     <div className="primary-btn px-2 py-1 shadow-none" onClick={handleShowVoucher}>
                                         <p>Chọn</p>
@@ -522,18 +584,30 @@ function Cart() {
                                                     {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
                                                         (orderData.shippingMethod === 'fast' && 'Nhanh') ||
                                                         (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
-                                                    <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
+                                                    <span className="fs-4 text-body-tertiary ms-2">
+                                                        {orderData.shippingPrice}đ
+                                                    </span>
                                                 </p>
                                             </>
                                         )}
-                                        {orderData.expectedDeliveryDate.startDate && orderData.expectedDeliveryDate.endDate && (
-                                            <p className="fs-4">
-                                                Đảm bảo nhận hàng từ {orderData.expectedDeliveryDate.startDate.toLocaleDateString('vi-VN')} đến{' '}
-                                                {orderData.expectedDeliveryDate.endDate.toLocaleDateString('vi-VN')}
-                                            </p>
-                                        )}
+                                        {orderData.expectedDeliveryDate.startDate &&
+                                            orderData.expectedDeliveryDate.endDate && (
+                                                <p className="fs-4">
+                                                    Đảm bảo nhận hàng từ{' '}
+                                                    {orderData.expectedDeliveryDate.startDate.toLocaleDateString(
+                                                        'vi-VN'
+                                                    )}{' '}
+                                                    đến{' '}
+                                                    {orderData.expectedDeliveryDate.endDate.toLocaleDateString('vi-VN')}
+                                                </p>
+                                            )}
                                     </div>
-                                    <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={() => setShowShippingMethod(true)} />
+                                    <FontAwesomeIcon
+                                        icon={faPen}
+                                        color="#4a90e2"
+                                        className="hover-icon fs-2 ms-2 p-2"
+                                        onClick={() => setShowShippingMethod(true)}
+                                    />
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
@@ -544,13 +618,20 @@ function Cart() {
                                             <>
                                                 <p className="fs-3">{orderData.shippingAddress?.name}</p>
                                                 <p className="fs-3">{orderData.shippingAddress?.phone}</p>
-                                                <p className="fs-3 fw-medium product-name">{orderData.shippingAddress?.location}</p>
+                                                <p className="fs-3 fw-medium product-name">
+                                                    {orderData.shippingAddress?.location}
+                                                </p>
                                             </>
                                         ) : (
                                             <p className="fs-3 text-danger">Chưa chọn địa chỉ</p>
                                         )}
                                     </div>
-                                    <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={handleShowAddress} />
+                                    <FontAwesomeIcon
+                                        icon={faPen}
+                                        color="#4a90e2"
+                                        className="hover-icon fs-2 ms-2 p-2"
+                                        onClick={handleShowAddress}
+                                    />
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
@@ -558,8 +639,15 @@ function Cart() {
                                     Phương thức thanh toán:
                                 </p>
                                 <div className="d-flex align-items-center">
-                                    <p className="fs-3">{orderData.paymentMethod === 'paymentUponReceipt' && 'Khi nhận hàng'}</p>
-                                    <FontAwesomeIcon icon={faPen} color="#4a90e2" className="hover-icon fs-2 ms-2 p-2" onClick={handleShowPaymentMethod} />
+                                    <p className="fs-3">
+                                        {orderData.paymentMethod === 'paymentUponReceipt' && 'Khi nhận hàng'}
+                                    </p>
+                                    <FontAwesomeIcon
+                                        icon={faPen}
+                                        color="#4a90e2"
+                                        className="hover-icon fs-2 ms-2 p-2"
+                                        onClick={handleShowPaymentMethod}
+                                    />
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
@@ -599,8 +687,16 @@ function Cart() {
                 </div>
             </div>
             {notification.show && (
-                <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
-                    <Notification title={notification.title} description={notification.description} type={notification.type} />
+                <Modal
+                    show={notification.show}
+                    onHide={() => setNotification({ ...notification, show: false })}
+                    centered
+                >
+                    <Notification
+                        title={notification.title}
+                        description={notification.description}
+                        type={notification.type}
+                    />
                 </Modal>
             )}
             {showShippingMethod && (
@@ -615,7 +711,14 @@ function Cart() {
             )}
             {/* Modal Voucher */}
             {showVoucher && (
-                <VoucherModal cart={cart} showVoucher={showVoucher} handleCloseVoucher={handleCloseVoucher} orderData={orderData} setOrderData={setOrderData} originalVouchers={orderData.vouchers} />
+                <VoucherModal
+                    cart={cart}
+                    showVoucher={showVoucher}
+                    handleCloseVoucher={handleCloseVoucher}
+                    orderData={orderData}
+                    setOrderData={setOrderData}
+                    originalVouchers={orderData.vouchers}
+                />
             )}
             {showAddress && (
                 <SelectAddressModal
@@ -651,10 +754,18 @@ function Cart() {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
+                        <div
+                            className="primary-btn px-4 py-2 shadow-none light border rounded-3"
+                            variant="secondary"
+                            onClick={handleClosePaymentMethod}
+                        >
                             <p>Đóng</p>
                         </div>
-                        <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
+                        <div
+                            className="primary-btn px-4 py-2 shadow-none"
+                            variant="secondary"
+                            onClick={handleClosePaymentMethod}
+                        >
                             <p>Xác nhận</p>
                         </div>
                     </Modal.Footer>

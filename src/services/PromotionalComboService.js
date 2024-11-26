@@ -70,3 +70,12 @@ export const deleteManyPromotionalCombos = async (comboIds) => {
         throw error
     }
 }
+
+export const getPromotionalComboByProductId = async (productId) => {
+    try {
+        const response = await axios.get(API_URL + `get-by-product/${productId}`)
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

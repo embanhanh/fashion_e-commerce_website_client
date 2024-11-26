@@ -1,20 +1,23 @@
-import './Cart.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
+import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useLayoutEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
 import { createOrderAction } from '../../redux/slices/orderSilce'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
+
+import { calculateRouteDistance } from '../../utils/MapUtils'
 import SelectAddressModal from '../../components/SelectAddressModal'
 import Notification from '../../components/Notification'
-import { calculateRouteDistance } from '../../utils/MapUtils'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
+import './Cart.scss'
+import { set } from 'lodash'
 
 function Cart() {
     const dispatch = useDispatch()
@@ -54,6 +57,23 @@ function Cart() {
         type: '',
         title: '',
     })
+    const [isLoading, setIsLoading] = useState({
+        shipping: false,
+        order: false,
+    })
+    const [comboDiscounts, setComboDiscounts] = useState([])
+    useEffect(() => {
+        const fetchCombos = async () => {
+            const promises = cart.items.map((item) => dispatch(getPromotionalComboByProductIdAction(item.variant.product._id)))
+            const results = await Promise.all(promises)
+            const comboDiscounts = results.map((result) => result.payload)
+            const finalCombos = [...new Set(comboDiscounts)]
+            setComboDiscounts(finalCombos)
+        }
+        if (cart.items?.length > 0) {
+            fetchCombos()
+        }
+    }, [cart.items])
 
     useEffect(() => {
         dispatch(fetchCart())
@@ -136,47 +156,67 @@ function Cart() {
     const calculateTotalShippingPrice = async () => {
         if (shopInfo && Object.keys(orderData.shippingAddress).length > 0 && addresses.length > 0) {
             if (orderData.products.length > 0) {
-                const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
-                if (distance) {
-                    let price = 0
-                    const distanceValue = distance.distance
-                    if (distanceValue <= 500) {
-                        price += Math.ceil(distanceValue) * 100
-                    } else {
-                        price += 75000
+                try {
+                    setIsLoading((pre) => ({
+                        ...pre,
+                        shipping: true,
+                    }))
+                    const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
+                    if (distance) {
+                        let price = 0
+                        const distanceValue = distance.distance
+                        if (distanceValue <= 500) {
+                            price += Math.ceil(distanceValue) * 100
+                        } else {
+                            price += 75000
+                        }
+                        if (orderData.products.length > 0) {
+                            const productsPrice = orderData.products.reduce((total, item) => {
+                                if (orderData.shippingMethod === 'basic') {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price *
+                                            item.quantity
+                                    )
+                                } else if (orderData.shippingMethod === 'fast') {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
+                                    )
+                                } else {
+                                    return (
+                                        total +
+                                        cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price *
+                                            item.quantity
+                                    )
+                                }
+                            }, 0)
+                            price += productsPrice
+                        }
+                        const totalPrice = orderData.productsPrice + price
+                        setOrderData({
+                            ...orderData,
+                            shippingPrice: price,
+                            expectedDeliveryDate: {
+                                startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
+                                endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
+                            },
+                            totalPrice,
+                            vouchers: [],
+                        })
                     }
-                    if (orderData.products.length > 0) {
-                        const productsPrice = orderData.products.reduce((total, item) => {
-                            if (orderData.shippingMethod === 'basic') {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')?.price * item.quantity
-                                )
-                            } else if (orderData.shippingMethod === 'fast') {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price * item.quantity
-                                )
-                            } else {
-                                return (
-                                    total +
-                                    cart.items.find((cartItem) => cartItem.variant._id === item.product)?.variant.product?.shippingInfo?.find((info) => info.type === 'express')?.price * item.quantity
-                                )
-                            }
-                        }, 0)
-                        price += productsPrice
-                    }
-                    const totalPrice = orderData.productsPrice + price
-                    setOrderData({
-                        ...orderData,
-                        shippingPrice: price,
-                        expectedDeliveryDate: {
-                            startDate: new Date(new Date().setDate(new Date().getDate() + distance.duration)),
-                            endDate: new Date(new Date().setDate(new Date().getDate() + distance.duration + 3)),
-                        },
-                        totalPrice,
-                        vouchers: [],
+                } catch (error) {
+                    setNotification({
+                        show: true,
+                        description: error.message,
+                        type: 'error',
+                        title: 'Lỗi',
                     })
+                } finally {
+                    setIsLoading((pre) => ({
+                        ...pre,
+                        shipping: false,
+                    }))
                 }
             } else {
                 setOrderData({
@@ -200,21 +240,21 @@ function Cart() {
         }
     }
 
-    const handleSelectItem = (itemId, quantity, price) => {
+    const handleSelectItem = (item) => {
         setOrderData((prev) => {
-            if (prev.products.some((product) => product.product === itemId)) {
-                const productsPrice = prev.productsPrice - quantity * price
+            if (prev.products.some((product) => product.product === item.variant._id)) {
+                const productsPrice = prev.productsPrice - handleComboDiscountValue(item)
                 return {
                     ...prev,
-                    products: prev.products.filter((product) => product.product !== itemId),
+                    products: prev.products.filter((product) => product.product !== item.variant._id),
                     productsPrice,
                     totalPrice: productsPrice + prev.shippingPrice,
                 }
             } else {
-                const productsPrice = prev.productsPrice + quantity * price
+                const productsPrice = prev.productsPrice + handleComboDiscountValue(item)
                 return {
                     ...prev,
-                    products: [...prev.products, { product: itemId, quantity }],
+                    products: [...prev.products, { product: item.variant._id, quantity: item.quantity }],
                     productsPrice,
                     totalPrice: productsPrice + prev.shippingPrice,
                 }
@@ -230,8 +270,8 @@ function Cart() {
                     product: item.variant._id,
                     quantity: item.quantity,
                 })),
-                productsPrice: cart.items.reduce((total, item) => total + item.variant.price * item.quantity, 0),
-                totalPrice: cart.items.reduce((total, item) => total + item.variant.price * item.quantity, 0) + prev.shippingPrice,
+                productsPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0),
+                totalPrice: cart.items.reduce((total, item) => total + handleComboDiscountValue(item), 0) + prev.shippingPrice,
             }))
         } else {
             setOrderData((prev) => ({
@@ -251,6 +291,10 @@ function Cart() {
                 vouchers: orderData.vouchers.map((voucher) => voucher._id),
             }
             try {
+                setIsLoading((pre) => ({
+                    ...pre,
+                    order: true,
+                }))
                 await dispatch(createOrderAction(finalOrderData)).unwrap()
                 setNotification({
                     show: true,
@@ -265,23 +309,38 @@ function Cart() {
                     type: 'error',
                     title: 'Lỗi',
                 })
+            } finally {
+                setIsLoading((pre) => ({
+                    ...pre,
+                    order: false,
+                }))
             }
         }
     }
 
-    const handleQuantityChange = async (itemId, change) => {
-        const item = cart.items.find((i) => i._id === itemId)
+    const handleQuantityChange = async (item, change) => {
+        const oldValue = handleComboDiscountValue(item)
         const newQuantity = Math.max(1, item.quantity + change)
-        await dispatch(updateItemQuantity({ itemId, quantity: newQuantity })).unwrap()
-        setOrderData((prev) => ({
-            ...prev,
-            products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
-            productsPrice: prev.productsPrice + item.variant.price * change,
-        }))
+        await dispatch(updateItemQuantity({ itemId: item._id, quantity: newQuantity })).unwrap()
+        console.log(handleComboDiscountValue(item, newQuantity), orderData.productsPrice, oldValue, newQuantity)
+        if (orderData.products.some((product) => product.product === item.variant._id)) {
+            setOrderData((prev) => ({
+                ...prev,
+                products: prev.products.map((product) => (product.product === item.variant._id ? { ...product, quantity: newQuantity } : product)),
+                productsPrice: prev.productsPrice - oldValue + handleComboDiscountValue(item, newQuantity),
+            }))
+        }
     }
 
-    const handleRemoveItem = (itemId) => {
-        dispatch(removeItemFromCart(itemId))
+    const handleRemoveItem = async (item) => {
+        await dispatch(removeItemFromCart(item._id)).unwrap()
+        if (orderData.products.some((product) => product.product === item.variant._id)) {
+            setOrderData((prev) => ({
+                ...prev,
+                products: prev.products.filter((product) => product.product !== item.variant._id),
+                productsPrice: prev.productsPrice - handleComboDiscountValue(item),
+            }))
+        }
     }
 
     const handleCloseVoucher = () => setShowVoucher(false)
@@ -303,52 +362,29 @@ function Cart() {
         )
     }
 
+    const handleComboDiscountValue = (item, newQuantity = null) => {
+        const combo = comboDiscounts.find((combo) => combo.products.includes(item.variant.product._id))
+        if (combo) {
+            if (newQuantity ? newQuantity <= combo.limitCombo : item.quantity <= combo.limitCombo) {
+                let discountValue = 0
+                for (let i = 0; i < combo.discountCombos.length; i++) {
+                    if (newQuantity ? newQuantity >= combo.discountCombos[i].quantity : item.quantity >= combo.discountCombos[i].quantity) {
+                        discountValue = combo.discountCombos[i].discountValue
+                    }
+                }
+                if (combo.comboType === 'percentage') {
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - discountValue / 100) * (1 - item.variant.product.discount / 100)
+                } else {
+                    return (newQuantity ? newQuantity : item.quantity) * item.variant.price - discountValue * (1 - item.variant.product.discount / 100)
+                }
+            }
+        }
+        return (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - item.variant.product.discount / 100)
+    }
+
     return (
         <>
             <div className="container h-100 px-5 py-5">
-                {showAddress && (
-                    <SelectAddressModal
-                        showAddress={showAddress}
-                        handleCloseAddress={handleCloseAddress}
-                        addresses={addresses}
-                        originalSelectedAddress={orderData.shippingAddress}
-                        handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
-                    />
-                )}
-                {/* Modal Payment Method*/}
-                {showPaymentMethod && (
-                    <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <div className="">
-                                <div className="d-flex p-3 align-items-center border-bottom">
-                                    <label className="d-flex align-items-center me-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <p className="fs-3">Thanh toán khi nhận hàng</p>
-                                </div>
-                                <div className="d-flex p-3 align-items-center border-bottom">
-                                    <label className="d-flex align-items-center me-3">
-                                        <input type="checkbox" className="input-checkbox" />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                    <p className="fs-3">Thanh toán bằng chuyển khoản</p>
-                                </div>
-                            </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
-                                <p>Đóng</p>
-                            </div>
-                            <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
-                                <p>Xác nhận</p>
-                            </div>
-                        </Modal.Footer>
-                    </Modal>
-                )}
                 <p className="fw-bold fs-2">Giỏ hàng</p>
                 <div className="d-flex">
                     <div className="mt-2 me-4" style={{ width: '60%' }}>
@@ -386,7 +422,9 @@ function Cart() {
                                                             type="checkbox"
                                                             className="input-checkbox"
                                                             checked={orderData.products.some((product) => product.product === item.variant._id)}
-                                                            onChange={() => handleSelectItem(item.variant._id, item.quantity, item.variant.price)}
+                                                            onChange={(e) => {
+                                                                handleSelectItem(item)
+                                                            }}
                                                         />
                                                         <span className="custom-checkbox"></span>
                                                     </label>
@@ -408,21 +446,36 @@ function Cart() {
                                                             icon={faMinus}
                                                             size="lg"
                                                             className="p-4"
-                                                            onClick={() => {
+                                                            onClick={(e) => {
                                                                 if (item.quantity > 1) {
-                                                                    handleQuantityChange(item._id, -1)
+                                                                    handleQuantityChange(item, -1)
                                                                 }
                                                             }}
                                                             style={{ cursor: 'pointer' }}
                                                         />
                                                         <p className="fs-3 fw-medium lh-1 mx-2">{item.quantity}</p>
-                                                        <FontAwesomeIcon icon={faPlus} size="lg" className="p-4" onClick={() => handleQuantityChange(item._id, 1)} style={{ cursor: 'pointer' }} />
+                                                        <FontAwesomeIcon
+                                                            icon={faPlus}
+                                                            size="lg"
+                                                            className="p-4"
+                                                            onClick={(e) => {
+                                                                handleQuantityChange(item, 1)
+                                                            }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
-                                                    <p className="text-center fs-3">{item.variant.price * item.quantity}đ</p>
+                                                    <p className="text-center fs-3">{handleComboDiscountValue(item)}đ</p>
                                                 </div>
-                                                <FontAwesomeIcon icon={faTrashCan} className="fs-3 p-2 hover-icon" color="#ff7262" onClick={() => handleRemoveItem(item._id)} />
+                                                <FontAwesomeIcon
+                                                    icon={faTrashCan}
+                                                    className="fs-3 p-2 hover-icon"
+                                                    color="#ff7262"
+                                                    onClick={(e) => {
+                                                        handleRemoveItem(item)
+                                                    }}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -456,12 +509,23 @@ function Cart() {
                                 </p>
                                 <div className="d-flex align-items-center">
                                     <div className="flex-grow-1">
-                                        <p className="fs-3 fw-medium text-end">
-                                            {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
-                                                (orderData.shippingMethod === 'fast' && 'Nhanh') ||
-                                                (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
-                                            <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
-                                        </p>
+                                        {isLoading.shipping ? (
+                                            <section className="dots-container ">
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                                <div className="dot"></div>
+                                            </section>
+                                        ) : (
+                                            <>
+                                                <p className="fs-3 fw-medium text-end">
+                                                    {(orderData.shippingMethod === 'basic' && 'Cơ bản') ||
+                                                        (orderData.shippingMethod === 'fast' && 'Nhanh') ||
+                                                        (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
+                                                    <span className="fs-4 text-body-tertiary ms-2">{orderData.shippingPrice}đ</span>
+                                                </p>
+                                            </>
+                                        )}
                                         {orderData.expectedDeliveryDate.startDate && orderData.expectedDeliveryDate.endDate && (
                                             <p className="fs-4">
                                                 Đảm bảo nhận hàng từ {orderData.expectedDeliveryDate.startDate.toLocaleDateString('vi-VN')} đến{' '}
@@ -505,11 +569,28 @@ function Cart() {
                             <div className="text-center py-3">
                                 <button
                                     disabled={
-                                        orderData.products.length === 0 || orderData.shippingAddress === null || Object.keys(orderData.shippingAddress).length === 0 || orderData.paymentMethod === null
+                                        orderData.products.length === 0 ||
+                                        orderData.shippingAddress === null ||
+                                        Object.keys(orderData.shippingAddress).length === 0 ||
+                                        orderData.paymentMethod === null ||
+                                        isLoading.order ||
+                                        isLoading.shipping
                                     }
                                     className="primary-btn shadow-none px-5 py-3"
                                     onClick={handleOrder}
                                 >
+                                    {isLoading.order && (
+                                        <div className="dot-spinner ms-4">
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                            <div className="dot-spinner__dot"></div>
+                                        </div>
+                                    )}
                                     <p>Đặt hàng</p>
                                 </button>
                             </div>
@@ -535,6 +616,49 @@ function Cart() {
             {/* Modal Voucher */}
             {showVoucher && (
                 <VoucherModal cart={cart} showVoucher={showVoucher} handleCloseVoucher={handleCloseVoucher} orderData={orderData} setOrderData={setOrderData} originalVouchers={orderData.vouchers} />
+            )}
+            {showAddress && (
+                <SelectAddressModal
+                    showAddress={showAddress}
+                    handleCloseAddress={handleCloseAddress}
+                    addresses={addresses}
+                    originalSelectedAddress={orderData.shippingAddress}
+                    handleSelectAddress={(address) => handleChangeOrderData('shippingAddress', address)}
+                />
+            )}
+            {/* Modal Payment Method*/}
+            {showPaymentMethod && (
+                <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="">
+                            <div className="d-flex p-3 align-items-center border-bottom">
+                                <label className="d-flex align-items-center me-3">
+                                    <input type="checkbox" className="input-checkbox" />
+                                    <span className="custom-checkbox"></span>
+                                </label>
+                                <p className="fs-3">Thanh toán khi nhận hàng</p>
+                            </div>
+                            <div className="d-flex p-3 align-items-center border-bottom">
+                                <label className="d-flex align-items-center me-3">
+                                    <input type="checkbox" className="input-checkbox" />
+                                    <span className="custom-checkbox"></span>
+                                </label>
+                                <p className="fs-3">Thanh toán bằng chuyển khoản</p>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleClosePaymentMethod}>
+                            <p>Đóng</p>
+                        </div>
+                        <div className="primary-btn px-4 py-2 shadow-none" variant="secondary" onClick={handleClosePaymentMethod}>
+                            <p>Xác nhận</p>
+                        </div>
+                    </Modal.Footer>
+                </Modal>
             )}
         </>
     )

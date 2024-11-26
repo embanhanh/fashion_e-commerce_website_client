@@ -139,8 +139,8 @@ const CreateVoucher = () => {
     }
 
     return (
-        <div className="w-75 pb-5">
-            <div className="bg-white border">
+        <div className="d-flex flex-column gap-4 align-items-center pb-5 ">
+            <div className="bg-white rounded-4 shadow-sm create-voucher-container">
                 <p className="fs-3 fw-medium p-3 border-bottom">Tạo khuyến mãi</p>
                 <div className="p-4">
                     <div className="d-flex mt-5  align-items-center">
@@ -368,7 +368,7 @@ const CreateVoucher = () => {
             <section className="d-flex flex-row-reverse mt-4">
                 <div className="">
                     <div className="d-flex flex-row-reverse">
-                        <button className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0" onClick={handleSubmit}>
+                        <button className="primary-btn px-4 py-2 shadow-none ms-4 rounded-4" onClick={handleSubmit}>
                             <p>Xác nhận</p>
                             {loading && (
                                 <div className="dot-spinner ms-4">
@@ -382,7 +382,7 @@ const CreateVoucher = () => {
                                 </div>
                             )}
                         </button>
-                        <button className="border px-3 ms-4 bg-white" onClick={() => navigate(-1)}>
+                        <button className="border px-4 py-2 ms-4 bg-white rounded-4" onClick={() => navigate(-1)}>
                             <p>Hủy</p>
                         </button>
                     </div>

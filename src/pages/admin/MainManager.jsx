@@ -194,7 +194,7 @@ function MainManager() {
                                     </td>
                                     <td>
                                         <div className="h-100 d-flex align-items-center justify-content-center">
-                                            <button className="px-3 fw-medium py-2 rounded-3 bg-primary text-white shadow-sm">Bổ sung</button>
+                                            <button className="px-3  py-2 rounded-4 primary-btn shadow-sm">Bổ sung</button>
                                         </div>
                                     </td>
                                 </tr>

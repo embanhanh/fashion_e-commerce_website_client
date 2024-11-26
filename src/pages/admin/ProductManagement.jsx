@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
-import './ProductManagement.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faList } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faList, faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons'
 import { BsGridFill } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProducts, setFilters, setSortOption, setCurrentPage, deleteProductAction, deleteManyProductsAction } from '../../redux/slices/productSlice'
-import { fetchCategories } from '../../redux/slices/categorySlice'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
+import Modal from 'react-bootstrap/Modal'
+import Pagination from 'react-bootstrap/Pagination'
+
+import { fetchProducts, setFilters, setSortOption, setCurrentPage, deleteProductAction, deleteManyProductsAction } from '../../redux/slices/productSlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
 import CategoryDropdown from '../../components/CategoryDropdown'
 import Notification from '../../components/Notification'
-import Modal from 'react-bootstrap/Modal'
+import './ProductManagement.scss'
 
 function ProductManagement() {
     const navigate = useNavigate()
@@ -33,7 +35,7 @@ function ProductManagement() {
 
     const debouncedFetchProducts = useCallback(
         debounce(() => {
-            dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage, limit: 1000000 }))
+            dispatch(fetchProducts({ ...filters, sort: sortOption, page: currentPage, limit: 1 }))
         }, 300),
         [dispatch, filters, sortOption, currentPage]
     )
@@ -129,7 +131,7 @@ function ProductManagement() {
                         <img src={product.urlImage[0]} alt="" className="product-image" />
                         <p className="fs-4 fw-medium">{product.name}</p>
                     </div>
-                    <p className="fs-4 fw-medium text-center">{product.categories.map((category) => categories.find((c) => c._id === category).name).join(', ')}</p>
+                    <p className="fs-4 fw-medium text-center">{product.categories.map((category) => category.name).join(', ')}</p>
                     <p className="fs-4 fw-medium text-center">{product.originalPrice - (product.originalPrice * product.discount) / 100}</p>
                     <p className="fs-4 fw-medium text-center">{product.stockQuantity}</p>
                     <p className="fs-4 fw-medium text-center">{product.soldQuantity}</p>
@@ -168,8 +170,8 @@ function ProductManagement() {
 
     return (
         <>
-            <div className=" pb-5">
-                <div className="bg-white border">
+            <div className="pb-5 px-4 d-flex flex-column gap-4">
+                <div className="bg-white rounded-4 shadow-sm py-2">
                     <p className="fs-3 fw-medium p-3 border-bottom">Quản lý sản phẩm</p>
                     <div className="row p-3 g-4">
                         <div className="col-6 d-flex align-items-center">
@@ -226,7 +228,7 @@ function ProductManagement() {
                         </button>
                     </div>
                 </div>
-                <div className="bg-white border mt-3">
+                <div className="bg-white rounded-4 shadow-sm">
                     <p className="fs-3 fw-medium p-3 border-bottom">Danh sách sản phẩm</p>
                     <div className="p-3 d-flex align-items-center justify-content-between">
                         <p className="fs-3 fw-medium">{products.length} sản phẩm</p>
@@ -347,6 +349,33 @@ function ProductManagement() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="">
+                    <Pagination>
+                        <Pagination.Prev
+                            onClick={() => {
+                                window.scrollTo(0, 0)
+                                dispatch(setCurrentPage(currentPage - 1))
+                            }}
+                            disabled={currentPage === 1}
+                        >
+                            <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+                        </Pagination.Prev>
+                        {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => dispatch(setCurrentPage(index + 1))}>
+                                {index + 1}
+                            </Pagination.Item>
+                        ))}
+                        <Pagination.Next
+                            onClick={() => {
+                                window.scrollTo(0, 0)
+                                dispatch(setCurrentPage(currentPage + 1))
+                            }}
+                            disabled={currentPage === totalPages}
+                        >
+                            <FontAwesomeIcon icon={faCaretRight} size="lg" />
+                        </Pagination.Next>
+                    </Pagination>
                 </div>
             </div>
             {productNames.length > 0 && (

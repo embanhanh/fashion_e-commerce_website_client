@@ -1,16 +1,18 @@
 import './ProductList.scss'
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
-import Accordion from '../../components/Accordion'
-import ProductCard from '../../components/ProductCard'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
+import { useNavigate } from 'react-router-dom'
+import Accordion from '../../components/Accordion'
+import ProductCard from '../../components/ProductCard'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
-import { removeDiacritics } from '../../utils/StringUtil'
-import { debounce } from 'lodash'
-import { useNavigate } from 'react-router-dom'
+import { removeDiacritics, removeVietnameseTones } from '../../utils/StringUtil'
+import Rating from '../../components/Rating'
 
 function ProductList() {
     const navigate = useNavigate()
@@ -96,6 +98,10 @@ function ProductList() {
         [dispatch]
     )
 
+    const handleRatingChange = (value) => {
+        dispatch(setFilters({ rating: value }))
+    }
+
     return (
         <>
             <div className="container h-100 py-5">
@@ -172,6 +178,22 @@ function ProductList() {
                         <Accordion
                             data={[
                                 {
+                                    title: 'Lọc theo đánh giá',
+                                },
+                            ]}
+                            isOpen={true}
+                        >
+                            <div className="d-flex align-items-center flex-column">
+                                <div className="mb-2 py-2 d-flex">
+                                    <Rating initialRating={0} size={16} gap={4} onRate={handleRatingChange} />
+                                    <p className="ms-2 align-self-end">Trở lên</p>
+                                </div>
+                            </div>
+                        </Accordion>
+                        <div className=" w-100 border-bottom mt-2"></div>
+                        <Accordion
+                            data={[
+                                {
                                     title: 'Lọc theo màu sắc',
                                 },
                             ]}
@@ -212,7 +234,13 @@ function ProductList() {
                         </Accordion>
                     </div>
                     <div style={{ width: '80%' }} className="px-5 py-2">
-                        <div className="d-flex align-items-center justify-content-end border-bottom pb-3">
+                        <div className="d-flex align-items-center justify-content-between border-bottom pb-3 gap-3">
+                            <div className="flex-grow-1">
+                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4">
+                                    <input type="text" className="input-text w-100" placeholder="Tìm kiếm" onChange={(e) => handleFilterChange('search', e.target.value)} value={filters.search} />
+                                    <FontAwesomeIcon icon={faSearch} size="xl" className="theme-color p-2" />
+                                </div>
+                            </div>
                             <div className="d-flex align-items-center">
                                 <p className="fw-medium me-4 fs-3">Sắp xếp theo</p>
                                 <div className="select">
@@ -246,63 +274,57 @@ function ProductList() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="row" style={{ minHeight: '200px' }}>
-                            {status === 'loading' ? (
-                                <section className="dots-container mt-4">
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                    <div className="dot"></div>
-                                </section>
-                            ) : (
-                                <>
-                                    {products.map((product, index) => (
-                                        <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
-                                            <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
-                                        </div>
-                                    ))}
-                                    {products.length === 0 && (
-                                        <div className="d-flex justify-content-center align-items-center">
-                                            <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
-                                        </div>
-                                    )}
-                                </>
-                            )}
+                        <div className="" style={{ minHeight: '1200px' }}>
+                            <div className="row">
+                                {status === 'loading' ? (
+                                    <section className="dots-container mt-4">
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                    </section>
+                                ) : (
+                                    <>
+                                        {products.map((product, index) => (
+                                            <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-4" onClick={() => navigate(`/products/${product.slug}`)}>
+                                                <ProductCard name={product.name} originalPrice={product.originalPrice} discount={product.discount} rating={product.rating} url={product.urlImage[0]} />
+                                            </div>
+                                        ))}
+                                        {products.length === 0 && (
+                                            <div className="d-flex justify-content-center align-items-center">
+                                                <p className="fw-medium fs-3">Không tìm thấy sản phẩm nào</p>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className="">
-                            {/* <Pagination>
+                            <Pagination>
                                 <Pagination.Prev
                                     onClick={() => {
                                         window.scrollTo(0, 0)
-                                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                        handlePageChange(currentPage - 1)
                                     }}
                                     disabled={currentPage === 1}
                                 >
                                     <FontAwesomeIcon icon={faCaretLeft} size="lg" />
                                 </Pagination.Prev>
                                 {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => paginate(index + 1)}>
+                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
                                         {index + 1}
                                     </Pagination.Item>
                                 ))}
                                 <Pagination.Next
                                     onClick={() => {
                                         window.scrollTo(0, 0)
-                                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                        handlePageChange(currentPage + 1)
                                     }}
                                     disabled={currentPage === totalPages}
                                 >
                                     <FontAwesomeIcon icon={faCaretRight} size="lg" />
                                 </Pagination.Next>
-                            </Pagination> */}
-                            <Pagination>
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
-                                        {index + 1}
-                                    </Pagination.Item>
-                                ))}
                             </Pagination>
                         </div>
                     </div>

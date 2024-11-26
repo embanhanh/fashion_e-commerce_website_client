@@ -1,7 +1,33 @@
+%dropdown-box {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(174, 225, 225, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
 .header {
     height: var(--header-height);
-    background-color: #fff;
     z-index: 100;
+    &.header-scrolled {
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    // Chỉ fixed khi scroll qua hết hero section
+    &.header-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        animation: slideDown 0.3s ease-out;
+        background-color: #fff;
+    }
+}
+
+.header-home {
+    background-color: var(--theme-color);
 }
 
 .header-admin {
@@ -23,6 +49,15 @@
 .admin-sidebar {
     width: var(--admin-sidebar-width);
     top: var(--header-admin-height);
+    p {
+        color: var(--theme-color-1);
+    }
+    .seller-option:hover,
+    .seller-option.active {
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--theme-color-1);
+    }
 }
 
 .admin-content {
@@ -31,58 +66,93 @@
 }
 
 .nav-wrapper {
-    --font-color-dark: #000;
-    --font-color-light: #fff;
-    --bg-color: #fff;
-    --main-color: #000;
-    height: 40px;
     padding: 4px 8px;
-    background-color: var(--bg-color);
-    border-radius: 8px;
     display: flex;
-    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
+    gap: 15px;
     position: relative;
 }
 
 .nav-option {
     min-width: 80px;
     height: 100%;
-    background-color: var(--bg-color);
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 4px 8px;
-}
+    padding: 6px 8px;
+    position: relative;
 
-.nav-option + .nav-option {
-    margin-left: 8px;
-}
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0; // Bắt đầu với width = 0
+        height: 3px;
+        background-color: var(--theme-color-1);
+        transition: all 0.3s ease;
+        border-radius: 3px;
+        opacity: 0; // Thêm opacity = 0 để ẩn hoàn toàn
+    }
 
-.nav-option.checked,
-.nav-option:hover {
-    background-color: var(--main-color);
+    &:hover,
+    &.checked {
+        cursor: pointer;
+
+        &::after {
+            width: calc(100% - 16px);
+            opacity: 1; // Hiện border khi hover hoặc checked
+        }
+
+        .nav-title {
+            color: var(--theme-color-1);
+            font-weight: 700;
+        }
+    }
 }
 
 .nav-option.checked .nav-title,
 .nav-option:hover .nav-title {
-    color: #fff;
+    color: var(--theme-color-1);
+    font-weight: 700;
 }
 
 .nav-title {
-    color: var(--font-color-dark);
-    font-weight: 500;
+    color: var(--theme-color-1);
+    font-weight: 400;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
 }
 
 .nav-shop-category {
+    @extend %dropdown-box;
     position: absolute;
     top: calc(100% + 5px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: #fff;
     display: none;
     width: 800px;
-    // box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 16px;
+        height: 16px;
+        background: inherit;
+        border-left: 1px solid rgba(174, 225, 225, 0.3);
+        border-top: 1px solid rgba(174, 225, 225, 0.3);
+    }
+
+    a {
+        color: var(--theme-color-1);
+        transition: all 0.2s ease;
+
+        &:hover {
+            color: var(--theme-color-2);
+            background-color: rgba(174, 225, 225, 0.1);
+        }
+    }
 }
 
 .nav-option.show_detail::before {
@@ -99,8 +169,22 @@
     display: flex;
 }
 
-.shop-body {
-    margin-top: var(--header-height);
+.notification-container,
+.cart-container {
+    .fa-bell,
+    .fa-bag-shopping {
+        color: var(--theme-color-1);
+        transition: all 0.3s ease;
+    }
+
+    &:hover {
+        background-color: rgba(174, 225, 225, 0.2);
+
+        .fa-bell,
+        .fa-bag-shopping {
+            color: var(--theme-color-2);
+        }
+    }
 }
 
 .cart-container:hover {
@@ -140,38 +224,120 @@
 }
 
 .cart-mini {
+    @extend %dropdown-box;
     width: 400px;
     display: none;
     top: calc(100% + 10px);
     right: -10px;
-    background-color: #fff;
-    z-index: 2;
+    z-index: 100;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 20px;
+        transform: rotate(45deg);
+        width: 16px;
+        height: 16px;
+        background: inherit;
+        border-left: 1px solid rgba(174, 225, 225, 0.3);
+        border-top: 1px solid rgba(174, 225, 225, 0.3);
+    }
+
+    .cart-product-container {
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 10px;
+
+        .border-bottom {
+            border-color: rgba(174, 225, 225, 0.3) !important;
+        }
+    }
+
+    p {
+        color: var(--theme-color-1);
+    }
 }
 
 .notification-mini {
+    @extend %dropdown-box;
     width: 400px;
     display: none;
     top: calc(100% + 10px);
     right: -10px;
-    background-color: #fff;
-    z-index: 2;
+    z-index: 100;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 20px;
+        transform: rotate(45deg);
+        width: 16px;
+        height: 16px;
+        background: inherit;
+        border-left: 1px solid rgba(174, 225, 225, 0.3);
+        border-top: 1px solid rgba(174, 225, 225, 0.3);
+    }
+
+    .notification-item-container {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .border-bottom {
+            border-color: rgba(174, 225, 225, 0.3) !important;
+        }
+
+        .hover-icon {
+            border-radius: 8px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: linear-gradient(45deg, rgba(174, 225, 225, 0.1), rgba(20, 145, 155, 0.1));
+            }
+        }
+    }
+
+    p {
+        color: var(--theme-color-1);
+    }
 }
 
-.cart-product-container {
-    max-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.notification-item-container {
-    max-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
+.notification-count,
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .user-actions-container:hover {
     .user-actions {
         display: block;
+        z-index: 100;
+    }
+    p {
+        color: var(--theme-color-2);
+    }
+}
+
+.user-actions-container {
+    p {
+        color: var(--theme-color-1);
     }
 }
 
@@ -192,12 +358,43 @@
     top: calc(100% + 10px);
     left: 12px;
     z-index: 2;
-    .user-action:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+    .user-action {
+        color: var(--theme-color-1);
+        transition: all 0.2s ease;
+
+        &:hover {
+            color: var(--theme-color-2);
+            background-color: rgba(174, 225, 225, 0.1);
+        }
     }
 }
 
-.seller-option:hover {
-    font-weight: 500;
-    cursor: pointer;
+.user-action {
+    .fa-right-from-bracket {
+        color: var(--theme-color-1);
+        transition: all 0.3s ease;
+    }
+
+    &:hover {
+        .fa-right-from-bracket {
+            color: var(--theme-color-2);
+        }
+    }
+}
+
+// Footer
+.main-footer {
+    background-color: var(--theme-color);
+    color: var(--theme-color-1);
+    display: flex;
+    justify-content: center;
+}
+
+.footer-link {
+    color: var(--theme-color-1);
+    transition: all 0.3s ease;
+
+    &:hover {
+        font-weight: 600;
+    }
 }

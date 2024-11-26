@@ -21,12 +21,16 @@ function Accordion({ data, children, isOpen, onChange }) {
         }
     }
 
-    const handleItemSelect = (item, isSelected, childrenIds = []) => {
+    const handleItemSelect = (item, isSelected, childrenIds = [], idParent = null) => {
         let newSelectedItems
         if (isSelected) {
-            newSelectedItems = [...selectedItems, item]
+            newSelectedItems = [...selectedItems, item, ...childrenIds]
         } else {
-            newSelectedItems = selectedItems.filter((i) => i !== item && !childrenIds.includes(i))
+            if (idParent) {
+                newSelectedItems = selectedItems.filter((i) => i !== item && i !== idParent)
+            } else {
+                newSelectedItems = selectedItems.filter((i) => i !== item && !childrenIds.includes(i))
+            }
         }
         setSelectedItems(newSelectedItems)
         onChange(newSelectedItems)

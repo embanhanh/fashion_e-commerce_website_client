@@ -1,9 +1,106 @@
 .product-card {
+    background-color: #fff;
+    color: var(--theme-color-1);
     transition: transform 0.1s ease, box-shadow 0.1s ease;
     cursor: pointer;
+    position: relative;
 }
 
 .product-card:hover {
-    transform: translateY(-2px);
+    // transform: translateY(-2px);
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-card__img {
+    aspect-ratio: 1;
+    width: 100%;
+    object-fit: cover;
+}
+
+.product-badge {
+    position: absolute;
+    padding: 4px 10px;
+    font-weight: 600;
+    font-size: 1.4rem;
+    z-index: 1;
+    animation: floating 3s ease-in-out infinite;
+    backdrop-filter: blur(2px); // Thêm blur cho nền phía sau
+    color: white;
+
+    // Lớp hoa đậm (dưới)
+    &::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        z-index: -1;
+        border-radius: 55% 45% 45% 55% / 55% 45% 55% 45%;
+        animation: morph 8s ease-in-out infinite;
+        transform: rotate(-15deg);
+    }
+
+    // Lớp hoa nhạt (trên)
+    &::after {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: -6px;
+        right: -6px;
+        bottom: -6px;
+        z-index: -2;
+        border-radius: 45% 55% 55% 45% / 45% 55% 45% 55%;
+        animation: morph 8s ease-in-out infinite reverse;
+        transform: rotate(10deg);
+    }
+}
+
+.discount-badge {
+    top: 0px;
+    right: 0px;
+
+    &::before {
+        background: rgba(251, 113, 129, 0.6); // Màu đỏ trong suốt
+        box-shadow: 0 4px 15px rgba(251, 113, 129, 0.3);
+    }
+
+    &::after {
+        background: rgba(255, 107, 107, 0.4); // Màu đỏ nhạt hơn và trong suốt hơn
+        filter: brightness(1.3);
+        transform: rotate(15deg) scale(1.1);
+    }
+}
+
+.hot-badge {
+    top: 0px;
+    left: -4px;
+
+    &::before {
+        background: rgba(20, 145, 155, 0.6); // Màu theme trong suốt
+        box-shadow: 0 4px 15px rgba(11, 100, 119, 0.3);
+    }
+
+    &::after {
+        background: rgba(10, 209, 200, 0.4); // Màu theme nhạt hơn và trong suốt hơn
+        filter: brightness(1.3);
+        transform: rotate(15deg) scale(1.1);
+    }
+}
+
+.product-card__cart-btn {
+    background-color: rgba(20, 145, 155, 0.6);
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.product-card__cart-btn:hover {
+    background-color: rgba(20, 145, 155, 1);
+}
+
+.cart-icon__img {
+    width: 18px;
+    height: 18px;
 }

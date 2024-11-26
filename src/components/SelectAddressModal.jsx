@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux'
 import { addNewAddress } from '../redux/slices/userSlice'
 
 function SelectAddressModal({ showAddress, handleCloseAddress, addresses, originalSelectedAddress, handleSelectAddress }) {
-    const dispatch = useDispatch()   
+    const dispatch = useDispatch()
 
     const [selectedAddress, setSelectedAddress] = useState(originalSelectedAddress)
     const [showNewAddressModal, setShowAddressModal] = useState(false)
@@ -15,11 +15,11 @@ function SelectAddressModal({ showAddress, handleCloseAddress, addresses, origin
 
     const handleCloseModal = () => {
         setShowAddressModal(false)
-        setIsSelectAddressVisible(true) // Khi đóng AddAddressModal, mở lại SelectAddressModal
+        setIsSelectAddressVisible(true)
     }
 
-    const handleAddAddress = (newAddressData) => {
-        dispatch(addNewAddress(newAddressData))
+    const handleAddAddress = async (newAddressData) => {
+        await dispatch(addNewAddress(newAddressData))
         handleCloseModal()
     }
 
@@ -28,11 +28,10 @@ function SelectAddressModal({ showAddress, handleCloseAddress, addresses, origin
         setIsSelectAddressVisible(false) // Ẩn SelectAddressModal khi mở AddAddressModal
     }
 
-    
     return (
         <>
-            {
-                isSelectAddressVisible && <Modal show={showAddress} onHide={handleCloseAddress} centered>
+            {isSelectAddressVisible && (
+                <Modal show={showAddress} onHide={handleCloseAddress} centered>
                     <Modal.Header closeButton>
                         <Modal.Title className="fs-2">Địa chỉ của bạn</Modal.Title>
                     </Modal.Header>
@@ -95,7 +94,7 @@ function SelectAddressModal({ showAddress, handleCloseAddress, addresses, origin
                         </div>
                     </Modal.Footer>
                 </Modal>
-            }
+            )}
             <AddAddressModal show={showNewAddressModal} handleClose={handleCloseModal} onAddAddress={handleAddAddress} />
         </>
     )

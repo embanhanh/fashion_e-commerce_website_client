@@ -28,7 +28,9 @@ function Chatbot() {
                         messages.forEach((message) => {
                             message.message.type === 'text'
                                 ? dfMessenger.renderCustomText(message.message.text, message.user === 'admin' || !message.user)
-                                : dfMessenger.renderCustomCard([message.message])
+                                : message.message.type === 'chips'
+                                ? dfMessenger.renderCustomCard([message.message])
+                                : dfMessenger.renderCustomCard(message.message.richElements)
                         })
                         historyLoadedRef.current = true
                     } else {
@@ -61,46 +63,53 @@ function Chatbot() {
     const saveChatMessage = async (messages, isUserMessage) => {
         try {
             if (!user) return
+            if (messages.length > 0) {
+                const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
 
-            const chatHistoryRef = doc(db, 'chatAIHistory', user._id)
-
-            const chatHistory = await getDoc(chatHistoryRef)
-            const messageObjects = messages.map((message) => ({
-                message,
-                user: isUserMessage ? 'client' : null,
-                timestamp: new Date().toISOString(),
-                read: chatMode.mode === 'ai' ? true : false,
-            }))
-            if (!chatHistory.exists()) {
-                await setDoc(chatHistoryRef, {
-                    messages: messageObjects,
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp(),
-                    user: {
-                        _id: user._id,
-                        name: user.name,
-                        avatar: user.urlImage,
-                        email: user.email,
-                    },
-                    unreadCount: 0,
-                })
-            } else {
-                await updateDoc(chatHistoryRef, {
-                    messages: arrayUnion(...messageObjects),
-                    updatedAt: serverTimestamp(),
-                    unreadCount: chatMode.mode === 'ai' ? chatHistory.data().unreadCount : increment(1),
-                })
+                const chatHistory = await getDoc(chatHistoryRef)
+                const messageObjects = messages.map((message) => ({
+                    message,
+                    user: isUserMessage ? 'client' : null,
+                    timestamp: new Date().toISOString(),
+                    read: chatMode.mode === 'ai' ? true : false,
+                }))
+                if (!chatHistory.exists()) {
+                    await setDoc(chatHistoryRef, {
+                        messages: messageObjects,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                        user: {
+                            _id: user._id,
+                            name: user.name,
+                            avatar: user.urlImage,
+                            email: user.email,
+                        },
+                        unreadCount: chatMode.mode === 'human' && isUserMessage ? 1 : 0,
+                    })
+                } else {
+                    if (chatMode.mode === 'human' && isUserMessage) {
+                        await updateDoc(chatHistoryRef, {
+                            messages: arrayUnion(...messageObjects),
+                            updatedAt: serverTimestamp(),
+                            unreadCount: increment(1),
+                        })
+                    } else {
+                        await updateDoc(chatHistoryRef, {
+                            messages: arrayUnion(...messageObjects),
+                            updatedAt: serverTimestamp(),
+                        })
+                    }
+                }
             }
         } catch (error) {
             console.error('Lỗi khi lưu tin nhắn:', error)
         }
     }
 
-    const handleDfMessengerResponse = (event) => {
-        console.log('save chat message')
+    const handleDfMessengerResponse = async (event) => {
         if (event.type === 'df-user-input-entered') {
             // Lưu tin nhắn của người dùng
-            saveChatMessage(
+            await saveChatMessage(
                 [
                     {
                         type: 'text',
@@ -111,7 +120,7 @@ function Chatbot() {
             )
         } else if (event.type === 'df-response-received') {
             // Lưu tin nhắn từ chatbot
-            saveChatMessage(event.detail.messages, false)
+            await saveChatMessage(event.detail.messages, false)
         }
     }
 
@@ -155,21 +164,20 @@ function Chatbot() {
             window.removeEventListener('df-chip-clicked', handleChipClick)
         }
     }, [chatMode.mode])
-
     return (
         <>
-            {chatMode.show && (
+            {chatMode.show && user && (
                 <button
                     className="primary-btn shadow-none rounded-5 position-fixed btn-switch-chat"
-                    onClick={() =>
+                    onClick={() => {
                         setChatMode((prev) => {
-                            const dfMessenger = document.querySelector('df-messenger')
-                            if (dfMessenger) {
-                                dfMessenger.renderCustomText(`Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`, true)
-                            }
-                            return { ...prev, mode: chatMode.mode === 'ai' ? 'human' : 'ai' }
+                            return { ...prev, mode: prev.mode === 'ai' ? 'human' : 'ai' }
                         })
-                    }
+                        const dfMessenger = document.querySelector('df-messenger')
+                        if (dfMessenger && dfMessenger.renderCustomText) {
+                            dfMessenger.renderCustomText(`Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`, true)
+                        }
+                    }}
                 >
                     <p>Chat với {chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}</p>
                 </button>

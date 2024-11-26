@@ -19,6 +19,8 @@ function Chat() {
     const location = useLocation()
     const userData = location.state?.user
 
+    console.log('re-render')
+
     // Lấy danh sách chat từ Firestore
     useEffect(() => {
         const q = query(collection(db, 'chatAIHistory'), orderBy('updatedAt', 'desc'))
@@ -37,15 +39,25 @@ function Chat() {
                     setSelectedChat(targetChat)
                     // Cập nhật URL với user_id của chat được chọn
                     navigate(`/seller/chat/${user_id}`, { replace: true })
+                    setTimeout(() => {
+                        markMessagesAsRead(user_id)
+                    }, 1000)
                 } else if (userData) {
                     const newChat = await createNewChat(userData)
                     setSelectedChat(newChat)
+                    navigate(`/seller/chat/${userData?._id}`, { replace: true })
+                    setTimeout(() => {
+                        markMessagesAsRead(userData?._id)
+                    }, 1000)
                 }
             } else if (!selectedChat && chatList.length > 0) {
                 // Nếu không có user_id, chọn chat đầu tiên
                 setSelectedChat(chatList[0])
                 // Cập nhật URL với user_id của chat đầu tiên
                 navigate(`/seller/chat/${chatList[0].user?._id}`, { replace: true })
+                setTimeout(() => {
+                    markMessagesAsRead(chatList[0].user?._id)
+                }, 1000)
             } else if (selectedChat && selectedChat.unreadCount > 0) {
                 markMessagesAsRead(selectedChat.user?._id)
             }

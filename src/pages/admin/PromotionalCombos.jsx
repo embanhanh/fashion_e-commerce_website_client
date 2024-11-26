@@ -139,8 +139,8 @@ function PromotionalCombos() {
     }, [bulkAction])
 
     return (
-        <div className=" pb-5">
-            <div className="bg-white border">
+        <div className=" pb-5 px-4 d-flex flex-column gap-4">
+            <div className="bg-white rounded-4 shadow-sm">
                 <p className="fs-3 fw-medium p-3 border-bottom">Combo khuyến mãi</p>
                 <div className="row p-3 g-4">
                     <div className="col-6 d-flex align-items-center">
@@ -183,7 +183,7 @@ function PromotionalCombos() {
                     </button>
                 </div>
             </div>
-            <div className="bg-white border mt-3">
+            <div className="bg-white rounded-4 shadow-sm">
                 <p className="fs-3 fw-medium p-3 border-bottom">Danh sách combo</p>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">0 combo</p>
@@ -295,7 +295,7 @@ function PromotionalCombos() {
                                             </p>
                                         ))}
                                     </div>
-                                    <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
+                                    <div className="overflow-y-auto scrollbar-y" style={{ maxHeight: '150px' }}>
                                         {combo.products.map((product) => (
                                             <div key={product._id} className="d-flex align-items-center my-2">
                                                 <img src={product.urlImage} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
@@ -306,12 +306,13 @@ function PromotionalCombos() {
                                         ))}
                                     </div>
                                     <p
-                                        className={`fs-4 fw-medium text-center ${new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
-                                            ? 'text-success'
-                                            : new Date() > new Date(combo.endDate)
+                                        className={`fs-4 fw-medium text-center ${
+                                            new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate)
+                                                ? 'text-success'
+                                                : new Date() > new Date(combo.endDate)
                                                 ? 'text-danger'
                                                 : 'text-warning'
-                                            }`}
+                                        }`}
                                     >
                                         {(new Date() >= new Date(combo.startDate) && new Date() <= new Date(combo.endDate) && 'Đang diễn ra') ||
                                             (new Date() > new Date(combo.endDate) && 'Đã kết thúc') ||

@@ -21,6 +21,7 @@
         "@tomtom-international/web-sdk-plugin-searchbox": "^3.2.0",
         "@tomtom-international/web-sdk-services": "^6.25.0",
         "axios": "^1.7.5",
+        "bad-words": "^4.0.0",
         "browser-image-compression": "^2.0.2",
         "chart.js": "^4.4.6",
         "dotenv": "^16.4.5",

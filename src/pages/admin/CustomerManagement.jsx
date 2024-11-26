@@ -114,8 +114,8 @@ function CustomerManagement() {
     }
 
     return (
-        <div className="pb-5">
-            <div className="bg-white border">
+        <div className="pb-5 px-4 d-flex flex-column gap-4">
+            <div className="bg-white rounded-4 shadow-sm">
                 <p className="fs-3 fw-medium p-3 border-bottom">Quản lý khách hàng</p>
                 <div className="row p-3 g-4 mx-2">
                     <div className="col-6 d-flex align-items-center">
@@ -177,7 +177,7 @@ function CustomerManagement() {
                     </button>
                 </div>
             </div>
-            <div className="bg-white border mt-3 ">
+            <div className="bg-white rounded-4 shadow-sm">
                 <div className=" border-bottom d-flex">
                     <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === '' ? 'active' : ''}`} onClick={() => setClientType('')}>
                         Tất cả
@@ -336,7 +336,7 @@ function CustomerManagement() {
                                             <span className="custom-checkbox"></span>
                                         </label>
                                     </div>
-                                    <div className="overflow-y-auto mt-5">
+                                    <div className="overflow-y-auto mt-5 scrollbar-y">
                                         <div className="d-inline-flex align-items-center w-100">
                                             <img src={client.urlImage || defaultAvatar} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }} />
                                             <div className="ms-3 order-product-info">

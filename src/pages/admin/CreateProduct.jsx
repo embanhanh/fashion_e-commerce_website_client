@@ -404,8 +404,8 @@ function CreateProduct() {
                 <Notification title={message.title} description={message.description} type={message.type} />
             </Modal>
 
-            <div className="w-75 pb-5">
-                <section id="section1" className="p-4 bg-white border mt-4">
+            <div className="pb-5 d-flex flex-column gap-4 align-items-center">
+                <section id="section1" className="p-4 bg-white rounded-4 shadow-sm create-product-section">
                     <h2>Thông tin cơ bản</h2>
                     <div className="p-4">
                         <div className="d-flex mt-4">
@@ -497,7 +497,7 @@ function CreateProduct() {
                         {errors.description && <p className="text-danger ms-2 pt-2">{errors.description}</p>}
                     </div>
                 </section>
-                <section id="section2" className="p-4 bg-white border mt-4">
+                <section id="section2" className="p-4 bg-white rounded-4 shadow-sm create-product-section">
                     <h2>Thông tin chi tiết</h2>
                     <div className="p-4">
                         <div className="d-flex mt-4  align-items-center">
@@ -570,7 +570,7 @@ function CreateProduct() {
                         </div>
                     </div>
                 </section>
-                <section id="section3" className="p-4 bg-white border mt-4">
+                <section id="section3" className="p-4 bg-white rounded-4 shadow-sm create-product-section">
                     <h2>Thông tin bán hàng</h2>
                     <div className="p-4">
                         <div className="d-flex mt-4">
@@ -755,7 +755,7 @@ function CreateProduct() {
                         </div>
                     </div>
                 </section>
-                <section id="section4" className="p-4 bg-white border mt-4">
+                <section id="section4" className="p-4 bg-white rounded-4 shadow-sm create-product-section">
                     <h2>Thông tin vận chuyển</h2>
                     <div className="p-4">
                         <div className="d-flex align-items-center justify-content-between py-3 border-bottom">
@@ -856,7 +856,7 @@ function CreateProduct() {
                         <div className="d-flex flex-row-reverse">
                             <button
                                 disabled={isLoading || Object.keys(errors).length !== 0}
-                                className="primary-btn px-4 py-2 shadow-none ms-4 rounded-0"
+                                className="primary-btn px-4 py-2 shadow-none ms-4 rounded-4"
                                 onClick={() => {
                                     handleSubmit()
                                 }}
@@ -874,7 +874,7 @@ function CreateProduct() {
                                     </div>
                                 )}
                             </button>
-                            <button className="border ms-4 bg-white" onClick={() => navigate(-1)}>
+                            <button className="border px-4 py-2 ms-4 bg-white rounded-4" onClick={() => navigate(-1)}>
                                 <p>Hủy</p>
                             </button>
                         </div>

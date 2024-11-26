@@ -10,9 +10,9 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
 
     useEffect(() => {
         if (isOpen) {
-            setHeight(`${contentRef.current.scrollHeight}px`)
+            setHeight(`${contentRef.current.scrollHeight + 1}px`)
         } else {
-            setHeight(`${contentRef.current.scrollHeight}px`)
+            setHeight(`${contentRef.current.scrollHeight + 1}px`)
             requestAnimationFrame(() => {
                 setHeight('0px')
             })
@@ -31,8 +31,8 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
         onClick()
     }
 
-    const handleCheckboxChange = (item, isChecked, childrenIds) => {
-        onSelect(item, isChecked, childrenIds)
+    const handleCheckboxChange = (item, isChecked, childrenIds, idParent) => {
+        onSelect(item, isChecked, childrenIds, idParent)
     }
 
     return (
@@ -74,7 +74,7 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                                               className="input-checkbox"
                                               checked={selectedItems.includes(item.id) || selectedItems.includes(idParent)}
                                               onChange={(e) => {
-                                                  handleCheckboxChange(item.id, e.target.checked, [])
+                                                  handleCheckboxChange(item.id, e.target.checked, [], idParent)
                                               }}
                                           />
                                           <span className="custom-checkbox"></span>

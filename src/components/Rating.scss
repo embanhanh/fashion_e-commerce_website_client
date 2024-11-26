@@ -1,0 +1,138 @@
+.rating-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-direction: row-reverse;
+}
+
+.rating-container > input {
+    position: absolute;
+    appearance: none;
+}
+
+.rating-container > label {
+    cursor: pointer;
+    font-size: 30px;
+    position: relative;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.rating-container > label > svg {
+    fill: #ccc;
+    transition: fill 0.3s ease;
+}
+
+.rating-container > input.rating-0 + label > svg {
+    fill: #ccc;
+    width: 0.9em;
+}
+
+.rating-container > input.rating-0:checked + label > svg {
+    fill: #ff9e0b;
+}
+
+.rating-container > input.rating-0:hover + label > svg {
+    fill: #ff9e0b;
+}
+
+.rating-container > label::before,
+.rating-container > label::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #ff9e0b;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    animation: particle-explosion 1s ease-out;
+}
+
+.rating-container > label::before {
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+}
+
+.rating-container > label::after {
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+}
+
+.rating-container > label:hover::before,
+.rating-container > label:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.5);
+}
+
+.rating-container > label:hover {
+    transform: scale(1.2);
+}
+
+.rating-container > input:hover + label > svg,
+.rating-container > input:hover + label ~ label > svg {
+    fill: #ff9e0b;
+}
+
+@keyframes particle-explosion {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+.rating-container > input:checked + label:hover > svg,
+.rating-container > input:checked + label:hover ~ label > svg {
+    fill: #e58e09;
+}
+
+.rating-container > label:hover > svg,
+.rating-container > label:hover ~ label > svg {
+    fill: #ff9e0b;
+}
+
+.rating-container input:checked ~ label svg {
+    fill: #ffa723;
+}
+
+.rating-container.readonly {
+    pointer-events: none;
+
+    label {
+        cursor: default;
+    }
+
+    // Tắt các hiệu ứng hover trong chế độ readonly
+    & > label:hover::before,
+    & > label:hover::after {
+        opacity: 0;
+        transform: translateX(-50%) scale(0);
+    }
+
+    & > label:hover {
+        transform: none;
+        animation: none;
+    }
+
+    & > label:hover > svg,
+    & > label:hover ~ label > svg {
+        fill: #ccc;
+        filter: none;
+        animation: none;
+    }
+
+    & input:checked ~ label svg {
+        fill: #ff9e0b;
+    }
+}

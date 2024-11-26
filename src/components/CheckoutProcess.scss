@@ -72,3 +72,34 @@
         }
     }
 }
+
+.checkout-process_content {
+    height: 500px;
+    overflow-y: auto;
+}
+
+.checkout-process_product {
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+
+    .checkout-process_product-img {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+    }
+
+    &-name {
+        max-width: 300px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.checkout-process_discount {
+    gap: 10px;
+    grid-template-columns: 3fr 1.5fr 1fr;
+    align-items: center;
+}

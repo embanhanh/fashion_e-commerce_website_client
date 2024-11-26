@@ -18,7 +18,7 @@ export const calculateRouteDistance = async (start, end) => {
             const route = routeResponse.routes[0]
             const result = {
                 distance: route.summary.lengthInMeters / 1000,
-                duration: Math.ceil(route.summary.travelTimeInSeconds / (3600 * 24) + 3),
+                duration: Math.ceil(route.summary.travelTimeInSeconds / (3600 * 24) + 2),
                 trafficDelayInSeconds: route.summary.trafficDelayInSeconds,
             }
             return result

@@ -67,7 +67,9 @@ function Header({ location }) {
                 if (doc.exists()) {
                     const allNotifs = doc.data().notifications || []
 
-                    const recentNotifs = Array.from(allNotifs).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    const recentNotifs = Array.from(allNotifs).sort(
+                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                    )
                     setNotifications(recentNotifs)
                 }
             })
@@ -141,8 +143,12 @@ function Header({ location }) {
         <>
             <div
                 className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
-            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''} ${
-                    location.pathname.includes('/seller') || location.pathname.includes('/products/') ? 'header-fixed shadow' : ''
+            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${
+                    location.pathname === '/' ? 'header-home' : ''
+                } ${
+                    location.pathname.includes('/seller') || location.pathname.includes('/products/')
+                        ? 'header-fixed shadow'
+                        : ''
                 }`}
             >
                 <div className="container d-flex align-items-center justify-content-between">
@@ -161,7 +167,9 @@ function Header({ location }) {
                                         onClick={() => {
                                             setNavOption(nav.title)
                                         }}
-                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${nav?.className}`}
+                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${
+                                            nav?.className
+                                        }`}
                                     >
                                         <p className="nav-title">{nav.title}</p>
                                     </Link>
@@ -178,7 +186,10 @@ function Header({ location }) {
                                             </div>
                                         ) : (
                                             filteredCategories.map((category) => (
-                                                <div key={category._id} className=" col-md-4 col-lg-3 d-inline-flex flex-column  ">
+                                                <div
+                                                    key={category._id}
+                                                    className=" col-md-4 col-lg-3 d-inline-flex flex-column  "
+                                                >
                                                     <Link className="fw-bold fs-4 p-1">{category.name}</Link>
                                                     {category.children &&
                                                         category.children.map((child) => (
@@ -199,8 +210,16 @@ function Header({ location }) {
                             <>
                                 <div className="d-flex align-items-center gap-3">
                                     <div className="p-2 notification-container  rounded-3 position-relative">
-                                        <FontAwesomeIcon className="fs-2" icon={faBell} onMouseEnter={() => handleReadNotification()} />
-                                        {notifications.length > 0 && <span className="notification-count">{notifications.filter((notif) => !notif.read).length}</span>}
+                                        <FontAwesomeIcon
+                                            className="fs-2"
+                                            icon={faBell}
+                                            onMouseEnter={() => handleReadNotification()}
+                                        />
+                                        {notifications.filter((notif) => !notif.read).length > 0 && (
+                                            <span className="notification-count">
+                                                {notifications.filter((notif) => !notif.read).length}
+                                            </span>
+                                        )}
                                         <div className="notification-mini position-absolute shadow rounded-4 p-4">
                                             <div className="mb-3 notification-item-container scrollbar-y">
                                                 {notifications.length === 0 ? (
@@ -210,7 +229,10 @@ function Header({ location }) {
                                                         <div
                                                             key={index}
                                                             className="d-flex align-items-center py-3 px-2 border-bottom hover-icon"
-                                                            style={{ cursor: 'pointer', backgroundColor: notif.read ? 'transparent' : '#f0f0f0' }}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                backgroundColor: notif.read ? 'transparent' : '#f0f0f0',
+                                                            }}
                                                             onClick={() => {
                                                                 navigate(notif.link)
                                                             }}
@@ -223,15 +245,22 @@ function Header({ location }) {
                                             </div>
                                             {notifications.length > 0 && (
                                                 <div className="d-flex w-100">
-                                                    <button className="primary-btn mt-3 mx-auto fs-3 py-2">Xem tất cả</button>
+                                                    <button className="primary-btn mt-3 mx-auto fs-3 py-2">
+                                                        Xem tất cả
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                     {user?.role !== 'admin' && (
-                                        <div className="p-2 cart-container rounded-3 position-relative mx-3" onClick={() => navigate('/cart')}>
+                                        <div
+                                            className="p-2 cart-container rounded-3 position-relative mx-3"
+                                            onClick={() => navigate('/cart')}
+                                        >
                                             <FontAwesomeIcon className="fs-2" icon={faBagShopping} />
-                                            {cart && cart.items && cart.items.length > 0 && <span className="cart-count">{cart.items.length}</span>}
+                                            {cart && cart.items && cart.items.length > 0 && (
+                                                <span className="cart-count">{cart.items.length}</span>
+                                            )}
                                             <div className="cart-mini position-absolute shadow rounded-4 p-4">
                                                 {cartStatus === 'loading' ? (
                                                     <section className="dots-container mt-4">
@@ -246,19 +275,39 @@ function Header({ location }) {
                                                         <div className="mb-3 cart-product-container scrollbar-y">
                                                             {cartStatus === 'succeeded' && cart.items.length === 0 ? (
                                                                 <div className="d-flex justify-content-center align-items-center">
-                                                                    <img src={cartEmpty} alt="" style={{ width: 300, height: 300, objectFit: 'cover' }} />
+                                                                    <img
+                                                                        src={cartEmpty}
+                                                                        alt=""
+                                                                        style={{
+                                                                            width: 300,
+                                                                            height: 300,
+                                                                            objectFit: 'cover',
+                                                                        }}
+                                                                    />
                                                                 </div>
                                                             ) : cartStatus === 'failed' ? (
                                                                 <p className="fs-4 fw-medium">Không thể lấy giỏ hàng</p>
                                                             ) : (
                                                                 cartStatus === 'succeeded' &&
                                                                 cart.items.map((item, index) => (
-                                                                    <div key={index} className="d-flex align-items-center pb-4 mb-4 border-bottom">
-                                                                        <img src={item.variant.product?.urlImage || ''} className="me-4" alt="" width={50} height={50} />
+                                                                    <div
+                                                                        key={index}
+                                                                        className="d-flex align-items-center pb-4 mb-4 border-bottom"
+                                                                    >
+                                                                        <img
+                                                                            src={item.variant.product?.urlImage || ''}
+                                                                            className="me-4"
+                                                                            alt=""
+                                                                            width={50}
+                                                                            height={50}
+                                                                        />
                                                                         <div className="w-100">
-                                                                            <p className="fs-4 fw-medium ellipsis">{item.variant.product?.name || ''}</p>
+                                                                            <p className="fs-4 fw-medium ellipsis">
+                                                                                {item.variant.product?.name || ''}
+                                                                            </p>
                                                                             <p className="fw-medium">
-                                                                                {item.quantity} x {item.variant.price || 0}đ
+                                                                                {item.quantity} x{' '}
+                                                                                {item.variant.price || 0}đ
                                                                             </p>
                                                                         </div>
                                                                     </div>
@@ -267,8 +316,13 @@ function Header({ location }) {
                                                         </div>
                                                         {cartStatus === 'succeeded' && cart.items.length > 0 && (
                                                             <div className="d-flex justify-content-between align-items-center">
-                                                                <p className="fs-4 fw-medium">{cart.items.length} sản phẩm có trong giỏ hàng</p>
-                                                                <div className="primary-btn fs-3 p-3 shadow-none" onClick={() => navigate('/cart')}>
+                                                                <p className="fs-4 fw-medium">
+                                                                    {cart.items.length} sản phẩm có trong giỏ hàng
+                                                                </p>
+                                                                <div
+                                                                    className="primary-btn fs-3 p-3 shadow-none"
+                                                                    onClick={() => navigate('/cart')}
+                                                                >
                                                                     Xem giỏ hàng
                                                                 </div>
                                                             </div>
@@ -278,21 +332,43 @@ function Header({ location }) {
                                             </div>
                                         </div>
                                     )}
-                                    <div className="user-actions-container position-relative d-flex align-items-center" style={{ minWidth: 200 }}>
-                                        <img src={user?.urlImage || defaultAvatar} alt="" className="rounded-circle shadow mx-3" style={{ height: 32, width: 32 }} />
+                                    <div
+                                        className="user-actions-container position-relative d-flex align-items-center"
+                                        style={{ minWidth: 200 }}
+                                    >
+                                        <img
+                                            src={user?.urlImage || defaultAvatar}
+                                            alt=""
+                                            className="rounded-circle shadow mx-3"
+                                            style={{ height: 32, width: 32 }}
+                                        />
                                         <p className="fs-4 fw-bold me-5 ">{user?.name || user?.email.split('@')[0]}</p>
                                         <div className="position-absolute py-3 px-3 user-actions shadow rounded-3">
-                                            <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/profile'}>
+                                            <Link
+                                                className="user-action fs-4 fw-medium py-3 px-2 border-bottom"
+                                                to={'/user/account/profile'}
+                                            >
                                                 Tài khoản của tôi
                                             </Link>
-                                            {user?.role !== 'admin' && <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>}
+                                            {user?.role !== 'admin' && (
+                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">
+                                                    Đơn mua
+                                                </Link>
+                                            )}
                                             {user?.role === 'admin' && (
-                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
+                                                <Link
+                                                    className="user-action fs-4 fw-medium py-3 px-2 border-bottom"
+                                                    to={'/seller'}
+                                                >
                                                     Quản lý cửa hàng
                                                 </Link>
                                             )}
-                                            <Link className="user-action fs-4 fw-medium py-3 px-2" onClick={() => handleLogout()}>
-                                                <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng xuất
+                                            <Link
+                                                className="user-action fs-4 fw-medium py-3 px-2"
+                                                onClick={() => handleLogout()}
+                                            >
+                                                <FontAwesomeIcon icon={faRightFromBracket} className="fs-3 me-2" /> Đăng
+                                                xuất
                                             </Link>
                                         </div>
                                     </div>

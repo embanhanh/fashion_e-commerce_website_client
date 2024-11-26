@@ -250,23 +250,24 @@ const userSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(addNewAddress.pending, (state) => {
-                state.loading = true
+                state.loading = true;
             })
             .addCase(addNewAddress.fulfilled, (state, action) => {
-                state.loading = false
+                state.loading = false;
 
                 // Reset all addresses to not default
                 state.addresses.forEach(address => {
                     address.default = false;
                 });
 
-                // Add the new address to the list
-                state.addresses.push(action.payload); // Assuming action.payload contains the new address
+                // Add the new address as default and place it at the top
+                const newAddress = { ...action.payload, default: true }; // Đảm bảo địa chỉ mới là default
+                state.addresses.unshift(newAddress); // Thêm vào đầu danh sách
             })
             .addCase(addNewAddress.rejected, (state, action) => {
-                state.loading = false
-                state.error = action.payload // Lưu lỗi vào state
-                console.error('Error adding address:', action.payload) // Ghi lại lỗi
+                state.loading = false;
+                state.error = action.payload; // Lưu lỗi vào state
+                console.error('Error adding address:', action.payload); // Ghi lại lỗi
             })
             .addCase(updateAddress.pending, (state) => {
                 state.loading = true

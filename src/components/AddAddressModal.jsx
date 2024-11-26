@@ -1,6 +1,7 @@
 import { Form, Button, Modal, ListGroup } from 'react-bootstrap'
 import { useState, useEffect, useRef } from 'react'
 import TomTomMap from './TomTomMap'
+import Swal from 'sweetalert2'
 
 function AddAddressModal({ show, handleClose, onAddAddress }) {
     const [name, setName] = useState('')
@@ -77,8 +78,17 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                     default: isDefault,
                     address: address,
                 }
-                await onAddAddress(newAddressData)
-                handleClose()
+                Swal.fire({
+                    title: 'Thông báo',
+                    text: 'Bạn có chắc chắn muốn thêm địa chỉ này không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        onAddAddress(newAddressData)
+                        handleClose()
+                    }
+                })
             } catch (error) {
                 setErrors({ submit: 'Có lỗi xảy ra khi thêm địa chỉ' })
                 console.log(error)
@@ -92,85 +102,85 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                 <Modal.Title className="fs-1">Thêm địa chỉ mới</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3 fs-4">
-                        {/* <Form.Label>Họ và tên</Form.Label>
-                        <Form.Control type="text" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} /> */}
-                        <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Họ và tên:</p>
-                        <div className="input-form d-flex align-items-center w-100">
-                            <input type="text" className="input-text w-100" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        {errors.name && <p className="text-danger">{errors.name}</p>}
-                    </Form.Group>
-
-                    <Form.Group className="mb-3 fs-4">
-                        <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Số điện thoại:</p>
-                        <div className="input-form d-flex align-items-center w-100">
-                            <input type="text" className="input-text w-100" placeholder="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                        </div>
-                        {errors.phone && <p className="text-danger">{errors.phone}</p>}
-                    </Form.Group>
-
-                    <Form.Group className="mb-3 fs-4">
-                        <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Địa chỉ:</p>
-                        <div className="input-form d-flex align-items-center w-100">
-                            <input
-                                type="text"
-                                className="input-text w-100"
-                                placeholder="Tỉnh/ Thành phố, Quận/ Huyện, Phường/ Xã"
-                                value={location}
-                                onChange={handleAddressChange}
-                                onFocus={() => setShowSuggestions(true)}
-                                ref={inputRef}
-                            />
-                        </div>
-                        {showSuggestions && suggestions.length > 0 && (
-                            <ListGroup className="suggestions-list" ref={suggestionsRef}>
-                                {suggestions.map((suggestion, index) => (
-                                    <ListGroup.Item key={index} action onClick={() => handleSuggestionClick(suggestion)}>
-                                        {suggestion}
-                                    </ListGroup.Item>
-                                ))}
-                            </ListGroup>
-                        )}
-                        {errors.location && <p className="text-danger">{errors.location}</p>}
-                        <div className="my-3">
-                            <TomTomMap initialLocation={address} onLocationChange={setAddress} height="200px" setLocation={setLocation} />
-                        </div>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3 fs-4">
-                        <Form.Label>Loại địa chỉ</Form.Label>
-                        <div className="select">
-                            <div className="selected">
-                                <span>{type ? (type === 'home' ? 'Nhà riêng' : 'Cơ quan') : 'Chọn loại địa chỉ'}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
-                                    <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
-                                </svg>
+                <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3 fs-4">
+                            <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Họ và tên:</p>
+                            <div className="input-form d-flex align-items-center w-100">
+                                <input type="text" className="input-text w-100" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} />
                             </div>
-                            <div className="options">
-                                <div title="home">
-                                    <input id="home-address" name="address-type" type="radio" checked={type === 'home'} value="home" onChange={(e) => setType(e.target.value)} />
-                                    <label className="option" htmlFor="home-address" data-txt="Nhà riêng" />
+                            {errors.name && <p className="text-danger">{errors.name}</p>}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3 fs-4">
+                            <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Số điện thoại:</p>
+                            <div className="input-form d-flex align-items-center w-100">
+                                <input type="text" className="input-text w-100" placeholder="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                            </div>
+                            {errors.phone && <p className="text-danger">{errors.phone}</p>}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3 fs-4">
+                            <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Địa chỉ:</p>
+                            <div className="input-form d-flex align-items-center w-100">
+                                <input
+                                    type="text"
+                                    className="input-text w-100"
+                                    placeholder="Tỉnh/ Thành phố, Quận/ Huyện, Phường/ Xã"
+                                    value={location}
+                                    onChange={handleAddressChange}
+                                    onFocus={() => setShowSuggestions(true)}
+                                    ref={inputRef}
+                                />
+                            </div>
+                            {showSuggestions && suggestions.length > 0 && (
+                                <ListGroup className="suggestions-list" ref={suggestionsRef}>
+                                    {suggestions.map((suggestion, index) => (
+                                        <ListGroup.Item key={index} action onClick={() => handleSuggestionClick(suggestion)}>
+                                            {suggestion}
+                                        </ListGroup.Item>
+                                    ))}
+                                </ListGroup>
+                            )}
+                            {errors.location && <p className="text-danger">{errors.location}</p>}
+                            <div className="my-3">
+                                <TomTomMap initialLocation={address} onLocationChange={setAddress} height="200px" setLocation={setLocation} />
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3 fs-4">
+                            <Form.Label>Loại địa chỉ</Form.Label>
+                            <div className="select">
+                                <div className="selected">
+                                    <span>{type ? (type === 'home' ? 'Nhà riêng' : 'Cơ quan') : 'Chọn loại địa chỉ'}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                        <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                                    </svg>
                                 </div>
-                                <div title="work">
-                                    <input id="work-address" name="address-type" type="radio" checked={type === 'work'} value="work" onChange={(e) => setType(e.target.value)} />
-                                    <label className="option" htmlFor="work-address" data-txt="Cơ quan" />
+                                <div className="options">
+                                    <div title="home">
+                                        <input id="home-address" name="address-type" type="radio" checked={type === 'home'} value="home" onChange={(e) => setType(e.target.value)} />
+                                        <label className="option" htmlFor="home-address" data-txt="Nhà riêng" />
+                                    </div>
+                                    <div title="work">
+                                        <input id="work-address" name="address-type" type="radio" checked={type === 'work'} value="work" onChange={(e) => setType(e.target.value)} />
+                                        <label className="option" htmlFor="work-address" data-txt="Cơ quan" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Form.Group>
+                        </Form.Group>
 
-                    <Form.Group className="mb-3 fs-4">
-                        <div className="checkbox-cell">
-                            <label className="d-flex align-items-center">
-                                <input type="checkbox" className="input-checkbox" name="isDefault" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
-                                <span className="custom-checkbox" />
-                                <span className="ms-2">Đặt làm địa chỉ mặc định.</span>
-                            </label>
-                        </div>
-                    </Form.Group>
-                </Form>
+                        <Form.Group className="mb-3 fs-4">
+                            <div className="checkbox-cell">
+                                <label className="d-flex align-items-center">
+                                    <input type="checkbox" className="input-checkbox" name="isDefault" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
+                                    <span className="custom-checkbox" />
+                                    <span className="ms-2">Đặt làm địa chỉ mặc định.</span>
+                                </label>
+                            </div>
+                        </Form.Group>
+                    </Form>
+                </div>
             </Modal.Body>
             <Modal.Footer>
                 {errors.submit && <p className="text-danger">{errors.submit}</p>}

@@ -128,7 +128,7 @@ function Header({ location }) {
         },
         {
             title: 'Chính sách',
-            to: '/',
+            to: '/policy',
         },
     ]
 
@@ -141,9 +141,8 @@ function Header({ location }) {
         <>
             <div
                 className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
-            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''} ${
-                    location.pathname.includes('/seller') || location.pathname.includes('/products/') ? 'header-fixed shadow' : ''
-                }`}
+            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''} ${location.pathname.includes('/seller') || location.pathname.includes('/products/') ? 'header-fixed shadow' : ''
+                    }`}
             >
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">

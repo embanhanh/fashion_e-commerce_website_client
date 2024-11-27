@@ -15,6 +15,8 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
     const [categoryImage, setCategoryImage] = useState(null)
     const [previewImage, setPreviewImage] = useState(null)
     const [errors, setErrors] = useState({})
+    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
     const inputRef = useRef(null)
     const suggestionsRef = useRef(null)
 
@@ -83,6 +85,7 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
 
     const handleSuggestionClick = (category) => {
         setParentCategory(category.name)
+        setSelectedCategory(category)
         if (category.urlImage) {
             setCategoryImage(category.urlImage)
             setPreviewImage(category.urlImage)
@@ -95,12 +98,20 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
         if (!parentCategory || !categoryImage) {
             newErrors.parentCategory = 'Vui lòng nhập và chọn hình ảnh cho danh mục lớn'
         }
+        if (
+            selectedCategory &&
+            selectedCategory.name === parentCategory &&
+            selectedCategory.urlImage === categoryImage
+        ) {
+            newErrors.parentCategory = 'Danh mục lớn đã tồn tại'
+        }
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
 
     const handleSubmit = async () => {
         if (validateForm()) {
+            setIsLoading(true)
             try {
                 const formData = new FormData()
                 formData.append('parentCategory', parentCategory)
@@ -110,6 +121,8 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
                 handleClose()
             } catch (e) {
                 setErrors({ ...errors, submit: e.message || 'Có lỗi xảy ra khi tạo danh mục' })
+            } finally {
+                setIsLoading(false)
             }
         }
     }
@@ -223,13 +236,26 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer className="d-flex w-100">
-                <p className="text-danger">{errors.parentCategory}</p>
-                <p className="text-danger">{errors.submit}</p>
-                <div onClick={handleClose} className="border py-2 px-4" style={{ cursor: 'pointer' }}>
+                <div>
+                    <p className="text-danger">{errors.parentCategory}</p>
+                    <p className="text-danger">{errors.submit}</p>
+                </div>
+                <div onClick={handleClose} className="border py-2 px-4 rounded-4" style={{ cursor: 'pointer' }}>
                     <p className="fs-3 text-body-secondary">Đóng</p>
                 </div>
-                <div className="primary-btn py-2 px-4 shadow-none rounded-0" onClick={handleSubmit}>
+                <div className="primary-btn py-2 px-4 shadow-none rounded-4" onClick={handleSubmit}>
                     <p>Thêm danh mục</p>
+                    {isLoading && (
+                        <div className="dot-spinner ms-4">
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                            <div className="dot-spinner__dot"></div>
+                        </div>
+                    )}
                 </div>
             </Modal.Footer>
         </Modal>

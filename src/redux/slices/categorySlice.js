@@ -42,15 +42,15 @@ const categorySlice = createSlice({
             })
             .addCase(addNewCategory.fulfilled, (state, action) => {
                 const newCategory = action.payload.childCategory
-                if (newCategory.parentCategory) {
+                if (newCategory) {
                     const parentIndex = state.categories.findIndex(
                         (category) => category._id === newCategory.parentCategory._id
                     )
                     if (parentIndex === -1) {
                         state.categories.push(newCategory.parentCategory)
                     }
+                    state.categories.push(newCategory)
                 }
-                state.categories.push(newCategory)
             })
             .addCase(addNewCategory.rejected, (state, action) => {
                 state.error = action.payload

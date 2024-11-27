@@ -6,6 +6,7 @@ export const createCategory = async (categoryData) => {
     try {
         const response = await axios.post(API_URL + 'create', categoryData, {
             headers: {
+                'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         })

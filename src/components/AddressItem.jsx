@@ -72,7 +72,7 @@ function AddressItem({ address, onAddressUpdated }) {
                             <div className="address-name">{address.name}</div>
                         </span>
                         <div className="spacer"></div>
-                        <div role="row" className="address-phone mt-2 ">
+                        <div role="row" className="mt-2 fs-5 text-muted">
                             {address.phone}
                         </div>
                     </div>

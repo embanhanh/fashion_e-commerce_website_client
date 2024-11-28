@@ -13,6 +13,7 @@ function PromotionalCombos() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { promotionalCombos, promotionalCombo, status } = useSelector((state) => state.promotionalCombo)
+
     const [filteredPromotionalCombos, setFilteredPromotionalCombos] = useState([])
     const [filter, setFilter] = useState({
         name: '',
@@ -105,6 +106,13 @@ function PromotionalCombos() {
             console.error('Error fetching combo voucher:', error)
         }
     }
+
+    useEffect(() => {
+        if (comboVoucherId) {
+            fetchComboVoucherById(comboVoucherId)
+        }
+    }, [comboVoucherId])
+
 
     useEffect(() => {
         if (comboVoucherId) {
@@ -346,7 +354,7 @@ function PromotionalCombos() {
             {showDetailCombo && (
                 <Modal show={showDetailCombo} onHide={handleCloseCombo} centered>
                     <Modal.Header closeButton>
-                        <Modal.Title className="fs-2 fw-bold text-dark">Chi tiết voucher giảm giá</Modal.Title>
+                        <Modal.Title className="fs-2 fw-bold text-dark">Chi tiết combo voucher giảm giá</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {status === 'loading' ? (
@@ -356,7 +364,7 @@ function PromotionalCombos() {
                                 </div>
                             </div>
                         ) : promotionalCombo ? (
-                            <div className="voucher-details p-3 border rounded ">
+                            <div className="voucher-details p-3 border rounded overflow-y-auto" style={{ maxHeight: '500px' }}>
                                 <div className="d-flex justify-content-between mb-3 fs-4">
                                     <strong>Tên combo voucher:</strong>
                                     <span className="fs-4 fw-normal">{promotionalCombo.name}</span>

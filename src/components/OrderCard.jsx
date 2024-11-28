@@ -54,9 +54,7 @@ function OrderCard({ order }) {
                         <button className="btn secondary-btn">
                             Xem chi tiết đơn hàng
                         </button>
-                        <button className="btn outline-btn">
-                            Yêu cầu trả hàng/Hoàn tiền
-                        </button>
+
                     </>
                     {/* )} */}
                     {order.status === 'delivering' && (

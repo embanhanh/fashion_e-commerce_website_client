@@ -16,6 +16,7 @@ import {
     unblockManyClient,
     updateManyClientType,
     getOrderUser,
+    getOrdersByUserId,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -92,6 +93,8 @@ export const fetchOrderUser = createAsyncThunk('user/fetchOrderUser', async (_, 
     }
 })
 
+
+
 export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
     try {
         const response = await getVouchersUser()
@@ -164,6 +167,18 @@ export const unblockManyClientAction = createAsyncThunk('user/unblockManyClient'
     }
 })
 
+export const fetchOrdersByUserId = createAsyncThunk(
+    'user/fetchOrdersByUserId',
+    async (userId, { rejectWithValue }) => {
+        try {
+            const response = await getOrdersByUserId(userId)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -186,6 +201,7 @@ const userSlice = createSlice({
             orderCount: '',
             clientType: '',
         },
+        userOrders: [],
     },
     reducers: {
         setOrderFilters: (state, action) => {
@@ -234,23 +250,24 @@ const userSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(addNewAddress.pending, (state) => {
-                state.loading = true
+                state.loading = true;
             })
             .addCase(addNewAddress.fulfilled, (state, action) => {
-                state.loading = false
+                state.loading = false;
 
                 // Reset all addresses to not default
                 state.addresses.forEach(address => {
                     address.default = false;
                 });
 
-                // Add the new address to the list
-                state.addresses.push(action.payload); // Assuming action.payload contains the new address
+                // Add the new address as default and place it at the top
+                const newAddress = { ...action.payload, default: true }; // Đảm bảo địa chỉ mới là default
+                state.addresses.unshift(newAddress); // Thêm vào đầu danh sách
             })
             .addCase(addNewAddress.rejected, (state, action) => {
-                state.loading = false
-                state.error = action.payload // Lưu lỗi vào state
-                console.error('Error adding address:', action.payload) // Ghi lại lỗi
+                state.loading = false;
+                state.error = action.payload; // Lưu lỗi vào state
+                console.error('Error adding address:', action.payload); // Ghi lại lỗi
             })
             .addCase(updateAddress.pending, (state) => {
                 state.loading = true
@@ -387,6 +404,19 @@ const userSlice = createSlice({
             })
             .addCase(unblockManyClientAction.rejected, (state, action) => {
                 state.error = action.payload
+            })
+            .addCase(fetchOrdersByUserId.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchOrdersByUserId.fulfilled, (state, action) => {
+                state.loading = false
+                state.userOrders = action.payload
+            })
+            .addCase(fetchOrdersByUserId.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+                console.error('Error fetching user orders:', action.payload)
             })
     },
 })

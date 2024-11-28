@@ -130,7 +130,7 @@ function Header({ location }) {
         },
         {
             title: 'Chính sách',
-            to: '/',
+            to: '/policy',
         },
     ]
 

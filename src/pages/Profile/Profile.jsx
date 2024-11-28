@@ -7,7 +7,7 @@ import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config' // Đảm bảo đường dẫn đúng
 import Notification from '../../components/Notification' // Import component Notification
-
+import Swal from 'sweetalert2'
 function Profile() {
     const dispatch = useDispatch()
     const { user, loading, error, success } = useSelector((state) => state.user)
@@ -20,7 +20,7 @@ function Profile() {
     const [urlImage, setUrlImage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
-    const [showNotification, setShowNotification] = useState(false) // State để quản lý hiển thị thông báo
+
 
     useEffect(() => {
         dispatch(fetchUser())
@@ -39,8 +39,6 @@ function Profile() {
 
     useEffect(() => {
         if (success && isSuccess) {
-            setShowNotification(true) // Hiển thị thông báo khi cập nhật thành công
-            // setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
             setIsSuccess(false)
         }
     }, [success])
@@ -58,28 +56,42 @@ function Profile() {
         e.preventDefault()
         setIsLoading(true)
 
-        try {
-            let avatarUrl = urlImage
-
-            if (urlImage && !urlImage.startsWith('https://firebasestorage.googleapis.com')) {
-                avatarUrl = await uploadImage(urlImage) // Upload the new image if necessary
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn cập nhật hồ sơ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Cập nhật'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    let avatarUrl = urlImage
+                    if (urlImage && !urlImage.startsWith('https://firebasestorage.googleapis.com')) {
+                        avatarUrl = await uploadImage(urlImage) // Upload the new image if necessary
+                    }
+                    const userData = {
+                        name: userName,
+                        gender,
+                        birthday: birth,
+                        phone,
+                        urlImage: avatarUrl,
+                    }
+                    await dispatch(updateUserProfile(userData)) // Update user profile with Firebase URL
+                    Swal.fire({
+                        title: 'Thông báo',
+                        text: 'Cập nhật hồ sơ thành công',
+                        icon: 'success',
+                    })
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Thông báo',
+                        text: error.message,
+                        icon: 'error',
+                    })
+                }
             }
-
-            const userData = {
-                name: userName,
-                gender,
-                birthday: birth,
-                phone,
-                urlImage: avatarUrl,
-            }
-
-            await dispatch(updateUserProfile(userData)) // Update user profile with Firebase URL
-            setIsSuccess(true)
-        } catch (error) {
-            console.error('Error updating user profile:', error)
-        } finally {
-            setIsLoading(false)
-        }
+        })
     }
 
     // Function to upload image to Firebase
@@ -117,14 +129,6 @@ function Profile() {
 
     return (
         <div className="profile-container">
-            <div className="z-3 position-absolute end-0 top">
-                {showNotification && (
-                    <Modal show={showNotification} onHide={() => setShowNotification(false)} centered>
-                        <Notification title="Cập nhật thành công" description="Thông tin hồ sơ của bạn đã được cập nhật." type="success" isClosed={true} />
-                    </Modal>
-                )}
-            </div>
-
             <div className="profile-header">
                 <h1 className="profile-title">Hồ sơ của tôi</h1>
                 <div className="profile-subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</div>

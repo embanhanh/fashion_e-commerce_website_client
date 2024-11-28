@@ -3,6 +3,7 @@ import EditAddressModal from './EditAddressModal'
 import './AddressItem.scss' // Import SCSS file
 import { deleteAddress, updateAddress, setDefaultAddress } from '../redux/slices/userSlice'
 import { useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
 
 function AddressItem({ address, onAddressUpdated }) {
     const dispatch = useDispatch()
@@ -38,9 +39,23 @@ function AddressItem({ address, onAddressUpdated }) {
     const handleSetDefaultAddress = async () => {
         try {
             if (address._id) {
-                await dispatch(setDefaultAddress({ address_id: address._id }))
-                onAddressUpdated()
+                Swal.fire({
+                    title: 'Thông báo',
+                    text: 'Bạn có chắc chắn muốn thiết lập địa chỉ này làm mặc định không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await dispatch(setDefaultAddress({ address_id: address._id }))
+                        onAddressUpdated()
+                    }
+                })
             } else {
+                Swal.fire({
+                    title: 'Thông báo',
+                    text: 'Địa chỉ không tồn tại',
+                    icon: 'error',
+                })
                 console.error('Address ID is undefined')
             }
         } catch (error) {
@@ -57,7 +72,7 @@ function AddressItem({ address, onAddressUpdated }) {
                             <div className="address-name">{address.name}</div>
                         </span>
                         <div className="spacer"></div>
-                        <div role="row" className="address-phone mt-2 ">
+                        <div role="row" className="mt-2 fs-5 text-muted">
                             {address.phone}
                         </div>
                     </div>
@@ -99,12 +114,12 @@ function AddressItem({ address, onAddressUpdated }) {
                 </div>
             </div>
             {/* Thêm EditAddressModal */}
-            <EditAddressModal
+            {showEditModal && <EditAddressModal
                 show={showEditModal}
                 handleClose={() => setShowEditModal(false)}
                 onEditAddress={handleEditAddress}
                 address={address} // Truyền địa chỉ hiện tại vào modal
-            />
+            />}
         </div>
     )
 }

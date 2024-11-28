@@ -33,7 +33,7 @@ const OrderManagement = () => {
         orderStartDate: null,
         orderEndDate: null,
         paymentMethod: 'paymentUponReceipt',
-        shippingMethod: 'default',
+        shippingMethod: 'all',
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
     const [bulkAction, setBulkAction] = useState('')
@@ -121,6 +121,12 @@ const OrderManagement = () => {
         }
     }, [bulkAction])
 
+    useEffect(() => {
+        if (orders) {
+            // console.log(orders)
+        }
+    }, [orders])
+
     return (
         <div className="pb-5 d-flex flex-column gap-4 px-4">
             <div className="bg-white rounded-4 shadow-sm">
@@ -164,8 +170,8 @@ const OrderManagement = () => {
                     <div className="col-6 d-flex align-items-center">
                         <p className="fs-4 fw-medium text-nowrap me-4 label-width ">Hình thức vận chuyển</p>
                         <div className="d-flex align-items-center">
-                            <div className="select ">
-                                <div className="selected" data-default="Cơ bản" data-one="Nhanh" data-two="Ha tốc">
+                            <div className="select">
+                                <div className="selected" data-default="Tất cả" data-one="Cơ bản" data-two="Nhanh" data-three="Hỏa tốc">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
@@ -176,33 +182,44 @@ const OrderManagement = () => {
                                             id="all-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === 'default'}
-                                            value="default"
+                                            checked={filterLocal.shippingMethod === 'all'}
+                                            value="all"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="all-v2" data-txt="Cơ bản" />
+                                        <label className="option" htmlFor="all-v2" data-txt="Tất cả" />
                                     </div>
                                     <div title="option-1">
                                         <input
                                             id="option-1-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === 'fast'}
-                                            value="fast"
+                                            checked={filterLocal.shippingMethod === 'default'}
+                                            value="default"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="option-1-v2" data-txt="Nhanh" />
+                                        <label className="option" htmlFor="option-1-v2" data-txt="Cơ bản" />
                                     </div>
                                     <div title="option-2">
                                         <input
                                             id="option-2-v2"
                                             name="option-v2"
                                             type="radio"
+                                            checked={filterLocal.shippingMethod === 'fast'}
+                                            value="fast"
+                                            onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
+                                        />
+                                        <label className="option" htmlFor="option-2-v2" data-txt="Nhanh" />
+                                    </div>
+                                    <div title="option-3">
+                                        <input
+                                            id="option-3-v2"
+                                            name="option-v2"
+                                            type="radio"
                                             checked={filterLocal.shippingMethod === 'express'}
                                             value="express"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="option-2-v2" data-txt="Hỏa tốc" />
+                                        <label className="option" htmlFor="option-3-v2" data-txt="Hỏa tốc" />
                                     </div>
                                 </div>
                             </div>
@@ -258,10 +275,10 @@ const OrderManagement = () => {
                                 orderStartDate: null,
                                 orderEndDate: null,
                                 paymentMethod: 'paymentUponReceipt',
-                                shippingMethod: 'default',
+                                shippingMethod: 'all',
                             }
                             setFilterLocal(originalFilter)
-                            dispatch(setFilter({ ...originalFilter, filterStatus }))
+                            dispatch(setFilters({ ...originalFilter, filterStatus }))
                         }}
                     >
                         <p className="fs-4 fw-medium">Nhập lại</p>
@@ -431,12 +448,12 @@ const OrderManagement = () => {
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : order.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : order.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : order.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : order.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
                                         <FontAwesomeIcon
                                             onClick={() => setShowChangeStatusModal({ show: true, originalStatus: order.status, orderId: order._id })}
@@ -478,6 +495,7 @@ const OrderManagement = () => {
                         <p className="fs-2 fw-bold">Chi tiết đơn hàng</p>
                     </Modal.Header>
                     <Modal.Body>
+                        {console.log(selectedOrder)}
                         <div className="d-flex justify-content-between">
                             <div className="col-8 pe-4">
                                 <div className="d-flex justify-content-between align-items-center shadow-none p-3 mb-3 bg-light rounded border">
@@ -495,12 +513,12 @@ const OrderManagement = () => {
                                             {selectedOrder.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : selectedOrder.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : selectedOrder.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : selectedOrder.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : selectedOrder.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : selectedOrder.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
                                     </div>
                                 </div>
@@ -536,63 +554,78 @@ const OrderManagement = () => {
                                     </div>
                                 </div>
 
-                                {selectedOrder?.products.map((product, index) => (
-                                    <div key={index} className="d-flex align-items-center py-2 border-bottom">
-                                        <div className="text-center" style={{ width: '5%' }}>
-                                            {index + 1}
-                                        </div>
-                                        <div className="text-start" style={{ width: '40%' }}>
-                                            <div className="ms-3 d-flex align-items-center">
-                                                <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                                <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2" style={{ maxWidth: '100%' }}>
-                                                    {product.product?.product?.name}
-                                                </p>
+                                <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
+                                    {selectedOrder?.products.map((product, index) => (
+                                        <div key={index} className="d-flex align-items-center py-2 border-bottom">
+                                            <div className="text-center" style={{ width: '5%' }}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="text-start" style={{ width: '40%' }}>
+                                                <div className="ms-3 d-flex align-items-center">
+                                                    <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                    <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2" style={{ maxWidth: '100%' }}>
+                                                        {product.product?.product?.name}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-center fs-5 d-flex flex-column" style={{ width: '20%' }}>
+                                                <span>{product?.product?.price.toLocaleString('vi-VN')}đ</span>
+                                                {product?.product?.product?.originalPrice && (
+                                                    <span style={{ textDecoration: 'line-through', color: 'gray', fontSize: '0.9em', marginLeft: '5px' }}>
+                                                        {product?.product?.product?.originalPrice?.toLocaleString('vi-VN')}đ
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="text-center fs-5" style={{ width: '15%' }}>
+                                                {product.quantity}
+                                            </div>
+
+                                            <div className="text-center fs-5" style={{ width: '20%' }}>
+                                                <span>{(product?.product?.price * product?.quantity).toLocaleString('vi-VN')}đ</span>
                                             </div>
                                         </div>
-                                        <div className="text-center fs-5 d-flex flex-column" style={{ width: '20%' }}>
-                                            <span>{product?.product?.price.toLocaleString('vi-VN')}đ</span>
-                                            {product?.product?.product?.originalPrice && (
-                                                <span style={{ textDecoration: 'line-through', color: 'gray', fontSize: '0.9em', marginLeft: '5px' }}>
-                                                    {product?.product?.product?.originalPrice?.toLocaleString('vi-VN')}đ
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="text-center fs-5" style={{ width: '15%' }}>
-                                            {product.quantity}
-                                        </div>
-
-                                        <div className="text-center fs-5" style={{ width: '20%' }}>
-                                            <span>{(product?.product?.price * product?.quantity).toLocaleString('vi-VN')}đ</span>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                             <div className="col-4">
                                 <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
-                                    <p className="fs-4 fw-semibold bg-light info-title">PHƯƠNG THỨC THANH TOÁN</p>
+                                    <p className="fs-4 fw-semibold bg-light info-title text-uppercase">Thông tin khác</p>
                                     <div className="d-flex justify-content-between mt-3">
-                                        <p className="fs-5 fw-normal">{selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng' : 'Thanh toán chuyển khoản'}</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng:' : 'Thanh toán chuyển khoản:'}</p>
                                         <p className="fs-5 fw-normal">{selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
                                     </div>
-                                </div>
-                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px', minHeight: '200px' }}>
-                                    <div className="d-flex justify-content-between">
-                                        <p className="fs-5 fw-normal">Tạm tính</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
+                                    <div className="d-flex justify-content-between mt-3">
+                                        <p className="fs-5 fw-normal">Phương thức vận chuyển:</p>
+                                        <p className="fs-5 fw-normal">{selectedOrder?.shippingMethod === 'default' ? 'Cơ bản' : selectedOrder?.shippingMethod === 'fast' ? 'Nhanh' : 'Hỏa tốc'}</p>
                                     </div>
-                                    <div className="d-flex justify-content-between">
-                                        <p className="fs-5 fw-normal">Khuyến mãi</p>
-                                        {console.log(selectedOrder)}
-                                        {selectedOrder.products
-                                            ?.reduce((total, item) => {
-                                                const originalPrice = item?.product?.product?.originalPrice || 0
-                                                const discountedPrice = item?.product?.product?.price || 0
-                                                const quantity = item?.quantity || 1
+                                </div>
+                                <div className="shadow-none p-3 mb-3 bg-white rounded border d-flex flex-column" style={{ minWidth: '200px', minHeight: '250px' }}>
+                                    {/* Phần trên */}
+                                    <div>
+                                        <div className="d-flex justify-content-between">
+                                            <p className="fs-5 fw-normal">Tạm tính</p>
+                                            <p className="fs-5 fw-normal">{selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <p className="fs-5 fw-normal">Khuyến mãi</p>
+                                            <p className="fs-5 fw-normal">
+                                                {selectedOrder?.products.reduce((total, item) =>
+                                                    total + (item.product.product.discount || 0)
+                                                    , 0).toLocaleString('vi-VN')}đ
+                                            </p>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <p className="fs-5 fw-normal">Phí vận chuyển</p>
+                                            <p className="fs-5 fw-normal">{selectedOrder?.shippingPrice.toLocaleString('vi-VN')}đ</p>
+                                        </div>
+                                    </div>
 
-                                                return total + (originalPrice - discountedPrice) * quantity
-                                            }, 0)
-                                            .toLocaleString('vi-VN')}{' '}
-                                        đ
+                                    {/* Phần tổng tiền */}
+                                    <div className="mt-auto">
+                                        <div className="d-flex justify-content-between">
+                                            <p className="fs-3 fw-normal">Tổng tiền</p>
+                                            <p className="fs-4 fw-normal text-center">{selectedOrder?.totalPrice.toLocaleString('vi-VN')}đ</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

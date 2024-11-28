@@ -119,6 +119,7 @@ button:disabled {
     background-color: #ccc !important;
     border: 1px solid #ccc !important;
     color: #fff !important;
+
     p {
         color: #fff !important;
     }
@@ -220,6 +221,7 @@ input[type='number'] {
 
     .page-item {
         margin: 0 5px;
+
         .page-link {
             height: 35px;
             width: 35px;
@@ -733,6 +735,7 @@ textarea {
 .react-datepicker__navigation:hover *::before {
     border-color: var(--theme-color) !important;
 }
+
 //#endregion
 
 // Modal

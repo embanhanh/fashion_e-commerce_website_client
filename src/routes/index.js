@@ -30,9 +30,11 @@ import CustomerManagement from '../pages/admin/CustomerManagement.jsx'
 import Chat from '../pages/admin/Chat.jsx'
 import Statistic from '../pages/admin/Statistic.jsx'
 import RatingDemo from '../components/RatingDemo.jsx'
+import Policy from '../pages/Policy/Policy.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
+    { path: '/policy', element: Policy },
     {
         path: '/products',
         element: ProductList,

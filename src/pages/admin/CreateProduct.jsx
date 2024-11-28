@@ -184,8 +184,8 @@ function CreateProduct() {
             })
         }
 
-        if (shippingInfo.length === 0) {
-            newErrors.shippingInfo = 'Cần ít nhất 1 phương thức vận chuyển'
+        if (shippingInfo.length === 0 || !shippingInfo.find((info) => info.type === 'basic')) {
+            newErrors.shippingInfo = 'Cần ít nhất 1 phương thức vận chuyển cơ bản'
         }
 
         setErrors(newErrors)
@@ -490,7 +490,10 @@ function CreateProduct() {
                                     onSelect={handleSelectCategory}
                                     selectedCategories={selectedCategories}
                                 />
-                                <div className="ms-2 border p-3" onClick={() => setShowAddCategoryModal(true)}>
+                                <div
+                                    className="primary-btn px-4 py-2 shadow-none"
+                                    onClick={() => setShowAddCategoryModal(true)}
+                                >
                                     <p className="fs-4">
                                         Thêm danh mục mới <FontAwesomeIcon icon={faPlus} className="ms-3" />
                                     </p>

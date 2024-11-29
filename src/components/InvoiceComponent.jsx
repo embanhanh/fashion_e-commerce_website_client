@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react'
 import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer'
 import logo from '../assets/image/logo/logo.png'
-import RobotoRegular from '../assets/fonts/Roboto-Regular.ttf'
-import RobotoBold from '../assets/fonts/Roboto-Bold.ttf'
-import RobotoItalic from '../assets/fonts/Roboto-Italic.ttf'
+import QuicksandRegular from '../assets/fonts/Quicksand-Regular.ttf'
+import QuicksandBold from '../assets/fonts/Quicksand-Bold.ttf'
+import QuicksandMedium from '../assets/fonts/Quicksand-Medium.ttf'
 
 Font.register({
-    family: 'Roboto',
+    family: 'Quicksand',
     fonts: [
-        { src: RobotoRegular, fontWeight: 'normal' },
-        { src: RobotoBold, fontWeight: 'bold' },
-        { src: RobotoItalic, fontStyle: 'italic' },
+        { src: QuicksandRegular, fontWeight: 'normal' },
+        { src: QuicksandBold, fontWeight: 'bold' },
+        { src: QuicksandMedium, fontWeight: 'medium' },
     ],
 })
 
 const styles = StyleSheet.create({
     page: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Quicksand',
         fontSize: 11,
         padding: 40,
         lineHeight: 1.5,
@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         flexDirection: 'column',
-        border: '1px solid #4a90e2',
+        border: `5px solid #14919b`,
+        borderRadius: 12,
     },
 
     titleItem: {
@@ -38,16 +39,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: '1px dashed  #4a90e2',
+        borderBottom: '1px dashed #0b6477',
     },
 
     logo: { width: 90 },
 
-    reportTitle: { fontSize: 16, textAlign: 'center', fontWeight: 'bold' },
+    reportTitle: { fontSize: 16, textAlign: 'center', fontWeight: 'bold', color: '#0b6477' },
 
-    addressTitle: { fontSize: 12, fontWeight: 'bold' },
+    addressTitle: { fontSize: 12, fontWeight: 'bold', color: '#14919b' },
 
-    invoice: { fontSize: 30, fontWeight: 'bold' },
+    invoice: { fontSize: 28, fontWeight: 'bold', color: '#0b6477' },
 
     invoiceNumber: { fontSize: 11 },
 
@@ -59,15 +60,24 @@ const styles = StyleSheet.create({
         paddingLeft: 7,
         flex: 1,
         height: 20,
-        backgroundColor: '#DEDEDE',
+        backgroundColor: '#aee1e1',
         borderColor: 'whitesmoke',
         borderRightWidth: 1,
         borderBottomWidth: 1,
+        color: '#0b6477',
     },
 
     theader2: { flex: 2, borderRightWidth: 1, borderBottomWidth: 1 },
 
-    tbody: { fontSize: 9, paddingTop: 4, paddingLeft: 7, flex: 1, borderColor: 'whitesmoke', borderRightWidth: 1, borderBottomWidth: 1 },
+    tbody: {
+        fontSize: 9,
+        paddingTop: 4,
+        paddingLeft: 7,
+        flex: 1,
+        borderColor: 'whitesmoke',
+        borderRightWidth: 1,
+        borderBottomWidth: 1,
+    },
 
     total: { fontSize: 9, paddingTop: 4, paddingLeft: 7, flex: 1.5, borderColor: 'whitesmoke', borderBottomWidth: 1 },
 
@@ -83,7 +93,7 @@ const InvoiceComponent = ({ orders, shop }) => {
                     <View style={styles.contentContainer}>
                         <View style={styles.titleContainer}>
                             <View style={{ ...styles.titleItem, alignItems: 'center' }}>
-                                <Image style={styles.logo} src={shop?.logo} />
+                                <Image style={styles.logo} src={logo} />
                                 <Text style={styles.reportTitle}>{shop?.name}</Text>
                             </View>
                             <View style={styles.titleItem}>
@@ -92,7 +102,7 @@ const InvoiceComponent = ({ orders, shop }) => {
                             </View>
                         </View>
                         <View style={styles.titleContainer}>
-                            <View style={{ ...styles.titleItem, borderRight: '1px dashed #000' }}>
+                            <View style={{ ...styles.titleItem, borderRight: '1px dashed #0b6477' }}>
                                 <Text style={styles.addressTitle}>Từ: </Text>
                                 <Text style={styles.address}>{shop?.address}</Text>
                             </View>
@@ -102,7 +112,7 @@ const InvoiceComponent = ({ orders, shop }) => {
                             </View>
                         </View>
                         <Text style={{ fontSize: 12, marginVertical: 10, marginLeft: 10 }}>Chi tiết hóa đơn</Text>
-                        <View style={{ width: '100%', flexDirection: 'row' }}>
+                        <View style={{ width: '100%', flexDirection: 'row', padding: '0 10px' }}>
                             <View style={[styles.theader, styles.theader2]}>
                                 <Text>Sản phẩm</Text>
                             </View>
@@ -117,7 +127,7 @@ const InvoiceComponent = ({ orders, shop }) => {
                             </View>
                         </View>
                         {order?.products.map((product) => (
-                            <View key={product._id} style={{ width: '100%', flexDirection: 'row' }}>
+                            <View key={product._id} style={{ width: '100%', flexDirection: 'row', padding: '0 10px' }}>
                                 <View style={[styles.tbody, styles.tbody2]}>
                                     <Text>{product?.product?.product?.name}</Text>
                                 </View>
@@ -147,14 +157,20 @@ const InvoiceComponent = ({ orders, shop }) => {
                             </View>
                         </View>
                         <View style={{ ...styles.titleContainer, borderBottomWidth: '0' }}>
-                            <View style={{ ...styles.titleItem, borderRight: '1px dashed #000', borderBottom: '0' }}>
+                            <View style={{ ...styles.titleItem, borderRight: '1px dashed #0b6477', borderBottom: '0' }}>
                                 <Text style={styles.addressTitle}>Ngày đặt hàng </Text>
-                                <Text style={styles.address}>{new Date(order?.createdAt).toLocaleDateString('vi-VN')}</Text>
+                                <Text style={styles.address}>
+                                    {new Date(order?.createdAt).toLocaleDateString('vi-VN')}
+                                </Text>
                             </View>
                             <View style={{ ...styles.titleItem, borderBottom: '0' }}>
                                 <Text style={styles.address}>Phí vận chuyển: {order?.shippingPrice}đ</Text>
-                                <Text style={styles.address}>Tổng cộng: {order?.shippingPrice + order?.productsPrice}đ</Text>
-                                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Thanh toán: {order?.totalPrice}đ</Text>
+                                <Text style={styles.address}>
+                                    Tổng cộng: {order?.shippingPrice + order?.productsPrice}đ
+                                </Text>
+                                <Text style={{ fontWeight: 'bold', fontSize: 11, color: '#0b6477' }}>
+                                    Thanh toán: {order?.totalPrice}đ
+                                </Text>
                             </View>
                         </View>
                     </View>

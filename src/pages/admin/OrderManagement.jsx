@@ -10,6 +10,7 @@ import ChangeStatusModal from '../../components/ChangeStatusModal'
 import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 import debounce from 'lodash/debounce'
+import defaultAvatar from '../../assets/image/default/default-avatar.png'
 
 const OrderManagement = () => {
     const dispatch = useDispatch()
@@ -46,6 +47,10 @@ const OrderManagement = () => {
         }, 300),
         [dispatch, filters]
     )
+
+    useEffect(() => {
+        console.log(orders)
+    }, [orders])
 
     useEffect(() => {
         debouncedFetchOrders()
@@ -503,7 +508,7 @@ const OrderManagement = () => {
                                     <div className="overflow-y-auto mt-5 ">
                                         <div className="d-inline-flex align-items-center w-100 ">
                                             <img
-                                                src={order.user?.urlImage}
+                                                src={order.user?.urlImage || defaultAvatar}
                                                 alt=""
                                                 style={{
                                                     width: '50px',

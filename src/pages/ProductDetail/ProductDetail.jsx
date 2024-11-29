@@ -10,6 +10,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, Button, Toast } from 'react-bootstrap'
 
+import { useScrollReveal } from '../../hook/useScrollReveal'
 import { fetchProductByProductName } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
@@ -30,7 +31,7 @@ function ProductDetail() {
     const location = useLocation()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
     const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
-    const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
+    // const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
     // state ...
     const { currentProduct } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
@@ -45,6 +46,7 @@ function ProductDetail() {
     const [displayPrice, setDisplayPrice] = useState(0)
     const [activeTab, setActiveTab] = useState('description')
     const [ratings, setRatings] = useState([])
+    const [promotionalComboByProduct, setPromotionalComboByProduct] = useState(null)
     // confirm and notification
     const [showLoginModal, setShowLoginModal] = useState({
         show: false,
@@ -70,7 +72,11 @@ function ProductDetail() {
 
     useEffect(() => {
         if (currentProduct) {
-            dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
+            const getCombo = async () => {
+                const response = await dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
+                setPromotionalComboByProduct(response.payload)
+            }
+            getCombo()
             const images = [...currentProduct.urlImage, ...currentProduct.variants.map((variant) => variant.imageUrl)]
             setAllImages(images)
             const colors = currentProduct.variants
@@ -228,6 +234,29 @@ function ProductDetail() {
             setShowToast(true)
         }
     }
+
+    useEffect(() => {
+        const reveals = document.querySelectorAll('.reveal')
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active')
+                    }
+                })
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px',
+            }
+        )
+
+        reveals.forEach((reveal) => observer.observe(reveal))
+
+        return () => {
+            reveals.forEach((reveal) => observer.unobserve(reveal))
+        }
+    }, [currentProduct])
 
     if (!currentProduct) {
         return <div>Đang tải...</div>
@@ -504,7 +533,7 @@ function ProductDetail() {
                                 )}
                             </div>
                         </div>
-                        <div className=" rounded-4 bg-white shadow p-5">
+                        <div className=" rounded-4 bg-white shadow p-5 reveal ">
                             <div className="nav-wrapper border-bottom justify-content-center">
                                 <div
                                     className={`nav-option ${activeTab === 'description' ? 'checked' : ''}`}
@@ -673,11 +702,11 @@ function ProductDetail() {
                             </div>
                         </div>
 
-                        <div className="pt-4">
+                        <div className="pt-4 ">
                             <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3">
                                 {Array.from({ length: 6 }).map((_, index) => (
-                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 " key={index}>
+                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={index}>
                                         <ProductCard
                                             url={product1}
                                             name={'Giày thể thao'}

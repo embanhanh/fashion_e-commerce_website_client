@@ -1,5 +1,5 @@
 import './ProductList.scss'
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
@@ -18,12 +18,21 @@ function ProductList() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [searchParams, setSearchParams] = useSearchParams()
-    const { products, totalPages, currentPage, filters, sortOption, status } = useSelector((state) => state.product)
+    const { products, totalPages, sortOption, status } = useSelector((state) => state.product)
     const { categories, status: categoryStatus, error: categoryError } = useSelector((state) => state.category)
     const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity })
-    const [selectedSizes, setSelectedSizes] = useState([])
-    const [selectedColors, setSelectedColors] = useState([])
-
+    const [search, setSearch] = useState('')
+    const [filters, setFilters] = useState({
+        category: [],
+        priceRange: { min: 0, max: Infinity },
+        color: [],
+        size: [],
+        stockQuantity: { min: 0, max: Infinity },
+        soldQuantity: { min: 0, max: Infinity },
+        search: '',
+        rating: 0,
+        brand: [],
+    })
     const pageFromUrl = parseInt(searchParams.get('page')) || 1
 
     const debouncedFetchProducts = useCallback(
@@ -44,6 +53,67 @@ function ProductList() {
         fetchProducts()
     }, [debouncedFetchProducts])
 
+    useLayoutEffect(() => {
+        const categoriesFromUrl = searchParams.get('category')
+        if (categoriesFromUrl) {
+            const categoriesFromUrlIds = categories.filter((category) => categoriesFromUrl.includes(category.slug))
+            setFilters((prev) => ({ ...prev, category: categoriesFromUrlIds.map((category) => category._id) }))
+        }
+    }, [categories])
+
+    useEffect(() => {
+        setSearchParams((prev) => {
+            const newParams = new URLSearchParams(prev)
+            if (filters.category.length > 0) {
+                newParams.set(
+                    'category',
+                    filters.category.map((category) => categories.find((c) => c._id === category).slug).join(',')
+                )
+            } else {
+                newParams.delete('category')
+            }
+            if (filters.priceRange.min !== 0 || filters.priceRange.max !== Infinity) {
+                newParams.set('priceRange', `${filters.priceRange.min}-${filters.priceRange.max}`)
+            } else {
+                newParams.delete('priceRange')
+            }
+            if (filters.rating !== 0) {
+                newParams.set('rating', filters.rating)
+            } else {
+                newParams.delete('rating')
+            }
+            if (filters.size.length > 0) {
+                newParams.set('size', filters.size.join(','))
+            } else {
+                newParams.delete('size')
+            }
+            if (filters.color.length > 0) {
+                newParams.set('color', filters.color.join(','))
+            } else {
+                newParams.delete('color')
+            }
+            if (filters.stockQuantity.min !== 0 || filters.stockQuantity.max !== Infinity) {
+                newParams.set('stockQuantity', `${filters.stockQuantity.min}-${filters.stockQuantity.max}`)
+            } else {
+                newParams.delete('stockQuantity')
+            }
+            if (filters.soldQuantity.min !== 0 || filters.soldQuantity.max !== Infinity) {
+                newParams.set('soldQuantity', `${filters.soldQuantity.min}-${filters.soldQuantity.max}`)
+            } else {
+                newParams.delete('soldQuantity')
+            }
+            if (filters.search) {
+                newParams.set('search', filters.search)
+            } else {
+                newParams.delete('search')
+            }
+            if (!newParams.has('page') || totalPages <= 1) {
+                newParams.set('page', '1')
+            }
+            return newParams
+        })
+    }, [filters, categories, setSearchParams, totalPages])
+
     const filteredCategories = useMemo(() => {
         return categories
             .filter((category) => !category.parentCategory)
@@ -58,39 +128,27 @@ function ProductList() {
     }
 
     const handleSizeChange = (size) => {
-        setSelectedSizes((prev) => {
-            if (prev.includes(size)) {
-                return prev.filter((s) => s !== size)
-            } else {
-                return [...prev, size]
-            }
-        })
+        setFilters((prev) =>
+            prev.size.includes(size)
+                ? { ...prev, size: prev.size.filter((s) => s !== size) }
+                : { ...prev, size: [...prev.size, size] }
+        )
     }
 
     const handleColorChange = (color) => {
-        setSelectedColors((prev) => {
-            if (prev.includes(color)) {
-                return prev.filter((c) => c !== color)
-            } else {
-                return [...prev, color]
-            }
-        })
+        setFilters((prev) =>
+            prev.color.includes(color)
+                ? { ...prev, color: prev.color.filter((c) => c !== color) }
+                : { ...prev, color: [...prev.color, color] }
+        )
     }
 
-    useEffect(() => {
-        dispatch(setFilters({ size: selectedSizes }))
-    }, [selectedSizes, dispatch])
-
-    useEffect(() => {
-        dispatch(setFilters({ color: selectedColors }))
-    }, [selectedColors, dispatch])
-
     const applyPriceFilter = () => {
-        dispatch(setFilters({ priceRange }))
+        setFilters((prev) => ({ ...prev, priceRange }))
     }
 
     const handleFilterChange = (filterType, value) => {
-        dispatch(setFilters({ [filterType]: value }))
+        setFilters((prev) => ({ ...prev, [filterType]: value }))
     }
 
     const handleSortChange = (e) => {
@@ -110,7 +168,7 @@ function ProductList() {
     )
 
     const handleRatingChange = (value) => {
-        dispatch(setFilters({ rating: value }))
+        setFilters((prev) => ({ ...prev, rating: value }))
     }
 
     return (
@@ -127,6 +185,7 @@ function ProductList() {
                             ]}
                             isOpen={true}
                             onChange={(value) => handleFilterChange('category', value)}
+                            selectedItemIds={filters.category}
                         >
                             <Accordion
                                 data={filteredCategories.map((parent) => ({
@@ -136,6 +195,7 @@ function ProductList() {
                                     id: parent._id,
                                 }))}
                                 onChange={(value) => handleFilterChange('category', value)}
+                                selectedItemIds={filters.category}
                             />
                         </Accordion>
                         <div className=" w-100 border-bottom mt-2"></div>
@@ -220,7 +280,7 @@ function ProductList() {
                                             <input
                                                 type="checkbox"
                                                 className="input-checkbox"
-                                                checked={selectedColors.includes(color)}
+                                                checked={filters.color.includes(color)}
                                                 onChange={() => handleColorChange(color)}
                                             />
                                             <span className="custom-checkbox"></span>
@@ -251,7 +311,7 @@ function ProductList() {
                                         <input
                                             type="checkbox"
                                             className="input-checkbox"
-                                            checked={selectedSizes.includes(size)}
+                                            checked={filters.size.includes(size)}
                                             onChange={() => handleSizeChange(size)}
                                         />
                                         <span className="custom-checkbox"></span>
@@ -269,10 +329,15 @@ function ProductList() {
                                         type="text"
                                         className="input-text w-100"
                                         placeholder="Tìm kiếm"
-                                        onChange={(e) => handleFilterChange('search', e.target.value)}
-                                        value={filters.search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        value={search}
                                     />
-                                    <FontAwesomeIcon icon={faSearch} size="xl" className="theme-color p-2" />
+                                    <FontAwesomeIcon
+                                        icon={faSearch}
+                                        size="xl"
+                                        className="theme-color p-2"
+                                        onClick={() => handleFilterChange('search', search)}
+                                    />
                                 </div>
                             </div>
                             <div className="d-flex align-items-center">

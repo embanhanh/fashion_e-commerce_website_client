@@ -5,6 +5,7 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
 import { useNavigate } from 'react-router-dom'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
@@ -28,9 +29,15 @@ function Home() {
     const dispatch = useDispatch()
     const { banners } = useSelector((state) => state.banner)
     const { user } = useSelector((state) => state.auth)
+    const { categories } = useSelector((state) => state.category)
+
+    const handleExploreCategory = (categorySlug) => {
+        navigate(`/products?category=${categorySlug}&page=1`)
+    }
 
     useEffect(() => {
         dispatch(fetchBanners())
+        dispatch(fetchCategories())
     }, [dispatch])
 
     useScrollReveal()
@@ -110,23 +117,28 @@ function Home() {
                                 modules={[Autoplay, Pagination, Navigation]}
                                 className="mySwiper"
                             >
-                                {[...Array(8)].map((_, index) => (
-                                    <SwiperSlide key={index}>
-                                        <img
-                                            className="rounded-5"
-                                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                                            src={cay1}
-                                            loading="lazy"
-                                        />
-                                        <div className="position-absolute category-item-content ">
-                                            <p className="text-nowrap home-category-title">Thời trang nam</p>
-                                            <button className="primary-btn full-color px-4 py-2 rounded-4">
-                                                <p className="text-nowrap">Khám phá ngay</p>
-                                            </button>
-                                        </div>
-                                        <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                    </SwiperSlide>
-                                ))}
+                                {categories
+                                    .filter((category) => !category.parentCategory)
+                                    .map((category) => (
+                                        <SwiperSlide key={category?._id}>
+                                            <img
+                                                className="rounded-5"
+                                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                                src={category?.urlImage || cay1}
+                                                loading="lazy"
+                                            />
+                                            <div className="position-absolute category-item-content ">
+                                                <p className="text-center home-category-title">{category?.name}</p>
+                                                <button
+                                                    className="primary-btn full-color px-4 py-2 rounded-4"
+                                                    onClick={() => handleExploreCategory(category?.slug)}
+                                                >
+                                                    <p className="text-nowrap">Khám phá ngay</p>
+                                                </button>
+                                            </div>
+                                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                                        </SwiperSlide>
+                                    ))}
                             </Swiper>
                         </div>
                     </div>

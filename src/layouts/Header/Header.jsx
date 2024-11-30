@@ -121,7 +121,7 @@ function Header({ location }) {
         },
         {
             title: 'Cửa hàng',
-            to: '/products',
+            to: '/products?page=1',
             className: 'show_detail',
         },
         {

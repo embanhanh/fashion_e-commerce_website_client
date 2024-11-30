@@ -4,6 +4,7 @@
 
     .dropdown-header {
         cursor: pointer;
+        border-radius: 8px;
     }
 
     .dropdown-content {
@@ -18,6 +19,20 @@
         .child-list {
             max-height: 300px;
             overflow-y: auto;
+        }
+
+        .parent-list {
+            &.list-group-item {
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+        }
+
+        .child-list {
+            &.list-group-item {
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
         }
 
         .list-group-item {

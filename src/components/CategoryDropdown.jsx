@@ -55,13 +55,21 @@ const CategoryDropdown = ({ categories, onSelect, selectedCategories, isMultiple
     }
 
     const activeParentCategory = activeParent ? filteredCategories.find((cat) => cat._id === activeParent) : null
-    const showChildList = activeParentCategory && activeParentCategory.children && activeParentCategory.children.length > 0
+    const showChildList =
+        activeParentCategory && activeParentCategory.children && activeParentCategory.children.length > 0
 
     return (
         <div className="category-dropdown" ref={dropdownRef}>
-            <div className="dropdown-header form-control d-flex justify-content-between align-items-center py-3 rounded-0" onClick={() => setIsOpen(!isOpen)}>
+            <div
+                className="dropdown-header form-control d-flex justify-content-between align-items-center py-3 "
+                onClick={() => setIsOpen(!isOpen)}
+            >
                 <span className="fs-4 text-body-secondary fw-medium">
-                    {selectedCategories.length > 0 ? `${!isMultiple ? selectedCategories[0].name : `Đã chọn ${selectedCategories.length} danh mục`}` : 'Chọn danh mục'}
+                    {selectedCategories.length > 0
+                        ? `${
+                              !isMultiple ? selectedCategories[0].name : `Đã chọn ${selectedCategories.length} danh mục`
+                          }`
+                        : 'Chọn danh mục'}
                 </span>
                 <FontAwesomeIcon icon={isOpen ? faCaretUp : faCaretDown} className="ms-3" />
             </div>
@@ -73,9 +81,15 @@ const CategoryDropdown = ({ categories, onSelect, selectedCategories, isMultiple
                                 {filteredCategories.map((parent) => (
                                     <li
                                         key={parent._id}
-                                        className={`list-group-item py-3 px-4 ${activeParent === parent._id ? 'active' : ''}`}
+                                        className={`list-group-item py-3 px-4 ${
+                                            activeParent === parent._id ? 'active' : ''
+                                        }`}
                                         onMouseEnter={() => setActiveParent(parent._id)}
-                                        onClick={() => (!parent.children || parent.children.length === 0 ? handleSelect(parent) : null)}
+                                        onClick={() =>
+                                            !parent.children || parent.children.length === 0
+                                                ? handleSelect(parent)
+                                                : null
+                                        }
                                     >
                                         {parent.name}
                                     </li>
@@ -88,7 +102,11 @@ const CategoryDropdown = ({ categories, onSelect, selectedCategories, isMultiple
                                     {filteredCategories
                                         .find((cat) => cat._id === activeParent)
                                         ?.children.map((child) => (
-                                            <li key={child._id} className="list-group-item py-3 px-4" onClick={() => handleSelect(child)}>
+                                            <li
+                                                key={child._id}
+                                                className="list-group-item py-3 px-4"
+                                                onClick={() => handleSelect(child)}
+                                            >
                                                 {child.name}
                                             </li>
                                         ))}

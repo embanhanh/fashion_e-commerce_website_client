@@ -13,7 +13,7 @@ export const fetchCategories = createAsyncThunk('category/fetchCategories', asyn
 export const addNewCategory = createAsyncThunk('category/addNewCategory', async (categoryData, { rejectWithValue }) => {
     try {
         const response = await createCategory(categoryData)
-        return response.category
+        return response
     } catch (error) {
         return rejectWithValue(error)
     }
@@ -41,15 +41,16 @@ const categorySlice = createSlice({
                 state.error = action.error.message
             })
             .addCase(addNewCategory.fulfilled, (state, action) => {
-                const newCategory = action.payload
-                console.log(newCategory)
-                if (newCategory.parentCategory) {
-                    const parentIndex = state.categories.findIndex((category) => category._id === newCategory.parentCategory._id)
+                const newCategory = action.payload.childCategory
+                if (newCategory) {
+                    const parentIndex = state.categories.findIndex(
+                        (category) => category._id === newCategory.parentCategory._id
+                    )
                     if (parentIndex === -1) {
                         state.categories.push(newCategory.parentCategory)
                     }
+                    state.categories.push(newCategory)
                 }
-                state.categories.push(newCategory)
             })
             .addCase(addNewCategory.rejected, (state, action) => {
                 state.error = action.payload

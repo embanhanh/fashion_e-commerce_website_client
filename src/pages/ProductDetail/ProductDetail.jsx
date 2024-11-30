@@ -5,14 +5,17 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/thumbs'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faMinus, faPlus, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, Button, Toast } from 'react-bootstrap'
 
+import { useScrollReveal } from '../../hook/useScrollReveal'
 import { fetchProductByProductName } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
+import { db } from '../../firebase.config'
+import { doc, getDoc, updateDoc, onSnapshot, arrayUnion } from 'firebase/firestore'
 
 import product1 from '../../assets/image/product_image/product_image_1.png'
 import Rating from '../../components/Rating'
@@ -28,7 +31,7 @@ function ProductDetail() {
     const location = useLocation()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
     const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
-    const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
+    // const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
     // state ...
     const { currentProduct } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
@@ -41,8 +44,14 @@ function ProductDetail() {
     const [availableQuantity, setAvailableQuantity] = useState(0)
     const [quantity, setQuantity] = useState(1)
     const [displayPrice, setDisplayPrice] = useState(0)
+    const [activeTab, setActiveTab] = useState('description')
+    const [ratings, setRatings] = useState([])
+    const [promotionalComboByProduct, setPromotionalComboByProduct] = useState(null)
     // confirm and notification
-    const [showLoginModal, setShowLoginModal] = useState(false)
+    const [showLoginModal, setShowLoginModal] = useState({
+        show: false,
+        type: '',
+    })
     const [showCheckoutProcess, setShowCheckoutProcess] = useState(false)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
@@ -63,7 +72,11 @@ function ProductDetail() {
 
     useEffect(() => {
         if (currentProduct) {
-            dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
+            const getCombo = async () => {
+                const response = await dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
+                setPromotionalComboByProduct(response.payload)
+            }
+            getCombo()
             const images = [...currentProduct.urlImage, ...currentProduct.variants.map((variant) => variant.imageUrl)]
             setAllImages(images)
             const colors = currentProduct.variants
@@ -77,6 +90,19 @@ function ProductDetail() {
             setUniqueColors(colors)
             setAvailableQuantity(currentProduct.stockQuantity)
             setDisplayPrice(currentProduct.originalPrice)
+        }
+    }, [currentProduct])
+
+    useEffect(() => {
+        if (currentProduct) {
+            const ratingRef = doc(db, 'product_ratings', currentProduct._id)
+            console.log(currentProduct._id)
+            const unsub = onSnapshot(ratingRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    setRatings(snapshot.data().ratings || [])
+                }
+            })
+            return () => unsub()
         }
     }, [currentProduct])
 
@@ -141,7 +167,7 @@ function ProductDetail() {
     }
     const handleAddToCart = async () => {
         if (!isLoggedIn) {
-            setShowLoginModal(true)
+            setShowLoginModal({ show: true, type: 'addToCart' })
         } else {
             try {
                 const selectedVariant = currentProduct.variants.find(
@@ -167,9 +193,70 @@ function ProductDetail() {
     }
 
     const handleLoginRedirect = () => {
-        setShowLoginModal(false)
+        setShowLoginModal({ show: false, type: '' })
         navigate('/user/login', { state: { from: location.pathname } })
     }
+
+    const handleLike = async (ratingId) => {
+        if (!isLoggedIn) {
+            setShowLoginModal({ show: true, type: 'like' })
+            return
+        }
+
+        try {
+            const ratingRef = doc(db, 'product_ratings', currentProduct._id)
+            const ratingDoc = await getDoc(ratingRef)
+
+            if (ratingDoc.exists()) {
+                const ratings = ratingDoc.data().ratings
+                const ratingIndex = ratings.findIndex((r) => r.user._id === ratingId)
+
+                if (ratingIndex !== -1) {
+                    const rating = ratings[ratingIndex]
+                    const userLiked = rating.likes.includes(user._id)
+
+                    if (userLiked) {
+                        // Unlike
+                        rating.likes = rating.likes.filter((id) => id !== user._id)
+                    } else {
+                        // Like
+                        rating.likes.push(user._id)
+                    }
+
+                    ratings[ratingIndex] = rating
+                    await updateDoc(ratingRef, { ratings })
+                }
+            }
+        } catch (error) {
+            console.error('Error handling like:', error)
+            setToastMessage('Có lỗi xảy ra khi thực hiện thao tác')
+            setToastVariant('error')
+            setShowToast(true)
+        }
+    }
+
+    useEffect(() => {
+        const reveals = document.querySelectorAll('.reveal')
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active')
+                    }
+                })
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px',
+            }
+        )
+
+        reveals.forEach((reveal) => observer.observe(reveal))
+
+        return () => {
+            reveals.forEach((reveal) => observer.unobserve(reveal))
+        }
+    }, [currentProduct])
 
     if (!currentProduct) {
         return <div>Đang tải...</div>
@@ -280,12 +367,15 @@ function ProductDetail() {
                                 </div>
                                 <div className="d-flex gap-5 align-items-center p-4 shadow-sm rounded-4 bg-theme">
                                     <p className="fs-1 fw-medium theme-color">
-                                        {displayPrice - (displayPrice * currentProduct.discount) / 100}đ
+                                        {(displayPrice - (displayPrice * currentProduct.discount) / 100).toLocaleString(
+                                            'vi-VN'
+                                        )}
+                                        đ
                                     </p>
                                     {/* {currentProduct.discount > 0 && (
                                         <> */}
                                     <p className="fs-2 fw-medium text-decoration-line-through text-body-tertiary">
-                                        {displayPrice}đ
+                                        {displayPrice.toLocaleString('vi-VN')}đ
                                     </p>
                                     <div className="product-badge discount-badge position-static ms-auto">
                                         - {currentProduct.discount}%{' '}
@@ -443,61 +533,180 @@ function ProductDetail() {
                                 )}
                             </div>
                         </div>
-                        <div className="pe-5 rounded-4 bg-white shadow p-5">
-                            <p className="fs-2 fw-medium p-2 bg-body-tertiary">Mô tả sản phẩm</p>
-                            <p className="fs-3 my-4 ms-3">{currentProduct.description}</p>
-                            <p className="fs-2 fw-medium p-2 bg-body-tertiary">Chi tiết sản phẩm</p>
-                            <div className="row ms-2 my-2">
-                                <div className="col-3">
-                                    <p className="fs-3 py-2 text-body-tertiary">Danh mục</p>
-                                    <p className="fs-3 py-2 text-body-tertiary">Chất liệu</p>
-                                    <p className="fs-3 py-2 text-body-tertiary">Thương hiệu</p>
-                                    <p className="fs-3 py-2 text-body-tertiary">Xuất xứ</p>
-                                    <p className="fs-3 py-2 text-body-tertiary">Kho</p>
+                        <div className=" rounded-4 bg-white shadow p-5 reveal ">
+                            <div className="nav-wrapper border-bottom justify-content-center">
+                                <div
+                                    className={`nav-option ${activeTab === 'description' ? 'checked' : ''}`}
+                                    onClick={() => setActiveTab('description')}
+                                >
+                                    <p className="nav-title">Mô tả sản phẩm</p>
                                 </div>
-                                <div className="col-9">
-                                    <p className="fs-3 py-2">
-                                        {currentProduct.categories.map((category) => category.name).join(', ')}
-                                    </p>
-                                    <p className="fs-3 py-2">{currentProduct.material || 'Không có'}</p>
-                                    <p className="fs-3 py-2">{currentProduct.brand || 'Không có'}</p>
-                                    <p className="fs-3 py-2">...</p>
-                                    <p className="fs-3 py-2">{currentProduct.stockQuantity}</p>
+                                <div
+                                    className={`nav-option ${activeTab === 'details' ? 'checked' : ''}`}
+                                    onClick={() => setActiveTab('details')}
+                                >
+                                    <p className="nav-title">Chi tiết sản phẩm</p>
+                                </div>
+                                <div
+                                    className={`nav-option ${activeTab === 'reviews' ? 'checked' : ''}`}
+                                    onClick={() => setActiveTab('reviews')}
+                                >
+                                    <p className="nav-title">Đánh giá</p>
                                 </div>
                             </div>
-                        </div>
-                        <div className="rounded-4 bg-white shadow p-5">
-                            <p className="fs-2 fw-medium py-2">Đánh giá của khách hàng</p>
-                            {Array.from({ length: 2 }).map((_, index) => (
-                                <div className="pe-5 me-5 my-4 border-bottom py-4 " key={index}>
-                                    <div className="d-flex align-items-center justify-self-end mt-auto">
-                                        <img
-                                            src=""
-                                            alt=""
-                                            className="rounded-circle"
-                                            style={{ height: 50, width: 50 }}
-                                        />
-                                        <div className="ms-3">
-                                            <p className="fw-medium  fs-3">Trần Trung Thông</p>
-                                            <Rating initialRating={5} readonly={true} size={18} />
+                            <div
+                                className="tab-content__product-detail p-5 scrollbar-y"
+                                style={{ maxHeight: activeTab === 'reviews' ? '500px' : '320px' }}
+                            >
+                                {activeTab === 'description' && (
+                                    <div className={`reveal ${activeTab === 'description' ? 'active' : ''}`}>
+                                        <p className="fs-3 my-4">{currentProduct.description}</p>
+                                    </div>
+                                )}
+                                {activeTab === 'details' && (
+                                    <div className={`reveal ${activeTab === 'details' ? 'active' : ''}`}>
+                                        <div className="d-flex ms-2 my-2 justify-content-center" style={{ gap: 250 }}>
+                                            <div className="">
+                                                <p className="fs-3 py-2 text-body-tertiary fw-bold">Danh mục</p>
+                                                <p className="fs-3 py-2 text-body-tertiary fw-bold">Chất liệu</p>
+                                                <p className="fs-3 py-2 text-body-tertiary fw-bold">Thương hiệu</p>
+                                                <p className="fs-3 py-2 text-body-tertiary fw-bold">Xuất xứ</p>
+                                                <p className="fs-3 py-2 text-body-tertiary fw-bold">Kho</p>
+                                                {currentProduct.variants.some((variant) => variant.color) && (
+                                                    <p className="fs-3 py-2 text-body-tertiary fw-bold">Màu sắc</p>
+                                                )}
+                                                {currentProduct.variants.some((variant) => variant.size) && (
+                                                    <p className="fs-3 py-2 text-body-tertiary fw-bold">Size</p>
+                                                )}
+                                            </div>
+                                            <div className="">
+                                                <p className="fs-3 py-2">
+                                                    {currentProduct.categories
+                                                        .map((category) => category.name)
+                                                        .join(', ')}
+                                                </p>
+                                                <p className="fs-3 py-2">{currentProduct.material || 'Không có'}</p>
+                                                <p className="fs-3 py-2">{currentProduct.brand || 'Không có'}</p>
+                                                <p className="fs-3 py-2">...</p>
+                                                <p className="fs-3 py-2">{currentProduct.stockQuantity}</p>
+                                                {currentProduct.variants.some((variant) => variant.color) && (
+                                                    <p className="fs-3 py-2">
+                                                        {currentProduct.variants
+                                                            .map((variant) => variant.color)
+                                                            .join(', ')}
+                                                    </p>
+                                                )}
+                                                {currentProduct.variants.some((variant) => variant.size) && (
+                                                    <p className="fs-3 py-2">
+                                                        {currentProduct.variants
+                                                            .map((variant) => variant.size)
+                                                            .join(', ')}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                    <p className="my-2 ps-5 ms-5 text-body-tertiary"> 2024-22-9 10:00</p>
-                                    <p className="fs-3 ps-5 ms-5">
-                                        Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện
-                                        được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản
-                                        phẩm phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương
-                                        lai!
-                                    </p>
-                                </div>
-                            ))}
+                                )}
+
+                                {activeTab === 'reviews' && (
+                                    <div
+                                        className={`reveal ${
+                                            activeTab === 'reviews' ? 'active' : ''
+                                        } d-flex flex-column gap-4 p-4`}
+                                    >
+                                        {ratings.length > 0 ? (
+                                            ratings.map((rating, index) => (
+                                                <div
+                                                    className="shadow rounded-4 p-4 border-5 border-bottom border-theme"
+                                                    key={index}
+                                                >
+                                                    <div className="d-flex align-items-center justify-self-end mt-auto">
+                                                        <img
+                                                            src={rating.user.avatar}
+                                                            alt=""
+                                                            className="rounded-circle"
+                                                            style={{ height: 50, width: 50 }}
+                                                        />
+                                                        <div className="ms-3">
+                                                            <p className="fw-semibold fs-3 theme-color">
+                                                                {rating.user.name}
+                                                            </p>
+                                                            <div className="d-flex align-items-center justify-content-start">
+                                                                <Rating
+                                                                    initialRating={rating.rating}
+                                                                    readonly={true}
+                                                                    size={14}
+                                                                    gap={2}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="my-2 ps-5 ms-5 fs-5 text-body-tertiary">
+                                                        {new Date(rating.createdAt).toLocaleDateString('vi-VN')}
+                                                    </p>
+                                                    <div className="ps-5 ms-5 d-flex gap-4 my-2">
+                                                        {rating.files.map((file, index) => {
+                                                            if (file.contentType.startsWith('image/')) {
+                                                                return (
+                                                                    <img
+                                                                        key={index}
+                                                                        src={file.url}
+                                                                        alt=""
+                                                                        className="object-fit-cover rounded-3"
+                                                                        style={{ height: 80, width: 80 }}
+                                                                    />
+                                                                )
+                                                            } else if (file.contentType.startsWith('video/')) {
+                                                                return (
+                                                                    <video
+                                                                        key={index}
+                                                                        src={file.url}
+                                                                        controls
+                                                                        className="object-fit-cover rounded-3"
+                                                                        style={{ height: 80, width: 80 }}
+                                                                    ></video>
+                                                                )
+                                                            }
+                                                            return null
+                                                        })}
+                                                    </div>
+                                                    <p className="fs-3 ps-5 mt-3 ms-5">{rating.comment}</p>
+                                                    <div className="d-flex justify-content-end align-items-center">
+                                                        <FontAwesomeIcon
+                                                            icon={faThumbsUp}
+                                                            className={`p-2 fs-1 like-icon__product-detail ${
+                                                                rating.likes.includes(user?._id) ||
+                                                                rating.user._id === user?._id
+                                                                    ? 'liked'
+                                                                    : ''
+                                                            }`}
+                                                            onClick={() => {
+                                                                if (isLoggedIn && rating.user._id !== user?._id) {
+                                                                    handleLike(rating.user._id)
+                                                                } else {
+                                                                    setShowLoginModal({ show: true, type: 'like' })
+                                                                }
+                                                            }}
+                                                        />
+                                                        <span className="fs-3 fw-semibold ms-2 d-block theme-color mt-2">
+                                                            {rating.likes.length}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="fs-3 text-center">Không có đánh giá nào</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="pt-4">
-                            <p className="fs-1 theme-color fw-medium">Sản phẩm liên quan</p>
+                        <div className="pt-4 ">
+                            <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3">
                                 {Array.from({ length: 6 }).map((_, index) => (
-                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 " key={index}>
+                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={index}>
                                         <ProductCard
                                             url={product1}
                                             name={'Giày thể thao'}
@@ -512,18 +721,24 @@ function ProductDetail() {
                     </>
                 )}
             </div>
-            <Modal show={showLoginModal} onHide={() => setShowLoginModal(false)} centered>
+            <Modal show={showLoginModal.show} onHide={() => setShowLoginModal({ show: false, type: '' })} centered>
                 <Notification
                     type="info"
                     title="Thông báo"
-                    description="Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?"
+                    description={
+                        showLoginModal.type === 'addToCart'
+                            ? 'Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?'
+                            : 'Bạn có muốn đăng nhập để thích sản phẩm này không?'
+                    }
                 >
                     <div className="d-flex gap-4 align-items-center justify-content-center bg-white">
                         <button
                             className=" border px-4 py-2 bg-white rounded-4"
                             onClick={() => {
-                                setShowLoginModal(false)
-                                setShowCheckoutProcess(true)
+                                if (showLoginModal.type === 'addToCart') {
+                                    setShowCheckoutProcess(true)
+                                }
+                                setShowLoginModal({ show: false, type: '' })
                             }}
                         >
                             <p className="fs-4">Không</p>

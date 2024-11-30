@@ -117,7 +117,6 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                     setOrderData((pre) => ({
                         ...pre,
                         vouchers: [voucher._id],
-                        totalPrice: pre.totalPrice - discountValue,
                     }))
                 }
             } catch (error) {
@@ -190,7 +189,11 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
     }, [address, orderData, voucherInfo.code])
 
     useEffect(() => {
-        setOrderData((pre) => ({ ...pre, totalPrice: handlePrice() + orderData.shippingPrice }))
+        setOrderData((pre) => ({
+            ...pre,
+            totalPrice: handlePrice() + orderData.shippingPrice - voucherInfo.discountValue,
+            productsPrice: handlePrice(),
+        }))
     }, [orderData.shippingPrice, orderData.productsPrice, orderData.vouchers, comboDiscounts])
 
     useEffect(() => {
@@ -565,7 +568,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                         <div className="d-flex justify-content-end gap-2 align-items-center mx-2">
                             <p className="fs-4 fw-medium">Tổng tiền:</p>
                             <p className="fs-3 fw-medium theme-color">
-                                {(orderData.totalPrice - voucherInfo.discountValue).toLocaleString('vi-VN') + 'đ'}
+                                {orderData.totalPrice.toLocaleString('vi-VN') + 'đ'}
                             </p>
                         </div>
                     </div>

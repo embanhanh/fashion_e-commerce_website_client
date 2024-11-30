@@ -3,7 +3,17 @@ import React, { useRef, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
-function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecked, onSelect, selectedItems, idParent }) {
+function AccordionItem({
+    title,
+    content,
+    isOpen,
+    onClick,
+    childrenItem,
+    isChecked,
+    onSelect,
+    selectedItems,
+    idParent,
+}) {
     const contentRef = useRef(null)
     const [height, setHeight] = useState('0px')
     const [isAnimating, setIsAnimating] = useState(false)
@@ -48,7 +58,7 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                                     handleCheckboxChange(
                                         idParent,
                                         e.target.checked,
-                                        content.map((child) => child.id)
+                                        content?.map((child) => child.id) || []
                                     )
                                 }
                                 checked={selectedItems.includes(idParent)}
@@ -56,13 +66,30 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                             <span className="custom-checkbox"></span>
                         </label>
                     )}
-                    <p className={`${!isChecked && 'fw-bold '} fs-4 fw-medium ms-2 flex-grow-1`} onClick={handleClick}>
+                    <p
+                        className={`${
+                            selectedItems.includes(idParent) && 'fw-bold'
+                        }   theme-color fs-4 fw-medium ms-2 flex-grow-1`}
+                        onClick={handleClick}
+                    >
                         {title}
                     </p>
                 </div>
-                {(content || childrenItem) && <span onClick={handleClick}>{isOpen ? <FontAwesomeIcon size="lg" icon={faChevronUp} /> : <FontAwesomeIcon size="lg" icon={faChevronDown} />}</span>}
+                {(content || childrenItem) && (
+                    <span onClick={handleClick}>
+                        {isOpen ? (
+                            <FontAwesomeIcon size="lg" icon={faChevronUp} color="var(--theme-color-1)" />
+                        ) : (
+                            <FontAwesomeIcon size="lg" icon={faChevronDown} color="var(--theme-color-1)" />
+                        )}
+                    </span>
+                )}
             </div>
-            <div className="accordion-content-wrapper  ms-4" style={{ height: isAnimating ? height : isOpen ? 'auto' : '0px' }} onTransitionEnd={handleTransitionEnd}>
+            <div
+                className="accordion-content-wrapper  ms-4"
+                style={{ height: isAnimating ? height : isOpen ? 'auto' : '0px' }}
+                onTransitionEnd={handleTransitionEnd}
+            >
                 <div className="accordion-content-custom " ref={contentRef}>
                     {content
                         ? content.map((item, index) => (
@@ -72,7 +99,9 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                                           <input
                                               type="checkbox"
                                               className="input-checkbox"
-                                              checked={selectedItems.includes(item.id) || selectedItems.includes(idParent)}
+                                              checked={
+                                                  selectedItems.includes(item.id) || selectedItems.includes(idParent)
+                                              }
                                               onChange={(e) => {
                                                   handleCheckboxChange(item.id, e.target.checked, [], idParent)
                                               }}
@@ -80,7 +109,13 @@ function AccordionItem({ title, content, isOpen, onClick, childrenItem, isChecke
                                           <span className="custom-checkbox"></span>
                                       </label>
                                   )}
-                                  <p className="ms-3 fw-medium fs-4" onClick={handleClick}>
+                                  <p
+                                      className={`${
+                                          (selectedItems.includes(item.id) || selectedItems.includes(idParent)) &&
+                                          'fw-bold'
+                                      }  theme-color ms-3 fw-medium fs-4`}
+                                      onClick={handleClick}
+                                  >
                                       {item.name}
                                   </p>
                               </div>

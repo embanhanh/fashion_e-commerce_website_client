@@ -48,7 +48,7 @@ const vietnameseBadWords = [
 ]
 filter.addWords(...vietnameseBadWords)
 
-const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
+const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
     const dispatch = useDispatch()
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
@@ -62,7 +62,9 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
         if (files.length + selectedFiles.length > 3) {
             setError('Chỉ được tải lên tối đa 3 files')
         } else {
-            const newFiles = selectedFiles.filter((file) => file.type.startsWith('image/') || file.type.startsWith('video/'))
+            const newFiles = selectedFiles.filter(
+                (file) => file.type.startsWith('image/') || file.type.startsWith('video/')
+            )
             setFiles((prevFiles) => [...prevFiles, ...newFiles])
             newFiles.forEach((file) => {
                 const preview = {
@@ -180,9 +182,17 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
                     </div>
                     <div className="d-flex gap-3">
                         {previews.map((preview, index) => (
-                            <div key={index} className="position-relative rating-preview__container" style={{ width: '100px', height: '100px' }}>
+                            <div
+                                key={index}
+                                className="position-relative rating-preview__container"
+                                style={{ width: '100px', height: '100px' }}
+                            >
                                 {preview.type === 'image' ? (
-                                    <img src={preview.url} alt={`preview-${index}`} className="w-100 h-100 object-fit-cover rounded-4" />
+                                    <img
+                                        src={preview.url}
+                                        alt={`preview-${index}`}
+                                        className="w-100 h-100 object-fit-cover rounded-4"
+                                    />
                                 ) : (
                                     <video
                                         src={preview.url}
@@ -197,7 +207,10 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
                                         }}
                                     />
                                 )}
-                                <button className="position-absolute rating-preview__btn-close top-0 end-0 border-0" onClick={() => removeFile(index)}>
+                                <button
+                                    className="position-absolute rating-preview__btn-close top-0 end-0 border-0"
+                                    onClick={() => removeFile(index)}
+                                >
                                     <FontAwesomeIcon icon={faXmark} size="lg" />
                                 </button>
                             </div>
@@ -205,7 +218,12 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
                         {files.length < 3 && (
                             <label className="custum-file-upload px-1">
                                 <div className="icon-image">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" className="upload-icon">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill=""
+                                        viewBox="0 0 24 24"
+                                        className="upload-icon"
+                                    >
                                         <g strokeWidth={0} id="SVGRepo_bgCarrier" />
                                         <g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" />
                                         <g id="SVGRepo_iconCarrier">
@@ -221,12 +239,24 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
                                 <div className="text w-100">
                                     <span>Thêm hình ảnh/ video</span>
                                 </div>
-                                <input type="file" multiple id="main-product-images" onChange={handleFileChange} accept="image/*, video/*" />
+                                <input
+                                    type="file"
+                                    multiple
+                                    id="main-product-images"
+                                    onChange={handleFileChange}
+                                    accept="image/*, video/*"
+                                />
                             </label>
                         )}
                     </div>
                     <div className="input-form d-inline-flex align-items-center h-auto w-100">
-                        <textarea rows={4} className="input-text w-100" placeholder="Nhập đánh giá" value={comment} onChange={(e) => setComment(e.target.value)} />
+                        <textarea
+                            rows={4}
+                            className="input-text w-100"
+                            placeholder="Nhập đánh giá"
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                        />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
@@ -239,7 +269,11 @@ const RatingDemo = ({ productId = '671c56172d85b8448f598b8f', onClose }) => {
                     >
                         <p className="m-0">Hủy</p>
                     </button>
-                    <button disabled={loading || !validateForm()} className="px-4 py-2 primary-btn shadow-none rounded-4" onClick={handleSubmit}>
+                    <button
+                        disabled={loading || !validateForm()}
+                        className="px-4 py-2 primary-btn shadow-none rounded-4"
+                        onClick={handleSubmit}
+                    >
                         <p className="m-0">Đánh giá</p>
                         {loading && (
                             <div className="dot-spinner ms-4">

@@ -2,9 +2,15 @@ import './Accordion.scss'
 import React, { useEffect, useState } from 'react'
 import AccordionItem from './AccordionItem'
 
-function Accordion({ data, children, isOpen, onChange }) {
+function Accordion({ data, children, isOpen, onChange, selectedItemIds = [] }) {
     const [openIndices, setOpenIndices] = useState([])
-    const [selectedItems, setSelectedItems] = useState([])
+    const [selectedItems, setSelectedItems] = useState(selectedItemIds || [])
+
+    useEffect(() => {
+        if (selectedItemIds.length > 0) {
+            setSelectedItems(selectedItemIds)
+        }
+    }, [selectedItemIds])
 
     useEffect(() => {
         if (isOpen) {

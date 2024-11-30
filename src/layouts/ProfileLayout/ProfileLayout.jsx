@@ -1,9 +1,9 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import './ProfileLayout.scss';
+import React from 'react'
+import { Outlet } from 'react-router-dom'
+import Sidebar from '../../components/Sidebar'
+import './ProfileLayout.scss'
 
-const ProfileLayout = () => {
+function ProfileLayout() {
     return (
         <div className="container">
             <div className="row">
@@ -16,7 +16,7 @@ const ProfileLayout = () => {
                 </main>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default ProfileLayout;
+export default ProfileLayout

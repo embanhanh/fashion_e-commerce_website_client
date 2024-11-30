@@ -56,7 +56,13 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
             (voucher.voucherType === 'all' ||
                 voucher.voucherType === 'shipping' ||
                 (voucher.voucherType === 'product' &&
-                    orderData.products.every((product) => voucher.applicableProducts.some((p) => p._id === cart.items.find((item) => item.variant?._id === product.product)?.variant?.product?._id))))
+                    orderData.products.every((product) =>
+                        voucher.applicableProducts.some(
+                            (p) =>
+                                p._id ===
+                                cart.items.find((item) => item.variant?._id === product.product)?.variant?.product?._id
+                        )
+                    )))
         )
     }
 
@@ -69,6 +75,7 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
     }, [dispatch])
 
     useEffect(() => {
+        console.log(vouchers)
         setVoucherList(vouchers)
     }, [vouchers])
 
@@ -86,67 +93,94 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                     <div className="d-flex align-items-center pb-3 border-bottom">
                         <p className="fs-3 ">Mã voucher</p>
                         <div className="input-form d-flex align-items-center mx-3 flex-grow-1">
-                            <input type="text" autoComplete="off" className="input-text w-100" placeholder="Nhập mã" value={searchVoucher} onChange={(e) => setSearchVoucher(e.target.value)} />
+                            <input
+                                type="text"
+                                autoComplete="off"
+                                className="input-text w-100"
+                                placeholder="Nhập mã"
+                                value={searchVoucher}
+                                onChange={(e) => setSearchVoucher(e.target.value)}
+                            />
                         </div>
                     </div>
                     <p className="fs-3 my-3">Mã của bạn</p>
                     <div className="my-2" style={{ maxHeight: 260, overflowY: 'auto' }}>
-                        {voucherList.map((voucher) => {
-                            const isValid = isVoucherValid(voucher.voucher)
-                            return (
-                                <div key={voucher.voucher?._id} className="d-flex p-3 align-items-center my-2 border rounded-3" style={{ opacity: isValid ? 1 : 0.5 }}>
-                                    <img
-                                        src={
-                                            voucher.voucher?.voucherType === 'all' && voucher.voucher?.discountType === 'percentage'
-                                                ? voucherImages[3]
-                                                : voucher.voucher?.voucherType === 'all' && voucher.voucher?.discountType === 'fixedamount'
-                                                ? voucherImages[2]
-                                                : voucher.voucher?.voucherType === 'product' && voucher.voucher?.discountType === 'percentage'
-                                                ? voucherImages[1]
-                                                : voucher.voucher?.voucherType === 'product' && voucher.voucher?.discountType === 'fixedamount'
-                                                ? voucherImages[0]
-                                                : null
-                                        }
-                                        alt=""
-                                        width={120}
-                                        height={50}
-                                    />
-                                    <div className="mx-4 flex-grow-1">
-                                        {voucher.voucher?.discountType === 'percentage' && (
-                                            <p className="fs-4 ">
-                                                Giảm <strong>{voucher.voucher?.discountValue}%</strong> giảm tối đa <strong>{voucher.voucher?.maxDiscountValue}đ </strong>
-                                            </p>
-                                        )}
-                                        {voucher.voucher?.discountType === 'fixedamount' && (
-                                            <p className="fs-4 ">
-                                                Giảm tối đa <strong>{voucher.voucher?.discountValue}đ </strong>
-                                            </p>
-                                        )}
-                                        <p className="fs-4 ">
-                                            Đơn tối thiểu <strong>{voucher.voucher?.minOrderValue}đ </strong>
-                                        </p>
-                                        <p className="fs-5 text-body-tertiary">
-                                            HSD: đến hết <strong className="text-dark">{new Date(voucher.voucher?.validUntil).toLocaleDateString('vi-VN')} </strong>
-                                        </p>
-                                    </div>
-                                    <label className="d-flex align-items-center ms-3">
-                                        <input
-                                            type="checkbox"
-                                            className="input-checkbox"
-                                            disabled={!isValid}
-                                            checked={!!voucherSelected.find((v) => v._id === voucher.voucher?._id)}
-                                            onChange={(e) => handleSelectVoucher(e, voucher.voucher)}
+                        {voucherList.length > 0 ? (
+                            voucherList.map((voucher) => {
+                                const isValid = isVoucherValid(voucher.voucher)
+                                return (
+                                    <div
+                                        key={voucher.voucher?._id}
+                                        className="d-flex p-3 align-items-center my-2 border rounded-3"
+                                        style={{ opacity: isValid ? 1 : 0.5 }}
+                                    >
+                                        <img
+                                            src={
+                                                voucher.voucher?.voucherType === 'all' &&
+                                                voucher.voucher?.discountType === 'percentage'
+                                                    ? voucherImages[3]
+                                                    : voucher.voucher?.voucherType === 'all' &&
+                                                      voucher.voucher?.discountType === 'fixedamount'
+                                                    ? voucherImages[2]
+                                                    : voucher.voucher?.voucherType === 'product' &&
+                                                      voucher.voucher?.discountType === 'percentage'
+                                                    ? voucherImages[1]
+                                                    : voucher.voucher?.voucherType === 'product' &&
+                                                      voucher.voucher?.discountType === 'fixedamount'
+                                                    ? voucherImages[0]
+                                                    : null
+                                            }
+                                            alt=""
+                                            width={120}
+                                            height={50}
                                         />
-                                        <span className="custom-checkbox"></span>
-                                    </label>
-                                </div>
-                            )
-                        })}
+                                        <div className="mx-4 flex-grow-1">
+                                            {voucher.voucher?.discountType === 'percentage' && (
+                                                <p className="fs-4 ">
+                                                    Giảm <strong>{voucher.voucher?.discountValue}%</strong> giảm tối đa{' '}
+                                                    <strong>{voucher.voucher?.maxDiscountValue}đ </strong>
+                                                </p>
+                                            )}
+                                            {voucher.voucher?.discountType === 'fixedamount' && (
+                                                <p className="fs-4 ">
+                                                    Giảm tối đa <strong>{voucher.voucher?.discountValue}đ </strong>
+                                                </p>
+                                            )}
+                                            <p className="fs-4 ">
+                                                Đơn tối thiểu <strong>{voucher.voucher?.minOrderValue}đ </strong>
+                                            </p>
+                                            <p className="fs-5 text-body-tertiary">
+                                                HSD: đến hết{' '}
+                                                <strong className="text-dark">
+                                                    {new Date(voucher.voucher?.validUntil).toLocaleDateString('vi-VN')}{' '}
+                                                </strong>
+                                            </p>
+                                        </div>
+                                        <label className="d-flex align-items-center ms-3">
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                disabled={!isValid}
+                                                checked={!!voucherSelected.find((v) => v._id === voucher.voucher?._id)}
+                                                onChange={(e) => handleSelectVoucher(e, voucher.voucher)}
+                                            />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                    </div>
+                                )
+                            })
+                        ) : (
+                            <p className="fs-4 text-center">Không tìm thấy voucher nào</p>
+                        )}
                     </div>
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
+                <div
+                    className="primary-btn px-4 py-2 shadow-none light border rounded-3"
+                    variant="secondary"
+                    onClick={handleCloseVoucher}
+                >
                     <p>Đóng</p>
                 </div>
                 <div

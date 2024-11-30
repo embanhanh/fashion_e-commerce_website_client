@@ -4,7 +4,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import './CreateProduct.scss'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchCategories, addNewCategory } from '../../redux/slices/categorySlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
 import { fetchProductByProductName, updateProductAction } from '../../redux/slices/productSlice'
 import { createProduct } from '../../services/ProductService'
 import AddCategoryModal from '../../components/AddCategoryModal'
@@ -112,16 +112,6 @@ function CreateProduct() {
         })
     }
 
-    const handleAddCategory = async (newCategoryData) => {
-        try {
-            await dispatch(addNewCategory(newCategoryData)).unwrap()
-            // Optionally, you can show a success message here
-        } catch (error) {
-            // Handle error, maybe show an error message
-            console.error('Failed to add new category:', error)
-        }
-    }
-
     const handleNameChange = (e) => {
         setName(e.target.value)
         clearError('name')
@@ -194,8 +184,8 @@ function CreateProduct() {
             })
         }
 
-        if (shippingInfo.length === 0) {
-            newErrors.shippingInfo = 'Cần ít nhất 1 phương thức vận chuyển'
+        if (shippingInfo.length === 0 || !shippingInfo.find((info) => info.type === 'basic')) {
+            newErrors.shippingInfo = 'Cần ít nhất 1 phương thức vận chuyển cơ bản'
         }
 
         setErrors(newErrors)
@@ -225,7 +215,12 @@ function CreateProduct() {
                 )
                 const validVariants = await Promise.all(
                     classifyInputs.map(async (input) => {
-                        if ((!selectedClassify.includes('color') || input.color) && (!selectedClassify.includes('size') || input.size) && input.stockQuantity && input.price) {
+                        if (
+                            (!selectedClassify.includes('color') || input.color) &&
+                            (!selectedClassify.includes('size') || input.size) &&
+                            input.stockQuantity &&
+                            input.price
+                        ) {
                             let variantImageUrl = input.imageUrl
                             if (input.imageUrl && !input.imageUrl.startsWith('http')) {
                                 const response = await fetch(input.imageUrl)
@@ -276,7 +271,11 @@ function CreateProduct() {
                 resetForm()
             } catch (error) {
                 console.error('Error creating product:', error)
-                setMessage({ type: 'error', title: error.message || 'Có lỗi xảy ra khi tạo sản phẩm', description: 'Vui lòng thử lại' })
+                setMessage({
+                    type: 'error',
+                    title: error.message || 'Có lỗi xảy ra khi tạo sản phẩm',
+                    description: 'Vui lòng thử lại',
+                })
             } finally {
                 setIsLoading(false)
             }
@@ -315,11 +314,18 @@ function CreateProduct() {
             <div key={index} className="uploaded-image position-relative">
                 <img src={image} alt={`Uploaded ${index}`} className="uploaded-img" />
                 {index === 0 && (
-                    <p className="position-absolute bottom-0 text-white text-center end-0 start-0 fs-5" style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                    <p
+                        className="position-absolute bottom-0 text-white text-center end-0 start-0 fs-5"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+                    >
                         Ảnh bìa
                     </p>
                 )}
-                <div className="position-absolute d-none top-0 end-0 close-uploaded-img" onClick={() => removeImageUpload(index)} style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div
+                    className="position-absolute d-none top-0 end-0 close-uploaded-img"
+                    onClick={() => removeImageUpload(index)}
+                    style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+                >
                     <FontAwesomeIcon icon={faCircleXmark} size="2xl" color="white" />
                 </div>
             </div>
@@ -338,7 +344,9 @@ function CreateProduct() {
         if (file) {
             const fileURL = URL.createObjectURL(file)
 
-            setClassifyInputs((prev) => prev.map((input, ind) => (ind === index ? { ...input, imageUrl: fileURL } : input)))
+            setClassifyInputs((prev) =>
+                prev.map((input, ind) => (ind === index ? { ...input, imageUrl: fileURL } : input))
+            )
             clearError(`classifyInputs.${index}.image`)
         }
     }
@@ -419,9 +427,18 @@ function CreateProduct() {
                                 {images?.length < 5 && (
                                     <label className="custum-file-upload">
                                         <div className="icon-image">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" className="upload-icon">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill=""
+                                                viewBox="0 0 24 24"
+                                                className="upload-icon"
+                                            >
                                                 <g strokeWidth={0} id="SVGRepo_bgCarrier" />
-                                                <g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" />
+                                                <g
+                                                    strokeLinejoin="round"
+                                                    strokeLinecap="round"
+                                                    id="SVGRepo_tracerCarrier"
+                                                />
                                                 <g id="SVGRepo_iconCarrier">
                                                     <path
                                                         fill=""
@@ -435,7 +452,13 @@ function CreateProduct() {
                                         <div className="text">
                                             <span>Thêm hình ảnh</span>
                                         </div>
-                                        <input type="file" multiple id="main-product-images" onChange={handleImageUpload} accept="image/*" />
+                                        <input
+                                            type="file"
+                                            multiple
+                                            id="main-product-images"
+                                            onChange={handleImageUpload}
+                                            accept="image/*"
+                                        />
                                     </label>
                                 )}
                             </div>
@@ -446,7 +469,13 @@ function CreateProduct() {
                                 <span style={{ color: 'red' }}>*</span> Tên sản phẩm:
                             </p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="Tên sản phẩm" onChange={handleNameChange} value={name} />
+                                <input
+                                    type="text"
+                                    className="input-text w-100"
+                                    placeholder="Tên sản phẩm"
+                                    onChange={handleNameChange}
+                                    value={name}
+                                />
                             </div>
                         </div>
                         {errors.name && <p className="text-danger ms-2 pt-2">{errors.name}</p>}
@@ -456,8 +485,15 @@ function CreateProduct() {
                             </p>
 
                             <div className="d-flex align-items-center w-100 justify-content-between">
-                                <CategoryDropdown categories={categories} onSelect={handleSelectCategory} selectedCategories={selectedCategories} />
-                                <div className="ms-2 border p-3" onClick={() => setShowAddCategoryModal(true)}>
+                                <CategoryDropdown
+                                    categories={categories}
+                                    onSelect={handleSelectCategory}
+                                    selectedCategories={selectedCategories}
+                                />
+                                <div
+                                    className="primary-btn px-4 py-2 shadow-none"
+                                    onClick={() => setShowAddCategoryModal(true)}
+                                >
                                     <p className="fs-4">
                                         Thêm danh mục mới <FontAwesomeIcon icon={faPlus} className="ms-3" />
                                     </p>
@@ -467,17 +503,32 @@ function CreateProduct() {
                         {selectedCategories.length > 0 && (
                             <div className="mt-2 d-flex flex-wrap" style={{ marginLeft: '22%' }}>
                                 {selectedCategories.map((category, index) => (
-                                    <Badge key={index} bg="secondary" className="me-2 p-3" style={{ cursor: 'pointer' }}>
+                                    <Badge
+                                        key={index}
+                                        bg="secondary"
+                                        className="me-2 p-3"
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <p className="fs-5">
-                                            {category.parentCategory ? `${category.parentCategory.name} > ${category.name}` : category.name}{' '}
-                                            <FontAwesomeIcon onClick={() => handleRemoveCategory(category)} icon={faCircleXmark} className="ms-3" />
+                                            {category.parentCategory
+                                                ? `${category.parentCategory.name} > ${category.name}`
+                                                : category.name}{' '}
+                                            <FontAwesomeIcon
+                                                onClick={() => handleRemoveCategory(category)}
+                                                icon={faCircleXmark}
+                                                className="ms-3"
+                                            />
                                         </p>
                                     </Badge>
                                 ))}
                             </div>
                         )}
                         {errors.category && <p className="text-danger ms-2 pt-2">{errors.category}</p>}
-                        <AddCategoryModal show={showAddCategoryModal} handleClose={() => setShowAddCategoryModal(false)} categories={categories} onAddCategory={handleAddCategory} />
+                        <AddCategoryModal
+                            show={showAddCategoryModal}
+                            handleClose={() => setShowAddCategoryModal(false)}
+                            categories={categories}
+                        />
                         <div className="d-flex mt-4 ">
                             <p className="text-nowrap me-4 w-25 mt-2">
                                 <span style={{ color: 'red' }}>*</span> Mô tả sản phẩm:
@@ -537,13 +588,25 @@ function CreateProduct() {
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25 ps-3">Thương hiệu:</p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" onChange={(e) => setBrand(e.target.value)} value={brand} className="input-text w-100" placeholder="Thương hiệu của sản phẩm" />
+                                <input
+                                    type="text"
+                                    onChange={(e) => setBrand(e.target.value)}
+                                    value={brand}
+                                    className="input-text w-100"
+                                    placeholder="Thương hiệu của sản phẩm"
+                                />
                             </div>
                         </div>
                         <div className="d-flex mt-4  align-items-center">
                             <p className="text-nowrap me-4 w-25 ps-3">Chất liệu:</p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" onChange={(e) => setMaterial(e.target.value)} value={material} className="input-text w-100" placeholder="Giá trị giảm giá cho sản phẩm" />
+                                <input
+                                    type="text"
+                                    onChange={(e) => setMaterial(e.target.value)}
+                                    value={material}
+                                    className="input-text w-100"
+                                    placeholder="Giá trị giảm giá cho sản phẩm"
+                                />
                             </div>
                         </div>
                         <div className="d-flex mt-4  align-items-center">
@@ -563,7 +626,12 @@ function CreateProduct() {
                         </div>
                         <div className="d-flex mt-4  align-items-center">
                             <label className="d-flex align-items-center mx-3">
-                                <input type="checkbox" className="input-checkbox" checked={isFeatured} onChange={() => setIsFeatured((pre) => !pre)} />
+                                <input
+                                    type="checkbox"
+                                    className="input-checkbox"
+                                    checked={isFeatured}
+                                    onChange={() => setIsFeatured((pre) => !pre)}
+                                />
                                 <span className="custom-checkbox"></span>
                             </label>
                             <p className="fs-4 fw-medium">Sản phẩm nổi bật</p>
@@ -576,7 +644,12 @@ function CreateProduct() {
                         <div className="d-flex mt-4">
                             <div className="w-25 d-flex me-4">
                                 <label className="d-flex mx-3">
-                                    <input type="checkbox" className="input-checkbox" checked={isClassify} onChange={() => setIsClassify((pre) => !pre)} />
+                                    <input
+                                        type="checkbox"
+                                        className="input-checkbox"
+                                        checked={isClassify}
+                                        onChange={() => setIsClassify((pre) => !pre)}
+                                    />
                                     <span className="custom-checkbox mt-1"></span>
                                 </label>
                                 <p className="fs-4 fw-medium text-nowrap">Phân loại hàng</p>
@@ -586,31 +659,59 @@ function CreateProduct() {
                                     <div className="border p-3 mb-3">
                                         <div className="d-flex justify-content-between py-2 border-bottom align-items-center">
                                             <p className="fs-4 fw-medium">Phân loại</p>
-                                            <FontAwesomeIcon icon={faPlus} className="p-3 border" size="lg" onClick={() => addClassifyInput()} />
+                                            <FontAwesomeIcon
+                                                icon={faPlus}
+                                                className="p-3 border"
+                                                size="lg"
+                                                onClick={() => addClassifyInput()}
+                                            />
                                         </div>
                                         <div className="row mt-3 g-2">
                                             {classifyInputs.map((input, index) => (
-                                                <div key={input.id} className="col-sm-12 col-md-6 col-lg-6 d-flex align-items-center">
+                                                <div
+                                                    key={input.id}
+                                                    className="col-sm-12 col-md-6 col-lg-6 d-flex align-items-center"
+                                                >
                                                     {input.imageUrl ? (
                                                         <>
                                                             <div className="border me-3 position-relative uploaded-img-classify">
-                                                                <img src={input.imageUrl} style={{ width: 80, height: 80 }}></img>
+                                                                <img
+                                                                    src={input.imageUrl}
+                                                                    style={{ width: 80, height: 80 }}
+                                                                ></img>
                                                                 <div
                                                                     className="position-absolute d-none top-0 end-0 close-uploaded-img"
                                                                     onClick={() => removeImageUploadClassify(index)}
                                                                     style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
                                                                 >
-                                                                    <FontAwesomeIcon icon={faCircleXmark} size="2xl" color="white" />
+                                                                    <FontAwesomeIcon
+                                                                        icon={faCircleXmark}
+                                                                        size="2xl"
+                                                                        color="white"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </>
                                                     ) : (
                                                         <div>
-                                                            <label className="custum-file-upload p-0" style={{ width: 80, height: 80 }}>
+                                                            <label
+                                                                className="custum-file-upload p-0"
+                                                                style={{ width: 80, height: 80 }}
+                                                            >
                                                                 <div className="icon-image">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" width={50} height={50}>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill=""
+                                                                        viewBox="0 0 24 24"
+                                                                        width={50}
+                                                                        height={50}
+                                                                    >
                                                                         <g strokeWidth={0} id="SVGRepo_bgCarrier" />
-                                                                        <g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" />
+                                                                        <g
+                                                                            strokeLinejoin="round"
+                                                                            strokeLinecap="round"
+                                                                            id="SVGRepo_tracerCarrier"
+                                                                        />
                                                                         <g id="SVGRepo_iconCarrier">
                                                                             <path
                                                                                 fill=""
@@ -622,9 +723,20 @@ function CreateProduct() {
                                                                     </svg>
                                                                 </div>
 
-                                                                <input type="file" accept="image/*" id={`classify-image-${index}`} onChange={(e) => handleUploadImageClassify(e, index)} />
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    id={`classify-image-${index}`}
+                                                                    onChange={(e) =>
+                                                                        handleUploadImageClassify(e, index)
+                                                                    }
+                                                                />
                                                             </label>
-                                                            {errors[`classifyInputs.${index}.image`] && <p className="text-danger fs-5">{errors[`classifyInputs.${index}.image`]}</p>}
+                                                            {errors[`classifyInputs.${index}.image`] && (
+                                                                <p className="text-danger fs-5">
+                                                                    {errors[`classifyInputs.${index}.image`]}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     )}
 
@@ -637,11 +749,21 @@ function CreateProduct() {
                                                                         autoComplete="off"
                                                                         className="input-text w-100 p-2"
                                                                         placeholder="Màu sắc"
-                                                                        onChange={(e) => handleClassifyInputChange(index, 'color', e.target.value)}
+                                                                        onChange={(e) =>
+                                                                            handleClassifyInputChange(
+                                                                                index,
+                                                                                'color',
+                                                                                e.target.value
+                                                                            )
+                                                                        }
                                                                         value={input.color}
                                                                     />
                                                                 </div>
-                                                                {errors[`classifyInputs.${index}.color`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.color`]}</p>}
+                                                                {errors[`classifyInputs.${index}.color`] && (
+                                                                    <p className="text-danger fs-5 ms-2">
+                                                                        {errors[`classifyInputs.${index}.color`]}
+                                                                    </p>
+                                                                )}
                                                             </>
                                                         )}
                                                         {selectedClassify.includes('size') && (
@@ -652,11 +774,21 @@ function CreateProduct() {
                                                                         autoComplete="off"
                                                                         className="input-text w-100 p-2"
                                                                         placeholder="Kích cỡ"
-                                                                        onChange={(e) => handleClassifyInputChange(index, 'size', e.target.value)}
+                                                                        onChange={(e) =>
+                                                                            handleClassifyInputChange(
+                                                                                index,
+                                                                                'size',
+                                                                                e.target.value
+                                                                            )
+                                                                        }
                                                                         value={input.size}
                                                                     />
                                                                 </div>
-                                                                {errors[`classifyInputs.${index}.size`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.size`]}</p>}
+                                                                {errors[`classifyInputs.${index}.size`] && (
+                                                                    <p className="text-danger fs-5 ms-2">
+                                                                        {errors[`classifyInputs.${index}.size`]}
+                                                                    </p>
+                                                                )}
                                                             </>
                                                         )}
                                                         <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
@@ -665,22 +797,42 @@ function CreateProduct() {
                                                                 autoComplete="off"
                                                                 className="input-text w-100 p-2"
                                                                 placeholder="Số lượng"
-                                                                onChange={(e) => handleClassifyInputChange(index, 'stockQuantity', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleClassifyInputChange(
+                                                                        index,
+                                                                        'stockQuantity',
+                                                                        e.target.value
+                                                                    )
+                                                                }
                                                                 value={input.stockQuantity}
                                                             />
                                                         </div>
-                                                        {errors[`classifyInputs.${index}.stockQuantity`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.stockQuantity`]}</p>}
+                                                        {errors[`classifyInputs.${index}.stockQuantity`] && (
+                                                            <p className="text-danger fs-5 ms-2">
+                                                                {errors[`classifyInputs.${index}.stockQuantity`]}
+                                                            </p>
+                                                        )}
                                                         <div className="input-form d-flex align-items-center w-100 mt-2 h-auto">
                                                             <input
                                                                 type="number"
                                                                 autoComplete="off"
                                                                 className="input-text w-100 p-2"
                                                                 placeholder="Giá"
-                                                                onChange={(e) => handleClassifyInputChange(index, 'price', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleClassifyInputChange(
+                                                                        index,
+                                                                        'price',
+                                                                        e.target.value
+                                                                    )
+                                                                }
                                                                 value={input.price}
                                                             />
                                                         </div>
-                                                        {errors[`classifyInputs.${index}.price`] && <p className="text-danger fs-5 ms-2">{errors[`classifyInputs.${index}.price`]}</p>}
+                                                        {errors[`classifyInputs.${index}.price`] && (
+                                                            <p className="text-danger fs-5 ms-2">
+                                                                {errors[`classifyInputs.${index}.price`]}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     {classifyInputs.length > 1 && (
                                                         <FontAwesomeIcon
@@ -701,21 +853,46 @@ function CreateProduct() {
                                     <div className="select z-1 " style={{ height: 45 }}>
                                         <div className="selected border rounded-0 py-3 px-4">
                                             <p>Thêm phân loại hàng</p>
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="1em"
+                                                viewBox="0 0 512 512"
+                                                className="arrow"
+                                            >
                                                 <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                             </svg>
                                         </div>
                                         <div className="options border rounded-0">
                                             {!selectedClassify.includes('color') && (
                                                 <div title="option-1">
-                                                    <input id="option-1" name="option" type="radio" value="color" onChange={handleClassifyOptionChange} />
-                                                    <label className="option w-100 calssify-option" htmlFor="option-1" data-txt="Màu sắc" />
+                                                    <input
+                                                        id="option-1"
+                                                        name="option"
+                                                        type="radio"
+                                                        value="color"
+                                                        onChange={handleClassifyOptionChange}
+                                                    />
+                                                    <label
+                                                        className="option w-100 calssify-option"
+                                                        htmlFor="option-1"
+                                                        data-txt="Màu sắc"
+                                                    />
                                                 </div>
                                             )}
                                             {!selectedClassify.includes('size') && (
                                                 <div title="option-2">
-                                                    <input id="option-2" name="option" type="radio" value="size" onChange={handleClassifyOptionChange} />
-                                                    <label className="option w-100 calssify-option" htmlFor="option-2" data-txt="Size" />
+                                                    <input
+                                                        id="option-2"
+                                                        name="option"
+                                                        type="radio"
+                                                        value="size"
+                                                        onChange={handleClassifyOptionChange}
+                                                    />
+                                                    <label
+                                                        className="option w-100 calssify-option"
+                                                        htmlFor="option-2"
+                                                        data-txt="Size"
+                                                    />
                                                 </div>
                                             )}
                                         </div>
@@ -767,7 +944,13 @@ function CreateProduct() {
                                             type="number"
                                             value={shippingInfo.find((info) => info.type === 'basic')?.price}
                                             onChange={(e) => {
-                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'basic' ? { ...info, price: e.target.value } : info)))
+                                                setShippingInfo((pre) =>
+                                                    pre.map((info) =>
+                                                        info.type === 'basic'
+                                                            ? { ...info, price: e.target.value }
+                                                            : info
+                                                    )
+                                                )
                                             }}
                                             className="input-text w-100"
                                             placeholder="Phí vận chuyển"
@@ -797,7 +980,11 @@ function CreateProduct() {
                                             type="number"
                                             value={shippingInfo.find((info) => info.type === 'fast')?.price}
                                             onChange={(e) => {
-                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'fast' ? { ...info, price: e.target.value } : info)))
+                                                setShippingInfo((pre) =>
+                                                    pre.map((info) =>
+                                                        info.type === 'fast' ? { ...info, price: e.target.value } : info
+                                                    )
+                                                )
                                             }}
                                             className="input-text w-100"
                                             placeholder="Phí vận chuyển"
@@ -827,7 +1014,13 @@ function CreateProduct() {
                                             type="number"
                                             value={shippingInfo.find((info) => info.type === 'express')?.price}
                                             onChange={(e) => {
-                                                setShippingInfo((pre) => pre.map((info) => (info.type === 'express' ? { ...info, price: e.target.value } : info)))
+                                                setShippingInfo((pre) =>
+                                                    pre.map((info) =>
+                                                        info.type === 'express'
+                                                            ? { ...info, price: e.target.value }
+                                                            : info
+                                                    )
+                                                )
                                             }}
                                             className="input-text w-100"
                                             placeholder="Phí vận chuyển"
@@ -879,7 +1072,11 @@ function CreateProduct() {
                             </button>
                         </div>
 
-                        {Object.keys(errors).length !== 0 && <p className="text-danger ms-2 pt-2">Vui lòng điền đầy đủ thông tin cần thiết cho sản phẩm</p>}
+                        {Object.keys(errors).length !== 0 && (
+                            <p className="text-danger ms-2 pt-2">
+                                Vui lòng điền đầy đủ thông tin cần thiết cho sản phẩm
+                            </p>
+                        )}
                     </div>
                 </section>
             </div>

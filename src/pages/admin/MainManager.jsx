@@ -1,16 +1,41 @@
 import './MainManager.scss'
 import { Line } from 'react-chartjs-2'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 function MainManager() {
     const chartData = {
-        labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+        labels: [
+            '00:00',
+            '02:00',
+            '04:00',
+            '06:00',
+            '08:00',
+            '10:00',
+            '12:00',
+            '14:00',
+            '16:00',
+            '18:00',
+            '20:00',
+            '22:00',
+        ],
         datasets: [
             {
                 label: 'Doanh thu (VNĐ)',
-                data: [150000, 300000, 200000, 400000, 800000, 1200000, 900000, 1500000, 2000000, 1800000, 1600000, 1000000],
+                data: [
+                    150000, 300000, 200000, 400000, 800000, 1200000, 900000, 1500000, 2000000, 1800000, 1600000,
+                    1000000,
+                ],
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
                 pointStyle: 'circle',
@@ -129,7 +154,10 @@ function MainManager() {
                 </div>
                 <div className="p-4 main-manager-section bg-white rounded-3 shadow-sm">
                     <h3 className="fs-3 fw-bold mb-1">Doanh thu hôm nay</h3>
-                    <p className="fs-4 mb-2 text-body-secondary">( Hôm nay {new Date().toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })} )</p>
+                    <p className="fs-4 mb-2 text-body-secondary">
+                        ( Hôm nay{' '}
+                        {new Date().toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })} )
+                    </p>
                     <div style={{ height: '400px', width: '100%' }}>
                         <Line options={options} data={chartData} />
                     </div>
@@ -194,7 +222,9 @@ function MainManager() {
                                     </td>
                                     <td>
                                         <div className="h-100 d-flex align-items-center justify-content-center">
-                                            <button className="px-3  py-2 rounded-4 primary-btn shadow-sm">Bổ sung</button>
+                                            <button className="px-3  py-2 rounded-4 primary-btn shadow-sm">
+                                                Bổ sung
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

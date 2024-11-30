@@ -10,7 +10,6 @@ const InvoicePage = () => {
     const [orders, setOrders] = useState([])
     useEffect(() => {
         const storedOrders = localStorage.getItem('selectedOrders')
-        console.log(storedOrders)
         if (storedOrders) {
             setOrders(JSON.parse(storedOrders))
         }
@@ -19,7 +18,9 @@ const InvoicePage = () => {
 
     return (
         <div>
-            <Suspense fallback={<div>Đang tải PDF...</div>}>{orders.length > 0 && shopInfo && <LazyPDFViewer orders={orders} shop={shopInfo} />}</Suspense>
+            <Suspense fallback={<div>Đang tải PDF...</div>}>
+                {orders.length > 0 && shopInfo && <LazyPDFViewer orders={orders} shop={shopInfo} />}
+            </Suspense>
         </div>
     )
 }

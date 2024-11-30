@@ -148,3 +148,48 @@
 .combo-info-container {
     background-color: var(--combo-theme-color);
 }
+
+.tab-content__product-detail {
+    min-height: 320px;
+    position: relative;
+    overflow-y: auto;
+}
+
+.tab-content__product-detail > div {
+    animation: fadeInProductDetail 0.5s ease;
+    position: absolute; // Thêm dòng này
+    width: 100%; // Thêm dòng này
+    top: 0; // Thêm dòng này
+    left: 0; // Thêm dòng này
+    opacity: 0; // Bắt đầu với opacity 0
+    visibility: hidden; // Ẩn ban đầu
+    transition: opacity 0.5s ease, visibility 0.5s ease; // Thêm transition
+}
+
+.tab-content__product-detail > div.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@keyframes fadeInProductDetail {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.like-icon__product-detail {
+    cursor: pointer;
+    color: #ccc;
+    &:hover {
+        color: var(--theme-color-1);
+        transform: scale(1.1);
+    }
+    &.liked {
+        color: var(--theme-color-1);
+    }
+}

@@ -1,10 +1,21 @@
 import './CustomerManagement.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisVertical, faEye, faGift, faBan, faUnlockKeyhole, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import {
+    faEllipsisVertical,
+    faEye,
+    faGift,
+    faBan,
+    faUnlockKeyhole,
+    faArrowsRotate,
+} from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { fetchClients, unblockClientAction, unblockManyClientAction } from '../../redux/slices/userSlice'
+import {
+    fetchClients,
+    unblockClientAction,
+    unblockManyClientAction,
+} from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
 import Notification from '../../components/Notification'
@@ -166,7 +177,10 @@ function CustomerManagement() {
                     </div>
                 </div>
                 <div className="d-flex p-3 justify-content-center border-top align-items-center mt-3">
-                    <button className="primary-btn shadow-none py-1 px-4 rounded-2 border-1" onClick={handleConfirmClientFilters}>
+                    <button
+                        className="primary-btn shadow-none py-1 px-4 rounded-2 border-1"
+                        onClick={handleConfirmClientFilters}
+                    >
                         <p className="fs-4 fw-medium">Tìm</p>
                     </button>
 
@@ -201,13 +215,25 @@ function CustomerManagement() {
                             data-three="Thay đổi loại khách hàng các khách hàng đang chọn"
                             data-four="Tặng voucher các khách hàng đang chọn"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="1em"
+                                viewBox="0 0 512 512"
+                                className="arrow"
+                            >
                                 <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                             </svg>
                         </div>
                         <div className="options">
                             <div title="all">
-                                <input id="all-v2" name="option-v2" type="radio" value="" checked={bulkAction === ''} onChange={(e) => setBulkAction(e.target.value)} />
+                                <input
+                                    id="all-v2"
+                                    name="option-v2"
+                                    type="radio"
+                                    value=""
+                                    checked={bulkAction === ''}
+                                    onChange={(e) => setBulkAction(e.target.value)}
+                                />
                                 <label className="option" htmlFor="all-v2" data-txt="Công cụ xử lý hàng loạt" />
                             </div>
                             <div title="option-1">
@@ -224,7 +250,11 @@ function CustomerManagement() {
                                         }
                                     }}
                                 />
-                                <label className="option" htmlFor="option-1-v2" data-txt="Chặn các khách hàng đang chọn" />
+                                <label
+                                    className="option"
+                                    htmlFor="option-1-v2"
+                                    data-txt="Chặn các khách hàng đang chọn"
+                                />
                             </div>
                             <div title="option-2">
                                 <input
@@ -240,7 +270,11 @@ function CustomerManagement() {
                                         }
                                     }}
                                 />
-                                <label className="option" htmlFor="option-2-v2" data-txt="Mở khóa các khách hàng đang chọn" />
+                                <label
+                                    className="option"
+                                    htmlFor="option-2-v2"
+                                    data-txt="Mở khóa các khách hàng đang chọn"
+                                />
                             </div>
                             <div title="option-3">
                                 <input
@@ -256,7 +290,11 @@ function CustomerManagement() {
                                         }
                                     }}
                                 />
-                                <label className="option" htmlFor="option-3-v2" data-txt="Thay đổi loại các khách hàng đang chọn" />
+                                <label
+                                    className="option"
+                                    htmlFor="option-3-v2"
+                                    data-txt="Thay đổi loại các khách hàng đang chọn"
+                                />
                             </div>
                             <div title="option-4">
                                 <input
@@ -272,7 +310,11 @@ function CustomerManagement() {
                                         }
                                     }}
                                 />
-                                <label className="option" htmlFor="option-4-v2" data-txt="Tặng voucher các khách hàng đang chọn" />
+                                <label
+                                    className="option"
+                                    htmlFor="option-4-v2"
+                                    data-txt="Tặng voucher các khách hàng đang chọn"
+                                />
                             </div>
                         </div>
                     </div>
@@ -327,7 +369,9 @@ function CustomerManagement() {
                                                     if (e.target.checked) {
                                                         setSelectedClient([...selectedClient, client._id])
                                                     } else {
-                                                        setSelectedClient(selectedClient.filter((id) => id !== client._id))
+                                                        setSelectedClient(
+                                                            selectedClient.filter((id) => id !== client._id)
+                                                        )
                                                     }
                                                 }}
                                             />
@@ -336,12 +380,27 @@ function CustomerManagement() {
                                     </div>
                                     <div className="overflow-y-auto mt-5 scrollbar-y">
                                         <div className="d-inline-flex align-items-center w-100">
-                                            <img src={client.urlImage || defaultAvatar} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }} />
+                                            <img
+                                                src={client.urlImage || defaultAvatar}
+                                                alt=""
+                                                style={{
+                                                    width: '50px',
+                                                    height: '50px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '50%',
+                                                }}
+                                            />
                                             <div className="ms-3 order-product-info">
-                                                <p className="fs-4 fw-medium overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                <p
+                                                    className="fs-4 fw-medium overflow-hidden text-nowrap"
+                                                    style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                >
                                                     {client.name || client.email.split('@')[0]}
                                                 </p>
-                                                <p className="fs-4 overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                <p
+                                                    className="fs-4 overflow-hidden text-nowrap"
+                                                    style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                >
                                                     {client.email}
                                                 </p>
                                             </div>
@@ -366,35 +425,73 @@ function CustomerManagement() {
                                     </div>
                                     <p className="fs-4 fw-medium text-center">{client.phone || 'Không có'}</p>
                                     <p className="fs-4 fw-medium text-center">{client.gender || 'Không có'}</p>
-                                    <p className="fs-4 fw-medium text-center">{client.birthday ? new Date(client.birthday).toLocaleDateString('vi-VN') : 'Không có'}</p>
+                                    <p className="fs-4 fw-medium text-center">
+                                        {client.birthday
+                                            ? new Date(client.birthday).toLocaleDateString('vi-VN')
+                                            : 'Không có'}
+                                    </p>
                                     <p className="fs-4 fw-medium text-center">{client.totalSpent}</p>
                                     <p className="fs-4 fw-medium text-center">{client.orderCount}</p>
                                     <p className={`fs-4 fw-medium text-center ${client.isBlocked ? 'text-danger' : 'text-success'}`}>{client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}</p>
                                     <div className="px-2 dropdown-container">
-                                        <FontAwesomeIcon icon={faEllipsisVertical} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                                        <FontAwesomeIcon
+                                            icon={faEllipsisVertical}
+                                            className="fs-3 p-2 hover-icon"
+                                            color="#4a90e2"
+                                        />
                                         <div className="dropdown-menu">
                                             {!client.isBlocked ? (
                                                 <>
-                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setBlockUserIds([client._id])}>
-                                                        <FontAwesomeIcon icon={faBan} className="fs-4 me-2" color="#e74c3c" />
+                                                    <div
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => setBlockUserIds([client._id])}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faBan}
+                                                            className="fs-4 me-2"
+                                                            color="#e74c3c"
+                                                        />
                                                         <p className="fs-5 m-0">Chặn khách hàng</p>
                                                     </div>
-                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => handleViewOrderHistory(client)}>
+                                                    <div
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => handleViewOrderHistory(client)}
+                                                    >
                                                         <FontAwesomeIcon icon={faEye} className="fs-4 me-2" />
                                                         <p className="fs-5 m-0">Xem lịch sử mua hàng</p>
                                                     </div>
-                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setUserIds([client._id])}>
-                                                        <FontAwesomeIcon icon={faGift} className="fs-4 me-2" color="#4a90e2" />
+                                                    <div
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => setUserIds([client._id])}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faGift}
+                                                            className="fs-4 me-2"
+                                                            color="#4a90e2"
+                                                        />
                                                         <p className="fs-5 m-0">Tặng voucher</p>
                                                     </div>
-                                                    <div className="dropdown-item d-flex align-items-center" onClick={() => setUpdateClientType([client._id])}>
-                                                        <FontAwesomeIcon icon={faArrowsRotate} className="fs-4 me-2" color="#4a90e2" />
+                                                    <div
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => setUpdateClientType([client._id])}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faArrowsRotate}
+                                                            className="fs-4 me-2"
+                                                            color="#4a90e2"
+                                                        />
                                                         <p className="fs-5 m-0">Thay đổi loại khách hàng</p>
                                                     </div>
                                                 </>
                                             ) : (
-                                                <div className="dropdown-item d-flex align-items-center" onClick={() => handleUnblockClient(client._id)}>
-                                                    <FontAwesomeIcon icon={faUnlockKeyhole} className="fs-4 me-2 text-success" />
+                                                <div
+                                                    className="dropdown-item d-flex align-items-center"
+                                                    onClick={() => handleUnblockClient(client._id)}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faUnlockKeyhole}
+                                                        className="fs-4 me-2 text-success"
+                                                    />
                                                     <p className="fs-5 m-0">Mở khóa khách hàng</p>
                                                 </div>
                                             )}
@@ -407,7 +504,14 @@ function CustomerManagement() {
                 </div>
             </div>
             {userIds.length > 0 && (
-                <GiveVoucher isOpen={true} onClose={() => setUserIds([])} userId={userIds} setNotification={setNotification} setBulkAction={setBulkAction} setSelectedClient={setSelectedClient} />
+                <GiveVoucher
+                    isOpen={true}
+                    onClose={() => setUserIds([])}
+                    userId={userIds}
+                    setNotification={setNotification}
+                    setBulkAction={setBulkAction}
+                    setSelectedClient={setSelectedClient}
+                />
             )}
             {blockUserIds.length > 0 && (
                 <BlockClientModal
@@ -430,8 +534,16 @@ function CustomerManagement() {
                 />
             )}
             {notification.show && (
-                <Modal show={notification.show} onHide={() => setNotification({ ...notification, show: false })} centered>
-                    <Notification title={notification.title} description={notification.description} type={notification.type} />
+                <Modal
+                    show={notification.show}
+                    onHide={() => setNotification({ ...notification, show: false })}
+                    centered
+                >
+                    <Notification
+                        title={notification.title}
+                        description={notification.description}
+                        type={notification.type}
+                    />
                 </Modal>
             )}
             {showOrderHistory && <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
@@ -446,7 +558,9 @@ function CustomerManagement() {
                                 <div key={order._id} className="border rounded p-3 mb-3">
                                     <div className="d-flex justify-content-between mb-2">
                                         <p className="fs-4 fw-medium">Mã đơn hàng: {order._id}</p>
-                                        <p className="fs-4">Ngày đặt: {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                                        <p className="fs-4">
+                                            Ngày đặt: {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                                        </p>
                                     </div>
                                     <div className="mb-2">
                                         <p className="fs-4">
@@ -466,7 +580,10 @@ function CustomerManagement() {
                                             </span>
                                         </p>
                                         <p className="fs-4">
-                                            Tổng tiền: <span className="fw-medium">{order.productsPrice.toLocaleString('vi-VN')}đ</span>
+                                            Tổng tiền:{' '}
+                                            <span className="fw-medium">
+                                                {order.productsPrice.toLocaleString('vi-VN')}đ
+                                            </span>
                                         </p>
                                     </div>
                                     <div className="d-flex justify-content-between">
@@ -475,17 +592,28 @@ function CustomerManagement() {
                                                 <p className="fs-4 fw-medium overflow-y-hidden">Sản phẩm:</p>
                                                 {order.products.map((item, index) => (
                                                     <div key={index} className="d-flex align-items-center mb-2">
-                                                        <img src={item.product.imageUrl} alt="Product image" style={{ width: '50px', height: '50px', objectFit: 'cover' }} className="me-3" />
+                                                        <img
+                                                            src={item.product.imageUrl}
+                                                            alt="Product image"
+                                                            style={{
+                                                                width: '50px',
+                                                                height: '50px',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                            className="me-3"
+                                                        />
                                                         <div>
                                                             <p className="fs-4">{item.product.product.name}</p>
                                                             <p className="fs-4">Số lượng: {item.quantity}</p>
                                                             <p className="fs-4">
                                                                 Phân loại hàng:{' '}
-                                                                {item.product.product.categories.map((categorie, index) => (
-                                                                    <span key={index} className="ms-2">
-                                                                        {categorie.name}
-                                                                    </span>
-                                                                ))}
+                                                                {item.product.product.categories.map(
+                                                                    (categorie, index) => (
+                                                                        <span key={index} className="ms-2">
+                                                                            {categorie.name}
+                                                                        </span>
+                                                                    )
+                                                                )}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -496,23 +624,41 @@ function CustomerManagement() {
                                             <div className="mb-3">
                                                 <p className="fs-4 fw-medium">Thông tin giao hàng:</p>
                                                 <p className="fs-4 fw-medium">
-                                                    Người nhận: <span className="fw-normal">{order.shippingAddress?.name}</span>
+                                                    Người nhận:{' '}
+                                                    <span className="fw-normal">{order.shippingAddress?.name}</span>
                                                 </p>
                                                 <p className="fs-4 fw-medium">
-                                                    SĐT: <span className="fw-normal">{order.shippingAddress?.phone}</span>
+                                                    SĐT:{' '}
+                                                    <span className="fw-normal">{order.shippingAddress?.phone}</span>
                                                 </p>
                                                 <p className="fs-4 fw-medium">
-                                                    Địa chỉ: <span className="fw-normal">{order.shippingAddress?.location}</span>
+                                                    Địa chỉ:{' '}
+                                                    <span className="fw-normal">{order.shippingAddress?.location}</span>
                                                 </p>
                                             </div>
 
                                             <div className="mb-3">
                                                 <p className="fs-4 fw-medium">Thanh toán:</p>
-                                                <p className="fs-4">Phương thức: {order.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán sau khi nhận hàng.' : 'Thanh toán qua thẻ.'}</p>
-                                                <p className="fs-4">Tạm tính: {order.productsPrice?.toLocaleString('vi-VN')}đ</p>
-                                                <p className="fs-4">Phí vận chuyển: {order.shippingPrice?.toLocaleString('vi-VN')}đ</p>
-                                                {order.vouchers?.length > 0 && <p className="fs-4">Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ</p>}
-                                                <p className="fs-4 fw-medium">Tổng cộng: {order.totalPrice?.toLocaleString('vi-VN')}đ</p>
+                                                <p className="fs-4">
+                                                    Phương thức:{' '}
+                                                    {order.paymentMethod === 'paymentUponReceipt'
+                                                        ? 'Thanh toán sau khi nhận hàng.'
+                                                        : 'Thanh toán qua thẻ.'}
+                                                </p>
+                                                <p className="fs-4">
+                                                    Tạm tính: {order.productsPrice?.toLocaleString('vi-VN')}đ
+                                                </p>
+                                                <p className="fs-4">
+                                                    Phí vận chuyển: {order.shippingPrice?.toLocaleString('vi-VN')}đ
+                                                </p>
+                                                {order.vouchers?.length > 0 && (
+                                                    <p className="fs-4">
+                                                        Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ
+                                                    </p>
+                                                )}
+                                                <p className="fs-4 fw-medium">
+                                                    Tổng cộng: {order.totalPrice?.toLocaleString('vi-VN')}đ
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

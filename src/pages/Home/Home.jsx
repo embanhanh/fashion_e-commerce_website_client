@@ -5,7 +5,10 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchBanners } from '../../redux/slices/bannerSlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
 import { useNavigate } from 'react-router-dom'
+
+import { useScrollReveal } from '../../hook/useScrollReveal'
 import ProductCard from '../../components/ProductCard'
 import Chatbot from '../../components/Chatbot'
 import Rating from '../../components/Rating'
@@ -17,7 +20,6 @@ import headset from '../../assets/image/icons/headphone.png'
 import promotion from '../../assets/image/icons/shopping-bag.png'
 import quote from '../../assets/image/icons/quote.png'
 import avatar from '../../assets/image/default/default-avatar.png'
-
 import './Home.scss'
 
 function Home() {
@@ -27,14 +29,22 @@ function Home() {
     const dispatch = useDispatch()
     const { banners } = useSelector((state) => state.banner)
     const { user } = useSelector((state) => state.auth)
+    const { categories } = useSelector((state) => state.category)
+
+    const handleExploreCategory = (categorySlug) => {
+        navigate(`/products?category=${categorySlug}&page=1`)
+    }
 
     useEffect(() => {
         dispatch(fetchBanners())
+        dispatch(fetchCategories())
     }, [dispatch])
+
+    useScrollReveal()
 
     return (
         <>
-            {user?.role !== 'admin' && <Chatbot />}
+            {/* {user?.role !== 'admin' && <Chatbot />} */}
             <div className="slideshow-background w-100">
                 <div className="slideshow-container container">
                     <Swiper
@@ -91,18 +101,8 @@ function Home() {
             </div>
             <div className="container h-100">
                 <div className=" container max-md p-5">
-                    <div className="content-category w-100 py-5">
-                        {/* <div className="header-category d-flex justify-content-between align-items-center"> */}
+                    <div className="content-category w-100 py-5 reveal">
                         <p className="shop-sm-title theme-color text-center">Danh Mục Sản phẩm</p>
-                        {/* <div className="d-flex gap-3">
-                                <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slidePrev()}>
-                                    <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-                                </div>
-                                <div className="primary-btn" onClick={() => swiperCategory.current.swiper.slideNext()}>
-                                    <FontAwesomeIcon icon={faArrowRight} size="xl" />
-                                </div>
-                            </div> */}
-                        {/* </div> */}
                         <div className="list-category mt-5">
                             <Swiper
                                 ref={swiperCategory}
@@ -117,28 +117,40 @@ function Home() {
                                 modules={[Autoplay, Pagination, Navigation]}
                                 className="mySwiper"
                             >
-                                {[...Array(8)].map((_, index) => (
-                                    <SwiperSlide key={index}>
-                                        <img className="rounded-5" style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={cay1} loading="lazy" />
-                                        <div className="position-absolute category-item-content ">
-                                            <p className="text-nowrap home-category-title">Thời trang nam</p>
-                                            <button className="primary-btn full-color px-4 py-2 rounded-4">
-                                                <p className="text-nowrap">Khám phá ngay</p>
-                                            </button>
-                                        </div>
-                                        <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                    </SwiperSlide>
-                                ))}
+                                {categories
+                                    .filter((category) => !category.parentCategory)
+                                    .map((category) => (
+                                        <SwiperSlide key={category?._id}>
+                                            <img
+                                                className="rounded-5"
+                                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                                src={category?.urlImage || cay1}
+                                                loading="lazy"
+                                            />
+                                            <div className="position-absolute category-item-content ">
+                                                <p className="text-center home-category-title">{category?.name}</p>
+                                                <button
+                                                    className="primary-btn full-color px-4 py-2 rounded-4"
+                                                    onClick={() => handleExploreCategory(category?.slug)}
+                                                >
+                                                    <p className="text-nowrap">Khám phá ngay</p>
+                                                </button>
+                                            </div>
+                                            <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                                        </SwiperSlide>
+                                    ))}
                             </Swiper>
                         </div>
                     </div>
-                    <div className="content-bestseller py-5">
+                    <div className="content-bestseller py-5 reveal reveal-delay-1">
                         <p className="shop-sm-title text-center theme-color">Bán Chạy Nhất</p>
                         <div className="row">
                             {[...Array(8)].map((_, index) => (
                                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
                                     <ProductCard
-                                        url={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNeJa_l26MBy8VuAnFG5ff2SIBCpEP5RdIVA&s'}
+                                        url={
+                                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNeJa_l26MBy8VuAnFG5ff2SIBCpEP5RdIVA&s'
+                                        }
                                         name={'Giày thể thao hhhhhhhhhh jasdasd jasdasda'}
                                         originalPrice={150000}
                                         discount={15}
@@ -150,10 +162,10 @@ function Home() {
                         </div>
                     </div>
 
-                    <div className="content-policy"></div>
+                    {/* <div className="content-policy"></div> */}
                 </div>
             </div>
-            <div className="py-5 home-customer-review">
+            <div className="py-5 home-customer-review reveal reveal-delay-2">
                 {[...Array(15)].map((_, index) => (
                     <div key={`bubble-${index}`} className={`bubble bubble-${index + 1}`} />
                 ))}
@@ -178,11 +190,18 @@ function Home() {
                                 <div className="customer-review shadow rounded-5 d-flex flex-column">
                                     <img src={quote} alt="quote" className="customer-review-quote" />
                                     <p className="customer-review-text mt-4">
-                                        Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản
-                                        phẩm phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương lai!
+                                        Mình rất ấn tượng với trải nghiệm mua sắm tại website thời trang này. Giao diện
+                                        được thiết kế hiện đại và tinh tế, giúp mình dễ dàng tìm kiếm và lựa chọn sản
+                                        phẩm phù hợp. Mình chắc chắn sẽ quay lại đây để tiếp tục mua sắm trong tương
+                                        lai!
                                     </p>
                                     <div className="d-flex align-items-center gap-3 justify-self-end mt-auto">
-                                        <img src={avatar} alt="" className="rounded-circle" style={{ height: 50, width: 50 }} />
+                                        <img
+                                            src={avatar}
+                                            alt=""
+                                            className="rounded-circle"
+                                            style={{ height: 50, width: 50 }}
+                                        />
                                         <div className="d-flex flex-column">
                                             <p className="fw-bold fs-3 theme-color">Trần Trung Thông</p>
                                             <Rating initialRating={5} readonly gap={4} size={14} />
@@ -197,42 +216,49 @@ function Home() {
             </div>
             <div className="container max-md p-5">
                 <div className="row w-100 pb-5 ">
-                    <div className="col-12 col-sm-6 g-5 col-md-4 col-lg-3 ">
+                    <div className="col-12 col-sm-6 g-5 col-md-4 col-lg-3 reveal reveal-delay-1">
                         <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
                             <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
                                 <img src={truck} alt="truck" className="m-auto" />
                             </div>
                             <p className="home-policy-item-title my-3">Miễn phí vận chuyển</p>
-                            <p className="home-policy-item-description text-center">Miễn phí vận chuyển đối với những đơn hàng lớn hơn 500.000đ</p>
+                            <p className="home-policy-item-description text-center">
+                                Miễn phí vận chuyển đối với những đơn hàng lớn hơn 500.000đ
+                            </p>
                         </div>
                     </div>
-                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
+                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  reveal reveal-delay-2">
                         <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
                             <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
                                 <img src={refund} alt="refund" className="m-auto" />
                             </div>
                             <p className="home-policy-item-title my-3">Hoàn tiền 100%</p>
-                            <p className="home-policy-item-description text-center">Khách hàng có thể đổi/trả hàng trong vòng 7 ngày kể từ ngày nhận hàng</p>
+                            <p className="home-policy-item-description text-center">
+                                Khách hàng có thể đổi/trả hàng trong vòng 7 ngày kể từ ngày nhận hàng
+                            </p>
                         </div>
                     </div>
-                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
+                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  reveal reveal-delay-3">
                         <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
                             <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
                                 <img src={headset} alt="headset" className="m-auto" />
                             </div>
                             <p className="home-policy-item-title my-3">Hỗ trợ 24/7</p>
                             <p className="home-policy-item-description text-center">
-                                Cung cấp dịch vụ tư vấn miễn phí về lựa chọn sản phẩm phù hợp với nhu cầu và phong cách thời trang của khách hàng
+                                Cung cấp dịch vụ tư vấn miễn phí về lựa chọn sản phẩm phù hợp với nhu cầu và phong cách
+                                thời trang của khách hàng
                             </p>
                         </div>
                     </div>
-                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  ">
+                    <div className="col-12 col-sm-6 col-md-4 col-lg-3 g-5  reveal reveal-delay-3">
                         <div className="d-flex flex-column align-items-center shadow position-relative home-policy-item">
                             <div className="d-flex justify-content-center p-4 rounded-circle bg-white position-absolute home-policy-item-icon">
                                 <img src={promotion} alt="promotion" className="m-auto" />
                             </div>
                             <p className="home-policy-item-title my-3">Khuyến mãi hấp dẫn</p>
-                            <p className="home-policy-item-description text-center">Khách hàng sẽ được hưởng nhiều ưu đãi khi mua sắm tại website</p>
+                            <p className="home-policy-item-description text-center">
+                                Khách hàng sẽ được hưởng nhiều ưu đãi khi mua sắm tại website
+                            </p>
                         </div>
                     </div>
                 </div>

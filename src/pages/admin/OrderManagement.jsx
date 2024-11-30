@@ -10,6 +10,7 @@ import ChangeStatusModal from '../../components/ChangeStatusModal'
 import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 import debounce from 'lodash/debounce'
+import defaultAvatar from '../../assets/image/default/default-avatar.png'
 
 const OrderManagement = () => {
     const dispatch = useDispatch()
@@ -33,7 +34,7 @@ const OrderManagement = () => {
         orderStartDate: null,
         orderEndDate: null,
         paymentMethod: 'paymentUponReceipt',
-        shippingMethod: 'all',
+        shippingMethod: '',
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
     const [bulkAction, setBulkAction] = useState('')
@@ -46,6 +47,10 @@ const OrderManagement = () => {
         }, 300),
         [dispatch, filters]
     )
+
+    useEffect(() => {
+        console.log(orders)
+    }, [orders])
 
     useEffect(() => {
         debouncedFetchOrders()
@@ -78,7 +83,12 @@ const OrderManagement = () => {
     const handleStatusChange = async () => {
         try {
             await dispatch(updateOrderStatusManyAction({ orderIds: selectedOrderIds, status: bulkAction }))
-            setShowNotifyModal({ show: true, description: 'Cập nhật trạng thái đơn hàng thành công', title: 'Thành công', type: 'success' })
+            setShowNotifyModal({
+                show: true,
+                description: 'Cập nhật trạng thái đơn hàng thành công',
+                title: 'Thành công',
+                type: 'success',
+            })
             setSelectedOrderIds([])
         } catch (error) {
             setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
@@ -171,8 +181,19 @@ const OrderManagement = () => {
                         <p className="fs-4 fw-medium text-nowrap me-4 label-width ">Hình thức vận chuyển</p>
                         <div className="d-flex align-items-center">
                             <div className="select">
-                                <div className="selected" data-default="Tất cả" data-one="Cơ bản" data-two="Nhanh" data-three="Hỏa tốc">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <div
+                                    className="selected"
+                                    data-default="Tất cả"
+                                    data-one="Cơ bản"
+                                    data-two="Nhanh"
+                                    data-three="Hỏa tốc"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -182,8 +203,8 @@ const OrderManagement = () => {
                                             id="all-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === 'all'}
-                                            value="all"
+                                            checked={filterLocal.shippingMethod === ''}
+                                            value=""
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
                                         <label className="option" htmlFor="all-v2" data-txt="Tất cả" />
@@ -193,8 +214,8 @@ const OrderManagement = () => {
                                             id="option-1-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === 'default'}
-                                            value="default"
+                                            checked={filterLocal.shippingMethod === 'basic'}
+                                            value="basic"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
                                         <label className="option" htmlFor="option-1-v2" data-txt="Cơ bản" />
@@ -229,8 +250,17 @@ const OrderManagement = () => {
                         <p className="fs-4 fw-medium text-nowrap me-4 label-width ">Hình thức thanh toán</p>
                         <div className="d-flex align-items-center">
                             <div className="select ">
-                                <div className="selected" data-default="Thanh toán khi nhận hàng" data-one="Thanh toán chuyển khoản">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <div
+                                    className="selected"
+                                    data-default="Thanh toán khi nhận hàng"
+                                    data-one="Thanh toán chuyển khoản"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -244,7 +274,11 @@ const OrderManagement = () => {
                                             value="paymentUponReceipt"
                                             onChange={(e) => handleChangeFilter('paymentMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="all-v3" data-txt="Thanh toán khi nhận hàng" />
+                                        <label
+                                            className="option"
+                                            htmlFor="all-v3"
+                                            data-txt="Thanh toán khi nhận hàng"
+                                        />
                                     </div>
                                     <div title="option-1">
                                         <input
@@ -255,7 +289,11 @@ const OrderManagement = () => {
                                             value="bankTransfer"
                                             onChange={(e) => handleChangeFilter('paymentMethod', e.target.value)}
                                         />
-                                        <label className="option" htmlFor="option-1-v3" data-txt="Thanh toán chuyển khoản" />
+                                        <label
+                                            className="option"
+                                            htmlFor="option-1-v3"
+                                            data-txt="Thanh toán chuyển khoản"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -263,7 +301,10 @@ const OrderManagement = () => {
                     </div>
                 </div>
                 <div className="d-flex p-3 justify-content-center border-top align-items-center mt-3">
-                    <button className="primary-btn shadow-none py-1 px-4 rounded-2 border-1" onClick={handleSubmitFilters}>
+                    <button
+                        className="primary-btn shadow-none py-1 px-4 rounded-2 border-1"
+                        onClick={handleSubmitFilters}
+                    >
                         <p className="fs-4 fw-medium">Tìm</p>
                     </button>
 
@@ -286,25 +327,43 @@ const OrderManagement = () => {
                 </div>
             </div>
             <div className="bg-white rounded-4 shadow-sm">
-                <div className=" border-bottom d-flex">
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === '' ? 'active' : ''}`} onClick={() => setFilterStatus('')}>
-                        Tất cả
-                    </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'pending' ? 'active' : ''}`} onClick={() => setFilterStatus('pending')}>
-                        Chờ xác nhận
-                    </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'processing' ? 'active' : ''}`} onClick={() => setFilterStatus('processing')}>
-                        Đang xử lý
-                    </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivering' ? 'active' : ''}`} onClick={() => setFilterStatus('delivering')}>
-                        Đang giao
-                    </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivered' ? 'active' : ''}`} onClick={() => setFilterStatus('delivered')}>
-                        Đã giao
-                    </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'cancelled' ? 'active' : ''}`} onClick={() => setFilterStatus('cancelled')}>
-                        Đã hủy
-                    </p>
+                <div className="nav-wrapper border-bottom d-flex">
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === '' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('')}
+                    >
+                        <p className="nav-title fs-4">Tất cả</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'pending' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('pending')}
+                    >
+                        <p className="nav-title fs-4">Chờ xác nhận</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'processing' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('processing')}
+                    >
+                        <p className="nav-title fs-4">Đang xử lý</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'delivering' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('delivering')}
+                    >
+                        <p className="nav-title fs-4">Đang giao</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'delivered' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('delivered')}
+                    >
+                        <p className="nav-title fs-4">Đã giao</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'cancelled' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('cancelled')}
+                    >
+                        <p className="nav-title fs-4">Đã hủy</p>
+                    </div>
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">{orders.length} đơn hàng</p>
@@ -317,13 +376,25 @@ const OrderManagement = () => {
                                 data-two="Xác nhận giao hàng các đơn đang chọn"
                                 data-three="In hóa đơn các đơn hàng đang chọn"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    height="1em"
+                                    viewBox="0 0 512 512"
+                                    className="arrow"
+                                >
                                     <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                 </svg>
                             </div>
                             <div className="options">
                                 <div title="all">
-                                    <input id="all" name="option" type="radio" value="" checked={bulkAction === ''} onChange={() => setBulkAction('')} />
+                                    <input
+                                        id="all"
+                                        name="option"
+                                        type="radio"
+                                        value=""
+                                        checked={bulkAction === ''}
+                                        onChange={() => setBulkAction('')}
+                                    />
                                     <label className="option" htmlFor="all" data-txt="Công cụ xử lý hàng loạt" />
                                 </div>
                                 <div title="option-1">
@@ -339,7 +410,11 @@ const OrderManagement = () => {
                                             }
                                         }}
                                     />
-                                    <label className="option" htmlFor="option-1" data-txt="Xác nhận các đơn hàng đang chọn" />
+                                    <label
+                                        className="option"
+                                        htmlFor="option-1"
+                                        data-txt="Xác nhận các đơn hàng đang chọn"
+                                    />
                                 </div>
                                 <div title="option-2">
                                     <input
@@ -354,7 +429,11 @@ const OrderManagement = () => {
                                             }
                                         }}
                                     />
-                                    <label className="option" htmlFor="option-2" data-txt="Xác nhận giao hàng các đơn đang chọn" />
+                                    <label
+                                        className="option"
+                                        htmlFor="option-2"
+                                        data-txt="Xác nhận giao hàng các đơn đang chọn"
+                                    />
                                 </div>
                                 <div title="option-3">
                                     <input
@@ -367,7 +446,11 @@ const OrderManagement = () => {
                                             handlePrintInvoiceMany()
                                         }}
                                     />
-                                    <label className="option" htmlFor="option-3" data-txt="In hóa đơn các đơn hàng đang chọn" />
+                                    <label
+                                        className="option"
+                                        htmlFor="option-3"
+                                        data-txt="In hóa đơn các đơn hàng đang chọn"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -378,7 +461,12 @@ const OrderManagement = () => {
                         <div className="order-grid py-3 border-bottom">
                             <div className="checkbox-cell">
                                 <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" checked={selectedOrderIds.length === orders.length} onChange={handleSelectAllOrders} />
+                                    <input
+                                        type="checkbox"
+                                        className="input-checkbox"
+                                        checked={selectedOrderIds.length === orders.length}
+                                        onChange={handleSelectAllOrders}
+                                    />
                                     <span className="custom-checkbox"></span>
                                 </label>
                             </div>
@@ -408,30 +496,61 @@ const OrderManagement = () => {
                                 <div key={order._id} className="order-grid py-3 border-bottom">
                                     <div className="checkbox-cell">
                                         <label className="d-flex align-items-center">
-                                            <input type="checkbox" className="input-checkbox" checked={selectedOrderIds.includes(order._id)} onChange={() => handleSelectOrder(order._id)} />
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={selectedOrderIds.includes(order._id)}
+                                                onChange={() => handleSelectOrder(order._id)}
+                                            />
                                             <span className="custom-checkbox"></span>
                                         </label>
                                     </div>
                                     <div className="overflow-y-auto mt-5 ">
                                         <div className="d-inline-flex align-items-center w-100 ">
-                                            <img src={order.user?.urlImage} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }} />
+                                            <img
+                                                src={order.user?.urlImage || defaultAvatar}
+                                                alt=""
+                                                style={{
+                                                    width: '50px',
+                                                    height: '50px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '50%',
+                                                }}
+                                            />
                                             <div className="ms-3 order-product-info">
-                                                <p className="fs-4 fw-medium overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                <p
+                                                    className="fs-4 fw-medium overflow-hidden text-nowrap"
+                                                    style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                >
                                                     {order.user?.name}
                                                 </p>
-                                                <p className="fs-4 overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                <p
+                                                    className="fs-4 overflow-hidden text-nowrap"
+                                                    style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                >
                                                     {order.user?.email}
                                                 </p>
                                             </div>
                                         </div>
-                                        <FontAwesomeIcon icon={faComment} className="fs-3 p-2 hover-icon" color="#4a90e2" />
+                                        <FontAwesomeIcon
+                                            icon={faComment}
+                                            className="fs-3 p-2 hover-icon"
+                                            color="#4a90e2"
+                                        />
                                     </div>
                                     <div className="overflow-y-auto scrollbar-y" style={{ maxHeight: '150px' }}>
                                         {order.products?.map((product) => (
                                             <div key={product._id} className="d-flex align-items-center my-2">
-                                                <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                                <img
+                                                    src={product.product?.imageUrl}
+                                                    alt=""
+                                                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                />
                                                 <div className="ms-3 order-product-info">
-                                                    <p className="fs-4 fw-medium overflow-hidden text-nowrap" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                    <p
+                                                        className="fs-4 fw-medium overflow-hidden text-nowrap"
+                                                        style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                    >
                                                         {product.product?.product?.name}
                                                     </p>
                                                     <p className="fs-4">x{product?.quantity}</p>
@@ -439,32 +558,66 @@ const OrderManagement = () => {
                                             </div>
                                         ))}
                                     </div>
-                                    <p className="fs-4 text-center">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
-                                    <p className="fs-4 text-center">{order.shippingMethod === 'default' ? 'Cơ bản' : order.shippingMethod === 'fast' ? 'Nhanh' : 'Hỏa tốc'}</p>
-                                    <p className="fs-4 text-center">{order.paymentMethod === 'bankTransfer' ? 'Thanh toán chuyển khoản' : 'Thanh toán khi nhận hàng'}</p>
+                                    <p className="fs-4 text-center">
+                                        {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                                    </p>
+                                    <p className="fs-4 text-center">
+                                        {order.shippingMethod === 'basic'
+                                            ? 'Cơ bản'
+                                            : order.shippingMethod === 'fast'
+                                            ? 'Nhanh'
+                                            : 'Hỏa tốc'}
+                                    </p>
+                                    <p className="fs-4 text-center">
+                                        {order.paymentMethod === 'bankTransfer'
+                                            ? 'Thanh toán chuyển khoản'
+                                            : 'Thanh toán khi nhận hàng'}
+                                    </p>
                                     <p className="fs-4 text-center">{order.totalPrice.toLocaleString('vi-VN')}đ</p>
                                     <div className="text-center">
-                                        <p className={`text-center ${order.status === 'cancelled' ? 'text-danger' : order.status === 'delivered' ? 'text-success' : 'text-warning'}`}>
+                                        <p
+                                            className={`text-center ${
+                                                order.status === 'cancelled'
+                                                    ? 'text-danger'
+                                                    : order.status === 'delivered'
+                                                    ? 'text-success'
+                                                    : 'text-warning'
+                                            }`}
+                                        >
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                    ? 'Đang xử lý'
-                                                    : order.status === 'delivering'
-                                                        ? 'Đang giao'
-                                                        : order.status === 'delivered'
-                                                            ? 'Đã giao'
-                                                            : 'Đã hủy'}
+                                                ? 'Đang xử lý'
+                                                : order.status === 'delivering'
+                                                ? 'Đang giao'
+                                                : order.status === 'delivered'
+                                                ? 'Đã giao'
+                                                : 'Đã hủy'}
                                         </p>
                                         <FontAwesomeIcon
-                                            onClick={() => setShowChangeStatusModal({ show: true, originalStatus: order.status, orderId: order._id })}
+                                            onClick={() =>
+                                                setShowChangeStatusModal({
+                                                    show: true,
+                                                    originalStatus: order.status,
+                                                    orderId: order._id,
+                                                })
+                                            }
                                             icon={faPen}
                                             className="fs-3 p-2 hover-icon"
                                             color="#4a90e2"
                                         />
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
-                                        <FontAwesomeIcon icon={faCircleInfo} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => handleShowDetail(order)} />
-                                        <p className="fs-5 text-primary hover-icon p-2" onClick={() => handlePrintInvoice(order)}>
+                                        <FontAwesomeIcon
+                                            icon={faCircleInfo}
+                                            className="fs-3 my-2 p-2 hover-icon"
+                                            color="#000"
+                                            onClick={() => handleShowDetail(order)}
+                                        />
+                                        <p
+                                            className="fs-5 text-primary hover-icon p-2"
+                                            onClick={() => handlePrintInvoice(order)}
+                                        >
                                             In hóa đơn
                                         </p>
                                         <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>
@@ -485,8 +638,16 @@ const OrderManagement = () => {
                 />
             )}
             {showNotifyModal.show && (
-                <Modal show={showNotifyModal.show} onHide={() => setShowNotifyModal({ show: false, description: '', title: '', type: '' })} centered>
-                    <Notification description={showNotifyModal.description} title={showNotifyModal.title} type={showNotifyModal.type} />
+                <Modal
+                    show={showNotifyModal.show}
+                    onHide={() => setShowNotifyModal({ show: false, description: '', title: '', type: '' })}
+                    centered
+                >
+                    <Notification
+                        description={showNotifyModal.description}
+                        title={showNotifyModal.title}
+                        type={showNotifyModal.type}
+                    />
                 </Modal>
             )}
             {showDetailOrder && (
@@ -500,34 +661,55 @@ const OrderManagement = () => {
                                 <div className="d-flex justify-content-between align-items-center shadow-none p-3 mb-3 bg-light rounded border">
                                     <div className="text-start">
                                         <span className="fs-3 fw-semibold">
-                                            Đơn hàng: <span className="text-primary fs-4 fw-normal text-nowrap">{selectedOrder._id}</span>
+                                            Đơn hàng:{' '}
+                                            <span className="text-primary fs-4 fw-normal text-nowrap">
+                                                {selectedOrder._id}
+                                            </span>
                                         </span>
                                         <div className="fs-5">
-                                            <span className="me-2">{new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}</span>
-                                            <span className="ms-2">{new Date(selectedOrder.createdAt).toLocaleTimeString('vi-VN')}</span>
+                                            <span className="me-2">
+                                                {new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}
+                                            </span>
+                                            <span className="ms-2">
+                                                {new Date(selectedOrder.createdAt).toLocaleTimeString('vi-VN')}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="text-center">
-                                        <p className={`text-center ${selectedOrder.status === 'cancelled' ? 'text-danger' : selectedOrder.status === 'delivered' ? 'text-success' : 'text-warning'}`}>
+                                        <p
+                                            className={`text-center ${
+                                                selectedOrder.status === 'cancelled'
+                                                    ? 'text-danger'
+                                                    : selectedOrder.status === 'delivered'
+                                                    ? 'text-success'
+                                                    : 'text-warning'
+                                            }`}
+                                        >
                                             {selectedOrder.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : selectedOrder.status === 'processing'
-                                                    ? 'Đang xử lý'
-                                                    : selectedOrder.status === 'delivering'
-                                                        ? 'Đang giao'
-                                                        : selectedOrder.status === 'delivered'
-                                                            ? 'Đã giao'
-                                                            : 'Đã hủy'}
+                                                ? 'Đang xử lý'
+                                                : selectedOrder.status === 'delivering'
+                                                ? 'Đang giao'
+                                                : selectedOrder.status === 'delivered'
+                                                ? 'Đã giao'
+                                                : 'Đã hủy'}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="d-flex">
-                                    <div className="shadow-none p-3 mb-3 bg-white rounded border me-4" style={{ minWidth: '200px' }}>
+                                    <div
+                                        className="shadow-none p-3 mb-3 bg-white rounded border me-4"
+                                        style={{ minWidth: '200px' }}
+                                    >
                                         <p className="fs-4 fw-semibold bg-light info-title">KHÁCH HÀNG</p>
                                         <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
                                         <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
                                     </div>
-                                    <div className="shadow-none p-3 mb-3 bg-white rounded border" style={{ flexGrow: 1 }}>
+                                    <div
+                                        className="shadow-none p-3 mb-3 bg-white rounded border"
+                                        style={{ flexGrow: 1 }}
+                                    >
                                         <p className="fs-4 fw-semibold bg-light info-title">NGƯỜI NHẬN</p>
                                         <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
                                         <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
@@ -561,17 +743,37 @@ const OrderManagement = () => {
                                             </div>
                                             <div className="text-start" style={{ width: '40%' }}>
                                                 <div className="ms-3 d-flex align-items-center">
-                                                    <img src={product.product?.imageUrl} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                                    <p className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2" style={{ maxWidth: '100%' }}>
+                                                    <img
+                                                        src={product.product?.imageUrl}
+                                                        alt=""
+                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                    />
+                                                    <p
+                                                        className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2"
+                                                        style={{ maxWidth: '100%' }}
+                                                    >
                                                         {product.product?.product?.name}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="text-center fs-5 d-flex flex-column" style={{ width: '20%' }}>
+                                            <div
+                                                className="text-center fs-5 d-flex flex-column"
+                                                style={{ width: '20%' }}
+                                            >
                                                 <span>{product?.product?.price.toLocaleString('vi-VN')}đ</span>
                                                 {product?.product?.product?.originalPrice && (
-                                                    <span style={{ textDecoration: 'line-through', color: 'gray', fontSize: '0.9em', marginLeft: '5px' }}>
-                                                        {product?.product?.product?.originalPrice?.toLocaleString('vi-VN')}đ
+                                                    <span
+                                                        style={{
+                                                            textDecoration: 'line-through',
+                                                            color: 'gray',
+                                                            fontSize: '0.9em',
+                                                            marginLeft: '5px',
+                                                        }}
+                                                    >
+                                                        {product?.product?.product?.originalPrice?.toLocaleString(
+                                                            'vi-VN'
+                                                        )}
+                                                        đ
                                                     </span>
                                                 )}
                                             </div>
@@ -580,42 +782,75 @@ const OrderManagement = () => {
                                             </div>
 
                                             <div className="text-center fs-5" style={{ width: '20%' }}>
-                                                <span>{(product?.product?.price * product?.quantity).toLocaleString('vi-VN')}đ</span>
+                                                <span>
+                                                    {(product?.product?.price * product?.quantity).toLocaleString(
+                                                        'vi-VN'
+                                                    )}
+                                                    đ
+                                                </span>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                             <div className="col-4">
-                                <div className="shadow-none p-3 mb-3 bg-white rounded border " style={{ minWidth: '200px' }}>
-                                    <p className="fs-4 fw-semibold bg-light info-title text-uppercase">Thông tin khác</p>
+                                <div
+                                    className="shadow-none p-3 mb-3 bg-white rounded border "
+                                    style={{ minWidth: '200px' }}
+                                >
+                                    <p className="fs-4 fw-semibold bg-light info-title text-uppercase">
+                                        Thông tin khác
+                                    </p>
                                     <div className="d-flex justify-content-between mt-3">
-                                        <p className="fs-5 fw-normal">{selectedOrder?.paymentMethod === 'paymentUponReceipt' ? 'Thanh toán khi nhận hàng:' : 'Thanh toán chuyển khoản:'}</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ</p>
+                                        <p className="fs-5 fw-normal">
+                                            {selectedOrder?.paymentMethod === 'paymentUponReceipt'
+                                                ? 'Thanh toán khi nhận hàng:'
+                                                : 'Thanh toán chuyển khoản:'}
+                                        </p>
+                                        <p className="fs-5 fw-normal">
+                                            {selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ
+                                        </p>
                                     </div>
                                     <div className="d-flex justify-content-between mt-3">
                                         <p className="fs-5 fw-normal">Phương thức vận chuyển:</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.shippingMethod === 'default' ? 'Cơ bản' : selectedOrder?.shippingMethod === 'fast' ? 'Nhanh' : 'Hỏa tốc'}</p>
+                                        <p className="fs-5 fw-normal">
+                                            {selectedOrder?.shippingMethod === 'basic'
+                                                ? 'Cơ bản'
+                                                : selectedOrder?.shippingMethod === 'fast'
+                                                ? 'Nhanh'
+                                                : 'Hỏa tốc'}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="shadow-none p-3 mb-3 bg-white rounded border d-flex flex-column" style={{ minWidth: '200px', minHeight: '250px' }}>
+                                <div
+                                    className="shadow-none p-3 mb-3 bg-white rounded border d-flex flex-column"
+                                    style={{ minWidth: '200px', minHeight: '250px' }}
+                                >
                                     {/* Phần trên */}
                                     <div>
                                         <div className="d-flex justify-content-between">
                                             <p className="fs-5 fw-normal">Tạm tính</p>
-                                            <p className="fs-5 fw-normal">{selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ</p>
+                                            <p className="fs-5 fw-normal">
+                                                {selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ
+                                            </p>
                                         </div>
                                         <div className="d-flex justify-content-between">
                                             <p className="fs-5 fw-normal">Khuyến mãi</p>
                                             <p className="fs-5 fw-normal">
-                                                {selectedOrder?.products.reduce((total, item) =>
-                                                    total + (item.product.product.discount || 0)
-                                                    , 0).toLocaleString('vi-VN')}đ
+                                                {selectedOrder?.products
+                                                    .reduce(
+                                                        (total, item) => total + (item.product.product.discount || 0),
+                                                        0
+                                                    )
+                                                    .toLocaleString('vi-VN')}
+                                                đ
                                             </p>
                                         </div>
                                         <div className="d-flex justify-content-between">
                                             <p className="fs-5 fw-normal">Phí vận chuyển</p>
-                                            <p className="fs-5 fw-normal">{selectedOrder?.shippingPrice.toLocaleString('vi-VN')}đ</p>
+                                            <p className="fs-5 fw-normal">
+                                                {selectedOrder?.shippingPrice.toLocaleString('vi-VN')}đ
+                                            </p>
                                         </div>
                                     </div>
 
@@ -623,7 +858,9 @@ const OrderManagement = () => {
                                     <div className="mt-auto">
                                         <div className="d-flex justify-content-between">
                                             <p className="fs-3 fw-normal">Tổng tiền</p>
-                                            <p className="fs-4 fw-normal text-center">{selectedOrder?.totalPrice.toLocaleString('vi-VN')}đ</p>
+                                            <p className="fs-4 fw-normal text-center">
+                                                {selectedOrder?.totalPrice.toLocaleString('vi-VN')}đ
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -631,7 +868,11 @@ const OrderManagement = () => {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseOrder}>
+                        <div
+                            className="primary-btn px-4 py-2 shadow-none light border rounded-3"
+                            variant="secondary"
+                            onClick={handleCloseOrder}
+                        >
                             <p>Đóng</p>
                         </div>
                     </Modal.Footer>

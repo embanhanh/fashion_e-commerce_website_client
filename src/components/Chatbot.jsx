@@ -1,7 +1,12 @@
 import { useEffect, memo, useState, useRef } from 'react'
-import { db } from '../firebase.config'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane, faImage, faMessage } from '@fortawesome/free-solid-svg-icons'
 import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore'
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useSelector } from 'react-redux'
+
+import messageIcon from '../assets/image/default/messenger.png'
+import { db, storage } from '../firebase.config'
 import './Chat.scss'
 
 function Chatbot() {
@@ -27,7 +32,10 @@ function Chatbot() {
                         dfMessenger.clearStorage()
                         messages.forEach((message) => {
                             message.message.type === 'text'
-                                ? dfMessenger.renderCustomText(message.message.text, message.user === 'admin' || !message.user)
+                                ? dfMessenger.renderCustomText(
+                                      message.message.text,
+                                      message.user === 'admin' || !message.user
+                                  )
                                 : message.message.type === 'chips'
                                 ? dfMessenger.renderCustomCard([message.message])
                                 : dfMessenger.renderCustomCard(message.message.richElements)
@@ -42,7 +50,9 @@ function Chatbot() {
                             //         anchor: 'top-left',
                             //     })
                             // }
-                            lastMessage.message.type === 'text' ? dfMessenger.renderCustomText(lastMessage.message.text, true) : dfMessenger.renderCustomCard([lastMessage.message])
+                            lastMessage.message.type === 'text'
+                                ? dfMessenger.renderCustomText(lastMessage.message.text, true)
+                                : dfMessenger.renderCustomCard([lastMessage.message])
                         }
                     }
                 }
@@ -175,7 +185,10 @@ function Chatbot() {
                         })
                         const dfMessenger = document.querySelector('df-messenger')
                         if (dfMessenger && dfMessenger.renderCustomText) {
-                            dfMessenger.renderCustomText(`Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`, true)
+                            dfMessenger.renderCustomText(
+                                `Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`,
+                                true
+                            )
                         }
                     }}
                 >
@@ -189,7 +202,12 @@ function Chatbot() {
                 language-code="vi"
                 max-query-length="-1"
             >
-                <df-messenger-chat-bubble chat-title={chatMode.mode === 'ai' ? `Trợ lý AI Heartie` : `Nhân viên Heartie`}></df-messenger-chat-bubble>
+                <df-messenger-chat-bubble
+                    chat-icon={messageIcon}
+                    chat-title={chatMode.mode === 'ai' ? `Trợ lý AI Heartie` : `Nhân viên Heartie`}
+                >
+                    <FontAwesomeIcon icon={faMessage} />
+                </df-messenger-chat-bubble>
             </df-messenger>
         </>
     )

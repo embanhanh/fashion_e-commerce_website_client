@@ -56,7 +56,11 @@ function ProductList() {
     useLayoutEffect(() => {
         const categoriesFromUrl = searchParams.get('category')
         if (categoriesFromUrl) {
-            const categoriesFromUrlIds = categories.filter((category) => categoriesFromUrl.includes(category.slug))
+            const categoriesFromUrlIds = categories.filter(
+                (category) =>
+                    categoriesFromUrl.includes(category.slug) ||
+                    categoriesFromUrl.includes(category.parentCategory?.slug)
+            )
             setFilters((prev) => ({ ...prev, category: categoriesFromUrlIds.map((category) => category._id) }))
         }
     }, [categories])

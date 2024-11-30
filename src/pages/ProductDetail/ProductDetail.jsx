@@ -5,15 +5,17 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/thumbs'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinus, faPlus, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faMinus, faPlus, faThumbsUp, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, Button, Toast } from 'react-bootstrap'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
-import { fetchProductByProductName } from '../../redux/slices/productSlice'
+import { fetchProductByProductName, likeProductAction } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
+import { fetchUser } from '../../redux/slices/userSlice'
 import { db } from '../../firebase.config'
 import { doc, getDoc, updateDoc, onSnapshot, arrayUnion } from 'firebase/firestore'
 
@@ -30,8 +32,8 @@ function ProductDetail() {
     const navigate = useNavigate()
     const location = useLocation()
     const { isLoggedIn, user } = useSelector((state) => state.auth)
+    const { user: userInfo } = useSelector((state) => state.user)
     const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
-    // const { promotionalComboByProduct } = useSelector((state) => state.promotionalCombo)
     // state ...
     const { currentProduct } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
@@ -75,6 +77,7 @@ function ProductDetail() {
             const getCombo = async () => {
                 const response = await dispatch(getPromotionalComboByProductIdAction(currentProduct._id))
                 setPromotionalComboByProduct(response.payload)
+                await dispatch(fetchUser()).unwrap()
             }
             getCombo()
             const images = [...currentProduct.urlImage, ...currentProduct.variants.map((variant) => variant.imageUrl)]
@@ -195,6 +198,10 @@ function ProductDetail() {
     const handleLoginRedirect = () => {
         setShowLoginModal({ show: false, type: '' })
         navigate('/user/login', { state: { from: location.pathname } })
+    }
+
+    const handleLove = async () => {
+        await dispatch(likeProductAction(currentProduct._id)).unwrap()
     }
 
     const handleLike = async (ratingId) => {
@@ -353,8 +360,23 @@ function ProductDetail() {
                                     </Swiper>
                                 </div>
                             </div>
-                            <div style={{ width: '60%' }} className="px-5 py-1 ms-5">
-                                <p className="fs-1 lh-1 fw-bold theme-color">{currentProduct.name}</p>
+                            <div style={{ width: '60%' }} className="px-5 py-1 ms-5 position-relative">
+                                <div
+                                    className="position-absolute top-0 end-0"
+                                    onClick={handleLove}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <FontAwesomeIcon
+                                        icon={
+                                            userInfo?.favoriteProducts.includes(currentProduct._id)
+                                                ? faHeart
+                                                : faHeartRegular
+                                        }
+                                        className="fs-1"
+                                        color="#ea9099"
+                                    />
+                                </div>
+                                <p className="fs-1 lh-1 fw-bold theme-color me-3">{currentProduct.name}</p>
                                 <div className="d-flex py-3 gap-3">
                                     <p className="me-2 fs-2  fw-medium align-self-end">{currentProduct.rating} </p>{' '}
                                     <Rating

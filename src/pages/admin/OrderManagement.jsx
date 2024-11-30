@@ -13,7 +13,7 @@ import debounce from 'lodash/debounce'
 
 const OrderManagement = () => {
     const dispatch = useDispatch()
-    const { orders, status, error, filters } = useSelector((state) => state.order)
+    const { orders, status, error, filters, ordersByUserId } = useSelector((state) => state.order)
     // modal
     const [showChangeStatusModal, setShowChangeStatusModal] = useState({
         show: false,
@@ -495,7 +495,6 @@ const OrderManagement = () => {
                         <p className="fs-2 fw-bold">Chi tiết đơn hàng</p>
                     </Modal.Header>
                     <Modal.Body>
-                        {console.log(selectedOrder)}
                         <div className="d-flex justify-content-between">
                             <div className="col-8 pe-4">
                                 <div className="d-flex justify-content-between align-items-center shadow-none p-3 mb-3 bg-light rounded border">

@@ -284,7 +284,11 @@ function Header({ location }) {
                                             <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/profile'}>
                                                 Tài khoản của tôi
                                             </Link>
-                                            {user?.role !== 'admin' && <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">Đơn mua</Link>}
+                                            {user?.role !== 'admin' && (
+                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/orders'}>
+                                                    Đơn mua
+                                                </Link>
+                                            )}
                                             {user?.role === 'admin' && (
                                                 <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/seller'}>
                                                     Quản lý cửa hàng

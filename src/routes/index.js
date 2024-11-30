@@ -30,11 +30,21 @@ import CustomerManagement from '../pages/admin/CustomerManagement.jsx'
 import Chat from '../pages/admin/Chat.jsx'
 import Statistic from '../pages/admin/Statistic.jsx'
 import RatingDemo from '../components/RatingDemo.jsx'
-import Policy from '../pages/Policy/Policy.jsx'
+import Privacy from '../pages/Policy/Privacy.jsx'
+import Terms from '../pages/Policy/Terms.jsx'
+import Refund from '../pages/Policy/Refund.jsx'
+import Delivery from '../pages/Policy/Delivery.jsx'
+import Payment from '../pages/Policy/Payment.jsx'
+import Check from '../pages/Policy/Check.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
-    { path: '/policy', element: Policy },
+    { path: '/policy/privacy', element: Privacy },
+    { path: '/policy/terms', element: Terms },
+    { path: '/policy/refund', element: Refund },
+    { path: '/policy/delivery', element: Delivery },
+    { path: '/policy/payment', element: Payment },
+    { path: '/policy/check', element: Check },
     {
         path: '/products',
         element: ProductList,

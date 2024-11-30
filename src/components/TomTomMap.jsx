@@ -15,12 +15,10 @@ const TomTomMap = ({ initialLocation, onLocationChange, height = '400px', setLoc
         if (mapInstance.current && event?.data?.result?.position) {
             let { lat, lon } = event.data.result.position
 
-            // Kiểm tra xem lon có tồn tại không, nếu không thì thử lấy lng
             if (lon === undefined && event.data.result.position.lng !== undefined) {
                 lon = event.data.result.position.lng
             }
 
-            // Kiểm tra tính hợp lệ của lat và lon
             if (typeof lat === 'number' && !isNaN(lat) && typeof lon === 'number' && !isNaN(lon)) {
                 console.log('Di chuyển bản đồ đến:', lon, lat)
                 markerRef.current.setLngLat([lon, lat])
@@ -70,7 +68,9 @@ const TomTomMap = ({ initialLocation, onLocationChange, height = '400px', setLoc
                 dragPan: true,
             })
 
-            markerRef.current = new tt.Marker({ draggable: true }).setLngLat([initialLocation.lng, initialLocation.lat]).addTo(mapInstance.current)
+            markerRef.current = new tt.Marker({ draggable: true })
+                .setLngLat([initialLocation.lng, initialLocation.lat])
+                .addTo(mapInstance.current)
 
             markerRef.current.on('dragend', () => {
                 const lngLat = markerRef.current.getLngLat()
@@ -128,7 +128,7 @@ const TomTomMap = ({ initialLocation, onLocationChange, height = '400px', setLoc
                 mapInstance.current.remove()
             }
         }
-    }, [handleResultSelection])
+    }, [handleResultSelection, initialLocation])
 
     const handleResultsFound = useCallback((event) => {
         console.log('Kết quả tìm kiếm:', event)

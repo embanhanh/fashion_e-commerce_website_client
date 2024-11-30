@@ -4,18 +4,20 @@ import { faEllipsisVertical, faEye, faGift, faBan, faUnlockKeyhole, faArrowsRota
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { fetchClients, fetchOrderUser, unblockClientAction, unblockManyClientAction, fetchOrdersByUserId } from '../../redux/slices/userSlice'
+import { fetchClients, unblockClientAction, unblockManyClientAction } from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
 import Notification from '../../components/Notification'
 import BlockClientModal from '../../components/BlockClientModal'
 import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
+import { getOrdersByUserIdAction } from '../../redux/slices/orderSilce'
 import Modal from 'react-bootstrap/Modal'
 import { useNavigate } from 'react-router-dom'
 
 function CustomerManagement() {
     const navigate = useNavigate()
     const { clients, clientsLoading } = useSelector((state) => state.user)
+    const { ordersByUserId } = useSelector((state) => state.order)
     const dispatch = useDispatch()
     const [clientFilters, setClientFilters] = useState({
         name: '',
@@ -50,10 +52,6 @@ function CustomerManagement() {
     const handleConfirmClientFilters = () => {
         dispatch(fetchClients({ ...clientFilters, clientType }))
     }
-
-    useEffect(() => {
-        dispatch(fetchOrderUser())
-    }, [user])
 
     const handleResetClientFilters = () => {
         const defaultClientFilters = {
@@ -110,7 +108,7 @@ function CustomerManagement() {
     const handleViewOrderHistory = (client) => {
         setSelectedOrderHistory(client)
         setShowOrderHistory(true)
-        dispatch(fetchOrdersByUserId(client._id))
+        dispatch(getOrdersByUserIdAction(client._id))
     }
 
     return (
@@ -436,15 +434,15 @@ function CustomerManagement() {
                     <Notification title={notification.title} description={notification.description} type={notification.type} />
                 </Modal>
             )}
-            <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
+            {showOrderHistory && <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title className="fs-4">Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="p-3 overflow-y-auto" style={{ maxHeight: '500px' }}>
-                        {console.log(userOrders)}
-                        {userOrders.length > 0 ? (
-                            userOrders.map((order) => (
+                        {console.log(ordersByUserId)}
+                        {ordersByUserId.length > 0 ? (
+                            ordersByUserId.map((order) => (
                                 <div key={order._id} className="border rounded p-3 mb-3">
                                     <div className="d-flex justify-content-between mb-2">
                                         <p className="fs-4 fw-medium">Mã đơn hàng: {order._id}</p>
@@ -525,7 +523,7 @@ function CustomerManagement() {
                         )}
                     </div>
                 </Modal.Body>
-            </Modal>
+            </Modal>}
         </div>
     )
 }

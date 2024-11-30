@@ -6,6 +6,7 @@ import {
     updateOrderStatusMany,
     getOrderById,
     createOrderFromGuest,
+    getOrdersByUserId,
 } from '../../services/OrderService'
 
 export const createOrderAction = createAsyncThunk('order/createOrder', async (orderData, { rejectWithValue }) => {
@@ -68,6 +69,18 @@ export const createOrderFromGuestAction = createAsyncThunk(
     }
 )
 
+export const getOrdersByUserIdAction = createAsyncThunk(
+    'order/getOrdersByUserId',
+    async (userId, { rejectWithValue }) => {
+        try {
+            const response = await getOrdersByUserId(userId)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
@@ -81,6 +94,7 @@ const orderSlice = createSlice({
             orderStartDate: '',
             orderEndDate: '',
         },
+        ordersByUserId: [],
         status: 'idle',
         error: null,
     },
@@ -149,6 +163,15 @@ const orderSlice = createSlice({
                 state.orders.push(action.payload)
             })
             .addCase(createOrderFromGuestAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getOrdersByUserIdAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(getOrdersByUserIdAction.fulfilled, (state, action) => {
+                state.ordersByUserId = action.payload
+            })
+            .addCase(getOrdersByUserIdAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

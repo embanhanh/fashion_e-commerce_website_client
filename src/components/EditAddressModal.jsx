@@ -10,16 +10,7 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
     const [location, setLocation] = useState('')
     const [type, setType] = useState('') // State cho loại địa chỉ
     const [isDefault, setIsDefault] = useState(false)
-    const defaultLocation = { lat: 21.0285, lng: 105.8542 }
-    const [mapLocation, setMapLocation] = useState(() => {
-        if (address?.address?.lat && address?.address?.lng) {
-            return {
-                lat: address.address.lat,
-                lng: address.address.lng
-            }
-        }
-        return defaultLocation
-    })
+    const [mapLocation, setMapLocation] = useState({ lat: 21.0285, lng: 105.8542 })
 
     const [errors, setErrors] = useState({})
     const [suggestions, setSuggestions] = useState([])
@@ -37,10 +28,9 @@ function EditAddressModal({ show, handleClose, onEditAddress, address }) {
             setErrors({})
             setShowSuggestions(false)
             setSuggestions([])
-            setMapLocation(address.address || { lat: 21.0285, lng: 105.8542 })
+            setMapLocation(address.address)
         }
     }, [show, address])
-
     const handleAddressChange = (e) => {
         const value = e.target.value
         setLocation(value)

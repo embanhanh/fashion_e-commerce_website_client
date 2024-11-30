@@ -174,7 +174,7 @@ function ProductList() {
     return (
         <>
             <div className="container h-100 py-5">
-                <p className="fs-3 fw-bold">Cửa hàng</p>
+                <p className="fs-2 fw-bold theme-color">Cửa hàng</p>
                 <div className="d-flex">
                     <div className="p-2" style={{ width: '20%' }}>
                         <Accordion

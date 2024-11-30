@@ -194,31 +194,35 @@ function CustomerManagement() {
                 </div>
             </div>
             <div className="bg-white rounded-4 shadow-sm">
-                <div className=" border-bottom d-flex">
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === '' ? 'active' : ''}`}
+                <div className="nav-wrapper border-bottom d-flex">
+                    <div
+                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${clientType === '' ? 'checked' : ''}`}
                         onClick={() => setClientType('')}
                     >
-                        Tất cả
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'new' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Tất cả</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${clientType === 'new' ? 'checked' : ''}`}
                         onClick={() => setClientType('new')}
                     >
-                        Khách hàng mới
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'potential' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Khách hàng mới</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${
+                            clientType === 'potential' ? 'checked' : ''
+                        }`}
                         onClick={() => setClientType('potential')}
                     >
-                        Khách hàng tiềm năng
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'loyal' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Khách hàng tiềm năng</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${
+                            clientType === 'loyal' ? 'checked' : ''
+                        }`}
                         onClick={() => setClientType('loyal')}
                     >
-                        Khách hàng thân thiết
-                    </p>
+                        <p className="nav-title fs-4">Khách hàng thân thiết</p>
+                    </div>
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">100 khách hàng</p>

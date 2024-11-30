@@ -66,16 +66,21 @@ function AccordionItem({
                             <span className="custom-checkbox"></span>
                         </label>
                     )}
-                    <p className={`${!isChecked && 'fw-bold '} fs-4 fw-medium ms-2 flex-grow-1`} onClick={handleClick}>
+                    <p
+                        className={`${
+                            selectedItems.includes(idParent) && 'fw-bold'
+                        }   theme-color fs-4 fw-medium ms-2 flex-grow-1`}
+                        onClick={handleClick}
+                    >
                         {title}
                     </p>
                 </div>
                 {(content || childrenItem) && (
                     <span onClick={handleClick}>
                         {isOpen ? (
-                            <FontAwesomeIcon size="lg" icon={faChevronUp} />
+                            <FontAwesomeIcon size="lg" icon={faChevronUp} color="var(--theme-color-1)" />
                         ) : (
-                            <FontAwesomeIcon size="lg" icon={faChevronDown} />
+                            <FontAwesomeIcon size="lg" icon={faChevronDown} color="var(--theme-color-1)" />
                         )}
                     </span>
                 )}
@@ -104,7 +109,13 @@ function AccordionItem({
                                           <span className="custom-checkbox"></span>
                                       </label>
                                   )}
-                                  <p className="ms-3 fw-medium fs-4" onClick={handleClick}>
+                                  <p
+                                      className={`${
+                                          (selectedItems.includes(item.id) || selectedItems.includes(idParent)) &&
+                                          'fw-bold'
+                                      }  theme-color ms-3 fw-medium fs-4`}
+                                      onClick={handleClick}
+                                  >
                                       {item.name}
                                   </p>
                               </div>

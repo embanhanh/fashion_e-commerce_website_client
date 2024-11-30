@@ -327,43 +327,43 @@ const OrderManagement = () => {
                 </div>
             </div>
             <div className="bg-white rounded-4 shadow-sm">
-                <div className=" border-bottom d-flex">
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === '' ? 'active' : ''}`}
+                <div className="nav-wrapper border-bottom d-flex">
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === '' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('')}
                     >
-                        Tất cả
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'pending' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Tất cả</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'pending' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('pending')}
                     >
-                        Chờ xác nhận
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'processing' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Chờ xác nhận</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'processing' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('processing')}
                     >
-                        Đang xử lý
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivering' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Đang xử lý</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'delivering' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('delivering')}
                     >
-                        Đang giao
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivered' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Đang giao</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'delivered' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('delivered')}
                     >
-                        Đã giao
-                    </p>
-                    <p
-                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'cancelled' ? 'active' : ''}`}
+                        <p className="nav-title fs-4">Đã giao</p>
+                    </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'cancelled' ? 'checked' : ''}`}
                         onClick={() => setFilterStatus('cancelled')}
                     >
-                        Đã hủy
-                    </p>
+                        <p className="nav-title fs-4">Đã hủy</p>
+                    </div>
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">{orders.length} đơn hàng</p>

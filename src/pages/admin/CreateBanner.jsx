@@ -71,6 +71,7 @@ function CreateBanner() {
     const validateForm = () => {
         let tempErrors = {}
         let isValid = true
+        console.log(bannerInfo)
 
         // Validate title
         if (!bannerInfo.title.trim()) {
@@ -91,7 +92,7 @@ function CreateBanner() {
         }
 
         // Validate image
-        if (!file) {
+        if (!file && !bannerInfo.imageUrl) {
             tempErrors.imageUrl = 'Vui lòng chọn ảnh banner'
             isValid = false
         }
@@ -212,7 +213,13 @@ function CreateBanner() {
                             <span style={{ color: 'red' }}>*</span> Tiêu đề:
                         </p>
                         <div className={`input-form d-flex align-items-center w-100`}>
-                            <input value={bannerInfo.title} type="text" className="input-text w-100" placeholder="Tiêu đề" onChange={(e) => setBannerInfo({ ...bannerInfo, title: e.target.value })} />
+                            <input
+                                value={bannerInfo.title}
+                                type="text"
+                                className="input-text w-100"
+                                placeholder="Tiêu đề"
+                                onChange={(e) => setBannerInfo({ ...bannerInfo, title: e.target.value })}
+                            />
                         </div>
                     </div>
                     <div className="d-flex gap-4">
@@ -251,7 +258,11 @@ function CreateBanner() {
                             {previewImage || bannerInfo.imageUrl ? (
                                 <>
                                     <div className="preview-image__banner-container">
-                                        <img src={previewImage || bannerInfo.imageUrl} alt="Preview" className="preview-image__banner" />
+                                        <img
+                                            src={previewImage || bannerInfo.imageUrl}
+                                            alt="Preview"
+                                            className="preview-image__banner"
+                                        />
                                         <button
                                             className="remove-image__banner-btn"
                                             onClick={(e) => {
@@ -268,9 +279,18 @@ function CreateBanner() {
                             ) : (
                                 <label className="custum-file-upload custom-file-upload__banner">
                                     <div className="icon-image">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" className="upload-icon">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill=""
+                                            viewBox="0 0 24 24"
+                                            className="upload-icon"
+                                        >
                                             <g strokeWidth={0} id="SVGRepo_bgCarrier" />
-                                            <g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" />
+                                            <g
+                                                strokeLinejoin="round"
+                                                strokeLinecap="round"
+                                                id="SVGRepo_tracerCarrier"
+                                            />
                                             <g id="SVGRepo_iconCarrier">
                                                 <path
                                                     fill=""
@@ -284,7 +304,12 @@ function CreateBanner() {
                                     <div className="text">
                                         <span>Thêm hình ảnh</span>
                                     </div>
-                                    <input type="file" id="main-product-images" onChange={handleImageUpload} accept="image/*" />
+                                    <input
+                                        type="file"
+                                        id="main-product-images"
+                                        onChange={handleImageUpload}
+                                        accept="image/*"
+                                    />
                                 </label>
                             )}
                         </div>
@@ -294,7 +319,13 @@ function CreateBanner() {
                             <span style={{ color: 'red' }}>*</span> Link:
                         </p>
                         <div className={`input-form d-flex align-items-center w-100`}>
-                            <input value={bannerInfo.linkUrl} type="text" className="input-text w-100" placeholder="Link" onChange={(e) => setBannerInfo({ ...bannerInfo, linkUrl: e.target.value })} />
+                            <input
+                                value={bannerInfo.linkUrl}
+                                type="text"
+                                className="input-text w-100"
+                                placeholder="Link"
+                                onChange={(e) => setBannerInfo({ ...bannerInfo, linkUrl: e.target.value })}
+                            />
                         </div>
                     </div>
                     <div className="d-flex gap-4 align-items-center">

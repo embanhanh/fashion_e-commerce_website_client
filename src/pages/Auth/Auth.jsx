@@ -151,14 +151,28 @@ function Auth() {
 
     return (
         <>
-            <div className="d-flex w-100 align-items-center flex-column justify-content-start h-100" style={{ minHeight: '100vh' }}>
+            <div
+                className="d-flex w-100 align-items-center flex-column justify-content-start h-100"
+                style={{ minHeight: '100vh' }}
+            >
                 {notication && (
                     <>
-                        <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.3' }} aria-modal="true" role="dialog">
+                        <div
+                            className="modal d-block"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.3' }}
+                            aria-modal="true"
+                            role="dialog"
+                        >
                             <div className="modal-dialog modal-dialog-centered justify-content-center">
                                 <Notification
-                                    title={(notication == 'success_login' && 'Đăng nhập thành công') || (notication == 'success_signup' && 'Đăng ký thành công')}
-                                    description={(notication == 'success_login' && 'Chúc bạn mua sắm vui vẻ') || (notication == 'success_signup' && 'Bạn sẽ quay trở lại trang "Đăng ký"')}
+                                    title={
+                                        (notication == 'success_login' && 'Đăng nhập thành công') ||
+                                        (notication == 'success_signup' && 'Đăng ký thành công')
+                                    }
+                                    description={
+                                        (notication == 'success_login' && 'Chúc bạn mua sắm vui vẻ') ||
+                                        (notication == 'success_signup' && 'Bạn sẽ quay trở lại trang "Đăng ký"')
+                                    }
                                     type={'success'}
                                 />
                             </div>
@@ -166,7 +180,10 @@ function Auth() {
                     </>
                 )}
                 <div className="w-100 bg-white header shadow-sm h-100">
-                    <div className="container max-md d-flex justify-content-between align-items-center" style={{ height: 84 }}>
+                    <div
+                        className="container max-md d-flex justify-content-between align-items-center"
+                        style={{ height: 84 }}
+                    >
                         <Link to={'/'} className="h-100">
                             <img src={shopInfo?.logo} alt="logo" className="h-100" />
                         </Link>
@@ -181,7 +198,16 @@ function Auth() {
                             <div key={`drop-${index + 1}`} className={`auth-drop-${index + 1}`} />
                         ))}
                     </div>
-                    <div className=" d-flex align-items-center" style={{ width: '800px', backgroundColor: '#fff', height: '500px', boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)', zIndex: 100 }}>
+                    <div
+                        className=" d-flex align-items-center"
+                        style={{
+                            width: '800px',
+                            backgroundColor: '#fff',
+                            height: '500px',
+                            boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)',
+                            zIndex: 100,
+                        }}
+                    >
                         <div className=" w-50 h-100">
                             <Swiper
                                 style={{
@@ -199,25 +225,56 @@ function Auth() {
                                 loop={true}
                             >
                                 <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={brand1} loading="lazy" />
+                                    <img
+                                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                        src={brand1}
+                                        loading="lazy"
+                                    />
                                     <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                                 </SwiperSlide>
                                 <SwiperSlide>
-                                    <img style={{ objectFit: 'cover', width: '100%', height: '100%' }} src={brand2} loading="lazy" />
+                                    <img
+                                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                        src={brand2}
+                                        loading="lazy"
+                                    />
                                     <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
                                 </SwiperSlide>
                             </Swiper>
                         </div>
                         <div className="auth-container">
                             <div className="mb-3">
-                                <p style={{ fontSize: '2.4rem', fontWeight: '500' }}>{mode == 'login' ? 'Welcome 👋' : 'Đăng ký'}</p>
+                                <p style={{ fontSize: '2.4rem', fontWeight: '500' }}>
+                                    {mode == 'login' ? 'Welcome 👋' : 'Đăng ký'}
+                                </p>
                             </div>
                             {authError && (
                                 <div className="error-container d-flex mb-4">
                                     <svg viewBox="0 0 16 16" height={16}>
-                                        <path fill="none" stroke="#FF424F" d="M8 15A7 7 0 108 1a7 7 0 000 14z" clipRule="evenodd"></path>
-                                        <rect stroke="none" width="7" height="1.5" x="6.061" y="5" fill="#FF424F" rx=".75" transform="rotate(45 6.06 5)"></rect>
-                                        <rect stroke="none" width="7" height="1.5" fill="#FF424F" rx=".75" transform="scale(-1 1) rotate(45 -11.01 -9.51)"></rect>
+                                        <path
+                                            fill="none"
+                                            stroke="#FF424F"
+                                            d="M8 15A7 7 0 108 1a7 7 0 000 14z"
+                                            clipRule="evenodd"
+                                        ></path>
+                                        <rect
+                                            stroke="none"
+                                            width="7"
+                                            height="1.5"
+                                            x="6.061"
+                                            y="5"
+                                            fill="#FF424F"
+                                            rx=".75"
+                                            transform="rotate(45 6.06 5)"
+                                        ></rect>
+                                        <rect
+                                            stroke="none"
+                                            width="7"
+                                            height="1.5"
+                                            fill="#FF424F"
+                                            rx=".75"
+                                            transform="scale(-1 1) rotate(45 -11.01 -9.51)"
+                                        ></rect>
                                     </svg>
                                     <p className="ms-3">{authError}</p>
                                 </div>
@@ -250,7 +307,9 @@ function Auth() {
                                             {error}
                                         </p>
 
-                                        <div className={`input-form d-flex align-items-center ${error2 ? 'valid' : ''}`}>
+                                        <div
+                                            className={`input-form d-flex align-items-center ${error2 ? 'valid' : ''}`}
+                                        >
                                             <input
                                                 autoComplete="off"
                                                 type={showPassword ? 'text' : 'password'}
@@ -301,7 +360,9 @@ function Auth() {
                                         <p className="error-message" style={{ height: '1.6rem' }}>
                                             {error2}
                                         </p>
-                                        <div className={`input-form d-flex align-items-center ${error3 ? 'valid' : ''}`}>
+                                        <div
+                                            className={`input-form d-flex align-items-center ${error3 ? 'valid' : ''}`}
+                                        >
                                             <input
                                                 autoComplete="off"
                                                 type={showPassword2 ? 'text' : 'password'}
@@ -380,7 +441,9 @@ function Auth() {
                                             {error}
                                         </p>
 
-                                        <div className={`input-form d-flex align-items-center ${error2 ? 'valid' : ''}`}>
+                                        <div
+                                            className={`input-form d-flex align-items-center ${error2 ? 'valid' : ''}`}
+                                        >
                                             <input
                                                 autoComplete="off"
                                                 type={showPassword ? 'text' : 'password'}
@@ -435,8 +498,13 @@ function Auth() {
                                 )}
 
                                 <button
-                                    className="button-submit d-flex align-items-center justify-content-center"
-                                    disabled={email.trim() == '' || password.trim() == '' || (mode == 'signup' && confirmPassword.trim() == '') || isLoading}
+                                    className="button-submit d-flex align-items-center justify-content-center rounded-4"
+                                    disabled={
+                                        email.trim() == '' ||
+                                        password.trim() == '' ||
+                                        (mode == 'signup' && confirmPassword.trim() == '') ||
+                                        isLoading
+                                    }
                                     onClick={handleSubmit}
                                 >
                                     {mode == 'signup' ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}
@@ -456,13 +524,25 @@ function Auth() {
                                 {mode == 'login' ? (
                                     <>
                                         <div className="d-flex w-100 my-3 align-items-center">
-                                            <div className="flex-grow-1" style={{ height: '1px', backgroundColor: '#ccc' }}></div>
-                                            <span style={{ fontSize: '1.2rem', padding: '0 16px', color: '#ccc' }}>Hoặc</span>
-                                            <div className="flex-grow-1" style={{ height: '1px', backgroundColor: '#ccc' }}></div>
+                                            <div
+                                                className="flex-grow-1"
+                                                style={{ height: '1px', backgroundColor: '#ccc' }}
+                                            ></div>
+                                            <span style={{ fontSize: '1.2rem', padding: '0 16px', color: '#ccc' }}>
+                                                Hoặc
+                                            </span>
+                                            <div
+                                                className="flex-grow-1"
+                                                style={{ height: '1px', backgroundColor: '#ccc' }}
+                                            ></div>
                                         </div>
 
                                         <div className="content-section d-flex flex-row align-items-center justify-content-between">
-                                            <button disabled={isLoading} className="btn d-flex btn-google align-items-center justify-content-center  google" onClick={handleLoginWithGg}>
+                                            <button
+                                                disabled={isLoading}
+                                                className="btn d-flex btn-google align-items-center justify-content-center  google"
+                                                onClick={handleLoginWithGg}
+                                            >
                                                 <svg className="icon" viewBox="0 0 24 24" width={20}>
                                                     <path
                                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -484,7 +564,11 @@ function Auth() {
                                                 </svg>
                                                 <p>Google</p>
                                             </button>
-                                            <button disabled={isLoading} onClick={handleLoginWithFb} className="btn d-flex btn-facebook align-items-center justify-content-center  apple">
+                                            <button
+                                                disabled={isLoading}
+                                                onClick={handleLoginWithFb}
+                                                className="btn d-flex btn-facebook align-items-center justify-content-center  apple"
+                                            >
                                                 <svg viewBox="0 0 16 16" fill="#1877f2" width={20}>
                                                     <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"></path>
                                                 </svg>
@@ -500,14 +584,22 @@ function Auth() {
                                 {mode == 'signup' ? (
                                     <>
                                         <p style={{ color: '#ccc' }}>Bạn đã có tài khoản?</p>
-                                        <Link to={'/user/login'} className="ms-2" style={{ color: 'var(--primary-color)', fontWeight: '500' }}>
+                                        <Link
+                                            to={'/user/login'}
+                                            className="ms-2"
+                                            style={{ color: 'var(--primary-color)', fontWeight: '500' }}
+                                        >
                                             Đăng nhập
                                         </Link>
                                     </>
                                 ) : (
                                     <>
                                         <p style={{ color: '#ccc' }}>Bạn chưa có tài khoản?</p>
-                                        <Link to={'/user/signup'} className="ms-2" style={{ color: 'var(--primary-color)', fontWeight: '500' }}>
+                                        <Link
+                                            to={'/user/signup'}
+                                            className="ms-2"
+                                            style={{ color: 'var(--primary-color)', fontWeight: '500' }}
+                                        >
                                             Đăng ký
                                         </Link>
                                     </>

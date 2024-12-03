@@ -1,5 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getAllProducts, getProductByProductName, updateProduct, deleteProduct, deleteManyProducts, ratingProduct } from '../../services/ProductService'
+import {
+    getAllProducts,
+    getProductByProductName,
+    updateProduct,
+    deleteProduct,
+    deleteManyProducts,
+    ratingProduct,
+    likeProduct,
+} from '../../services/ProductService'
 import _ from 'lodash'
 
 // export const fetchAllProducts = createAsyncThunk('product/fetchAllProducts', async (_, { rejectWithValue }) => {
@@ -20,45 +28,69 @@ export const fetchProducts = createAsyncThunk('product/fetchProducts', async (pa
     }
 })
 
-export const fetchProductByProductName = createAsyncThunk('product/fetchProductByProductName', async (product_name, { rejectWithValue }) => {
-    try {
-        const response = await getProductByProductName(product_name)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const fetchProductByProductName = createAsyncThunk(
+    'product/fetchProductByProductName',
+    async (product_name, { rejectWithValue }) => {
+        try {
+            const response = await getProductByProductName(product_name)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const updateProductAction = createAsyncThunk('product/updateProduct', async ({ product_name, productData }, { rejectWithValue }) => {
-    try {
-        const response = await updateProduct(product_name, productData)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateProductAction = createAsyncThunk(
+    'product/updateProduct',
+    async ({ product_name, productData }, { rejectWithValue }) => {
+        try {
+            const response = await updateProduct(product_name, productData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const deleteProductAction = createAsyncThunk('product/deleteProduct', async (product_name, { rejectWithValue }) => {
-    try {
-        const response = await deleteProduct(product_name)
-        return { product_name, message: response.message }
-    } catch (error) {
-        return rejectWithValue(error)
+export const deleteProductAction = createAsyncThunk(
+    'product/deleteProduct',
+    async (product_name, { rejectWithValue }) => {
+        try {
+            const response = await deleteProduct(product_name)
+            return { product_name, message: response.message }
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const deleteManyProductsAction = createAsyncThunk('product/deleteManyProducts', async (product_names, { rejectWithValue }) => {
-    try {
-        const response = await deleteManyProducts(product_names)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const deleteManyProductsAction = createAsyncThunk(
+    'product/deleteManyProducts',
+    async (product_names, { rejectWithValue }) => {
+        try {
+            const response = await deleteManyProducts(product_names)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const ratingProductAction = createAsyncThunk('product/ratingProduct', async ({ productId, ratingData }, { rejectWithValue }) => {
+export const ratingProductAction = createAsyncThunk(
+    'product/ratingProduct',
+    async ({ productId, ratingData }, { rejectWithValue }) => {
+        try {
+            const response = await ratingProduct(productId, ratingData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const likeProductAction = createAsyncThunk('product/likeProduct', async (productId, { rejectWithValue }) => {
     try {
-        const response = await ratingProduct(productId, ratingData)
+        const response = await likeProduct(productId)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -140,17 +172,23 @@ const productSlice = createSlice({
             .addCase(ratingProductAction.rejected, (state, action) => {
                 state.error = action.payload
             })
-        // .addCase(fetchAllProducts.pending, (state) => {
-        //     state.status = 'loading'
-        // })
-        // .addCase(fetchAllProducts.fulfilled, (state, action) => {
-        //     state.status = 'succeeded'
-        //     state.products = action.payload.products
-        // })
-        // .addCase(fetchAllProducts.rejected, (state, action) => {
-        //     state.status = 'failed'
-        //     state.error = action.error.message
-        // })
+            // .addCase(fetchAllProducts.pending, (state) => {
+            //     state.status = 'loading'
+            // })
+            // .addCase(fetchAllProducts.fulfilled, (state, action) => {
+            //     state.status = 'succeeded'
+            //     state.products = action.payload.products
+            // })
+            // .addCase(fetchAllProducts.rejected, (state, action) => {
+            //     state.status = 'failed'
+            //     state.error = action.error.message
+            // })
+            .addCase(likeProductAction.fulfilled, (state, action) => {
+                state.currentProduct.favoriteProducts = action.payload
+            })
+            .addCase(likeProductAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
     },
 })
 

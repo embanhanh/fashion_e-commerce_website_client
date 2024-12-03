@@ -1,7 +1,12 @@
 import { useEffect, memo, useState, useRef } from 'react'
-import { db } from '../firebase.config'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane, faImage, faMessage, faCirclePlus, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore'
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useSelector } from 'react-redux'
+
+import messageIcon from '../assets/image/default/messenger.png'
+import { db, storage } from '../firebase.config'
 import './Chat.scss'
 
 function Chatbot() {
@@ -11,6 +16,31 @@ function Chatbot() {
         mode: 'ai',
     })
     const historyLoadedRef = useRef(false)
+    const fileInputRef = useRef(null)
+    const [selectedImage, setSelectedImage] = useState([])
+    const [imagePreview, setImagePreview] = useState([])
+
+    // Thêm hàm xử lý upload hình ảnh
+    const handleImageUpload = (e) => {
+        if (e.target.files.length > 0 && e.target.files.length + selectedImage.length <= 7) {
+            const files = Array.from(e.target.files)
+            setSelectedImage([...selectedImage, ...files])
+            setImagePreview([...imagePreview, ...files.map((file) => URL.createObjectURL(file))])
+            e.target.value = ''
+        }
+    }
+
+    const handleImageRemove = (index) => {
+        URL.revokeObjectURL(imagePreview[index])
+        setImagePreview((prev) => prev.filter((_, i) => i !== index))
+        setSelectedImage((prev) => prev.filter((_, i) => i !== index))
+    }
+
+    useEffect(() => {
+        return () => {
+            imagePreview.forEach((image) => URL.revokeObjectURL(image))
+        }
+    }, [])
 
     useEffect(() => {
         if (!user) return
@@ -27,7 +57,10 @@ function Chatbot() {
                         dfMessenger.clearStorage()
                         messages.forEach((message) => {
                             message.message.type === 'text'
-                                ? dfMessenger.renderCustomText(message.message.text, message.user === 'admin' || !message.user)
+                                ? dfMessenger.renderCustomText(
+                                      message.message.text,
+                                      message.user === 'admin' || !message.user
+                                  )
                                 : message.message.type === 'chips'
                                 ? dfMessenger.renderCustomCard([message.message])
                                 : dfMessenger.renderCustomCard(message.message.richElements)
@@ -42,9 +75,19 @@ function Chatbot() {
                             //         anchor: 'top-left',
                             //     })
                             // }
-                            lastMessage.message.type === 'text' ? dfMessenger.renderCustomText(lastMessage.message.text, true) : dfMessenger.renderCustomCard([lastMessage.message])
+                            lastMessage.message.type === 'text'
+                                ? dfMessenger.renderCustomText(lastMessage.message.text, true)
+                                : lastMessage.message.type === 'chips'
+                                ? dfMessenger.renderCustomCard([lastMessage.message])
+                                : dfMessenger.renderCustomCard(lastMessage.message.richElements)
                         }
                     }
+                }
+            } else {
+                const dfMessenger = document.querySelector('df-messenger')
+                if (dfMessenger) {
+                    dfMessenger.clearStorage()
+                    historyLoadedRef.current = false
                 }
             }
         })
@@ -118,6 +161,45 @@ function Chatbot() {
                 ],
                 true
             )
+            if (selectedImage.length > 0) {
+                try {
+                    const uploadPromises = selectedImage.map(async (file) => {
+                        const storageRef = ref(storage, `chat/${user._id}/${Date.now()}_${file.name}`)
+                        await uploadBytes(storageRef, file)
+                        const url = await getDownloadURL(storageRef)
+                        return url
+                    })
+                    const imageUrls = await Promise.all(uploadPromises)
+                    const dfMessenger = document.querySelector('df-messenger')
+                    if (dfMessenger) {
+                        dfMessenger.renderCustomCard(
+                            imageUrls.map((url) => ({
+                                type: 'image',
+                                rawUrl: url,
+                                accessibilityText: 'Hình ảnh được gửi',
+                            }))
+                        )
+                    }
+                    await saveChatMessage(
+                        [
+                            {
+                                type: 'customCard',
+                                richElements: imageUrls.map((url) => ({
+                                    type: 'image',
+                                    rawUrl: url,
+                                    accessibilityText: 'Hình ảnh được gửi',
+                                })),
+                            },
+                        ],
+                        true
+                    )
+                    imagePreview.forEach((image) => URL.revokeObjectURL(image))
+                    setSelectedImage([])
+                    setImagePreview([])
+                } catch (error) {
+                    console.error('Lỗi khi upload hình ảnh:', error)
+                }
+            }
         } else if (event.type === 'df-response-received') {
             // Lưu tin nhắn từ chatbot
             await saveChatMessage(event.detail.messages, false)
@@ -163,24 +245,63 @@ function Chatbot() {
             window.removeEventListener('df-request-sent', handleDfRequestSent)
             window.removeEventListener('df-chip-clicked', handleChipClick)
         }
-    }, [chatMode.mode])
+    }, [chatMode.mode, selectedImage])
     return (
         <>
             {chatMode.show && user && (
-                <button
-                    className="primary-btn shadow-none rounded-5 position-fixed btn-switch-chat"
-                    onClick={() => {
-                        setChatMode((prev) => {
-                            return { ...prev, mode: prev.mode === 'ai' ? 'human' : 'ai' }
-                        })
-                        const dfMessenger = document.querySelector('df-messenger')
-                        if (dfMessenger && dfMessenger.renderCustomText) {
-                            dfMessenger.renderCustomText(`Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`, true)
-                        }
-                    }}
-                >
-                    <p>Chat với {chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}</p>
-                </button>
+                <>
+                    <button
+                        className="primary-btn shadow-none rounded-5 position-fixed btn-switch-chat"
+                        onClick={() => {
+                            if (chatMode.mode === 'human') {
+                                if (imagePreview.length > 0) {
+                                    imagePreview.forEach((image) => URL.revokeObjectURL(image))
+                                    setImagePreview([])
+                                    setSelectedImage([])
+                                }
+                            }
+                            setChatMode((prev) => {
+                                return { ...prev, mode: prev.mode === 'ai' ? 'human' : 'ai' }
+                            })
+                            const dfMessenger = document.querySelector('df-messenger')
+                            if (dfMessenger && dfMessenger.renderCustomText) {
+                                dfMessenger.renderCustomText(
+                                    `Chuyển sang chat với ${chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}`,
+                                    true
+                                )
+                            }
+                        }}
+                    >
+                        <p>Chat với {chatMode.mode === 'ai' ? 'Nhân viên' : 'AI'}</p>
+                    </button>
+                    {chatMode.mode === 'human' && (
+                        <div className="position-fixed chatbot-additional-btn">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                                multiple={true}
+                                onChange={(e) => handleImageUpload(e)}
+                            />
+                            <FontAwesomeIcon icon={faImage} onClick={() => fileInputRef.current.click()} />
+                        </div>
+                    )}
+                    {imagePreview.length > 0 && (
+                        <div className="chatbot-image-preview-container">
+                            {imagePreview.map((image, index) => (
+                                <div key={index} className="chatbot-image-preview-item">
+                                    <img src={image} alt="Preview" />
+                                    <FontAwesomeIcon
+                                        className="chatbot-image-preview-remove"
+                                        icon={faTimes}
+                                        onClick={() => handleImageRemove(index)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
             <df-messenger
                 location={import.meta.env.VITE_DIALOGFLOW_LOCATION}
@@ -189,7 +310,11 @@ function Chatbot() {
                 language-code="vi"
                 max-query-length="-1"
             >
-                <df-messenger-chat-bubble chat-title={chatMode.mode === 'ai' ? `Trợ lý AI Heartie` : `Nhân viên Heartie`}></df-messenger-chat-bubble>
+                <df-messenger-chat-bubble
+                    chat-icon={messageIcon}
+                    chat-title={chatMode.mode === 'ai' ? `Trợ lý AI Heartie` : `Nhân viên Heartie`}
+                    placeholder-text="Nhập văn bản..."
+                ></df-messenger-chat-bubble>
             </df-messenger>
         </>
     )

@@ -180,7 +180,7 @@ function Cart() {
                                             .find((cartItem) => cartItem.variant._id === item.product)
                                             ?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')
                                             ?.price *
-                                            item.quantity
+                                        item.quantity
                                     )
                                 } else if (orderData.shippingMethod === 'fast') {
                                     return (
@@ -189,7 +189,7 @@ function Cart() {
                                             .find((cartItem) => cartItem.variant._id === item.product)
                                             ?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')
                                             ?.price *
-                                            item.quantity
+                                        item.quantity
                                     )
                                 } else {
                                     return (
@@ -198,7 +198,7 @@ function Cart() {
                                             .find((cartItem) => cartItem.variant._id === item.product)
                                             ?.variant.product?.shippingInfo?.find((info) => info.type === 'express')
                                             ?.price *
-                                            item.quantity
+                                        item.quantity
                                     )
                                 }
                             }, 0)
@@ -377,7 +377,7 @@ function Cart() {
     }
 
     const handleComboDiscountValue = (item, newQuantity = null) => {
-        const combo = comboDiscounts.find((combo) => combo.products.includes(item.variant.product._id))
+        const combo = comboDiscounts?.find((combo) => combo && combo.products?.includes(item.variant.product._id))
         if (combo) {
             if (newQuantity ? newQuantity <= combo.limitCombo : item.quantity <= combo.limitCombo) {
                 let discountValue = 0
@@ -492,7 +492,9 @@ function Cart() {
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
-                                                    <p className="text-center fs-3">{item.variant.price}đ</p>
+                                                    <p className="text-center fs-3">
+                                                        {item.variant.price.toLocaleString('vi-VN')}đ
+                                                    </p>
                                                 </div>
                                                 <div className="flex-grow-1 justify-content-center d-flex">
                                                     <div className="d-flex align-items-center justify-content-center px-1 py-1 rounded-4 border border-black my-4">
@@ -521,7 +523,7 @@ function Cart() {
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
                                                     <p className="text-center fs-3">
-                                                        {handleComboDiscountValue(item)}đ
+                                                        {handleComboDiscountValue(item).toLocaleString('vi-VN')}đ
                                                     </p>
                                                 </div>
                                                 <FontAwesomeIcon
@@ -543,7 +545,9 @@ function Cart() {
                         <div className="w-100 h-100 border p-3">
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium ">Tổng tiền hàng:</p>
-                                <p className="fs-3 ">{orderData.productsPrice}đ</p>
+                                <p className="fs-3 ">
+                                    {orderData.productsPrice.toLocaleString('vi-VN')}đ
+                                </p>
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-medium ">
@@ -585,7 +589,7 @@ function Cart() {
                                                         (orderData.shippingMethod === 'fast' && 'Nhanh') ||
                                                         (orderData.shippingMethod === 'express' && 'Hỏa tốc')}
                                                     <span className="fs-4 text-body-tertiary ms-2">
-                                                        {orderData.shippingPrice}đ
+                                                        {orderData.shippingPrice.toLocaleString('vi-VN')}đ
                                                     </span>
                                                 </p>
                                             </>
@@ -652,7 +656,7 @@ function Cart() {
                             </div>
                             <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
                                 <p className="fs-3 fw-bolder ">Tổng tiền:</p>
-                                <p className="fs-3 fw-bolder">{orderData.totalPrice}đ</p>
+                                <p className="fs-3 fw-bolder">{orderData.totalPrice.toLocaleString('vi-VN')}đ</p>
                             </div>
                             <div className="text-center py-3">
                                 <button

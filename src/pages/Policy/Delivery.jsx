@@ -4,7 +4,7 @@ function Delivery() {
     return (
         <div className="policy-container lh-lg">
             <nav aria-label="breadcrumb">
-                <ol className="breadcrumb d-flex align-items-center gap-3 fs-4">
+                <ol className="breadcrumb d-flex align-items-center gap-3 fs-3">
                     <li className="breadcrumb-item"><a href="/">Trang chủ</a></li>
                     <li className="breadcrumb-item active" aria-current="page">Chính sách giao hàng</li>
                 </ol>

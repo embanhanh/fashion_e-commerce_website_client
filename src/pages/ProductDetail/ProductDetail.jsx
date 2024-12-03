@@ -201,6 +201,10 @@ function ProductDetail() {
     }
 
     const handleLove = async () => {
+        if (!isLoggedIn) {
+            setShowLoginModal({ show: true, type: 'love' })
+            return
+        }
         await dispatch(likeProductAction(currentProduct._id)).unwrap()
     }
 
@@ -750,7 +754,9 @@ function ProductDetail() {
                     description={
                         showLoginModal.type === 'addToCart'
                             ? 'Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?'
-                            : 'Bạn có muốn đăng nhập để thích sản phẩm này không?'
+                            : showLoginModal.type === 'love'
+                            ? 'Bạn có muốn đăng nhập để thích sản phẩm này không?'
+                            : 'Bạn có muốn đăng nhập để like đánh giá sản phẩm không?'
                     }
                 >
                     <div className="d-flex gap-4 align-items-center justify-content-center bg-white">

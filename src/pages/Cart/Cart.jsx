@@ -1,9 +1,10 @@
+import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
-import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useLayoutEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
@@ -16,6 +17,7 @@ import SelectAddressModal from '../../components/SelectAddressModal'
 import Notification from '../../components/Notification'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
+import PaymentMethodModal from '../../components/PaymentMethodModal'
 import './Cart.scss'
 
 function Cart() {
@@ -24,6 +26,7 @@ function Cart() {
     const { addresses } = useSelector((state) => state.user)
     const { shopInfo } = useSelector((state) => state.shop)
     const navigate = useNavigate()
+    const location = useLocation()
 
     //modal
     const [showVoucher, setShowVoucher] = useState(false)
@@ -48,6 +51,7 @@ function Cart() {
             startDate: null,
             endDate: null,
         },
+        transferOption: null,
     })
     // notification
     const [notification, setNotification] = useState({
@@ -61,13 +65,42 @@ function Cart() {
         order: false,
     })
     const [comboDiscounts, setComboDiscounts] = useState([])
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search)
+        const resultCode = searchParams.get('resultCode')
+        if (resultCode) {
+            if (resultCode === '0') {
+                setNotification({
+                    show: true,
+                    description: 'Đơn hàng đã được đặt thành công',
+                    type: 'success',
+                    title: 'Thành công',
+                    onClose: () => {
+                        navigate('/cart', { replace: true })
+                    },
+                })
+            } else {
+                setNotification({
+                    show: true,
+                    description: 'Thanh toán thất bại',
+                    type: 'error',
+                    title: 'Lỗi',
+                    onClose: () => {
+                        navigate('/cart', { replace: true })
+                    },
+                })
+            }
+        }
+    }, [location])
+
     useEffect(() => {
         const fetchCombos = async () => {
             const promises = cart.items.map((item) =>
                 dispatch(getPromotionalComboByProductIdAction(item.variant.product._id))
             )
             const results = await Promise.all(promises)
-            const comboDiscounts = results.map((result) => result.payload)
+            const comboDiscounts = results.map((result) => (result.payload ? result.payload : [])).flat()
             const finalCombos = [...new Set(comboDiscounts)]
             setComboDiscounts(finalCombos)
         }
@@ -307,13 +340,24 @@ function Cart() {
                     ...pre,
                     order: true,
                 }))
-                await dispatch(createOrderAction(finalOrderData)).unwrap()
-                setNotification({
-                    show: true,
-                    description: 'Đặt hàng thành công',
-                    type: 'success',
-                    title: 'Thành công',
-                })
+                if (orderData.paymentMethod === 'bankTransfer' && orderData.transferOption === 'momo') {
+                    const response = await axios.post('http://localhost:5000/momo/payment', {
+                        amount: orderData.totalPrice,
+                    })
+                    const { payUrl } = response.data
+                    window.location.href = payUrl
+                } else {
+                    await dispatch(createOrderAction(finalOrderData)).unwrap()
+                    setNotification({
+                        show: true,
+                        description: 'Đặt hàng thành công',
+                        type: 'success',
+                        title: 'Thành công',
+                        onClose: () => {
+                            window.location.reload()
+                        },
+                    })
+                }
             } catch (error) {
                 setNotification({
                     show: true,
@@ -638,9 +682,25 @@ function Cart() {
                                 <p className="fs-3 fw-medium text-wrap" style={{ maxWidth: 120 }}>
                                     Phương thức thanh toán:
                                 </p>
-                                <div className="d-flex align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    {orderData.paymentMethod === 'bankTransfer' && (
+                                        <img
+                                            src={
+                                                orderData.transferOption === 'momo'
+                                                    ? 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
+                                                    : 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
+                                            }
+                                            alt="payment method"
+                                            width={50}
+                                            height={50}
+                                        />
+                                    )}
                                     <p className="fs-3">
                                         {orderData.paymentMethod === 'paymentUponReceipt' && 'Khi nhận hàng'}
+                                        {(orderData.paymentMethod === 'bankTransfer' &&
+                                            orderData.transferOption === 'momo' &&
+                                            'Ví MoMo') ||
+                                            (orderData.transferOption === 'bank' && 'Chuyển khoản')}
                                     </p>
                                     <FontAwesomeIcon
                                         icon={faPen}
@@ -689,7 +749,12 @@ function Cart() {
             {notification.show && (
                 <Modal
                     show={notification.show}
-                    onHide={() => setNotification({ ...notification, show: false })}
+                    onHide={() => {
+                        if (notification.onClose) {
+                            notification.onClose()
+                        }
+                        setNotification({ ...notification, show: false })
+                    }}
                     centered
                 >
                     <Notification
@@ -731,45 +796,12 @@ function Cart() {
             )}
             {/* Modal Payment Method*/}
             {showPaymentMethod && (
-                <Modal show={showPaymentMethod} onHide={handleClosePaymentMethod} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fs-2">Chọn phương thức thanh toán</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="">
-                            <div className="d-flex p-3 align-items-center border-bottom">
-                                <label className="d-flex align-items-center me-3">
-                                    <input type="checkbox" className="input-checkbox" />
-                                    <span className="custom-checkbox"></span>
-                                </label>
-                                <p className="fs-3">Thanh toán khi nhận hàng</p>
-                            </div>
-                            <div className="d-flex p-3 align-items-center border-bottom">
-                                <label className="d-flex align-items-center me-3">
-                                    <input type="checkbox" className="input-checkbox" />
-                                    <span className="custom-checkbox"></span>
-                                </label>
-                                <p className="fs-3">Thanh toán bằng chuyển khoản</p>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div
-                            className="primary-btn px-4 py-2 shadow-none light border rounded-3"
-                            variant="secondary"
-                            onClick={handleClosePaymentMethod}
-                        >
-                            <p>Đóng</p>
-                        </div>
-                        <div
-                            className="primary-btn px-4 py-2 shadow-none"
-                            variant="secondary"
-                            onClick={handleClosePaymentMethod}
-                        >
-                            <p>Xác nhận</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
+                <PaymentMethodModal
+                    showPaymentMethod={showPaymentMethod}
+                    handleClosePaymentMethod={handleClosePaymentMethod}
+                    orderData={orderData}
+                    setOrderData={setOrderData}
+                />
             )}
         </>
     )

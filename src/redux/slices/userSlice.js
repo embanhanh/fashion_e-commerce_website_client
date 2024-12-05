@@ -16,6 +16,7 @@ import {
     unblockManyClient,
     updateManyClientType,
     getOrderUser,
+    getFavoriteProducts,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -166,6 +167,15 @@ export const unblockManyClientAction = createAsyncThunk('user/unblockManyClient'
     }
 })
 
+export const fetchFavoriteProducts = createAsyncThunk('user/fetchFavoriteProducts', async (_, { rejectWithValue }) => {
+    try {
+        const response = await getFavoriteProducts()
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -188,6 +198,7 @@ const userSlice = createSlice({
             orderCount: '',
             clientType: '',
         },
+        favoriteProducts: [],
     },
     reducers: {
         setOrderFilters: (state, action) => {
@@ -389,6 +400,18 @@ const userSlice = createSlice({
                 state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
             })
             .addCase(unblockManyClientAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchFavoriteProducts.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchFavoriteProducts.fulfilled, (state, action) => {
+                state.loading = false
+                state.favoriteProducts = action.payload
+            })
+            .addCase(fetchFavoriteProducts.rejected, (state, action) => {
+                state.loading = false
                 state.error = action.payload
             })
     },

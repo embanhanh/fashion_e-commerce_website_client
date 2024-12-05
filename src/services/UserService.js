@@ -301,4 +301,15 @@ export const getOrderUser = async (status) => {
     }
 }
 
-
+export const getFavoriteProducts = async () => {
+    try {
+        const response = await axiosInstance.get('account/favorite-products', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}   

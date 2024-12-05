@@ -341,9 +341,18 @@ function Cart() {
                     order: true,
                 }))
                 if (orderData.paymentMethod === 'bankTransfer' && orderData.transferOption === 'momo') {
-                    const response = await axios.post('http://localhost:5000/momo/payment', {
-                        amount: orderData.totalPrice,
-                    })
+                    const response = await axios.post(
+                        'http://localhost:5000/momo/payment',
+                        {
+                            amount: orderData.totalPrice,
+                            orderData: finalOrderData,
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                            },
+                        }
+                    )
                     const { payUrl } = response.data
                     window.location.href = payUrl
                 } else {
@@ -361,7 +370,7 @@ function Cart() {
             } catch (error) {
                 setNotification({
                     show: true,
-                    description: error.message,
+                    description: error.response?.data?.message || error.message,
                     type: 'error',
                     title: 'Lỗi',
                 })

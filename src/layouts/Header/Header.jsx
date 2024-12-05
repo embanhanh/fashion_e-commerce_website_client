@@ -68,7 +68,7 @@ function Header({ location }) {
                     const allNotifs = doc.data().notifications || []
 
                     const recentNotifs = Array.from(allNotifs).sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                        (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
                     )
                     setNotifications(recentNotifs)
                 }

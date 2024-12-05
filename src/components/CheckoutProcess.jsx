@@ -3,6 +3,7 @@ import { Modal } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLocationDot, faStore, faCheck, faBagShopping, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
 
 import { getPromotionalComboByProductIdAction } from '../redux/slices/promotionalComboSlice'
 import { getShopInfo } from '../redux/slices/shopSlice'
@@ -43,6 +44,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
             startDate: null,
             endDate: null,
         },
+        transferOption: '',
     })
     const [comboDiscounts, setComboDiscounts] = useState(null)
     const [voucherInfo, setVoucherInfo] = useState({
@@ -148,18 +150,30 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
         if (validate()) {
             try {
                 setIsLoading(true)
-                await dispatch(createOrderFromGuestAction({ orderData, address })).unwrap()
-                setNotification({
-                    title: 'Thành công',
-                    description:
-                        'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
-                    type: 'success',
-                    show: true,
-                })
+                if (orderData.paymentMethod === 'bankTransfer') {
+                    const response = await axios.post('http://localhost:5000/momo/payment-from-guest', {
+                        amount: orderData.totalPrice,
+                        orderData,
+                        address,
+                        url: window.location.href,
+                    })
+                    const { payUrl } = response.data
+                    window.location.href = payUrl
+                } else {
+                    await dispatch(createOrderFromGuestAction({ orderData, address })).unwrap()
+                    setNotification({
+                        title: 'Thành công',
+                        description:
+                            'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
+                        type: 'success',
+                        show: true,
+                    })
+                }
             } catch (error) {
+                console.log(error)
                 setNotification({
                     title: 'Thất bại',
-                    description: error.message,
+                    description: error.response?.data?.message || error.message,
                     type: 'error',
                     show: true,
                 })
@@ -174,7 +188,10 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
             setErrors('Vui lòng điền đẩy đủ thông tin')
             return false
         }
-        if (!orderData.shippingMethod && !orderData.paymentMethod && currentStep === 1) {
+        if (
+            (!orderData.shippingMethod && !orderData.paymentMethod && currentStep === 1) ||
+            (currentStep === 1 && orderData.paymentMethod === 'bankTransfer' && !orderData.transferOption)
+        ) {
             setErrors('Vui lòng chọn phương thức vận chuyển và phương thức thanh toán')
             return false
         }
@@ -423,7 +440,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                 Phương thức thanh toán
                             </label>
                             <div className="d-flex align-items-center justify-content-between py-3 ">
-                                <p className="fs-4 w-25 fw-bold theme-color">Thanh toán khi nhận hàng</p>
+                                <p className="fs-4 w-25 fw-bold theme-color text-nowrap">Thanh toán khi nhận hàng</p>
                                 <div className="d-flex align-items-center gap-3">
                                     <input
                                         type="checkbox"
@@ -440,7 +457,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                 </div>
                             </div>
                             <div className="d-flex align-items-center justify-content-between py-3 ">
-                                <p className="fs-4 w-25 fw-bold theme-color">Thanh toán qua ngân hàng</p>
+                                <p className="fs-4 w-25 fw-bold theme-color text-nowrap">Thanh toán chuyển khoản</p>
                                 <div className="d-flex align-items-center gap-3">
                                     <input
                                         type="checkbox"
@@ -456,6 +473,36 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                     />
                                 </div>
                             </div>
+                            {orderData.paymentMethod === 'bankTransfer' && (
+                                <div className="d-flex gap-3 px-2">
+                                    <div className="d-flex flex-column gap-2 align-items-center">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <label className="d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={orderData.transferOption === 'momo'}
+                                                    onChange={(e) =>
+                                                        setOrderData((pre) => ({
+                                                            ...pre,
+                                                            transferOption: e.target.checked ? 'momo' : '',
+                                                        }))
+                                                    }
+                                                />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                            <p className="fs-3">ví MoMo</p>
+                                        </div>
+                                        <img
+                                            src={
+                                                'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
+                                            }
+                                            alt="momo"
+                                            style={{ width: '35px', height: '35px' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )
@@ -491,11 +538,16 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                     {orderData.shippingPrice.toLocaleString('vi-VN') + 'đ'}
                                 </p>
                             </div>
-                            <p className="fs-4 fw-medium">
+                            <p className="fs-4 fw-medium position-relative">
                                 <strong className="theme-color">Phương thức thanh toán:</strong>{' '}
                                 {orderData.paymentMethod === 'paymentUponReceipt'
                                     ? 'Thanh toán khi nhận hàng'
-                                    : 'Thanh toán qua ngân hàng'}
+                                    : 'Thanh toán chuyển khoản'}
+                                {orderData.paymentMethod === 'bankTransfer' && (
+                                    <span className="fs-4 fw-medium position-absolute top-0 end-0">
+                                        {orderData.transferOption === 'momo' ? 'ví MoMo' : 'Khác'}
+                                    </span>
+                                )}
                             </p>
                         </div>
                         <div className="d-flex flex-column gap-2 p-4 pt-3 shadow rounded-4 border-top border-5 border-theme">

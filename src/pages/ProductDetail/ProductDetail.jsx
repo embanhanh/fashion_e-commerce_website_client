@@ -58,6 +58,12 @@ function ProductDetail() {
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
     const [toastVariant, setToastVariant] = useState('success')
+    const [notification, setNotification] = useState({
+        show: false,
+        title: '',
+        description: '',
+        type: 'success',
+    })
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -133,6 +139,34 @@ function ProductDetail() {
         }
     }, [currentProduct, selectedColor, selectedSize])
 
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search)
+        const resultCode = searchParams.get('resultCode')
+        if (resultCode) {
+            if (resultCode === '0') {
+                setNotification({
+                    show: true,
+                    description: 'Đơn hàng đã được đặt thành công',
+                    type: 'success',
+                    title: 'Thành công',
+                    onClose: () => {
+                        navigate(location.pathname, { replace: true })
+                    },
+                })
+            } else {
+                setNotification({
+                    show: true,
+                    description: 'Thanh toán thất bại',
+                    type: 'error',
+                    title: 'Lỗi',
+                    onClose: () => {
+                        navigate(location.pathname, { replace: true })
+                    },
+                })
+            }
+        }
+    }, [location])
+
     const handleColorSelect = (color) => {
         if (color !== selectedColor) {
             setSelectedColor(color)
@@ -183,14 +217,20 @@ function ProductDetail() {
                             quantity: quantity,
                         })
                     ).unwrap()
-                    setToastMessage('Đã thêm sản phẩm vào giỏ hàng thành công!')
-                    setToastVariant('success')
-                    setShowToast(true)
+                    setNotification({
+                        show: true,
+                        description: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
+                        type: 'success',
+                        title: 'Thành công',
+                    })
                 }
             } catch (error) {
-                setToastMessage('Có lỗi xảy ra ' + error)
-                setToastVariant('error')
-                setShowToast(true)
+                setNotification({
+                    show: true,
+                    description: 'Có lỗi xảy ra ' + error,
+                    type: 'error',
+                    title: 'Lỗi',
+                })
             }
         }
     }
@@ -240,9 +280,12 @@ function ProductDetail() {
             }
         } catch (error) {
             console.error('Error handling like:', error)
-            setToastMessage('Có lỗi xảy ra khi thực hiện thao tác')
-            setToastVariant('error')
-            setShowToast(true)
+            setNotification({
+                show: true,
+                description: 'Có lỗi xảy ra khi thực hiện thao tác',
+                type: 'error',
+                title: 'Lỗi',
+            })
         }
     }
 
@@ -559,7 +602,7 @@ function ProductDetail() {
                                 )}
                             </div>
                         </div>
-                        <div className=" rounded-4 bg-white shadow p-5 reveal ">
+                        <div className="rounded-4 bg-white shadow p-5 reveal">
                             <div className="nav-wrapper border-bottom justify-content-center">
                                 <div
                                     className={`nav-option ${activeTab === 'description' ? 'checked' : ''}`}
@@ -777,8 +820,21 @@ function ProductDetail() {
                     </div>
                 </Notification>
             </Modal>
-            <Modal show={showToast} onHide={() => setShowToast(false)} centered>
-                <Notification type={toastVariant} title="Thông báo" description={toastMessage} />
+            <Modal
+                show={notification.show}
+                onHide={() => {
+                    if (notification.onClose) {
+                        notification.onClose()
+                    }
+                    setNotification({ ...notification, show: false })
+                }}
+                centered
+            >
+                <Notification
+                    type={notification.type}
+                    title={notification.title}
+                    description={notification.description}
+                />
             </Modal>
             {showCheckoutProcess && (
                 <CheckoutProcess

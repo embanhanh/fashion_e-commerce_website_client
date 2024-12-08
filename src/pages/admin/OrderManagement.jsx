@@ -33,7 +33,7 @@ const OrderManagement = () => {
         productName: '',
         orderStartDate: null,
         orderEndDate: null,
-        paymentMethod: 'paymentUponReceipt',
+        paymentMethod: '',
         shippingMethod: '',
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
@@ -252,8 +252,9 @@ const OrderManagement = () => {
                             <div className="select ">
                                 <div
                                     className="selected"
-                                    data-default="Thanh toán khi nhận hàng"
-                                    data-one="Thanh toán chuyển khoản"
+                                    data-default="Tất cả"
+                                    data-one="Thanh toán khi nhận hàng"
+                                    data-two="Thanh toán chuyển khoản"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -270,19 +271,30 @@ const OrderManagement = () => {
                                             id="all-v3"
                                             name="option-v3"
                                             type="radio"
+                                            checked={filterLocal.paymentMethod === ''}
+                                            value=""
+                                            onChange={(e) => handleChangeFilter('paymentMethod', e.target.value)}
+                                        />
+                                        <label className="option" htmlFor="all-v3" data-txt="Tất cả" />
+                                    </div>
+                                    <div title="option-1">
+                                        <input
+                                            id="option-1-v3"
+                                            name="option-v3"
+                                            type="radio"
                                             checked={filterLocal.paymentMethod === 'paymentUponReceipt'}
                                             value="paymentUponReceipt"
                                             onChange={(e) => handleChangeFilter('paymentMethod', e.target.value)}
                                         />
                                         <label
                                             className="option"
-                                            htmlFor="all-v3"
+                                            htmlFor="option-1-v3"
                                             data-txt="Thanh toán khi nhận hàng"
                                         />
                                     </div>
-                                    <div title="option-1">
+                                    <div title="option-2">
                                         <input
-                                            id="option-1-v3"
+                                            id="option-2-v3"
                                             name="option-v3"
                                             type="radio"
                                             checked={filterLocal.paymentMethod === 'bankTransfer'}
@@ -291,7 +303,7 @@ const OrderManagement = () => {
                                         />
                                         <label
                                             className="option"
-                                            htmlFor="option-1-v3"
+                                            htmlFor="option-2-v3"
                                             data-txt="Thanh toán chuyển khoản"
                                         />
                                     </div>

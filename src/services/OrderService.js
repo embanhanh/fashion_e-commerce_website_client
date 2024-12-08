@@ -89,7 +89,19 @@ export const getOrdersByUserId = async (userId) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         })
-        console.log(response.data)
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateOrder = async (orderData) => {
+    try {
+        const response = await axios.put(API_URL + 'update', orderData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error

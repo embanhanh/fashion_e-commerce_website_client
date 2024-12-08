@@ -178,37 +178,40 @@ function Profile() {
                                 <div className="col-4 label-cell">
                                     <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Giới tính</label>
                                 </div>
-                                <div className="col-8 input-cell">
-                                    <div className="radio-group">
-                                        <label className="radio-option">
+                                <div className="col-8">
+                                    <div className="d-flex gap-3 align-items-center fs-4">
+                                        <label className="d-flex align-items-center ms-3">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="male"
                                                 checked={gender === 'male'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Nam
+                                            <span className="custom-radio me-2 fs-4"></span> Nam
                                         </label>
-                                        <label className="radio-option ms-3">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="female"
                                                 checked={gender === 'female'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Nữ
+                                            <span className="custom-radio me-2 fs-3"></span> Nữ
                                         </label>
-                                        <label className="radio-option ms-3">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="other"
                                                 checked={gender === 'other'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Khác
+                                            <span className="custom-radio me-2 fs-3"></span> Khác
                                         </label>
                                     </div>
                                 </div>

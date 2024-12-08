@@ -17,6 +17,7 @@ import {
     updateManyClientType,
     getOrderUser,
     getFavoriteProducts,
+    cancelOrder,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -176,6 +177,15 @@ export const fetchFavoriteProducts = createAsyncThunk('user/fetchFavoriteProduct
     }
 })
 
+export const cancelOrderUser = createAsyncThunk('user/cancelOrder', async ({ orderId, reason }, { rejectWithValue }) => {
+    try {
+        const response = await cancelOrder(orderId, reason)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -315,7 +325,6 @@ const userSlice = createSlice({
             .addCase(fetchOrderUser.fulfilled, (state, action) => {
                 state.loading = false
                 state.orders = action.payload
-                console.log('Fetched orders:', action.payload) // Kiểm tra dữ liệu
             })
             .addCase(fetchOrderUser.rejected, (state, action) => {
                 state.loading = false
@@ -412,6 +421,16 @@ const userSlice = createSlice({
             })
             .addCase(fetchFavoriteProducts.rejected, (state, action) => {
                 state.loading = false
+                state.error = action.payload
+            })
+            .addCase(cancelOrderUser.pending, (state) => {
+                state.error = null
+            })
+            .addCase(cancelOrderUser.fulfilled, (state, action) => {
+                state.error = null
+                state.orders = state.orders.map((order) => (order._id === action.payload.orderId ? action.payload : order))
+            })
+            .addCase(cancelOrderUser.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

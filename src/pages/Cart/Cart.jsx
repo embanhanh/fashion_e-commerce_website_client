@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPen, faPlus, faTicket } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import Modal from 'react-bootstrap/Modal'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
-import { createOrderAction } from '../../redux/slices/orderSilce'
+import { createOrderAction, updateOrderAction, getOrderByIdAction } from '../../redux/slices/orderSilce'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
 
 import { calculateRouteDistance } from '../../utils/MapUtils'
@@ -21,10 +21,12 @@ import PaymentMethodModal from '../../components/PaymentMethodModal'
 import './Cart.scss'
 
 function Cart() {
+    const { order_id } = useParams()
     const dispatch = useDispatch()
     const { cart, status } = useSelector((state) => state.cart)
     const { addresses } = useSelector((state) => state.user)
     const { shopInfo } = useSelector((state) => state.shop)
+    const { currentOrder } = useSelector((state) => state.order)
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -126,6 +128,29 @@ function Cart() {
             }
         }
     }, [addresses])
+
+    useEffect(() => {
+        if (order_id) {
+            dispatch(getOrderByIdAction(order_id))
+        }
+    }, [order_id, dispatch])
+
+    useEffect(() => {
+        if (order_id && currentOrder) {
+            // Populate form with order data
+            setOrderData({
+                products: currentOrder.products,
+                shippingAddress: currentOrder.shippingAddress,
+                paymentMethod: currentOrder.paymentMethod,
+                shippingMethod: currentOrder.shippingMethod,
+                vouchers: currentOrder.vouchers,
+                productsPrice: currentOrder.productsPrice,
+                shippingPrice: currentOrder.shippingPrice,
+                totalPrice: currentOrder.totalPrice,
+                expectedDeliveryDate: currentOrder.expectedDeliveryDate,
+            });
+        }
+    }, [currentOrder, order_id]);
 
     const handleChangeOrderData = (key, value) => {
         setOrderData({
@@ -437,20 +462,20 @@ function Cart() {
                 if (combo.comboType === 'percentage') {
                     return (
                         (newQuantity ? newQuantity : item.quantity) *
-                        item.variant.price *
+                        item?.variant?.price *
                         (1 - discountValue / 100) *
-                        (1 - item.variant.product.discount / 100)
+                        (1 - item?.variant?.product?.discount / 100)
                     )
                 } else {
                     return (
-                        (newQuantity ? newQuantity : item.quantity) * item.variant.price -
-                        discountValue * (1 - item.variant.product.discount / 100)
+                        (newQuantity ? newQuantity : item.quantity) * item?.variant?.price -
+                        discountValue * (1 - item?.variant?.product?.discount / 100)
                     )
                 }
             }
         }
         return (
-            (newQuantity ? newQuantity : item.quantity) * item.variant.price * (1 - item.variant.product.discount / 100)
+            (newQuantity ? newQuantity : item.quantity) * item?.variant?.price * (1 - item?.variant?.product?.discount / 100)
         )
     }
 
@@ -478,7 +503,7 @@ function Cart() {
                                 <>
                                     <div className="d-flex pb-3 border-bottom">
                                         <div className="d-flex" style={{ width: '40%' }}>
-                                            <label className="d-flex align-items-center">
+                                            {order_id ? <></> : <label className="d-flex align-items-center">
                                                 <input
                                                     type="checkbox"
                                                     className="input-checkbox"
@@ -486,7 +511,7 @@ function Cart() {
                                                     checked={orderData.products.length === cart.items.length}
                                                 />
                                                 <span className="custom-checkbox"></span>
-                                            </label>
+                                            </label>}
                                             <p className="fs-3 ms-3 fw-medium ">Sản phẩm</p>
                                         </div>
                                         <p className="fs-3 fw-medium flex-grow-1 text-center">Giá</p>
@@ -515,7 +540,7 @@ function Cart() {
                                                     </label>
                                                     <img
                                                         className="mx-3"
-                                                        src={item.variant.product?.urlImage}
+                                                        src={item?.variant?.product?.urlImage}
                                                         alt=""
                                                         width={70}
                                                         height={70}
@@ -525,19 +550,19 @@ function Cart() {
                                                             className="fs-3 fw-medium product-name"
                                                             style={{ maxWidth: '80%' }}
                                                         >
-                                                            {item.variant.product?.name}
+                                                            {item?.variant?.product?.name}
                                                         </p>
-                                                        {item.variant.size && (
+                                                        {item?.variant?.size && (
                                                             <p className="fw-medium">Size: {item.variant.size}</p>
                                                         )}
-                                                        {item.variant.color && (
+                                                        {item?.variant?.color && (
                                                             <p className="fw-medium">Màu: {item.variant.color}</p>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1 m-auto">
                                                     <p className="text-center fs-3">
-                                                        {item.variant.price.toLocaleString('vi-VN')}đ
+                                                        {item?.variant?.price.toLocaleString('vi-VN')}đ
                                                     </p>
                                                 </div>
                                                 <div className="flex-grow-1 justify-content-center d-flex">

@@ -36,6 +36,7 @@ import Refund from '../pages/Policy/Refund.jsx'
 import Delivery from '../pages/Policy/Delivery.jsx'
 import Payment from '../pages/Policy/Payment.jsx'
 import Check from '../pages/Policy/Check.jsx'
+import DetailOrder from '../components/DetailOrder.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
@@ -65,6 +66,7 @@ const privateRoutes = [
         allowedRoles: ['user', 'admin'],
         children: [
             { path: 'profile', element: Profile, layout: Fragment },
+            { path: 'orders/:order_id', element: DetailOrder, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },
@@ -73,6 +75,7 @@ const privateRoutes = [
             { path: 'settings', element: Settings, layout: Fragment },
         ],
     },
+    { path: '/cart/edit/:order_id', element: Cart, allowedRoles: ['user', 'admin'] },
     { path: '/cart', element: Cart, allowedRoles: ['user', 'admin'] },
     { path: '/seller/products/edit/:product_name', element: CreateProduct, layout: Adminlayout, allowedRoles: ['admin'] },
     { path: '/seller/products/create', element: CreateProduct, layout: Adminlayout, allowedRoles: ['admin'] },

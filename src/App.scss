@@ -153,9 +153,43 @@ button:disabled {
     opacity: 0;
 }
 
-.input-checkbox:checked + .custom-checkbox::after {
+.input-checkbox:checked+.custom-checkbox::after {
     opacity: 1;
 }
+
+// Input radio
+.input-radio {
+    display: none;
+}
+
+.custom-radio {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--theme-color-1);
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+}
+
+.custom-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--theme-color-1);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.input-radio:checked+.custom-radio::after {
+    opacity: 1;
+}
+
 
 .max-md {
     max-width: 1140px;
@@ -310,12 +344,12 @@ input[type='number'] {
     z-index: -1;
 }
 
-.select:hover > .options {
+.select:hover>.options {
     opacity: 1;
     top: 0;
 }
 
-.select:hover > .selected .arrow {
+.select:hover>.selected .arrow {
     transform: rotate(0deg);
 }
 
@@ -345,11 +379,11 @@ input[type='number'] {
     content: attr(data-txt);
 }
 
-.options input[type='radio']:checked + label {
+.options input[type='radio']:checked+label {
     display: none;
 }
 
-.options input[type='radio']#all:checked + label {
+.options input[type='radio']#all:checked+label {
     display: none;
 }
 
@@ -421,14 +455,11 @@ textarea {
     appearance: none;
     width: 3.125em;
     height: 1.5625em;
-    background: -webkit-gradient(
-            linear,
+    background: -webkit-gradient(linear,
             left top,
             right top,
             color-stop(50%, var(--theme-color)),
-            color-stop(50%, var(--theme-color-2))
-        )
-        no-repeat;
+            color-stop(50%, var(--theme-color-2))) no-repeat;
     background: -o-linear-gradient(left, var(--theme-color) 50%, var(--theme-color-2) 50%) no-repeat;
     background: linear-gradient(to right, var(--theme-color) 50%, var(--theme-color-2) 50%) no-repeat;
     background-size: 205%;
@@ -449,14 +480,11 @@ textarea {
     position: absolute;
     top: 0.219em;
     left: 0.219em;
-    background: -webkit-gradient(
-            linear,
+    background: -webkit-gradient(linear,
             left top,
             right top,
             color-stop(50%, var(--theme-color)),
-            color-stop(50%, var(--theme-color-2))
-        )
-        no-repeat;
+            color-stop(50%, var(--theme-color-2))) no-repeat;
     background: -o-linear-gradient(left, var(--theme-color) 50%, var(--theme-color-2) 50%) no-repeat;
     background: linear-gradient(to right, var(--theme-color) 50%, var(--theme-color-2) 50%) no-repeat;
     background-size: 205%;

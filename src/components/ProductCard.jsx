@@ -19,9 +19,6 @@ function ProductCard({ name, url, originalPrice, discount, rating, isFeature, pr
             getCombo()
         }
     }, [dispatch, productId])
-
-
-
     return (
         <>
             <div className="product-card d-flex flex-column w-100 shadow rounded-5 h-100">

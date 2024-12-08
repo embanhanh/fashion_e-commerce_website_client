@@ -312,4 +312,17 @@ export const getFavoriteProducts = async () => {
     } catch (error) {
         throw error
     }
-}   
+}
+
+export const cancelOrder = async (orderId, reason) => {
+    try {
+        const response = await axiosInstance.put('purchase/cancel/' + orderId, { reason }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

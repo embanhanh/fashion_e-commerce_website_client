@@ -27,7 +27,6 @@ function Orders() {
 
     return (
         <div className="container mb-4">
-            {/* Tabs điều hướng */}
             <div className="order-tabs mt-4 z-0 position-sticky bg-white">
                 <div className="border-bottom d-flex">
                     <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === '' ? 'active' : ''}`} onClick={() => setFilterStatus('')}>
@@ -51,9 +50,12 @@ function Orders() {
                 </div>
             </div>
 
-            {/* Danh sách đơn hàng */}
             {loading ? (
-                <p>Đang tải...</p>
+                <div class="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             ) : error ? (
                 <p>{error}</p>
             ) : !orders || orders.length === 0 ? (

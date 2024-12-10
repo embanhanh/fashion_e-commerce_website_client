@@ -1,62 +1,96 @@
-import React from 'react';
-
-const NotificationItem = ({ icon, title, description, time }) => (
-    <div className="d-flex align-items-center py-2 fs-4">
-        <div className={`rounded-circle p-2 ${icon === "user" ? "" : (icon === "lock" ? "bg-secondary" : "bg-info")} text-white`}>
-            {icon === "user" ? (
-                <img src={UserAvatar} alt="User Avatar" width="32" height="32" className="rounded-circle" />
-            ) : (
-                icon === "box" && <i className="bi bi-box-seam fs-4"></i>
-            )}
-            {icon === "lock" && <i className="bi bi-lock-fill fs-4"></i>}
-        </div>
-        <div className="ms-3 flex-grow-1">
-            <h6 className="mb-0 fw-bold fs-4">{title}</h6>
-            <p className="mb-0 text-muted small fs-4">{description}</p>
-        </div>
-        <small className="text-muted fs-4">{time}</small>
-    </div>
-);
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase.config';
+import { useNavigate } from 'react-router-dom';
 
 function Notifications() {
+    const [notifications, setNotifications] = useState([]);
+    const { user } = useSelector((state) => state.auth);
+    const { shopInfo } = useSelector((state) => state.shop);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            const docs = doc(db, 'notifications', user.role === 'admin' ? 'admin' : user._id);
+            const unsubscribe = onSnapshot(docs, (doc) => {
+                if (doc.exists()) {
+                    const allNotifs = doc.data().notifications || [];
+                    const recentNotifs = Array.from(allNotifs).sort(
+                        (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()
+                    );
+                    setNotifications(recentNotifs);
+                }
+            });
+
+            return () => unsubscribe();
+        }
+    }, [user]);
+
+    const handleReadNotification = async (notification) => {
+        try {
+            if (!notification.read) {
+                const notificationRef = doc(db, 'notifications', user.role === 'admin' ? 'admin' : user._id);
+
+                const updatedNotifications = notifications.map((notif) => {
+                    if (notif.createdAt.toMillis() === notification.createdAt.toMillis()) {
+                        return { ...notif, read: true };
+                    }
+                    return notif;
+                });
+
+                await updateDoc(notificationRef, {
+                    notifications: updatedNotifications,
+                });
+            }
+
+            if (notification.link) {
+                navigate(notification.link);
+            }
+        } catch (error) {
+            console.error('Lỗi khi đánh dấu đã đọc:', error);
+        }
+    };
+
     return (
-        <div className="container mt-5 bg-white">
-            <NotificationItem
-                icon="bi-person-circle"
-                title="Cập nhật tài khoản"
-                description="Bạn vừa cập nhật ảnh đại diện của mình"
-                time="Gần đây"
-            />
-            <hr className="my-2" />
-            <NotificationItem
-                icon="bi-box-seam"
-                title="Đơn hàng đã được đặt"
-                description="Đặt hàng mới của bạn đã được đặt thành công"
-                time="11:00 AM"
-            />
-            <hr className="my-2" />
-            <NotificationItem
-                icon="bi-box-seam"
-                title="Đơn hàng đã được giao"
-                description="Đơn hàng của bạn đã được giao thành công"
-                time="11:00 AM"
-            />
-            <hr className="my-2" />
-            <NotificationItem
-                icon="bi-person-circle"
-                title="Bạn đã chia sẻ đánh giá của mình"
-                description='"Giao đúng sản phẩm đã đặt"'
-                time="10:00 AM"
-            />
-            <hr className="my-2" />
-            <NotificationItem
-                icon="bi-lock-fill"
-                title="Cập nhật mật khẩu thành công"
-                description="Mật khẩu của bạn đã được cập nhật thành công"
-                time="11:00 AM"
-            />
+        <div className="container mt-5 bg-white p-4 rounded-3">
+            <h4 className="mb-4 fs-3">Thông báo của bạn</h4>
+            <div className="notification-list">
+                {notifications.length === 0 ? (
+                    <p className="fs-4 text-center">Không có thông báo nào</p>
+                ) : (
+                    notifications.map((notification, index) => (
+                        <div
+                            key={index}
+                            className="d-flex align-items-center p-3 border-bottom hover-icon"
+                            style={{
+                                cursor: 'pointer',
+                                backgroundColor: notification.read ? 'transparent' : '#f0f0f0',
+                            }}
+                            onClick={() => handleReadNotification(notification)}
+                        >
+                            <img
+                                src={shopInfo?.logo}
+                                alt=""
+                                height={80}
+                                width={80}
+                                className="me-3"
+                            />
+                            <div className="flex-grow-1 fs-4">
+                                <p className="fs-4 mb-1">{notification.message}</p>
+                                <small className="text-muted">
+                                    {notification.createdAt.toDate().toLocaleString('vi-VN')}
+                                </small>
+                            </div>
+                            {!notification.read && (
+                                <span className="badge bg-primary rounded-pill">Mới</span>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
     );
-};
+}
 
 export default Notifications;

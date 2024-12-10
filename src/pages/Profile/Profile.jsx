@@ -1,10 +1,10 @@
-import './Profile.scss' // Đổi tên file SCSS nếu cần
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage } from '../../firebase.config' // Đảm bảo đường dẫn đúng
+import { storage } from '../../firebase.config'
+import './Profile.scss'
 
 import Swal from 'sweetalert2'
 import DatePicker from 'react-datepicker'
@@ -32,19 +32,19 @@ function Profile() {
             setUserName(user.name || '')
             setEmail(user.email || '')
             setPhone(user.phone || '')
-            setBirth(formatDate(user.birthday)) // Định dạng ngày tháng đúng
+            setBirth(formatDate(user.birthday) || '')
             setGender(user.gender || '')
             setUrlImage(user.urlImage || '')
         }
     }, [user])
 
     const formatDate = (dateString) => {
-        if (!dateString) return '' // Kiểm tra nếu ngày tháng null hoặc undefined
-        const date = new Date(dateString) // Chuyển đổi string thành đối tượng Date
-        const year = date.getFullYear() // Lấy năm
-        const month = String(date.getMonth() + 1).padStart(2, '0') // Lấy tháng, cộng th��m 1 do tháng bắt đầu từ 0
-        const day = String(date.getDate()).padStart(2, '0') // Lấy ngày
-        return `${year}-${month}-${day}` // Trả về định dạng yyyy-MM-dd
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 
     const handleSubmit = async (e) => {
@@ -63,7 +63,7 @@ function Profile() {
                 try {
                     let avatarUrl = urlImage
                     if (urlImage && !urlImage.startsWith('https://firebasestorage.googleapis.com')) {
-                        avatarUrl = await uploadImage(urlImage) // Upload the new image if necessary
+                        avatarUrl = await uploadImage(urlImage)
                     }
                     const userData = {
                         name: userName,
@@ -72,7 +72,7 @@ function Profile() {
                         phone,
                         urlImage: avatarUrl,
                     }
-                    await dispatch(updateUserProfile(userData)) // Update user profile with Firebase URL
+                    await dispatch(updateUserProfile(userData))
                     Swal.fire({
                         title: 'Thông báo',
                         text: 'Cập nhật hồ sơ thành công',
@@ -89,7 +89,6 @@ function Profile() {
         })
     }
 
-    // Function to upload image to Firebase
     const uploadImage = async (imageFile) => {
         const imageRef = ref(storage, `avatars/${uuidv4()}`)
         const response = await fetch(imageFile)
@@ -98,12 +97,11 @@ function Profile() {
         return getDownloadURL(imageRef)
     }
 
-    // Handle image upload and display preview
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
             const fileURL = URL.createObjectURL(file)
-            setUrlImage(fileURL) // Display the selected image as a preview
+            setUrlImage(fileURL)
         } else {
             alert('Please select a valid image format: .JPEG, .PNG')
         }
@@ -119,7 +117,7 @@ function Profile() {
         )
     if (error) {
         console.error(error)
-        return <div className="alert alert-danger">Error: {error}</div> // Hiển thị lỗi cho người dùng
+        return <div className="alert alert-danger">Error: {error}</div>
     }
 
     return (

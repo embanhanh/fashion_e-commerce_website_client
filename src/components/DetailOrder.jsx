@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { getOrderByIdAction } from '../redux/slices/orderSilce'
@@ -8,58 +8,31 @@ import './DetailOrder.scss'
 
 
 function DetailOrder() {
-    const { order_id } = useParams();
+    const { order_id } = useParams()
     const dispatch = useDispatch()
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const { status, error, currentOrder } = useSelector((state) => state.order)
 
 
     const handleBack = () => {
-        navigate(`/user/account/orders`);
+        navigate(`/user/account/orders`)
     }
 
     const handleUpdateOrder = (order_id) => {
-        navigate(`/cart/edit/${order_id}`);
+        navigate(`/cart/edit/${order_id}`)
     }
 
 
     useEffect(() => {
         if (order_id) {
-            dispatch(getOrderByIdAction(order_id));
+            dispatch(getOrderByIdAction(order_id))
         }
-    }, [order_id]);
+    }, [order_id])
 
     useEffect(() => {
-        console.log('Current Order:', currentOrder);
-    }, [currentOrder]);
+        console.log('Current Order:', currentOrder)
+    }, [currentOrder])
 
-    const handleReceiveOrder = async () => {
-        // try {
-        //     setIsUpdating(true);
-        //     await dispatch(updateOrderStatusAction({
-        //         orderId: order_id,
-        //         status: 'delivered'
-        //     }));
-        //     setIsUpdating(false);
-        // } catch (error) {
-        //     setIsUpdating(false);
-        //     console.error('Error updating order:', error);
-        // }
-    }
-
-    const handleReturnRequest = async () => {
-        // try {
-        //     setIsUpdating(true);
-        //     await dispatch(updateOrderStatusAction({
-        //         orderId: order_id,
-        //         status: 'return_requested'
-        //     }));
-        //     setIsUpdating(false);
-        // } catch (error) {
-        //     setIsUpdating(false);
-        //     console.error('Error requesting return:', error);
-        // }
-    }
 
     if (status === 'loading') {
         return (<div className="text-center">
@@ -136,27 +109,24 @@ function DetailOrder() {
                 </table>
             </div>
             <div className="d-flex justify-content-between mt-3">
-                <div className="">
+                <div className="d-flex flex-column align-items-start gap-2 ms-3">
                     <p className="fs-4 fw-bold">Thông tin giao hàng:</p>
                     <p className="fs-4">Tên khách hàng: {currentOrder?.shippingAddress?.name}</p>
                     <p className="fs-4">Email: {currentOrder?.user?.email}</p>
                     <p className="fs-4 text-wrap" style={{ maxWidth: '400px' }}>Địa chỉ nhận hàng: {currentOrder?.shippingAddress?.location}</p>
                 </div>
 
-                <div className="d-flex flex-column">
-                    <div className="d-flex justify-content-around align-items-center mx-5 gap-3">
-                        <p className="mb-0 fs-4">Tổng tiền thanh toán:</p>
-                        <p className="mb-0 fs-3 fw-bold">
-                            {(currentOrder?.totalPrice || 0).toLocaleString('vi-VN')}đ
-                        </p>
-                    </div>
+
+                <div className="d-flex align-items-center mx-5 gap-3">
+                    <p className="mb-0 fs-4">Tổng tiền thanh toán:</p>
+                    <p className="mb-0 fs-3 fw-bold">
+                        {(currentOrder?.totalPrice || 0).toLocaleString('vi-VN')}đ
+                    </p>
                 </div>
 
-
             </div>
-
         </div>
-    );
+    )
 }
 
-export default DetailOrder;
+export default DetailOrder

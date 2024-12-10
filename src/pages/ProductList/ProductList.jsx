@@ -58,12 +58,12 @@ function ProductList() {
         if (categoriesFromUrl) {
             const categoriesFromUrlIds = categories.filter(
                 (category) =>
-                    categoriesFromUrl.includes(category.slug) ||
-                    categoriesFromUrl.includes(category.parentCategory?.slug)
+                    categoriesFromUrl.split(',').includes(category.slug) ||
+                    categoriesFromUrl.split(',').includes(category.parentCategory?.slug)
             )
             setFilters((prev) => ({ ...prev, category: categoriesFromUrlIds.map((category) => category._id) }))
         }
-    }, [categories])
+    }, [])
 
     useEffect(() => {
         setSearchParams((prev) => {

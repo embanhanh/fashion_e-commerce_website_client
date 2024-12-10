@@ -48,15 +48,11 @@ export const updateProduct = async (product_name, productData) => {
 
 export const deleteProduct = async (product_name) => {
     try {
-        const response = await axios.delete(
-            `${API_URL}delete/${product_name}`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            }
-        )
+        const response = await axios.delete(`${API_URL}delete/${product_name}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
         return response.data
     } catch (error) {
         throw error

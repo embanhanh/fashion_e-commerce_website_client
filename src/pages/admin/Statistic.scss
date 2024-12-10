@@ -13,3 +13,53 @@
 .border-visits {
     border-top-color: rgb(153, 102, 255) !important;
 }
+
+.statistic-select__option {
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    padding: 0 16px;
+    font-size: 1.6rem;
+    outline: none;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        border-color: var(--theme-color-1);
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.14);
+    }
+
+    &:focus {
+        border-color: var(--theme-color-1);
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.14);
+    }
+
+    option {
+        padding: 12px;
+        font-size: 1.4rem;
+        background-color: #fff;
+        color: #333;
+
+        &:hover {
+            background-color: var(--theme-color);
+        }
+    }
+}
+
+// Tùy chỉnh mũi tên dropdown
+.statistic-select__option {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b6477' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+}
+
+.out-of-stock-table.page-table th:nth-child(5),
+.out-of-stock-table.page-table th:nth-child(6) {
+    text-align: center;
+}

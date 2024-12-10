@@ -132,7 +132,7 @@ function MainManager() {
                         </div>
                         <div className="col-3">
                             <p className="fs-2 fw-bold text-center value-color">79</p>
-                            <p className="fs-4 fw-medium text-center">Sản phẩm hết hàng</p>
+                            <p className="fs-4 fw-medium text-center">Sản phẩm sắp hết hàng</p>
                         </div>
                         <div className="col-3 border-end border-3">
                             <p className="fs-2 fw-bold text-center value-color">79</p>
@@ -162,38 +162,8 @@ function MainManager() {
                         <Line options={options} data={chartData} />
                     </div>
                 </div>
-                <div className="p-4 main-manager-section bg-white rounded-3 shadow-sm">
-                    <h3 className="fs-3 fw-bold mb-3">Top sản phẩm bán chạy</h3>
-                    <table className="page-table">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Sản phẩm</th>
-                                <th>Tồn kho</th>
-                                <th>Đã bán</th>
-                                <th>Doanh thu</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topProductData.map((item, index) => (
-                                <tr key={item._id}>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <img src={item.urlImage} alt={item.name} width={50} height={50} />
-                                            <p className="mb-0 product-name">{item.name}</p>
-                                        </div>
-                                    </td>
-                                    <td>{item.stockQuantity}</td>
-                                    <td>{item.soldQuantity}</td>
-                                    <td>{item.revenue.toLocaleString('vi-VN')}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="p-4 main-manager-section bg-white rounded-3 shadow-sm">
-                    <h3 className="fs-3 fw-bold mb-3">Các sản phẩm sắp hết hàng/đã hết hàng</h3>
+                <div className="p-3 bg-white main-manager-section rounded-3 shadow-sm">
+                    <h3 className="fs-3 fw-semibold mb-3">Các sản phẩm sắp hết hàng/đã hết hàng</h3>
                     <table className="page-table out-of-stock-table">
                         <thead>
                             <tr>

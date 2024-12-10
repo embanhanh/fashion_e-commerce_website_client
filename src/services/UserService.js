@@ -208,11 +208,15 @@ export const blockManyClient = async (userIds, reasons) => {
 
 export const unblockClient = async (userId) => {
     try {
-        const response = await axiosInstance.put(`clients/unblock/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        })
+        const response = await axiosInstance.put(
+            `clients/unblock/${userId}`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
         return response.data
     } catch (error) {
         throw error
@@ -307,12 +311,10 @@ export const getOrdersByUserId = async (userId) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-        });
-        return response.data;
+        })
+        return response.data
     } catch (error) {
-        console.error('Error fetching user orders:', error);
-        throw error;
+        console.error('Error fetching user orders:', error)
+        throw error
     }
 }
-
-

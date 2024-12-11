@@ -4,10 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { db } from '../../firebase.config'
+import { collection, getDoc, doc, updateDoc, increment, Timestamp, setDoc } from 'firebase/firestore'
+import { format } from 'date-fns'
+
 import { fetchBanners } from '../../redux/slices/bannerSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
-import { useNavigate } from 'react-router-dom'
-
 import { useScrollReveal } from '../../hook/useScrollReveal'
 import ProductCard from '../../components/ProductCard'
 import Chatbot from '../../components/Chatbot'
@@ -40,6 +43,31 @@ function Home() {
         dispatch(fetchCategories())
     }, [dispatch])
 
+    const handleClickBanner = async (banner) => {
+        navigate(banner?.linkUrl)
+        const bannerRef = doc(db, 'bannersClicks', format(new Date(), 'yyyy-MM-dd').toString())
+        const bannerDoc = await getDoc(bannerRef)
+        if (!bannerDoc.exists()) {
+            await setDoc(bannerRef, {
+                totalClicks: 1,
+                [banner?._id]: 1,
+            })
+        } else {
+            const data = bannerDoc.data()
+            if (!data[banner?._id]) {
+                await updateDoc(bannerRef, {
+                    totalClicks: increment(1),
+                    [banner?._id]: 1,
+                })
+            } else {
+                await updateDoc(bannerRef, {
+                    totalClicks: increment(1),
+                    [banner?._id]: increment(1),
+                })
+            }
+        }
+    }
+
     useScrollReveal()
 
     return (
@@ -67,7 +95,10 @@ function Home() {
                                 <img className="banner-image" src={banner?.imageUrl} loading="lazy" />
                                 <div></div>
                                 <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-                                <button onClick={() => {}} className="primary-btn py-3 px-5 rounded-5 banner-button">
+                                <button
+                                    onClick={() => handleClickBanner(banner)}
+                                    className="primary-btn py-3 px-5 rounded-5 banner-button"
+                                >
                                     <p className="fs-1 fw-bold">
                                         {banner?.buttonText} <FontAwesomeIcon className="ms-3" icon={faArrowRight} />
                                     </p>

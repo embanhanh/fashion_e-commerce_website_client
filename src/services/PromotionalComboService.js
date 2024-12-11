@@ -79,3 +79,12 @@ export const getPromotionalComboByProductId = async (productId) => {
         throw error
     }
 }
+
+export const getActivePromotionalCombos = async () => {
+    try {
+        const response = await axios.get(API_URL + 'promotional-combos-active')
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

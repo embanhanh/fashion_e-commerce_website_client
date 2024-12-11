@@ -28,9 +28,10 @@ import {
     ArcElement,
 } from 'chart.js'
 import { useDispatch } from 'react-redux'
+import { db } from '../firebase.config'
+import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore'
 import { getAdminOrdersAction } from '../redux/slices/orderSilce'
 import { sameDay, calculateDateDate } from '../utils/DateUtils'
-import { getOrdersByUserId } from '../services/OrderService'
 import { validateResult } from '../utils/StringUtil'
 import '../pages/admin/Statistic.scss'
 
@@ -59,7 +60,75 @@ function StatisticOverview({ dateRange, selectedDate }) {
 
     useEffect(() => {
         setData(generateData())
+        fetchClicks()
     }, [orders, dateData])
+
+    const fetchClicks = async () => {
+        const clicksRef = collection(db, 'bannersClicks')
+        const q = query(
+            clicksRef,
+            where('__name__', '>=', format(new Date(dateData.prev.start), 'yyyy-MM-dd')),
+            where('__name__', '<=', format(new Date(dateData.now.end), 'yyyy-MM-dd'))
+        )
+        try {
+            const visits = {
+                nowData: [],
+                prevData: [],
+            }
+            const querySnapshot = await getDocs(q)
+            const result = {}
+            querySnapshot.forEach((doc) => {
+                result[doc.id] = doc.data()
+            })
+            if (dateRange !== 'year') {
+                for (let date = dateData.now.start; date <= dateData.now.end; date = addDays(date, 1)) {
+                    const key = Object.keys(result).find((key) => sameDay(new Date(key), date))
+                    if (key) {
+                        visits.nowData.push(result[key].totalClicks)
+                    } else {
+                        visits.nowData.push(0)
+                    }
+                }
+                for (let date = dateData.prev.start; date <= dateData.prev.end; date = addDays(date, 1)) {
+                    const key = Object.keys(result).find((key) => sameDay(new Date(key), date))
+                    if (key) {
+                        visits.prevData.push(result[key].totalClicks)
+                    } else {
+                        visits.prevData.push(0)
+                    }
+                }
+            } else {
+                for (let month = 1; month <= 12; month++) {
+                    const keys = Object.keys(result).filter(
+                        (key) =>
+                            new Date(key).getMonth() === month &&
+                            new Date(key).getFullYear() === selectedDate.getFullYear()
+                    )
+                    if (keys.length > 0) {
+                        visits.nowData.push(keys.reduce((acc, key) => acc + result[key].totalClicks, 0))
+                    } else {
+                        visits.nowData.push(0)
+                    }
+                }
+                for (let month = 1; month <= 12; month++) {
+                    const keys = Object.keys(result).filter(
+                        (key) =>
+                            new Date(key).getMonth() === month &&
+                            new Date(key).getFullYear() === dateData.prev.start.getFullYear()
+                    )
+                    if (keys.length > 0) {
+                        visits.prevData.push(keys.reduce((acc, key) => acc + result[key].totalClicks, 0))
+                    } else {
+                        visits.prevData.push(0)
+                    }
+                }
+            }
+
+            setData((prev) => ({ ...prev, visits }))
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const generateLabels = () => {
         let dates = []
@@ -292,7 +361,7 @@ function StatisticOverview({ dateRange, selectedDate }) {
                 },
                 {
                     label: 'Lượt truy cập',
-                    data: activeDatasets.visits ? labels.map(() => Math.floor(Math.random() * 300)) : [],
+                    data: activeDatasets.visits ? data.visits?.nowData : [],
                     borderColor: 'rgb(153, 102, 255)',
                     backgroundColor: 'rgba(153, 102, 255, 0.2)',
                     yAxisID: 'y-visits',
@@ -638,8 +707,10 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                 activeDatasets.visits ? 'border-visits' : 'border-secondary'
                             }`}
                         >
-                            <div className="fs-4 fw-medium">Lượt truy cập</div>
-                            <div className="fs-1 fw-medium">100.000</div>
+                            <div className="fs-4 fw-medium">Lượt truy cập vào banner</div>
+                            <div className="fs-1 fw-medium">
+                                {data.visits?.nowData.reduce((acc, data) => acc + data, 0)}
+                            </div>
                             <div className="d-flex justify-content-between align-items-center">
                                 <p className="fs-5 text-muted">
                                     So với{' '}
@@ -649,7 +720,21 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                         ? 'tháng trước'
                                         : 'năm trước'}
                                 </p>
-                                <p className="fs-4 text-success fw-medium">10%</p>
+                                <p
+                                    className={`fs-4 text-success fw-medium ${
+                                        data.visits?.nowData.reduce((acc, data) => acc + data, 0) >=
+                                        data.visits?.prevData.reduce((acc, data) => acc + data, 0)
+                                            ? 'text-success'
+                                            : 'text-danger'
+                                    }`}
+                                >
+                                    {validateResult(
+                                        (data.visits?.nowData.reduce((acc, data) => acc + data, 0) -
+                                            data.visits?.prevData.reduce((acc, data) => acc + data, 0)) /
+                                            data.visits?.prevData.reduce((acc, data) => acc + data, 0)
+                                    ).toFixed(2)}
+                                    %
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -749,9 +834,9 @@ function StatisticOverview({ dateRange, selectedDate }) {
                         <div className="col d-flex flex-column gap-2">
                             <p className="fs-3 fw-medium">Tỉ lệ quay lại của người mua </p>
                             <p className="fs-1 fw-semibold">
-                                {((data.customer?.nowReOrder?.length / data.customer?.nowData?.length) * 100).toFixed(
-                                    2
-                                )}
+                                {validateResult(
+                                    (data.customer?.nowReOrder?.length / data.customer?.nowData?.length) * 100
+                                ).toFixed(2)}
                                 %
                             </p>
                             <p className="fs-4 text-muted fw-medium d-flex align-items-center gap-5">

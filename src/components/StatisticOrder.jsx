@@ -24,10 +24,6 @@ function StatisticOrder({ dateRange, selectedDate }) {
     }, [dateData])
 
     useEffect(() => {
-        console.log(orders)
-    }, [orders])
-
-    useEffect(() => {
         let orderData = {
             now: {
                 completed: 0,
@@ -47,7 +43,6 @@ function StatisticOrder({ dateRange, selectedDate }) {
                 new Date(order.createdAt).getTime() >= new Date(dateData.now.start).getTime() &&
                 new Date(order.createdAt).getTime() <= new Date(dateData.now.end).getTime()
             ) {
-                console.log('vào đây')
                 if (order.status === 'delevered') {
                     orderData.now.completed += 1
                     orderData.now.processingTime += calculateDaysDifference(order.createdAt, order.deliveredAt)

@@ -106,3 +106,16 @@ export const likeProduct = async (productId) => {
         throw error
     }
 }
+
+export const getProductOutOfStock = async () => {
+    try {
+        const response = await axios.get(API_URL + 'out-of-stock', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

@@ -1,4 +1,4 @@
-import './MainManager.scss'
+import { useState, useEffect, useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
@@ -10,40 +10,120 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js'
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore'
+import { useNavigate } from 'react-router-dom'
+import { db } from '../../firebase.config'
+import { getAdminOrders } from '../../services/OrderService'
+import { getProductOutOfStock } from '../../services/ProductService'
+import { getAllBanners } from '../../services/BannerService'
+import { getActivePromotionalCombos } from '../../services/PromotionalComboService'
+import './MainManager.scss'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 function MainManager() {
-    const chartData = {
-        labels: [
-            '00:00',
-            '02:00',
-            '04:00',
-            '06:00',
-            '08:00',
-            '10:00',
-            '12:00',
-            '14:00',
-            '16:00',
-            '18:00',
-            '20:00',
-            '22:00',
-        ],
-        datasets: [
-            {
-                label: 'Doanh thu (VNĐ)',
-                data: [
-                    150000, 300000, 200000, 400000, 800000, 1200000, 900000, 1500000, 2000000, 1800000, 1600000,
-                    1000000,
-                ],
-                borderColor: 'rgb(53, 162, 235)',
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
-                pointStyle: 'circle',
-                pointRadius: 5,
-                pointHoverRadius: 10,
-            },
-        ],
+    const navigate = useNavigate()
+    const [orders, setOrders] = useState([])
+    const [productOutOfStock, setProductOutOfStock] = useState([])
+    const [banners, setBanners] = useState([])
+    const [activePromotionalCombos, setActivePromotionalCombos] = useState([])
+    const [newRating, setNewRating] = useState([])
+    const [orderCompletedToday, setOrderCompletedToday] = useState([])
+    useEffect(() => {
+        const fetchOrders = async () => {
+            const response = await getAdminOrders({ manyStatus: ['pending', 'processing', 'cancelled'] })
+            const responseCompletedToday = await getAdminOrders({
+                manyStatus: ['delivered'],
+                orderEndDate: new Date().toISOString(),
+                orderStartDate: new Date().toISOString(),
+            })
+            setOrders(response)
+            setOrderCompletedToday(responseCompletedToday)
+        }
+        const fetchProductOutOfStock = async () => {
+            const response = await getProductOutOfStock()
+            setProductOutOfStock(response)
+        }
+        const fetchBanners = async () => {
+            const response = await getAllBanners({ isActive: true })
+            setBanners(response?.banners)
+        }
+        const fetchActivePromotionalCombos = async () => {
+            const response = await getActivePromotionalCombos()
+            setActivePromotionalCombos(response)
+        }
+        const fetchNewRating = async () => {
+            const ratingsRef = collection(db, 'product_ratings')
+            const today = new Date()
+            const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+            try {
+                const querySnapshot = await getDocs(ratingsRef)
+                const recentRatings = []
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data()
+
+                    const filteredRatings = data.ratings.filter((rating) => {
+                        const ratingDate = new Date(rating.createdAt)
+                        //ratingDate >= sevenDaysAgo &&
+                        return ratingDate <= today
+                    })
+
+                    recentRatings.push(...filteredRatings)
+                })
+                setNewRating(recentRatings)
+            } catch (error) {
+                console.error('Error fetching new ratings:', error)
+            }
+        }
+        fetchOrders()
+        fetchProductOutOfStock()
+        fetchBanners()
+        fetchActivePromotionalCombos()
+        fetchNewRating()
+    }, [])
+
+    const calculateRevenueByHour = () => {
+        const revenueByHour = new Array(12).fill(0)
+
+        orderCompletedToday.forEach((order) => {
+            const deliveredTime = new Date(order.deliveredAt)
+            const hour = deliveredTime.getHours()
+            const index = Math.floor(hour / 2)
+            revenueByHour[index] += order.totalPrice
+        })
+        return revenueByHour
     }
+
+    const chartData = useMemo(() => {
+        return {
+            labels: [
+                '00:00',
+                '02:00',
+                '04:00',
+                '06:00',
+                '08:00',
+                '10:00',
+                '12:00',
+                '14:00',
+                '16:00',
+                '18:00',
+                '20:00',
+                '22:00',
+            ],
+            datasets: [
+                {
+                    label: 'Doanh thu (VNĐ)',
+                    data: calculateRevenueByHour(),
+                    borderColor: 'rgb(53, 162, 235)',
+                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                    pointStyle: 'circle',
+                    pointRadius: 5,
+                    pointHoverRadius: 10,
+                },
+            ],
+        }
+    }, [orderCompletedToday])
 
     const options = {
         responsive: true,
@@ -69,49 +149,6 @@ function MainManager() {
         },
     }
 
-    const topProductData = [
-        {
-            _id: 1,
-            name: 'Sản phẩm 1 á á dsa á sa á á sa asd á asd á á sa dsa sa á á dá sa á á á á á á a s á  asd sa sa á á á',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 2,
-            name: 'Sản phẩm 2',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 3,
-            name: 'Sản phẩm 3',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 4,
-            name: 'Sản phẩm 4',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 5,
-            name: 'Sản phẩm 5',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-    ]
-
     return (
         <>
             <div className="d-flex flex-column gap-4 align-items-center">
@@ -119,35 +156,45 @@ function MainManager() {
                     <h3 className="fs-3 fw-bold mb-3">Danh sách cần làm</h3>
                     <div className="row g-4">
                         <div className="col-3 border-end border-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">
+                                {orders.filter((order) => order.status === 'pending').length}
+                            </p>
                             <p className="fs-4 fw-medium text-center">Đơn chờ xác nhận</p>
                         </div>
                         <div className="col-3 border-end border-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">
+                                {orders.filter((order) => order.status === 'processing').length}
+                            </p>
                             <p className="fs-4 fw-medium text-center">Đơn chờ giao hàng</p>
                         </div>
                         <div className="col-3 border-end border-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">
+                                {orders.filter((order) => order.status === 'cancelled').length}
+                            </p>
                             <p className="fs-4 fw-medium text-center">Đơn hủy</p>
                         </div>
                         <div className="col-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">
+                                {productOutOfStock.filter((product) => product.stockQuantity > 0).length}
+                            </p>
                             <p className="fs-4 fw-medium text-center">Sản phẩm sắp hết hàng</p>
                         </div>
                         <div className="col-3 border-end border-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">
+                                {productOutOfStock.filter((product) => product.stockQuantity === 0).length}
+                            </p>
                             <p className="fs-4 fw-medium text-center">Sản phẩm đã hết hàng</p>
                         </div>
                         <div className="col-3 border-end border-3 ">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">{activePromotionalCombos.length}</p>
                             <p className="fs-4 fw-medium text-center">Khuyến mãi đang chạy</p>
                         </div>
                         <div className="col-3 border-end border-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">{banners.length}</p>
                             <p className="fs-4 fw-medium text-center">Banner đang chạy</p>
                         </div>
                         <div className="col-3">
-                            <p className="fs-2 fw-bold text-center value-color">79</p>
+                            <p className="fs-2 fw-bold text-center value-color">{newRating.length}</p>
                             <p className="fs-4 fw-medium text-center">Đánh giá mới từ khách hàng</p>
                         </div>
                     </div>
@@ -176,23 +223,34 @@ function MainManager() {
                             </tr>
                         </thead>
                         <tbody>
-                            {topProductData.map((item, index) => (
+                            {productOutOfStock.map((item, index) => (
                                 <tr key={item._id}>
                                     <td>{index + 1}</td>
                                     <td>
                                         <div className="d-flex align-items-center gap-2">
-                                            <img src={item.urlImage} alt={item.name} width={50} height={50} />
+                                            <img src={item.urlImage[0]} alt={item.name} width={50} height={50} />
                                             <p className="mb-0 product-name">{item.name}</p>
                                         </div>
                                     </td>
                                     <td>{item.stockQuantity}</td>
                                     <td>{item.soldQuantity}</td>
                                     <td>
-                                        <p className="table__status warning shadow-sm">Sắp hết hàng</p>
+                                        <p
+                                            className={`table__status ${
+                                                item.stockQuantity > 0 ? 'warning' : 'error'
+                                            } shadow-sm`}
+                                        >
+                                            {item.stockQuantity > 0 ? 'Sắp hết hàng' : 'Đã hết hàng'}
+                                        </p>
                                     </td>
                                     <td>
                                         <div className="h-100 d-flex align-items-center justify-content-center">
-                                            <button className="px-3  py-2 rounded-4 primary-btn shadow-sm">
+                                            <button
+                                                className="px-3  py-2 rounded-4 primary-btn shadow-sm"
+                                                onClick={() => {
+                                                    navigate(`/seller/products/edit/${item.slug}`)
+                                                }}
+                                            >
                                                 Bổ sung
                                             </button>
                                         </div>

@@ -1,33 +1,100 @@
+import { useMemo, useState, useEffect } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-ChartJS.register(ArcElement, Tooltip, Legend)
+import { vi } from 'date-fns/locale'
+import { useDispatch } from 'react-redux'
+import { getAdminOrdersAction } from '../redux/slices/orderSilce'
+import { sameDay, calculateDateDate } from '../utils/DateUtils'
+
 import '../pages/admin/Statistic.scss'
 
+ChartJS.register(ArcElement, Tooltip, Legend)
 function StatisticProduct({ dateRange, selectedDate }) {
-    const categoryData = [
-        { name: 'Điện thoại', revenue: 5000000000 },
-        { name: 'Laptop', revenue: 3000000000 },
-        { name: 'Máy tính bảng', revenue: 2000000000 },
-        { name: 'Phụ kiện', revenue: 1500000000 },
-        { name: 'Đồng hồ', revenue: 500000000 },
-        { name: 'Tai nghe', revenue: 400000000 },
-        { name: 'Chuột', revenue: 300000000 },
-    ]
-    const sortedCategories = [...categoryData].sort((a, b) => b.revenue - a.revenue)
-    const top4Categories = sortedCategories.slice(0, 4)
-    const otherRevenue = sortedCategories.slice(4).reduce((sum, item) => sum + item.revenue, 0)
-    const chartData = {
-        labels: [...top4Categories.map((item) => item.name), 'Khác'],
-        datasets: [
-            {
-                data: [...top4Categories.map((item) => item.revenue), otherRevenue],
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-                borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-                borderWidth: 1,
-                hoverOffset: 10,
-            },
-        ],
-    }
+    const dateData = useMemo(() => calculateDateDate(dateRange, selectedDate), [dateRange, selectedDate])
+    const dispatch = useDispatch()
+    const [orders, setOrders] = useState([])
+    const [data, setData] = useState({})
+    useEffect(() => {
+        const fetchOrders = async () => {
+            const response = await dispatch(getAdminOrdersAction({ dateData }))
+            setOrders(response.payload)
+        }
+        fetchOrders()
+    }, [dateData])
+
+    useEffect(() => {
+        const topProductData = orders.reduce((acc, item) => {
+            if (item.createdAt < dateData.now.start) return acc
+            item.products.forEach((product) => {
+                if (!acc.find((item) => item._id === product.product.product._id)) {
+                    acc.push({
+                        _id: product.product.product._id,
+                        name: product.product.product.name,
+                        urlImage: product.product.product.urlImage[0],
+                        soldQuantity: product.quantity,
+                        revenue: product.product.price * product.quantity,
+                    })
+                } else {
+                    const index = acc.findIndex((item) => item._id === product.product.product._id)
+                    acc[index].soldQuantity += product.quantity
+                    acc[index].revenue += product.product.price * product.quantity
+                }
+            })
+            return acc
+        }, [])
+        const categoryData = orders.reduce((acc, item) => {
+            if (item.createdAt < dateData.now.start) return acc
+            item.products.forEach((product) => {
+                product.product.product.categories.forEach((category) => {
+                    if (!acc.find((item) => item._id === category.parentCategory._id)) {
+                        acc.push({
+                            _id: category.parentCategory._id,
+                            name: category.parentCategory.name,
+                            revenue: product.product.price * product.quantity,
+                        })
+                    } else {
+                        const index = acc.findIndex((item) => item._id === category.parentCategory._id)
+                        acc[index].revenue += product.product.price * product.quantity
+                    }
+                })
+            })
+            return acc
+        }, [])
+        setData({
+            topProductData,
+            categoryData,
+        })
+    }, [orders, dateData])
+
+    const chartData = useMemo(() => {
+        return {
+            labels:
+                data.categoryData?.length > 4
+                    ? data.categoryData
+                          ?.sort((a, b) => b.revenue - a.revenue)
+                          .slice(0, 4)
+                          .map((item) => item.name)
+                    : data.categoryData?.map((item) => item.name),
+            datasets: [
+                {
+                    data:
+                        data.categoryData?.length > 4
+                            ? [
+                                  ...data.categoryData
+                                      ?.sort((a, b) => b.revenue - a.revenue)
+                                      .slice(0, 4)
+                                      .map((item) => item.revenue),
+                                  data.categoryData?.slice(4).reduce((sum, item) => sum + item.revenue, 0),
+                              ]
+                            : data.categoryData?.map((item) => item.revenue),
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    borderWidth: 1,
+                    hoverOffset: 10,
+                },
+            ],
+        }
+    }, [data.categoryData])
     const chartOptions = {
         responsive: true,
         plugins: {
@@ -70,48 +137,7 @@ function StatisticProduct({ dateRange, selectedDate }) {
         },
         cutout: '60%',
     }
-    const topProductData = [
-        {
-            _id: 1,
-            name: 'Sản phẩm 1 á á dsa á sa á á sa asd á asd á á sa dsa sa á á dá sa á á á á á á a s á  asd sa sa á á á',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 2,
-            name: 'Sản phẩm 2',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 3,
-            name: 'Sản phẩm 3',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 4,
-            name: 'Sản phẩm 4',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-        {
-            _id: 5,
-            name: 'Sản phẩm 5',
-            urlImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzqMvMuYQIvpZGdgD7O8ESBZxgZG9QyKkxnw&s',
-            stockQuantity: 100,
-            soldQuantity: 100,
-            revenue: 1000000,
-        },
-    ]
+
     return (
         <>
             <div className="p-3 bg-white rounded-3 shadow-sm">
@@ -121,13 +147,12 @@ function StatisticProduct({ dateRange, selectedDate }) {
                         <tr>
                             <th>STT</th>
                             <th>Sản phẩm</th>
-                            <th>Tồn kho</th>
                             <th>Đã bán</th>
                             <th>Doanh thu</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {topProductData.map((item, index) => (
+                        {data.topProductData?.map((item, index) => (
                             <tr key={item._id}>
                                 <td>{index + 1}</td>
                                 <td>
@@ -136,7 +161,6 @@ function StatisticProduct({ dateRange, selectedDate }) {
                                         <p className="mb-0 product-name">{item.name}</p>
                                     </div>
                                 </td>
-                                <td>{item.stockQuantity}</td>
                                 <td>{item.soldQuantity}</td>
                                 <td>{item.revenue.toLocaleString('vi-VN')}</td>
                             </tr>
@@ -160,18 +184,34 @@ function StatisticProduct({ dateRange, selectedDate }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {top4Categories.map((item, index) => (
-                                <tr key={item._id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.revenue.toLocaleString('vi-VN')}</td>
-                                </tr>
-                            ))}
-                            {otherRevenue > 0 && (
+                            {data.categoryData?.length > 4
+                                ? data.categoryData
+                                      ?.sort((a, b) => b.revenue - a.revenue)
+                                      .slice(0, 4)
+                                      .map((item, index) => (
+                                          <tr key={item._id}>
+                                              <td>{index + 1}</td>
+                                              <td>{item.name}</td>
+                                              <td>{item.revenue.toLocaleString('vi-VN') + ' VND'}</td>
+                                          </tr>
+                                      ))
+                                : data.categoryData?.map((item, index) => (
+                                      <tr key={item._id}>
+                                          <td>{index + 1}</td>
+                                          <td>{item.name}</td>
+                                          <td>{item.revenue.toLocaleString('vi-VN') + ' VND'}</td>
+                                      </tr>
+                                  ))}
+                            {data.categoryData?.length > 4 && (
                                 <tr>
                                     <td>...</td>
                                     <td>Khác</td>
-                                    <td>{otherRevenue.toLocaleString('vi-VN')}</td>
+                                    <td>
+                                        {data.categoryData
+                                            ?.slice(4)
+                                            .reduce((sum, item) => sum + item.revenue, 0)
+                                            .toLocaleString('vi-VN') + ' VND'}
+                                    </td>
                                 </tr>
                             )}
                         </tbody>

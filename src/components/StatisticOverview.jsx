@@ -29,45 +29,15 @@ import {
 } from 'chart.js'
 import { useDispatch } from 'react-redux'
 import { getAdminOrdersAction } from '../redux/slices/orderSilce'
-import { sameDay } from '../utils/DateUtils'
+import { sameDay, calculateDateDate } from '../utils/DateUtils'
 import { getOrdersByUserId } from '../services/OrderService'
+import { validateResult } from '../utils/StringUtil'
 import '../pages/admin/Statistic.scss'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement)
 function StatisticOverview({ dateRange, selectedDate }) {
     const dateData = useMemo(() => {
-        return dateRange === 'week'
-            ? {
-                  now: {
-                      start: startOfWeek(selectedDate, { weekStartsOn: 1 }),
-                      end: endOfWeek(selectedDate, { weekStartsOn: 1 }),
-                  },
-                  prev: {
-                      start: startOfWeek(addDays(selectedDate, -7), { weekStartsOn: 1 }),
-                      end: endOfWeek(addDays(selectedDate, -7), { weekStartsOn: 1 }),
-                  },
-              }
-            : dateRange === 'month'
-            ? {
-                  now: {
-                      start: startOfMonth(selectedDate),
-                      end: endOfMonth(selectedDate),
-                  },
-                  prev: {
-                      start: startOfMonth(addMonths(selectedDate, -1)),
-                      end: endOfMonth(addMonths(selectedDate, -1)),
-                  },
-              }
-            : {
-                  now: {
-                      start: startOfYear(selectedDate),
-                      end: endOfYear(selectedDate),
-                  },
-                  prev: {
-                      start: startOfYear(addYears(selectedDate, -1)),
-                      end: endOfYear(addYears(selectedDate, -1)),
-                  },
-              }
+        return calculateDateDate(dateRange, selectedDate)
     }, [dateRange, selectedDate])
     const dispatch = useDispatch()
     const [activeDatasets, setActiveDatasets] = useState({
@@ -81,10 +51,7 @@ function StatisticOverview({ dateRange, selectedDate }) {
 
     useEffect(() => {
         const fetchOrders = async () => {
-            const response = await dispatch(
-                getAdminOrdersAction()
-                // { dateData }
-            )
+            const response = await dispatch(getAdminOrdersAction({ dateData }))
             setOrders(response.payload)
         }
         fetchOrders()
@@ -430,34 +397,36 @@ function StatisticOverview({ dateRange, selectedDate }) {
         },
     }
 
-    const customerData = {
-        labels: ['Người mua mới', 'Người mua hiện tại'],
-        datasets: [
-            {
-                data: [
-                    (data.customer?.nowData?.filter(
-                        (customer) =>
-                            new Date(customer.createdAt) <= new Date(dateData.now.end) &&
-                            new Date(customer.createdAt) >= new Date(dateData.now.start)
-                    ).length /
-                        data.customer?.nowData?.length) *
-                        100,
-                    (data.customer?.nowData?.filter(
-                        (customer) => new Date(customer.createdAt) < new Date(dateData.now.start)
-                    ).length /
-                        data.customer?.nowData?.length) *
-                        100,
-                ], // 30% mới, 70% hiện tại
-                backgroundColor: [
-                    'rgb(54, 162, 235)', // Màu cho người mua mới
-                    'rgb(75, 192, 192)', // Màu cho người mua hiện tại
-                ],
-                borderColor: ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)'],
-                borderWidth: 1,
-                hoverOffset: 10,
-            },
-        ],
-    }
+    const customerData = useMemo(() => {
+        return {
+            labels: ['Người mua mới', 'Người mua hiện tại'],
+            datasets: [
+                {
+                    data: [
+                        (data.customer?.nowData?.filter(
+                            (customer) =>
+                                new Date(customer.createdAt) <= new Date(dateData.now.end) &&
+                                new Date(customer.createdAt) >= new Date(dateData.now.start)
+                        ).length /
+                            data.customer?.nowData?.length) *
+                            100,
+                        (data.customer?.nowData?.filter(
+                            (customer) => new Date(customer.createdAt) < new Date(dateData.now.start)
+                        ).length /
+                            data.customer?.nowData?.length) *
+                            100,
+                    ], // 30% mới, 70% hiện tại
+                    backgroundColor: [
+                        'rgb(54, 162, 235)', // Màu cho người mua mới
+                        'rgb(75, 192, 192)', // Màu cho người mua hiện tại
+                    ],
+                    borderColor: ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+                    borderWidth: 1,
+                    hoverOffset: 10,
+                },
+            ],
+        }
+    }, [dateData, data])
 
     const customerChartOptions = {
         responsive: true,
@@ -576,11 +545,11 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                             : 'text-danger'
                                     }`}
                                 >
-                                    {(
+                                    {validateResult(
                                         ((data.revenue?.nowData.reduce((acc, data) => acc + data, 0) -
                                             data.revenue?.prevData.reduce((acc, data) => acc + data, 0)) /
                                             data.revenue?.prevData.reduce((acc, data) => acc + data, 0)) *
-                                        100
+                                            100
                                     ).toFixed(2)}
                                     %
                                 </p>
@@ -614,11 +583,11 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                             : 'text-danger'
                                     }`}
                                 >
-                                    {(
+                                    {validateResult(
                                         ((data.order?.nowData.reduce((acc, data) => acc + data, 0) -
                                             data.order?.prevData.reduce((acc, data) => acc + data, 0)) /
                                             data.order?.prevData.reduce((acc, data) => acc + data, 0)) *
-                                        100
+                                            100
                                     ).toFixed(2)}
                                     %
                                 </p>
@@ -652,11 +621,11 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                             : 'text-danger'
                                     }`}
                                 >
-                                    {(
+                                    {validateResult(
                                         ((data.cancelled?.nowData.reduce((acc, data) => acc + data, 0) -
                                             data.cancelled?.prevData.reduce((acc, data) => acc + data, 0)) /
                                             data.cancelled?.prevData.reduce((acc, data) => acc + data, 0)) *
-                                        100
+                                            100
                                     ).toFixed(2)}
                                     %
                                 </p>
@@ -715,9 +684,10 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                             : 'text-danger'
                                     } fw-semibold`}
                                 >
-                                    {((data.customer?.nowData?.length - data.customer?.prevData?.length) /
-                                        data.customer?.prevData?.length) *
-                                        100}
+                                    {validateResult(
+                                        (data.customer?.nowData?.length - data.customer?.prevData?.length) /
+                                            data.customer?.prevData?.length
+                                    ) * 100}
                                     %
                                 </span>
                             </p>
@@ -746,7 +716,7 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                         genreratePercentNew() >= 0 ? 'text-success' : 'text-danger'
                                     } fw-semibold`}
                                 >
-                                    {genreratePercentNew()}%
+                                    {validateResult(genreratePercentNew())}%
                                 </span>
                             </p>
                         </div>
@@ -771,7 +741,7 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                         genreratePercentOld() >= 0 ? 'text-success' : 'text-danger'
                                     } fw-semibold`}
                                 >
-                                    {genreratePercentOld()}%
+                                    {validateResult(genreratePercentOld())}%
                                 </span>
                             </p>
                         </div>
@@ -799,9 +769,9 @@ function StatisticOverview({ dateRange, selectedDate }) {
                                             : 'text-danger'
                                     } fw-semibold`}
                                 >
-                                    {(
+                                    {validateResult(
                                         (data.customer?.nowReOrder?.length / data.customer?.nowData?.length) * 100 -
-                                        (data.customer?.prevReOrder?.length / data.customer?.prevData?.length) * 100
+                                            (data.customer?.prevReOrder?.length / data.customer?.prevData?.length) * 100
                                     ).toFixed(2)}
                                     %
                                 </span>

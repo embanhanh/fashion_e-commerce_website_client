@@ -30,3 +30,10 @@ export function removeVietnameseTones(str) {
         .replace(/Đ/g, 'D') // Chuyển 'Đ' thành 'D'
         .replace(/[^a-zA-Z0-9\s]/g, '') // Loại bỏ các ký tự đặc biệt nếu cần
 }
+
+export function validateResult(result) {
+    if (isNaN(result) || !isFinite(result)) {
+        return 0
+    }
+    return result
+}

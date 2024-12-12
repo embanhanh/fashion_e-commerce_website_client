@@ -5,6 +5,7 @@ import 'swiper/css/pagination'
 import { Autoplay, Pagination } from 'swiper/modules'
 import './Auth.scss'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { login, register, loginWithFirebase } from '../../services/UserService'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, fbProvider, ggProvider } from '../../firebase.config'
@@ -59,7 +60,6 @@ function Auth() {
     const [showPassword, setShowPassword] = useState(false)
     const [showPassword2, setShowPassword2] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [notication, setNotication] = useState('')
 
     const handleLoginWithFb = async (e) => {
         setIsLoading(true)
@@ -70,11 +70,23 @@ function Auth() {
                 const idToken = await user.getIdToken()
 
                 await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'facebook' })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             }
         } catch (error) {
             const errorMessage = error.message
-            setAuthError(errorMessage)
+            Swal.fire({
+                title: 'Đăng nhập thất bại',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             setIsLoading(false)
         }
@@ -88,11 +100,23 @@ function Auth() {
                 const idToken = await user.getIdToken()
 
                 await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'google' })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             }
         } catch (error) {
             const errorMessage = error.message
-            setAuthError(errorMessage)
+            Swal.fire({
+                title: 'Đăng nhập thất bại',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             setIsLoading(false)
         }
@@ -106,9 +130,21 @@ function Auth() {
                 setIsLoading(true)
                 try {
                     await dispatch(registerUser({ email, password })).unwrap()
-                    setNotication('success_signup')
+                    Swal.fire({
+                        title: 'Đăng ký thành công',
+                        text: 'Bạn sẽ quay trở lại trang "Đăng nhập"',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        navigate('/user/login')
+                    })
                 } catch (e) {
-                    setAuthError(e.message)
+                    Swal.fire({
+                        title: 'Đăng ký thất bại',
+                        text: e.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                    })
                 } finally {
                     setIsLoading(false)
                 }
@@ -117,9 +153,21 @@ function Auth() {
             setIsLoading(true)
             try {
                 await dispatch(loginUser({ email, password })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             } catch (e) {
-                setAuthError(e.message)
+                Swal.fire({
+                    title: 'Đăng nhập thất bại',
+                    text: e.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                })
             } finally {
                 setIsLoading(false)
             }
@@ -135,50 +183,12 @@ function Auth() {
         }
     }, [email, password])
 
-    useEffect(() => {
-        if (notication == 'success_login') {
-            setTimeout(() => {
-                navigate(from)
-            }, 1000)
-        }
-        if (notication == 'success_signup') {
-            setTimeout(() => {
-                navigate('/user/login')
-                setNotication('')
-            }, 1000)
-        }
-    }, [notication, navigate, from])
-
     return (
         <>
             <div
                 className="d-flex w-100 align-items-center flex-column justify-content-start h-100"
                 style={{ minHeight: '100vh' }}
             >
-                {notication && (
-                    <>
-                        <div
-                            className="modal d-block"
-                            style={{ backgroundColor: 'rgba(0,0,0,0.3' }}
-                            aria-modal="true"
-                            role="dialog"
-                        >
-                            <div className="modal-dialog modal-dialog-centered justify-content-center">
-                                <Notification
-                                    title={
-                                        (notication == 'success_login' && 'Đăng nhập thành công') ||
-                                        (notication == 'success_signup' && 'Đăng ký thành công')
-                                    }
-                                    description={
-                                        (notication == 'success_login' && 'Chúc bạn mua sắm vui vẻ') ||
-                                        (notication == 'success_signup' && 'Bạn sẽ quay trở lại trang "Đăng ký"')
-                                    }
-                                    type={'success'}
-                                />
-                            </div>
-                        </div>
-                    </>
-                )}
                 <div className="w-100 bg-white header shadow-sm h-100">
                     <div
                         className="container max-md d-flex justify-content-between align-items-center"

@@ -21,7 +21,7 @@ function Orders() {
 
     useEffect(() => {
         if (orders) {
-            // console.log(orders)
+            console.log(orders)
         }
     }, [orders])
 
@@ -29,31 +29,49 @@ function Orders() {
         <div className="container mb-4">
             <div className="order-tabs mt-4 z-0 position-sticky bg-white">
                 <div className="border-bottom d-flex">
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === '' ? 'active' : ''}`} onClick={() => setFilterStatus('')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === '' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('')}
+                    >
                         Tất cả
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'pending' ? 'active' : ''}`} onClick={() => setFilterStatus('pending')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'pending' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('pending')}
+                    >
                         Chờ xác nhận
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'processing' ? 'active' : ''}`} onClick={() => setFilterStatus('processing')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'processing' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('processing')}
+                    >
                         Đang xử lý
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivering' ? 'active' : ''}`} onClick={() => setFilterStatus('delivering')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivering' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('delivering')}
+                    >
                         Đang giao
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivered' ? 'active' : ''}`} onClick={() => setFilterStatus('delivered')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'delivered' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('delivered')}
+                    >
                         Đã giao
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'cancelled' ? 'active' : ''}`} onClick={() => setFilterStatus('cancelled')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'cancelled' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('cancelled')}
+                    >
                         Đã hủy
                     </p>
                 </div>
             </div>
 
             {loading ? (
-                <div class="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
             ) : error ? (
@@ -61,9 +79,7 @@ function Orders() {
             ) : !orders || orders.length === 0 ? (
                 <p className="fs-3 fw-medium text-center">Không có đơn hàng nào</p>
             ) : (
-                orders.map((order) => (
-                    <OrderCard key={order._id} order={order}></OrderCard>
-                ))
+                orders.map((order) => <OrderCard key={order._id} order={order}></OrderCard>)
             )}
         </div>
     )

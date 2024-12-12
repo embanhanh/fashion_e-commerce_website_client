@@ -57,6 +57,7 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
     const [previews, setPreviews] = useState([])
     const [error, setError] = useState('')
 
+    console.log(productId)
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files)
         if (files.length + selectedFiles.length > 3) {
@@ -166,13 +167,7 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
 
     return (
         <div>
-            <Modal
-                show={true}
-                onHide={() => {
-                    console.log('close')
-                }}
-                centered
-            >
+            <Modal show={true} onHide={onClose} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Đánh giá sản phẩm</Modal.Title>
                 </Modal.Header>
@@ -261,12 +256,7 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
                 </Modal.Body>
                 <Modal.Footer>
                     {error && <p className="text-danger">{error}</p>}
-                    <button
-                        className="bg-white px-4 py-2 border rounded-4 "
-                        onClick={() => {
-                            console.log('close')
-                        }}
-                    >
+                    <button className="bg-white px-4 py-2 border rounded-4 " onClick={onClose}>
                         <p className="m-0">Hủy</p>
                     </button>
                     <button

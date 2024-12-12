@@ -10,6 +10,7 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, Button, Toast } from 'react-bootstrap'
+import Swal from 'sweetalert2'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
 import { fetchProductByProductName, likeProductAction } from '../../redux/slices/productSlice'
@@ -217,11 +218,17 @@ function ProductDetail() {
                             quantity: quantity,
                         })
                     ).unwrap()
-                    setNotification({
-                        show: true,
-                        description: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
-                        type: 'success',
+                    // setNotification({
+                    //     show: true,
+                    //     description: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
+                    //     type: 'success',
+                    //     title: 'Thành công',
+                    // })
+                    Swal.fire({
                         title: 'Thành công',
+                        text: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
                     })
                 }
             } catch (error) {

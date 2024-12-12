@@ -18,6 +18,8 @@ import {
     getOrderUser,
     getFavoriteProducts,
     cancelOrder,
+    getOrderDetail,
+    receivedOrder,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -57,14 +59,17 @@ export const addNewAddress = createAsyncThunk('user/createAddress', async (addre
     }
 })
 
-export const updateAddress = createAsyncThunk('user/updateAddress', async ({ address_id, addressData }, { rejectWithValue }) => {
-    try {
-        const respone = await updateAddressUser(address_id, addressData)
-        return respone
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateAddress = createAsyncThunk(
+    'user/updateAddress',
+    async ({ address_id, addressData }, { rejectWithValue }) => {
+        try {
+            const respone = await updateAddressUser(address_id, addressData)
+            return respone
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ address_id }) => {
     try {
@@ -75,14 +80,17 @@ export const deleteAddress = createAsyncThunk('user/deleteAddress', async ({ add
     }
 })
 
-export const setDefaultAddress = createAsyncThunk('user/setDefaultAddress', async ({ address_id }, { rejectWithValue }) => {
-    try {
-        const response = await setDefaultAddressUser(address_id)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const setDefaultAddress = createAsyncThunk(
+    'user/setDefaultAddress',
+    async ({ address_id }, { rejectWithValue }) => {
+        try {
+            const response = await setDefaultAddressUser(address_id)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 export const fetchOrderUser = createAsyncThunk('user/fetchOrderUser', async (_, { getState, rejectWithValue }) => {
     try {
@@ -93,8 +101,6 @@ export const fetchOrderUser = createAsyncThunk('user/fetchOrderUser', async (_, 
         return rejectWithValue(error)
     }
 })
-
-
 
 export const fetchVouchers = createAsyncThunk('user/fetchVouchers', async (_, { rejectWithValue }) => {
     try {
@@ -114,14 +120,17 @@ export const fetchClients = createAsyncThunk('user/fetchClients', async (clientF
     }
 })
 
-export const blockClientAction = createAsyncThunk('user/blockClient', async ({ userId, reasons }, { rejectWithValue }) => {
-    try {
-        const response = await blockClient(userId, reasons)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const blockClientAction = createAsyncThunk(
+    'user/blockClient',
+    async ({ userId, reasons }, { rejectWithValue }) => {
+        try {
+            const response = await blockClient(userId, reasons)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 export const unblockClientAction = createAsyncThunk('user/unblockClient', async ({ userId }, { rejectWithValue }) => {
     try {
@@ -132,41 +141,53 @@ export const unblockClientAction = createAsyncThunk('user/unblockClient', async 
     }
 })
 
-export const updateClientTypeAction = createAsyncThunk('user/updateClientType', async ({ userId, clientType }, { rejectWithValue }) => {
-    try {
-        const response = await updateClientType(userId, clientType)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateClientTypeAction = createAsyncThunk(
+    'user/updateClientType',
+    async ({ userId, clientType }, { rejectWithValue }) => {
+        try {
+            const response = await updateClientType(userId, clientType)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const updateManyClientTypeAction = createAsyncThunk('user/updateManyClientType', async ({ userIds, clientType }, { rejectWithValue }) => {
-    try {
-        const response = await updateManyClientType(userIds, clientType)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updateManyClientTypeAction = createAsyncThunk(
+    'user/updateManyClientType',
+    async ({ userIds, clientType }, { rejectWithValue }) => {
+        try {
+            const response = await updateManyClientType(userIds, clientType)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const blockManyClientAction = createAsyncThunk('user/blockManyClient', async ({ userIds, reasons }, { rejectWithValue }) => {
-    try {
-        const response = await blockManyClient(userIds, reasons)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const blockManyClientAction = createAsyncThunk(
+    'user/blockManyClient',
+    async ({ userIds, reasons }, { rejectWithValue }) => {
+        try {
+            const response = await blockManyClient(userIds, reasons)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const unblockManyClientAction = createAsyncThunk('user/unblockManyClient', async ({ userIds }, { rejectWithValue }) => {
-    try {
-        const response = await unblockManyClient(userIds)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const unblockManyClientAction = createAsyncThunk(
+    'user/unblockManyClient',
+    async ({ userIds }, { rejectWithValue }) => {
+        try {
+            const response = await unblockManyClient(userIds)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 export const fetchFavoriteProducts = createAsyncThunk('user/fetchFavoriteProducts', async (_, { rejectWithValue }) => {
     try {
@@ -177,9 +198,30 @@ export const fetchFavoriteProducts = createAsyncThunk('user/fetchFavoriteProduct
     }
 })
 
-export const cancelOrderUser = createAsyncThunk('user/cancelOrder', async ({ orderId, reason }, { rejectWithValue }) => {
+export const fetchOrderDetail = createAsyncThunk('user/fetchOrderDetail', async (orderId, { rejectWithValue }) => {
     try {
-        const response = await cancelOrder(orderId, reason)
+        const response = await getOrderDetail(orderId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const cancelOrderUser = createAsyncThunk(
+    'user/cancelOrder',
+    async ({ orderId, reason }, { rejectWithValue }) => {
+        try {
+            const response = await cancelOrder(orderId, reason)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const receivedOrderUser = createAsyncThunk('user/receivedOrder', async ({ orderId }, { rejectWithValue }) => {
+    try {
+        const response = await receivedOrder(orderId)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -199,6 +241,7 @@ const userSlice = createSlice({
         orderFilters: {
             status: '',
         },
+        orderDetail: null,
         clients: [],
         clientsLoading: false,
         clientFilters: {
@@ -257,24 +300,24 @@ const userSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(addNewAddress.pending, (state) => {
-                state.loading = true;
+                state.loading = true
             })
             .addCase(addNewAddress.fulfilled, (state, action) => {
-                state.loading = false;
+                state.loading = false
 
                 // Reset all addresses to not default
-                state.addresses.forEach(address => {
-                    address.default = false;
-                });
+                state.addresses.forEach((address) => {
+                    address.default = false
+                })
 
                 // Add the new address as default and place it at the top
-                const newAddress = { ...action.payload, default: true }; // Đảm bảo địa chỉ mới là default
-                state.addresses.unshift(newAddress); // Thêm vào đầu danh sách
+                const newAddress = { ...action.payload, default: true } // Đảm bảo địa chỉ mới là default
+                state.addresses.unshift(newAddress) // Thêm vào đầu danh sách
             })
             .addCase(addNewAddress.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload; // Lưu lỗi vào state
-                console.error('Error adding address:', action.payload); // Ghi lại lỗi
+                state.loading = false
+                state.error = action.payload // Lưu lỗi vào state
+                console.error('Error adding address:', action.payload) // Ghi lại lỗi
             })
             .addCase(updateAddress.pending, (state) => {
                 state.loading = true
@@ -324,7 +367,10 @@ const userSlice = createSlice({
             })
             .addCase(fetchOrderUser.fulfilled, (state, action) => {
                 state.loading = false
-                state.orders = action.payload
+                // Sắp xếp đơn hàng theo createdAt mới nhất
+                state.orders = action.payload.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt)
+                })
             })
             .addCase(fetchOrderUser.rejected, (state, action) => {
                 state.loading = false
@@ -356,7 +402,9 @@ const userSlice = createSlice({
             })
             .addCase(blockClientAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+                state.clients = state.clients.map((client) =>
+                    client._id === action.payload._id ? action.payload : client
+                )
             })
             .addCase(blockClientAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -366,7 +414,9 @@ const userSlice = createSlice({
             })
             .addCase(unblockClientAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+                state.clients = state.clients.map((client) =>
+                    client._id === action.payload._id ? action.payload : client
+                )
             })
             .addCase(unblockClientAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -376,7 +426,9 @@ const userSlice = createSlice({
             })
             .addCase(updateClientTypeAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (client._id === action.payload._id ? action.payload : client))
+                state.clients = state.clients.map((client) =>
+                    client._id === action.payload._id ? action.payload : client
+                )
             })
             .addCase(updateClientTypeAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -386,7 +438,11 @@ const userSlice = createSlice({
             })
             .addCase(updateManyClientTypeAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+                state.clients = state.clients.map((client) =>
+                    action.payload.find((user) => user._id === client._id)
+                        ? action.payload.find((user) => user._id === client._id)
+                        : client
+                )
             })
             .addCase(updateManyClientTypeAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -396,7 +452,11 @@ const userSlice = createSlice({
             })
             .addCase(blockManyClientAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+                state.clients = state.clients.map((client) =>
+                    action.payload.find((user) => user._id === client._id)
+                        ? action.payload.find((user) => user._id === client._id)
+                        : client
+                )
             })
             .addCase(blockManyClientAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -406,7 +466,11 @@ const userSlice = createSlice({
             })
             .addCase(unblockManyClientAction.fulfilled, (state, action) => {
                 state.error = null
-                state.clients = state.clients.map((client) => (action.payload.find((user) => user._id === client._id) ? action.payload.find((user) => user._id === client._id) : client))
+                state.clients = state.clients.map((client) =>
+                    action.payload.find((user) => user._id === client._id)
+                        ? action.payload.find((user) => user._id === client._id)
+                        : client
+                )
             })
             .addCase(unblockManyClientAction.rejected, (state, action) => {
                 state.error = action.payload
@@ -428,9 +492,35 @@ const userSlice = createSlice({
             })
             .addCase(cancelOrderUser.fulfilled, (state, action) => {
                 state.error = null
-                state.orders = state.orders.map((order) => (order._id === action.payload.orderId ? action.payload : order))
+                state.orders = state.orders.map((order) =>
+                    order._id === action.payload.orderId ? action.payload : order
+                )
             })
             .addCase(cancelOrderUser.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchOrderDetail.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchOrderDetail.fulfilled, (state, action) => {
+                state.loading = false
+                state.orderDetail = action.payload
+            })
+            .addCase(fetchOrderDetail.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(receivedOrderUser.pending, (state) => {
+                state.error = null
+            })
+            .addCase(receivedOrderUser.fulfilled, (state, action) => {
+                state.error = null
+                state.orders = state.orders.map((order) =>
+                    order._id === action.payload.orderId ? action.payload : order
+                )
+            })
+            .addCase(receivedOrderUser.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

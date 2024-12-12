@@ -97,6 +97,12 @@ const OrderManagement = () => {
         }
     }
 
+    useEffect(() => {
+        if (orders) {
+            console.log(orders.filter((order) => order.status === 'cancelled'))
+        }
+    }, [orders])
+
     const handlePrintInvoice = (order) => {
         localStorage.setItem('selectedOrders', JSON.stringify([order]))
         window.open(`/invoice`, '_blank', 'noopener,noreferrer')
@@ -577,8 +583,8 @@ const OrderManagement = () => {
                                         {order.shippingMethod === 'basic'
                                             ? 'Cơ bản'
                                             : order.shippingMethod === 'fast'
-                                            ? 'Nhanh'
-                                            : 'Hỏa tốc'}
+                                                ? 'Nhanh'
+                                                : 'Hỏa tốc'}
                                     </p>
                                     <p className="fs-4 text-center">
                                         {order.paymentMethod === 'bankTransfer'
@@ -588,25 +594,24 @@ const OrderManagement = () => {
                                     <p className="fs-4 text-center">{order.totalPrice.toLocaleString('vi-VN')}đ</p>
                                     <div className="text-center">
                                         <p
-                                            className={`text-center ${
-                                                order.status === 'cancelled'
-                                                    ? 'text-danger'
-                                                    : order.status === 'delivered'
+                                            className={`text-center ${order.status === 'cancelled'
+                                                ? 'text-danger'
+                                                : order.status === 'delivered'
                                                     ? 'text-success'
                                                     : 'text-warning'
-                                            }`}
+                                                }`}
                                         >
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : order.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : order.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : order.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : order.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
-                                        <FontAwesomeIcon
+                                        {order.status !== 'cancelled' && <FontAwesomeIcon
                                             onClick={() =>
                                                 setShowChangeStatusModal({
                                                     show: true,
@@ -617,7 +622,7 @@ const OrderManagement = () => {
                                             icon={faPen}
                                             className="fs-3 p-2 hover-icon"
                                             color="#4a90e2"
-                                        />
+                                        />}
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon
@@ -632,7 +637,7 @@ const OrderManagement = () => {
                                         >
                                             In hóa đơn
                                         </p>
-                                        <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>
+                                        {order.status !== 'cancelled' && <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>}
                                     </div>
                                 </div>
                             ))
@@ -689,23 +694,22 @@ const OrderManagement = () => {
                                     </div>
                                     <div className="text-center">
                                         <p
-                                            className={`text-center ${
-                                                selectedOrder.status === 'cancelled'
-                                                    ? 'text-danger'
-                                                    : selectedOrder.status === 'delivered'
+                                            className={`text-center ${selectedOrder.status === 'cancelled'
+                                                ? 'text-danger'
+                                                : selectedOrder.status === 'delivered'
                                                     ? 'text-success'
                                                     : 'text-warning'
-                                            }`}
+                                                } text-uppercase fs-3`}
                                         >
                                             {selectedOrder.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : selectedOrder.status === 'processing'
-                                                ? 'Đang xử lý'
-                                                : selectedOrder.status === 'delivering'
-                                                ? 'Đang giao'
-                                                : selectedOrder.status === 'delivered'
-                                                ? 'Đã giao'
-                                                : 'Đã hủy'}
+                                                    ? 'Đang xử lý'
+                                                    : selectedOrder.status === 'delivering'
+                                                        ? 'Đang giao'
+                                                        : selectedOrder.status === 'delivered'
+                                                            ? 'Đã giao'
+                                                            : 'Đã hủy'}
                                         </p>
                                     </div>
                                 </div>
@@ -804,6 +808,16 @@ const OrderManagement = () => {
                                         </div>
                                     ))}
                                 </div>
+                                {selectedOrder?.cancelReason && <div className="d-flex justify-content-between align-items-center mt-5">
+                                    <p className="fs-4 fw-semibold">Lý do hủy:</p>
+                                    <p className="fs-4 fw-normal">{selectedOrder?.cancelReason === 'change_address' ? 'Muốn thay đổi địa chỉ giao hàng.'
+                                        : selectedOrder?.cancelReason === 'change_voucher' ? 'Muốn nhập/thay đổi voucher.'
+                                            : selectedOrder?.cancelReason === 'change_product' ? 'Muốn thay đổi sản phẩm(số lượng, màu sắc, phân loại hàng,...).'
+                                                : selectedOrder?.cancelReason === 'find_cheaper' ? 'Tìm thấy giá rẻ ở chỗ khác.'
+                                                    : selectedOrder?.cancelReason === 'cancel_purchase' ? 'Đổi ý, không muốn mua nữa.'
+                                                        : 'Không có lý do'}
+                                    </p>
+                                </div>}
                             </div>
                             <div className="col-4">
                                 <div
@@ -829,8 +843,8 @@ const OrderManagement = () => {
                                             {selectedOrder?.shippingMethod === 'basic'
                                                 ? 'Cơ bản'
                                                 : selectedOrder?.shippingMethod === 'fast'
-                                                ? 'Nhanh'
-                                                : 'Hỏa tốc'}
+                                                    ? 'Nhanh'
+                                                    : 'Hỏa tốc'}
                                         </p>
                                     </div>
                                 </div>

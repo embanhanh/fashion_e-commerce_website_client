@@ -44,7 +44,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
             startDate: null,
             endDate: null,
         },
-        transferOption: '',
+        transferOption: null,
     })
     const [comboDiscounts, setComboDiscounts] = useState(null)
     const [voucherInfo, setVoucherInfo] = useState({
@@ -485,7 +485,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                                     onChange={(e) =>
                                                         setOrderData((pre) => ({
                                                             ...pre,
-                                                            transferOption: e.target.checked ? 'momo' : '',
+                                                            transferOption: e.target.checked ? 'momo' : null,
                                                         }))
                                                     }
                                                 />
@@ -531,8 +531,8 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                     {orderData.shippingMethod === 'basic'
                                         ? 'Vận chuyển cơ bản'
                                         : orderData.shippingMethod === 'fast'
-                                        ? 'Vận chuyển nhanh'
-                                        : 'Vận chuyển hỏa tốc'}
+                                            ? 'Vận chuyển nhanh'
+                                            : 'Vận chuyển hỏa tốc'}
                                 </p>
                                 <p className="fs-4 fw-medium">
                                     {orderData.shippingPrice.toLocaleString('vi-VN') + 'đ'}
@@ -642,9 +642,8 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                         {STEPS.map((step, index) => (
                             <div key={index} className="position-relative">
                                 <button
-                                    className={`checkout-process_step rounded-circle ${
-                                        index === currentStep ? 'active' : ''
-                                    } ${index < currentStep ? 'completed' : ''}`}
+                                    className={`checkout-process_step rounded-circle ${index === currentStep ? 'active' : ''
+                                        } ${index < currentStep ? 'completed' : ''}`}
                                     onClick={() => index <= currentStep && setCurrentStep(index)}
                                 >
                                     <FontAwesomeIcon

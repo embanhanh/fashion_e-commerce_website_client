@@ -13,7 +13,6 @@ function Wishlist() {
             {console.log(favoriteProducts)}
             {
                 favoriteProducts.map((product) => (
-                    // <ProductCard key={product._id} name={product.product.name} url={product.product.imageUrl} />
                     <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
                         <ProductCard
                             url={product.imageUrl}

@@ -41,7 +41,7 @@ function ProductCard({ name, url, originalPrice, discount, rating, isFeature, pr
                         </p>
                     </div>
                     <div className="d-inline-flex justify-content-between align-items-center px-3">
-                        <Rating initialRating={rating} readonly gap={4} size={18} />
+                        <Rating initialRating={Math.round(rating)} readonly gap={4} size={18} />
                         <button className="product-card__cart-btn">
                             <img className="cart-icon__img" src={cart} alt="cart" />
                         </button>

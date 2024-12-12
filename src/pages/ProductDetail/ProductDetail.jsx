@@ -427,12 +427,12 @@ function ProductDetail() {
                                 <div className="d-flex py-3 gap-3">
                                     <p className="me-2 fs-2  fw-medium align-self-end">{currentProduct.rating} </p>{' '}
                                     <Rating
-                                        initialRating={currentProduct.rating}
+                                        initialRating={Math.round(currentProduct.rating)}
                                         readonly={true}
                                         size={24}
                                         className="mx-3"
                                     />
-                                    <p className="fs-3 align-self-end">(100 đánh giá)</p>
+                                    <p className="fs-3 align-self-end">({ratings.length} đánh giá)</p>
                                 </div>
                                 <div className="d-flex gap-5 align-items-center p-4 shadow-sm rounded-4 bg-theme">
                                     <p className="fs-1 fw-medium theme-color">

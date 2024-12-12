@@ -198,12 +198,12 @@ function Cart() {
                     const distance = await calculateRouteDistance(orderData.shippingAddress.address, shopInfo.location)
                     if (distance) {
                         let price = 0
-                        const distanceValue = distance.distance
-                        if (distanceValue <= 500) {
-                            price += Math.ceil(distanceValue) * 100
-                        } else {
-                            price += 75000
-                        }
+                        // const distanceValue = distance.distance
+                        // if (distanceValue <= 500) {
+                        //     price += Math.ceil(distanceValue) * 100
+                        // } else {
+                        //     price += 75000
+                        // }
                         if (orderData.products.length > 0) {
                             const productsPrice = orderData.products.reduce((total, item) => {
                                 if (orderData.shippingMethod === 'basic') {
@@ -212,17 +212,14 @@ function Cart() {
                                         cart.items
                                             .find((cartItem) => cartItem.variant._id === item.product)
                                             ?.variant.product?.shippingInfo?.find((info) => info.type === 'basic')
-                                            ?.price *
-                                            item.quantity
+                                            ?.price
                                     )
                                 } else if (orderData.shippingMethod === 'fast') {
                                     return (
                                         total +
                                         cart.items
                                             .find((cartItem) => cartItem.variant._id === item.product)
-                                            ?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')
-                                            ?.price *
-                                            item.quantity
+                                            ?.variant.product?.shippingInfo?.find((info) => info.type === 'fast')?.price
                                     )
                                 } else {
                                     return (
@@ -230,8 +227,7 @@ function Cart() {
                                         cart.items
                                             .find((cartItem) => cartItem.variant._id === item.product)
                                             ?.variant.product?.shippingInfo?.find((info) => info.type === 'express')
-                                            ?.price *
-                                            item.quantity
+                                            ?.price
                                     )
                                 }
                             }, 0)

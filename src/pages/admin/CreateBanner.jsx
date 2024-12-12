@@ -6,22 +6,24 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useDropzone } from 'react-dropzone'
 import { useDispatch, useSelector } from 'react-redux'
-import { createBannerAction, resetBannerState, fetchBannerById, updateBanner } from '../../redux/slices/bannerSlice'
-import Notification from '../../components/Notification'
-import { storage } from '../../firebase.config'
+import Modal from 'react-bootstrap/Modal'
+import { useParams, useNavigate } from 'react-router-dom'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
-import './CreateBanner.scss'
+import { createBannerAction, resetBannerState, fetchBannerById, updateBanner } from '../../redux/slices/bannerSlice'
+import { fetchCategories } from '../../redux/slices/categorySlice'
+import Notification from '../../components/Notification'
+import { storage } from '../../firebase.config'
 import DraggableBox from '../../components/DraggableBox'
-import Modal from 'react-bootstrap/Modal'
-import { useParams, useNavigate } from 'react-router-dom'
+import './CreateBanner.scss'
 
 function CreateBanner() {
     const { banner_id } = useParams()
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { currentBanner, loading, error, success } = useSelector((state) => state.banner)
+    const { categories } = useSelector((state) => state.category)
     const [showNotification, setShowNotification] = useState(false)
     const [notificationTitle, setNotificationTitle] = useState('')
     const [notificationMessage, setNotificationMessage] = useState('')
@@ -47,6 +49,9 @@ function CreateBanner() {
         displayStartTime: '',
         displayEndTime: '',
     })
+    const [showSuggestions, setShowSuggestions] = useState(false)
+    const inputRef = useRef(null)
+    const suggestionsRef = useRef(null)
 
     useEffect(() => {
         if (banner_id) {
@@ -68,10 +73,31 @@ function CreateBanner() {
         }
     }, [currentBanner, banner_id])
 
+    useEffect(() => {
+        if (categories.length === 0) {
+            dispatch(fetchCategories())
+        }
+    }, [categories])
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                inputRef.current &&
+                !inputRef.current.contains(e.target) &&
+                suggestionsRef.current &&
+                !suggestionsRef.current.contains(e.target)
+            ) {
+                setShowSuggestions(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
     const validateForm = () => {
         let tempErrors = {}
         let isValid = true
-        console.log(bannerInfo)
 
         // Validate title
         if (!bannerInfo.title.trim()) {
@@ -318,14 +344,44 @@ function CreateBanner() {
                         <p className="text-nowrap me-4 w-25">
                             <span style={{ color: 'red' }}>*</span> Link:
                         </p>
-                        <div className={`input-form d-flex align-items-center w-100`}>
+                        <div
+                            className={`input-form d-flex align-items-center w-100 position-relative suggestion-categories-container__banner ${
+                                showSuggestions ? 'show-suggestions' : ''
+                            }`}
+                        >
                             <input
+                                ref={inputRef}
                                 value={bannerInfo.linkUrl}
                                 type="text"
                                 className="input-text w-100"
                                 placeholder="Link"
                                 onChange={(e) => setBannerInfo({ ...bannerInfo, linkUrl: e.target.value })}
+                                onFocus={() => setShowSuggestions(true)}
                             />
+                            <div
+                                ref={suggestionsRef}
+                                className={`position-absolute suggestion-categories__banner scrollbar-y shadow ${
+                                    showSuggestions ? 'd-block' : 'd-none'
+                                }`}
+                            >
+                                {categories
+                                    .filter((category) => category.parentCategory === null)
+                                    .map((category) => (
+                                        <div
+                                            className="suggestion-categories__banner-item"
+                                            key={category._id}
+                                            onClick={() => {
+                                                setBannerInfo((prev) => ({
+                                                    ...prev,
+                                                    linkUrl: `/products?category=${category.slug}&page=1`,
+                                                }))
+                                                setShowSuggestions(false)
+                                            }}
+                                        >
+                                            <p>{category.name}</p>
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
                     </div>
                     <div className="d-flex gap-4 align-items-center">

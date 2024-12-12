@@ -29,3 +29,40 @@
 .custom-file-upload__banner {
     height: 200px;
 }
+
+.suggestion-categories-container__banner {
+    .suggestion-categories__banner {
+        display: none;
+        width: 100%;
+        top: calc(100% + 5px);
+        left: -2px;
+        height: 150px;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow-y: auto;
+        z-index: 1000;
+        padding: 10px;
+        .suggestion-categories__banner-item {
+            padding: 8px;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 8px;
+            &:hover {
+                background-color: var(--theme-color);
+            }
+        }
+    }
+    // &:focus-within {
+    //     .suggestion-categories__banner {
+    //         display: block;
+    //     }
+    // }
+}
+
+.show-suggestions {
+    .suggestion-categories__banner {
+        display: block;
+    }
+}

@@ -1,13 +1,19 @@
 import './NotFound.scss'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import notFound from '../../assets/image/default/404-not-found.png'
 
 function NotFound() {
     return (
-        <div className="container text-center py-5 h-100">
-            <h1 className="display-1">404</h1>
-            <p className="fs-3 text-danger">Không tìm thấy trang</p>
-            <p className="lead">Xin lỗi, trang bạn đang tìm kiếm không tồn tại.</p>
+        <div className="not-found-container text-center py-5 h-100 d-flex">
+            <img src={notFound} alt="Not Found" className="not-found-image" />
+            <div>
+                <h1 className="not-found-title">404</h1>
+                <p className="not-found-description">Không tìm thấy trang</p>
+                <Link to="/" className="not-found-link">
+                    Trở về trang chủ
+                </Link>
+            </div>
         </div>
     )
 }

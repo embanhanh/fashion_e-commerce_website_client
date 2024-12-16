@@ -45,18 +45,27 @@ export const login = async (user) => {
     }
 }
 
-export const checkEmail = async (email) => {
+export const checkEmail = async (email, mode) => {
     try {
-        const response = await axiosInstance.post('check-email', { email })
+        const response = await axiosInstance.post('check-email', { email, mode })
         return response.data
     } catch (error) {
         throw error
     }
 }
 
-export const verifyEmail = async (email, code, password) => {
+export const verifyEmail = async (email, code, password, mode) => {
     try {
-        const response = await axiosInstance.post('verify-email', { email, code, password })
+        const response = await axiosInstance.post('verify-email', { email, code, password, mode })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const resetPassword = async (email, code, password) => {
+    try {
+        const response = await axiosInstance.post('reset-password', { email, code, password })
         return response.data
     } catch (error) {
         throw error

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { login, register, loginWithFirebase, checkEmail, verifyEmail } from '../../services/UserService'
+import { login, register, loginWithFirebase, checkEmail, verifyEmail, resetPassword } from '../../services/UserService'
 
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
     try {
@@ -19,9 +19,9 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
     }
 })
 
-export const checkEmailAction = createAsyncThunk('auth/checkEmail', async (email, { rejectWithValue }) => {
+export const checkEmailAction = createAsyncThunk('auth/checkEmail', async ({ email, mode }, { rejectWithValue }) => {
     try {
-        const response = await checkEmail(email)
+        const response = await checkEmail(email, mode)
         return response
     } catch (error) {
         return rejectWithValue(error)
@@ -30,9 +30,21 @@ export const checkEmailAction = createAsyncThunk('auth/checkEmail', async (email
 
 export const verifyEmailAction = createAsyncThunk(
     'auth/verifyEmail',
+    async ({ email, code, password, mode }, { rejectWithValue }) => {
+        try {
+            const response = await verifyEmail(email, code, password, mode)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const resetPasswordAction = createAsyncThunk(
+    'auth/resetPassword',
     async ({ email, code, password }, { rejectWithValue }) => {
         try {
-            const response = await verifyEmail(email, code, password)
+            const response = await resetPassword(email, code, password)
             return response
         } catch (error) {
             return rejectWithValue(error)

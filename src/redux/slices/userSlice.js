@@ -219,15 +219,6 @@ export const cancelOrderUser = createAsyncThunk(
     }
 )
 
-export const receivedOrderUser = createAsyncThunk('user/receivedOrder', async ({ orderId }, { rejectWithValue }) => {
-    try {
-        const response = await receivedOrder(orderId)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
-    }
-})
-
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -509,18 +500,6 @@ const userSlice = createSlice({
             })
             .addCase(fetchOrderDetail.rejected, (state, action) => {
                 state.loading = false
-                state.error = action.payload
-            })
-            .addCase(receivedOrderUser.pending, (state) => {
-                state.error = null
-            })
-            .addCase(receivedOrderUser.fulfilled, (state, action) => {
-                state.error = null
-                state.orders = state.orders.map((order) =>
-                    order._id === action.payload.orderId ? action.payload : order
-                )
-            })
-            .addCase(receivedOrderUser.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

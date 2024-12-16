@@ -343,20 +343,3 @@ export const cancelOrder = async (orderId, reason) => {
         throw error
     }
 }
-
-export const receivedOrder = async (orderId) => {
-    try {
-        const response = await axiosInstance.put(
-            `purchase/received/${orderId}`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            }
-        )
-        return response.data
-    } catch (error) {
-        throw error
-    }
-}

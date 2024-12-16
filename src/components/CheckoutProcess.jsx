@@ -44,7 +44,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
             startDate: null,
             endDate: null,
         },
-        transferOption: '',
+        transferOption: null,
     })
     const [comboDiscounts, setComboDiscounts] = useState(null)
     const [voucherInfo, setVoucherInfo] = useState({
@@ -485,7 +485,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                                     onChange={(e) =>
                                                         setOrderData((pre) => ({
                                                             ...pre,
-                                                            transferOption: e.target.checked ? 'momo' : '',
+                                                            transferOption: e.target.checked ? 'momo' : null,
                                                         }))
                                                     }
                                                 />

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { login, register, loginWithFirebase } from '../../services/UserService'
+import { login, register, loginWithFirebase, checkEmail, verifyEmail } from '../../services/UserService'
 
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
     try {
@@ -19,15 +19,39 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
     }
 })
 
-export const loginWithFirebaseAction = createAsyncThunk('auth/loginWithFirebase', async ({ token, provider }, { rejectWithValue }) => {
+export const checkEmailAction = createAsyncThunk('auth/checkEmail', async (email, { rejectWithValue }) => {
     try {
-        const response = await loginWithFirebase({ token }, provider)
-        localStorage.setItem('token', response.token)
-        return response.user
+        const response = await checkEmail(email)
+        return response
     } catch (error) {
         return rejectWithValue(error)
     }
 })
+
+export const verifyEmailAction = createAsyncThunk(
+    'auth/verifyEmail',
+    async ({ email, code, password }, { rejectWithValue }) => {
+        try {
+            const response = await verifyEmail(email, code, password)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const loginWithFirebaseAction = createAsyncThunk(
+    'auth/loginWithFirebase',
+    async ({ token, provider }, { rejectWithValue }) => {
+        try {
+            const response = await loginWithFirebase({ token }, provider)
+            localStorage.setItem('token', response.token)
+            return response.user
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
 
 const authSlice = createSlice({
     name: 'auth',
@@ -81,6 +105,28 @@ const authSlice = createSlice({
                 state.user = action.payload
             })
             .addCase(loginWithFirebaseAction.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(checkEmailAction.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(checkEmailAction.fulfilled, (state, action) => {
+                state.loading = false
+            })
+            .addCase(checkEmailAction.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(verifyEmailAction.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(verifyEmailAction.fulfilled, (state, action) => {
+                state.loading = false
+            })
+            .addCase(verifyEmailAction.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
             })

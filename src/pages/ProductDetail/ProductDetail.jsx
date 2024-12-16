@@ -425,7 +425,9 @@ function ProductDetail() {
                                 </div>
                                 <p className="fs-1 lh-1 fw-bold theme-color me-3">{currentProduct.name}</p>
                                 <div className="d-flex py-3 gap-3">
-                                    <p className="me-2 fs-2  fw-medium align-self-end">{currentProduct.rating} </p>{' '}
+                                    <p className="me-2 fs-2  fw-medium align-self-end">
+                                        {Number(currentProduct.rating).toFixed(1)}{' '}
+                                    </p>{' '}
                                     <Rating
                                         initialRating={Math.round(currentProduct.rating)}
                                         readonly={true}

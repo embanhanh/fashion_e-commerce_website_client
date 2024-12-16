@@ -72,7 +72,7 @@ function Home() {
 
     return (
         <>
-            {/* {user?.role !== 'admin' && <Chatbot />} */}
+            {user?.role !== 'admin' && <Chatbot />}
             <div className="slideshow-background w-100">
                 <div className="slideshow-container container">
                     <Swiper

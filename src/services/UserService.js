@@ -45,6 +45,24 @@ export const login = async (user) => {
     }
 }
 
+export const checkEmail = async (email) => {
+    try {
+        const response = await axiosInstance.post('check-email', { email })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const verifyEmail = async (email, code, password) => {
+    try {
+        const response = await axiosInstance.post('verify-email', { email, code, password })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
 export const register = async (user) => {
     try {
         const response = await axiosInstance.post('register', user)

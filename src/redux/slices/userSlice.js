@@ -19,7 +19,6 @@ import {
     getFavoriteProducts,
     cancelOrder,
     getOrderDetail,
-    receivedOrder,
     getOrdersByUserId,
 } from '../../services/UserService'
 

@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
-import { cancelOrderUser, fetchOrderUser, receivedOrderUser } from '../redux/slices/userSlice'
+import {
+    cancelOrderUser,
+    fetchOrderUser,
+    //  receivedOrderUser
+} from '../redux/slices/userSlice'
 import { addItemToCart } from '../redux/slices/cartSlice'
 import RatingDemo from './RatingDemo'
 
@@ -30,9 +34,9 @@ function OrderCard({ order }) {
         setShowCancelOrderModal(true)
     }
 
-    const handleReceivedOrder = (orderId) => {
-        dispatch(receivedOrderUser(orderId))
-    }
+    // const handleReceivedOrder = (orderId) => {
+    //     dispatch(receivedOrderUser(orderId))
+    // }
 
     const handleReviewOrder = (orderId) => {
         setShowRatingModal(true)

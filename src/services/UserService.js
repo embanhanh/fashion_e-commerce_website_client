@@ -344,6 +344,7 @@ export const getFavoriteProducts = async () => {
         throw error
     }
 }
+
 export const getOrdersByUserId = async (userId) => {
     try {
         const response = await axiosInstance.get(`purchase/orders/${userId}`, {
@@ -356,6 +357,7 @@ export const getOrdersByUserId = async (userId) => {
         throw error
     }
 }
+
 export const getOrderDetail = async (orderId) => {
     try {
         const response = await axiosInstance.get(`purchase/order/${orderId}`, {

@@ -20,6 +20,7 @@ import {
     cancelOrder,
     getOrderDetail,
     receivedOrder,
+    getOrdersByUserId,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -218,6 +219,15 @@ export const cancelOrderUser = createAsyncThunk(
         }
     }
 )
+
+export const fetchOrdersByUserId = createAsyncThunk('user/fetchOrdersByUserId', async (userId, { rejectWithValue }) => {
+    try {
+        const response = await getOrdersByUserId(userId)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
 
 const userSlice = createSlice({
     name: 'user',
@@ -499,6 +509,17 @@ const userSlice = createSlice({
                 state.orderDetail = action.payload
             })
             .addCase(fetchOrderDetail.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(fetchOrdersByUserId.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchOrdersByUserId.fulfilled, (state, action) => {
+                state.loading = false
+            })
+            .addCase(fetchOrdersByUserId.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
             })

@@ -7,6 +7,7 @@ import {
     getOrderById,
     createOrderFromGuest,
     getOrdersByUserId,
+    updateOrder,
 } from '../../services/OrderService'
 
 export const createOrderAction = createAsyncThunk('order/createOrder', async (orderData, { rejectWithValue }) => {

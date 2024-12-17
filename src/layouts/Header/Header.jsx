@@ -143,13 +143,11 @@ function Header({ location }) {
         <>
             <div
                 className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
-            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${
-                    location.pathname === '/' ? 'header-home' : ''
-                } ${
-                    location.pathname.includes('/seller') || location.pathname.includes('/products/')
+            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''
+                    } ${location.pathname.includes('/seller') || location.pathname.includes('/products/')
                         ? 'header-fixed shadow'
                         : ''
-                }`}
+                    }`}
             >
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">
@@ -167,9 +165,8 @@ function Header({ location }) {
                                         onClick={() => {
                                             setNavOption(nav.title)
                                         }}
-                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${
-                                            nav?.className
-                                        }`}
+                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${nav?.className
+                                            }`}
                                     >
                                         <p className="nav-title">{nav.title}</p>
                                     </Link>
@@ -295,7 +292,7 @@ function Header({ location }) {
                                                                         className="d-flex align-items-center pb-4 mb-4 border-bottom"
                                                                     >
                                                                         <img
-                                                                            src={item.variant.product?.urlImage || ''}
+                                                                            src={item?.variant?.product?.urlImage || ''}
                                                                             className="me-4"
                                                                             alt=""
                                                                             width={50}
@@ -303,11 +300,11 @@ function Header({ location }) {
                                                                         />
                                                                         <div className="w-100">
                                                                             <p className="fs-4 fw-medium ellipsis">
-                                                                                {item.variant.product?.name || ''}
+                                                                                {item?.variant?.product?.name || ''}
                                                                             </p>
                                                                             <p className="fw-medium">
                                                                                 {item.quantity} x{' '}
-                                                                                {item.variant.price || 0}đ
+                                                                                {item?.variant?.price || 0}đ
                                                                             </p>
                                                                         </div>
                                                                     </div>
@@ -351,7 +348,7 @@ function Header({ location }) {
                                                 Tài khoản của tôi
                                             </Link>
                                             {user?.role !== 'admin' && (
-                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom">
+                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/orders'}>
                                                     Đơn mua
                                                 </Link>
                                             )}

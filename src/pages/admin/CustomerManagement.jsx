@@ -13,22 +13,22 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
 import {
     fetchClients,
-    fetchOrderUser,
     unblockClientAction,
     unblockManyClientAction,
-    fetchOrdersByUserId,
 } from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
 import Notification from '../../components/Notification'
 import BlockClientModal from '../../components/BlockClientModal'
 import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
+import { getOrdersByUserIdAction } from '../../redux/slices/orderSilce'
 import Modal from 'react-bootstrap/Modal'
 import { useNavigate } from 'react-router-dom'
 
 function CustomerManagement() {
     const navigate = useNavigate()
     const { clients, clientsLoading } = useSelector((state) => state.user)
+    const { ordersByUserId } = useSelector((state) => state.order)
     const dispatch = useDispatch()
     const [clientFilters, setClientFilters] = useState({
         name: '',
@@ -63,10 +63,6 @@ function CustomerManagement() {
     const handleConfirmClientFilters = () => {
         dispatch(fetchClients({ ...clientFilters, clientType }))
     }
-
-    // useEffect(() => {
-    //     dispatch(fetchOrderUser())
-    // }, [clients])
 
     const handleResetClientFilters = () => {
         const defaultClientFilters = {
@@ -120,11 +116,11 @@ function CustomerManagement() {
         }
     }
 
-    // const handleViewOrderHistory = (client) => {
-    //     setSelectedOrderHistory(client)
-    //     setShowOrderHistory(true)
-    //     dispatch(fetchOrdersByUserId(client._id))
-    // }
+    const handleViewOrderHistory = (client) => {
+        setSelectedOrderHistory(client)
+        setShowOrderHistory(true)
+        dispatch(getOrdersByUserIdAction(client._id))
+    }
 
     return (
         <div className="pb-5 px-4 d-flex flex-column gap-4">
@@ -194,35 +190,19 @@ function CustomerManagement() {
                 </div>
             </div>
             <div className="bg-white rounded-4 shadow-sm">
-                <div className="nav-wrapper border-bottom d-flex">
-                    <div
-                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${clientType === '' ? 'checked' : ''}`}
-                        onClick={() => setClientType('')}
-                    >
-                        <p className="nav-title fs-4">Tất cả</p>
-                    </div>
-                    <div
-                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${clientType === 'new' ? 'checked' : ''}`}
-                        onClick={() => setClientType('new')}
-                    >
-                        <p className="nav-title fs-4">Khách hàng mới</p>
-                    </div>
-                    <div
-                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${
-                            clientType === 'potential' ? 'checked' : ''
-                        }`}
-                        onClick={() => setClientType('potential')}
-                    >
-                        <p className="nav-title fs-4">Khách hàng tiềm năng</p>
-                    </div>
-                    <div
-                        className={`fs-4 py-3 px-4 order-tab-item nav-option ${
-                            clientType === 'loyal' ? 'checked' : ''
-                        }`}
-                        onClick={() => setClientType('loyal')}
-                    >
-                        <p className="nav-title fs-4">Khách hàng thân thiết</p>
-                    </div>
+                <div className=" border-bottom d-flex">
+                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === '' ? 'active' : ''}`} onClick={() => setClientType('')}>
+                        Tất cả
+                    </p>
+                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'new' ? 'active' : ''}`} onClick={() => setClientType('new')}>
+                        Khách hàng mới
+                    </p>
+                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'potential' ? 'active' : ''}`} onClick={() => setClientType('potential')}>
+                        Khách hàng tiềm năng
+                    </p>
+                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'loyal' ? 'active' : ''}`} onClick={() => setClientType('loyal')}>
+                        Khách hàng thân thiết
+                    </p>
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">100 khách hàng</p>
@@ -452,13 +432,7 @@ function CustomerManagement() {
                                     </p>
                                     <p className="fs-4 fw-medium text-center">{client.totalSpent}</p>
                                     <p className="fs-4 fw-medium text-center">{client.orderCount}</p>
-                                    <p
-                                        className={`fs-4 fw-medium text-center ${
-                                            client.isBlocked ? 'text-danger' : 'text-success'
-                                        }`}
-                                    >
-                                        {client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}
-                                    </p>
+                                    <p className={`fs-4 fw-medium text-center ${client.isBlocked ? 'text-danger' : 'text-success'}`}>{client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}</p>
                                     <div className="px-2 dropdown-container">
                                         <FontAwesomeIcon
                                             icon={faEllipsisVertical}
@@ -572,17 +546,15 @@ function CustomerManagement() {
                     />
                 </Modal>
             )}
-            <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
-                {/* <Modal.Header closeButton>
-                    <Modal.Title className="fs-4">
-                        Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}
-                    </Modal.Title>
+            {showOrderHistory && <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="fs-4">Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="p-3 overflow-y-auto" style={{ maxHeight: '500px' }}>
-                        {console.log(userOrders)}
-                        {userOrders.length > 0 ? (
-                            userOrders.map((order) => (
+                        {console.log(ordersByUserId)}
+                        {ordersByUserId.length > 0 ? (
+                            ordersByUserId.map((order) => (
                                 <div key={order._id} className="border rounded p-3 mb-3">
                                     <div className="d-flex justify-content-between mb-2">
                                         <p className="fs-4 fw-medium">Mã đơn hàng: {order._id}</p>
@@ -696,8 +668,8 @@ function CustomerManagement() {
                             <p className="fs-4 text-center">Khách hàng chưa có đơn hàng nào</p>
                         )}
                     </div>
-                </Modal.Body> */}
-            </Modal>
+                </Modal.Body>
+            </Modal>}
         </div>
     )
 }

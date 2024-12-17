@@ -1,16 +1,19 @@
-import './Profile.scss' // Đổi tên file SCSS nếu cần
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
-import Modal from 'react-bootstrap/Modal'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchUser, updateUserProfile } from '../../redux/slices/userSlice'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage } from '../../firebase.config' // Đảm bảo đường dẫn đúng
-import Notification from '../../components/Notification' // Import component Notification
+import { storage } from '../../firebase.config'
+import './Profile.scss'
+
 import Swal from 'sweetalert2'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { FaCalendar } from 'react-icons/fa'
+
 function Profile() {
     const dispatch = useDispatch()
-    const { user, loading, error, success } = useSelector((state) => state.user)
+    const { user, loading, error } = useSelector((state) => state.user)
 
     const [userName, setUserName] = useState('')
     const [email, setEmail] = useState('')
@@ -19,8 +22,6 @@ function Profile() {
     const [gender, setGender] = useState('male')
     const [urlImage, setUrlImage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
-
 
     useEffect(() => {
         dispatch(fetchUser())
@@ -31,25 +32,19 @@ function Profile() {
             setUserName(user.name || '')
             setEmail(user.email || '')
             setPhone(user.phone || '')
-            setBirth(formatDate(user.birthday)) // Định dạng ngày tháng đúng
+            setBirth(formatDate(user.birthday) || '')
             setGender(user.gender || '')
             setUrlImage(user.urlImage || '')
         }
     }, [user])
 
-    useEffect(() => {
-        if (success && isSuccess) {
-            setIsSuccess(false)
-        }
-    }, [success])
-
     const formatDate = (dateString) => {
-        if (!dateString) return '' // Kiểm tra nếu ngày tháng null hoặc undefined
-        const date = new Date(dateString) // Chuyển đổi string thành đối tượng Date
-        const year = date.getFullYear() // Lấy năm
-        const month = String(date.getMonth() + 1).padStart(2, '0') // Lấy tháng, cộng thêm 1 do tháng bắt đầu từ 0
-        const day = String(date.getDate()).padStart(2, '0') // Lấy ngày
-        return `${year}-${month}-${day}` // Trả về định dạng yyyy-MM-dd
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 
     const handleSubmit = async (e) => {
@@ -68,7 +63,7 @@ function Profile() {
                 try {
                     let avatarUrl = urlImage
                     if (urlImage && !urlImage.startsWith('https://firebasestorage.googleapis.com')) {
-                        avatarUrl = await uploadImage(urlImage) // Upload the new image if necessary
+                        avatarUrl = await uploadImage(urlImage)
                     }
                     const userData = {
                         name: userName,
@@ -77,7 +72,7 @@ function Profile() {
                         phone,
                         urlImage: avatarUrl,
                     }
-                    await dispatch(updateUserProfile(userData)) // Update user profile with Firebase URL
+                    await dispatch(updateUserProfile(userData))
                     Swal.fire({
                         title: 'Thông báo',
                         text: 'Cập nhật hồ sơ thành công',
@@ -94,7 +89,6 @@ function Profile() {
         })
     }
 
-    // Function to upload image to Firebase
     const uploadImage = async (imageFile) => {
         const imageRef = ref(storage, `avatars/${uuidv4()}`)
         const response = await fetch(imageFile)
@@ -103,12 +97,11 @@ function Profile() {
         return getDownloadURL(imageRef)
     }
 
-    // Handle image upload and display preview
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
             const fileURL = URL.createObjectURL(file)
-            setUrlImage(fileURL) // Display the selected image as a preview
+            setUrlImage(fileURL)
         } else {
             alert('Please select a valid image format: .JPEG, .PNG')
         }
@@ -116,15 +109,15 @@ function Profile() {
 
     if (loading && isLoading)
         return (
-            <div class="d-flex justify-content-center" style={{ height: "100vh" }}>
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <div className="d-flex justify-content-center" style={{ height: "100vh" }}>
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
                 </div>
             </div>
         )
     if (error) {
         console.error(error)
-        return <div>Error: {error}</div> // Hiển thị lỗi cho người dùng
+        return <div className="alert alert-danger">Error: {error}</div>
     }
 
     return (
@@ -183,37 +176,40 @@ function Profile() {
                                 <div className="col-4 label-cell">
                                     <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Giới tính</label>
                                 </div>
-                                <div className="col-8 input-cell">
-                                    <div className="radio-group">
-                                        <label className="radio-option">
+                                <div className="col-8">
+                                    <div className="d-flex gap-3 align-items-center fs-4">
+                                        <label className="d-flex align-items-center ms-3">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="male"
                                                 checked={gender === 'male'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Nam
+                                            <span className="custom-radio me-2 fs-4"></span> Nam
                                         </label>
-                                        <label className="radio-option ms-3">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="female"
                                                 checked={gender === 'female'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Nữ
+                                            <span className="custom-radio me-2 fs-3"></span> Nữ
                                         </label>
-                                        <label className="radio-option ms-3">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="radio"
                                                 name="gender"
+                                                className="input-radio"
                                                 value="other"
                                                 checked={gender === 'other'}
                                                 onChange={(e) => setGender(e.target.value)}
                                             />
-                                            <span className="custom-radio me-2"></span> Khác
+                                            <span className="custom-radio me-2 fs-3"></span> Khác
                                         </label>
                                     </div>
                                 </div>
@@ -224,16 +220,16 @@ function Profile() {
                                     <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Ngày sinh</label>
                                 </div>
                                 <div className="col-8 input-cell">
-                                    <div className="input-form d-flex align-items-center w-100">
-                                        <input
-                                            type="date"
-                                            className="date-input w-100"
-                                            value={birth}
-                                            onChange={(e) => setBirth(e.target.value)}
-                                            max={new Date().toISOString().split('T')[0]}
-                                            placeholder="DD/MM/YYYY"
-                                            pattern="\d{2}/\d{2}/\d{4}"
+                                    <div className="d-flex align-items-center w-100 position-relative">
+                                        <DatePicker
+                                            selected={birth ? new Date(birth) : null}
+                                            onChange={(date) => setBirth(date ? date.toISOString().split('T')[0] : '')}
+                                            dateFormat="dd/MM/yyyy"
+                                            className="react-datepicker__input-container w-100"
+                                            maxDate={new Date()}
+                                            placeholderText="DD/MM/YYYY"
                                         />
+                                        <FaCalendar className="position-absolute end-0 me-3" style={{ pointerEvents: 'none' }} />
                                     </div>
                                 </div>
                             </div>
@@ -255,12 +251,12 @@ function Profile() {
                     <div className="avatar-wrapper" style={{ backgroundImage: `url(${urlImage})` }}></div>
                     <div className="custom-file-upload">
                         <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" onChange={handleImageUpload} />
-                        <label htmlFor="file-upload" className="btn choosefile-btn">
+                        <label htmlFor="file-upload" className="choosefile-btn ">
                             Chọn ảnh
                         </label>
                     </div>
-                    <div>Dụng lượng file tối đa 1 MB</div>
-                    <div>Định dạng:.JPEG, .PNG</div>
+                    <div className="file-info">Dụng lượng file tối đa 1 MB</div>
+                    <div className="file-info">Định dạng:.JPEG, .PNG</div>
                 </div>
             </div>
         </div>

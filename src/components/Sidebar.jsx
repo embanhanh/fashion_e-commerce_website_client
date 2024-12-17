@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { FaUser, FaBagShopping, FaRegHeart, FaLocationDot, FaCreditCard, FaRegBell, FaGear, FaCircleUser } from 'react-icons/fa6'
+import React, { useEffect } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+import { FaCircleUser, FaBagShopping, FaRegHeart, FaLocationDot, FaRegBell, FaGear } from 'react-icons/fa6'
 import './Sidebar.scss'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUser } from '../redux/slices/userSlice'
 
 function Sidebar() {
-    const menuItem = [
+    const userMenuItem = [
         {
             path: '/user/account/profile',
             name: 'Thông tin cá nhân',
@@ -33,35 +33,42 @@ function Sidebar() {
             icon: <FaRegBell />,
         },
     ]
+
+    const adminMenuItem = [
+        {
+            path: '/user/account/profile',
+            name: 'Thông tin cá nhân',
+            icon: <FaCircleUser />,
+        },
+        {
+            path: '/user/account/notifications',
+            name: 'Thông báo',
+            icon: <FaRegBell />,
+        },
+
+    ]
+
     const dispatch = useDispatch()
+    const location = useLocation()
 
     // Lấy dữ liệu từ Redux store
     const { user, loading, error } = useSelector((state) => state.user)
 
-    // Gọi fetchUser khi component được mount
+    // Chỉ gọi fetchUser khi ở trang profile
     useEffect(() => {
-        dispatch(fetchUser())
-    }, [dispatch])
+        if (location.pathname === '/user/account/profile') {
+            dispatch(fetchUser())
+        }
+    }, [dispatch, location.pathname])
 
-    // Hiển thị loading nếu đang tải dữ liệu
-    if (loading) {
-        <div>
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    }
-
-    // Hiển thị lỗi nếu có
-    if (error) {
-        return <div>Đã xảy ra lỗi: {error}</div>
-    }
+    // Chọn menu item dựa trên role của user
+    const menuItems = user?.role === 'admin' ? adminMenuItem : userMenuItem
 
     return (
         <nav className="sidebar-nav mt-4">
             <div className="d-flex flex-row align-items-center p-3 border-bottom text-start">
                 <img
-                    src={user?.urlImage || 'https://via.placeholder.com/80'} // Đường dẫn avatar từ Redux store hoặc ảnh mặc định
+                    src={user?.urlImage || 'https://via.placeholder.com/80'}
                     alt="User Avatar"
                     className="avatar-img rounded-circle mb-2 me-4"
                     style={{ width: '50px', height: '50px' }}
@@ -74,7 +81,7 @@ function Sidebar() {
             </div>
             <div className="d-flex flex-column d-inline-flex">
                 <ul className="nav nav-pills flex-column mb-auto">
-                    {menuItem.map((item, index) => (
+                    {menuItems.map((item, index) => (
                         <li key={index} className="nav-item">
                             <NavLink className={({ isActive }) => (isActive ? 'sidebar-nav-link active' : 'sidebar-nav-link')} to={item.path} end>
                                 <span className="icon-container">{item.icon}</span>

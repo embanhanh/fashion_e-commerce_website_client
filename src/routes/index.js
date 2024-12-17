@@ -30,11 +30,22 @@ import CustomerManagement from '../pages/admin/CustomerManagement.jsx'
 import Chat from '../pages/admin/Chat.jsx'
 import Statistic from '../pages/admin/Statistic.jsx'
 import RatingDemo from '../components/RatingDemo.jsx'
-import Policy from '../pages/Policy/Policy.jsx'
+import Privacy from '../pages/Policy/Privacy.jsx'
+import Terms from '../pages/Policy/Terms.jsx'
+import Refund from '../pages/Policy/Refund.jsx'
+import Delivery from '../pages/Policy/Delivery.jsx'
+import Payment from '../pages/Policy/Payment.jsx'
+import Check from '../pages/Policy/Check.jsx'
+import DetailOrder from '../components/DetailOrder.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
-    { path: '/policy', element: Policy },
+    { path: '/policy/privacy', element: Privacy },
+    { path: '/policy/terms', element: Terms },
+    { path: '/policy/refund', element: Refund },
+    { path: '/policy/delivery', element: Delivery },
+    { path: '/policy/payment', element: Payment },
+    { path: '/policy/check', element: Check },
     {
         path: '/products',
         element: ProductList,
@@ -56,6 +67,7 @@ const privateRoutes = [
         allowedRoles: ['user', 'admin'],
         children: [
             { path: 'profile', element: Profile, layout: Fragment },
+            { path: 'orders/:order_id', element: DetailOrder, layout: Fragment },
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },
@@ -64,6 +76,7 @@ const privateRoutes = [
             { path: 'settings', element: Settings, layout: Fragment },
         ],
     },
+    { path: '/cart/edit/:order_id', element: Cart, allowedRoles: ['user', 'admin'] },
     { path: '/cart', element: Cart, allowedRoles: ['user', 'admin'] },
     {
         path: '/seller/products/edit/:product_name',

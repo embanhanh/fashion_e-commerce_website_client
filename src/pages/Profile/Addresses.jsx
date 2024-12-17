@@ -64,13 +64,9 @@ function Addresses() {
                 <div>
                     <div className="add-address-button-container">
                         <div className="d-flex align-content-center">
-                            <button className="btn-addnew btn-dark add-address-btn" onClick={handleSetShowModal}>
-                                <div className="button-content d-flex">
-                                    <div className="icon-wrapper">
-                                        <FaPlus className="me-2" />
-                                    </div>
-                                    <div>Thêm địa chỉ mới</div>
-                                </div>
+                            <button className="btn-addnew add-address-btn" onClick={handleSetShowModal}>
+                                <FaPlus className="me-2" />
+                                <span className="fs-4 fw-semibold">Thêm địa chỉ mới</span>
                             </button>
                         </div>
                     </div>

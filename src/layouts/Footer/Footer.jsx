@@ -28,24 +28,27 @@ function Footer() {
                     </div>
                     <div className="w-25 d-flex flex-column ms-2 text-center">
                         <p className="fw-bold fs-3">Thông tin</p>
-                        <Link className="footer-link py-2">Tài khoản cá nhân</Link>
-                        <Link className="footer-link py-2">Đăng nhập</Link>
-                        <Link className="footer-link py-2">Giỏ hàng</Link>
-                        <Link className="footer-link py-2">Sản phẩm</Link>
-                        <Link className="footer-link py-2">Về chúng tôi</Link>
-                        <Link className="footer-link py-2">FAQ</Link>
+                        <Link className="footer-link py-2" to={'/user/account/profile'}>Tài khoản cá nhân</Link>
+                        <Link className="footer-link py-2" to={'user/login'}>Đăng nhập</Link>
+                        <Link className="footer-link py-2" to={'/cart'}>Giỏ hàng</Link>
+                        <Link className="footer-link py-2" to={'/products'}>Sản phẩm</Link>
+                        <Link className="footer-link py-2" to={'#'}>Về chúng tôi</Link>
+                        <Link className="footer-link py-2" to={'#'}>FAQ</Link>
                     </div>
                     <div className="w-25 d-flex flex-column ms-2 text-center">
                         <p className="fw-bold fs-3">Dịch vụ</p>
-                        <Link className="footer-link py-2">Chính sách bảo mật</Link>
-                        <Link className="footer-link py-2">Điều khoản sử dụng</Link>
-                        <Link className="footer-link py-2">Chính sách đổi trả</Link>
+                        <Link className="footer-link py-2" to={'/policy/privacy'}>Chính sách bảo mật</Link>
+                        <Link className="footer-link py-2" to={'/policy/terms'}>Điều khoản sử dụng</Link>
+                        <Link className="footer-link py-2" to={'/policy/refund'}>Chính sách đổi trả</Link>
+                        <Link className="footer-link py-2" to={'/policy/delivery'}>Chính sách giao hàng</Link>
+                        <Link className="footer-link py-2" to={'/policy/payment'}>Chính sách thanh toán</Link>
+                        <Link className="footer-link py-2" to={'/policy/check'}>Chính sách kiểm hàng</Link>
                     </div>
                     <div className="w-25 d-flex flex-column ms-2">
                         <p className="fw-bold fs-3">Theo dõi chúng tôi</p>
                         <p className=" py-2">Kết nối với chúng tôi trên các nền tảng xã hội để cập nhật xu hướng thời trang mới nhất và nhận ưu đãi độc quyền</p>
                         <div className="flex">
-                            <Link>
+                            <Link to={'https://www.facebook.com/heartiefashion?mibextid=ZbWKwL'}>
                                 <FontAwesomeIcon color="#1877f2" size="2xl" icon={faSquareFacebook} />
                             </Link>
                         </div>

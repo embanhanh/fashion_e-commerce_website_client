@@ -27,6 +27,8 @@
     --warning-color-dark: #c48609;
     --info-color-dark: #0e3ecc;
     --combo-theme-color: #ffddc1;
+    --cancel-color: #6ba3be;
+    --text-order-color: #fff;
 }
 
 #root {
@@ -71,7 +73,8 @@ a {
 input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px white inset;
     box-shadow: 0 0 0 1000px white inset;
-    -webkit-text-fill-color: #333; /* Màu chữ */
+    -webkit-text-fill-color: #333;
+    /* Màu chữ */
 }
 
 input:focus {

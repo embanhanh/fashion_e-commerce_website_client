@@ -5,6 +5,7 @@ import 'swiper/css/pagination'
 import { Autoplay, Pagination } from 'swiper/modules'
 import './Auth.scss'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, fbProvider, ggProvider } from '../../firebase.config'
 import brand1 from '../../assets/image/brand/brand-1.png'
@@ -107,7 +108,14 @@ function Auth() {
                 const idToken = await user.getIdToken()
 
                 await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'facebook' })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             }
         } catch (error) {
             const errorMessage = error.message
@@ -125,7 +133,14 @@ function Auth() {
                 const idToken = await user.getIdToken()
 
                 await dispatch(loginWithFirebaseAction({ token: idToken, provider: 'google' })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             }
         } catch (error) {
             const errorMessage = error.message
@@ -163,7 +178,14 @@ function Auth() {
             setIsLoading(true)
             try {
                 await dispatch(loginUser({ email, password })).unwrap()
-                setNotication('success_login')
+                Swal.fire({
+                    title: 'Đăng nhập thành công',
+                    text: 'Chúc bạn mua sắm vui vẻ',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(from)
+                })
             } catch (e) {
                 setAuthError(e.message)
             } finally {
@@ -183,7 +205,14 @@ function Auth() {
                         setError3('Mật khẩu nhập lại không trùng khớp')
                     } else {
                         await dispatch(resetPasswordAction({ email, code: verificationCode, password })).unwrap()
-                        setNotication('success_reset_password')
+                        Swal.fire({
+                            title: 'Mật khẩu thay đổi thành công',
+                            text: 'Bạn có thể đăng nhập bằng mật khẩu mới',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            navigate('/user/login')
+                        })
                     }
                 }
             } catch (e) {
@@ -211,7 +240,14 @@ function Auth() {
             ).unwrap()
 
             if (mode == 'signup') {
-                setNotication('success_signup')
+                Swal.fire({
+                    title: 'Đăng ký thành công',
+                    text: 'Bạn sẽ quay trở lại trang "Đăng nhập"',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate('/user/login')
+                })
             } else if (mode == 'forgot-password') {
                 setStep(3)
                 setCountdown(0)
@@ -271,52 +307,12 @@ function Auth() {
         }
     }, [email, password])
 
-    useEffect(() => {
-        if (notication == 'success_login') {
-            setTimeout(() => {
-                navigate(from)
-            }, 1000)
-        }
-        if (notication == 'success_signup' || notication == 'success_reset_password') {
-            setTimeout(() => {
-                navigate('/user/login')
-                setNotication('')
-            }, 1000)
-        }
-    }, [notication, navigate, from])
-
     return (
         <>
             <div
                 className="d-flex w-100 align-items-center flex-column justify-content-start h-100"
                 style={{ minHeight: '100vh' }}
             >
-                {notication && (
-                    <>
-                        <div
-                            className="modal d-block"
-                            style={{ backgroundColor: 'rgba(0,0,0,0.3' }}
-                            aria-modal="true"
-                            role="dialog"
-                        >
-                            <div className="modal-dialog modal-dialog-centered justify-content-center">
-                                <Notification
-                                    title={
-                                        (notication == 'success_login' && 'Đăng nhập thành công') ||
-                                        (notication == 'success_signup' && 'Đăng ký thành công') ||
-                                        (notication == 'success_reset_password' && 'Đặt lại mật khẩu thành công')
-                                    }
-                                    description={
-                                        (notication == 'success_login' && 'Chúc bạn mua sắm vui vẻ') ||
-                                        ((notication == 'success_signup' || notication == 'success_reset_password') &&
-                                            'Bạn sẽ quay trở lại trang "Đăng nhập"')
-                                    }
-                                    type={'success'}
-                                />
-                            </div>
-                        </div>
-                    </>
-                )}
                 <div className="w-100 bg-white header shadow-sm h-100">
                     <div
                         className="container max-md d-flex justify-content-between align-items-center"

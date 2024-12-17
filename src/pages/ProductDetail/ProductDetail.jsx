@@ -495,7 +495,15 @@ function ProductDetail() {
                                 <div className="d-flex">
                                     {currentProduct.variants.some((variant) => variant.size) && (
                                         <>
-                                            {['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => (
+                                            {[
+                                                ...new Set(
+                                                    currentProduct.variants
+                                                        .filter((variant) =>
+                                                            selectedColor ? variant.color === selectedColor : true
+                                                        )
+                                                        .map((variant) => variant.size)
+                                                ),
+                                            ].map((size) => (
                                                 <div
                                                     key={size}
                                                     className={`primary-btn light ${
@@ -638,7 +646,15 @@ function ProductDetail() {
                             >
                                 {activeTab === 'description' && (
                                     <div className={`reveal ${activeTab === 'description' ? 'active' : ''}`}>
-                                        <p className="fs-3 my-4">{currentProduct.description}</p>
+                                        <div
+                                            className="w-100 h-100 fs-3 p-3"
+                                            style={{
+                                                whiteSpace: 'pre-wrap',
+                                                color: 'black',
+                                            }}
+                                        >
+                                            {currentProduct.description}
+                                        </div>
                                     </div>
                                 )}
                                 {activeTab === 'details' && (

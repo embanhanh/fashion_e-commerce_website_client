@@ -605,7 +605,7 @@ function CreateProduct() {
                                     onChange={(e) => setMaterial(e.target.value)}
                                     value={material}
                                     className="input-text w-100"
-                                    placeholder="Giá trị giảm giá cho sản phẩm"
+                                    placeholder="Nhập chất liệu của sản phẩm "
                                 />
                             </div>
                         </div>
@@ -615,7 +615,7 @@ function CreateProduct() {
                                 <input
                                     type="number"
                                     className="input-text w-100"
-                                    placeholder="Nhập chất liệu của sản phẩm"
+                                    placeholder="Giá trị giảm giá cho sản phẩm"
                                     min={1}
                                     step={1}
                                     max={100}

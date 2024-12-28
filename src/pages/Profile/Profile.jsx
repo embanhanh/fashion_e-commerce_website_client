@@ -57,7 +57,7 @@ function Profile() {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Cập nhật'
+            confirmButtonText: 'Cập nhật',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -109,7 +109,7 @@ function Profile() {
 
     if (loading && isLoading)
         return (
-            <div className="d-flex justify-content-center" style={{ height: "100vh" }}>
+            <div className="d-flex justify-content-center" style={{ height: '100vh' }}>
                 <div className="spinner-border" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
@@ -132,7 +132,9 @@ function Profile() {
                         <div className="form-content">
                             <div className="row mb-3">
                                 <div className="col-4 label-cell">
-                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Email</label>
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">
+                                        Email
+                                    </label>
                                 </div>
                                 <div className="col-8 input-cell">
                                     <div className="readonly-input">{email}</div>
@@ -141,7 +143,9 @@ function Profile() {
 
                             <div className="row mb-3">
                                 <div className="col-4 label-cell">
-                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Tên</label>
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">
+                                        Tên
+                                    </label>
                                 </div>
                                 <div className="col-8 input-cell">
                                     <div className="input-form d-flex align-items-center w-100">
@@ -158,7 +162,9 @@ function Profile() {
 
                             <div className="row mb-3">
                                 <div className="col-4 label-cell">
-                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Số điện thoại</label>
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">
+                                        Số điện thoại
+                                    </label>
                                 </div>
                                 <div className="col-8 input-cell">
                                     <div className="input-form d-flex align-items-center w-100">
@@ -174,7 +180,9 @@ function Profile() {
 
                             <div className="row mb-3">
                                 <div className="col-4 label-cell">
-                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Giới tính</label>
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">
+                                        Giới tính
+                                    </label>
                                 </div>
                                 <div className="col-8">
                                     <div className="d-flex gap-3 align-items-center fs-4">
@@ -217,7 +225,9 @@ function Profile() {
 
                             <div className="row mb-3">
                                 <div className="col-4 label-cell">
-                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">Ngày sinh</label>
+                                    <label className="fs-4 fw-normal text-nowrap mb-2 text-end align-items-start">
+                                        Ngày sinh
+                                    </label>
                                 </div>
                                 <div className="col-8 input-cell">
                                     <div className="d-flex align-items-center w-100 position-relative">
@@ -229,7 +239,10 @@ function Profile() {
                                             maxDate={new Date()}
                                             placeholderText="DD/MM/YYYY"
                                         />
-                                        <FaCalendar className="position-absolute end-0 me-3" style={{ pointerEvents: 'none' }} />
+                                        <FaCalendar
+                                            className="position-absolute end-0 me-3"
+                                            style={{ pointerEvents: 'none' }}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -237,20 +250,24 @@ function Profile() {
                             <div className="row mb-3">
                                 <div className="col-4"></div>
                                 <div className="col-8 input-cell">
-                                    <button type="submit" className="btn edit-btn">
+                                    <button type="submit" className="edit-btn ">
                                         Lưu
                                     </button>
                                 </div>
                             </div>
                         </div>
-
-
                     </form>
                 </div>
                 <div className="profile-avatar col-4 border-start">
                     <div className="avatar-wrapper" style={{ backgroundImage: `url(${urlImage})` }}></div>
                     <div className="custom-file-upload">
-                        <input id="file-upload" className="file-input" type="file" accept=".jpg,.jpeg,.png" onChange={handleImageUpload} />
+                        <input
+                            id="file-upload"
+                            className="file-input"
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleImageUpload}
+                        />
                         <label htmlFor="file-upload" className="choosefile-btn ">
                             Chọn ảnh
                         </label>

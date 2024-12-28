@@ -1,7 +1,6 @@
-import './OrderCard.scss'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,6 +11,8 @@ import RatingDemo from './RatingDemo'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../firebase.config'
 import { v4 as uuidv4 } from 'uuid'
+
+import './OrderCard.scss'
 
 function OrderCard({ order }) {
     const navigate = useNavigate()
@@ -28,8 +29,6 @@ function OrderCard({ order }) {
     const [showReturnOrderModal, setShowReturnOrderModal] = useState(false)
     const [files, setFiles] = useState([])
     const [previews, setPreviews] = useState([])
-    const [evidenceUpload, setEvidenceUpload] = useState([])
-    const [isProcessing, setIsProcessing] = useState(false)
 
     const handleDetailOrder = (order_id) => {
         navigate(`/user/account/orders/${order._id}`)
@@ -43,11 +42,7 @@ function OrderCard({ order }) {
         setShowCancelOrderModal(true)
     }
 
-    // const handleReceivedOrder = (orderId) => {
-    //     dispatch(receivedOrderUser(orderId))
-    // }
-
-    const handleReviewOrder = (orderId) => {
+    const handleReviewOrder = () => {
         setShowRatingModal(true)
     }
 
@@ -87,7 +82,7 @@ function OrderCard({ order }) {
         } catch (error) {
             Swal.fire({
                 title: 'Thất bại',
-                text: error,
+                text: error.response.data.message,
                 icon: 'error',
             })
         }
@@ -175,27 +170,27 @@ function OrderCard({ order }) {
         return currentTime - deliveredTime <= SEVEN_DAYS_IN_MS
     }
 
-    const uploadFilesToFirebase = async (files) => {
-        const uploadPromises = files.map(async (preview) => {
-            // Tạo reference với path cụ thể
-            const fileRef = ref(storage, `returns/${order._id}/${uuidv4()}`)
+    // const uploadFilesToFirebase = async (files) => {
+    //     const uploadPromises = files.map(async (preview) => {
+    //         // Tạo reference với path cụ thể
+    //         const fileRef = ref(storage, `returns/${order._id}/${uuidv4()}`)
 
-            // Convert URL thành blob
-            const response = await fetch(preview.url)
-            const blob = await response.blob()
+    //         // Convert URL thành blob
+    //         const response = await fetch(preview.url)
+    //         const blob = await response.blob()
 
-            // Upload file lên Firebase Storage
-            await uploadBytes(fileRef, blob)
+    //         // Upload file lên Firebase Storage
+    //         await uploadBytes(fileRef, blob)
 
-            // Lấy URL public để truy cập file
-            const downloadURL = await getDownloadURL(fileRef)
+    //         // Lấy URL public để truy cập file
+    //         const downloadURL = await getDownloadURL(fileRef)
 
-            // Trả về URL string thay vì object
-            return downloadURL
-        })
+    //         // Trả về URL string thay vì object
+    //         return downloadURL
+    //     })
 
-        return Promise.all(uploadPromises)
-    }
+    //     return Promise.all(uploadPromises)
+    // }
 
     const handleConfirmReturn = async (orderId) => {
         try {
@@ -261,7 +256,7 @@ function OrderCard({ order }) {
         } catch (error) {
             Swal.fire({
                 title: 'Thất bại',
-                text: error.message || 'Có lỗi xảy ra',
+                text: error.message,
                 icon: 'error',
             })
         }
@@ -356,9 +351,9 @@ function OrderCard({ order }) {
                             <button className="btn-detail-order" onClick={handleDetailOrder}>
                                 Xem chi tiết đơn hàng
                             </button>
-                            <div className="btn-return-order" disabled={order.status === 'delivered'}>
+                            <button className="btn-preview-order" disabled={true}>
                                 Đánh giá
-                            </div>
+                            </button>
                         </>
                     )}
 
@@ -367,13 +362,11 @@ function OrderCard({ order }) {
                             <button className="btn-detail-order" onClick={handleDetailOrder}>
                                 Xem chi tiết đơn hàng
                             </button>
-                            <button
-                                className="btn-return-order"
-                                onClick={handleReceivedOrder}
-                                disabled={!order.status === 'delivered'}
-                            >
+
+                            <button className="btn-preview-order" onClick={handleReviewOrder}>
                                 Đánh giá
                             </button>
+
                             {isWithin7Days(order.deliveredAt) && (
                                 <button className="btn-return-order" onClick={() => handleReturnOrder(order._id)}>
                                     Yêu cầu trả hàng
@@ -387,7 +380,7 @@ function OrderCard({ order }) {
                                 Xem chi tiết đơn hủy
                             </button>
                             <button
-                                className="btn-detail-order"
+                                className="btn-buy-again-order"
                                 onClick={() => handleBuyAgain(order)}
                                 disabled={cartLoading}
                             >
@@ -695,6 +688,7 @@ function OrderCard({ order }) {
                     onClose={() => setShowRatingModal(false)}
                     onRatingSuccess={() => {
                         dispatch(fetchOrderUser())
+                        dispatch(checkUserRatingAction(order.products[0].product.product._id))
                         setShowRatingModal(false)
                     }}
                 />

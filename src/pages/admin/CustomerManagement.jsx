@@ -10,15 +10,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
 import { useEffect, useState } from 'react'
-import {
-    fetchClients,
-    unblockClientAction,
-    unblockManyClientAction,
-} from '../../redux/slices/userSlice'
+import { fetchClients, unblockClientAction, unblockManyClientAction } from '../../redux/slices/userSlice'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import GiveVoucher from '../../components/GiveVoucher'
-import Notification from '../../components/Notification'
+
 import BlockClientModal from '../../components/BlockClientModal'
 import UpdateClientTypeModal from '../../components/UpdateClientTypeModal'
 import { getOrdersByUserIdAction } from '../../redux/slices/orderSilce'
@@ -78,18 +75,28 @@ function CustomerManagement() {
     const handleUnblockClient = async (userId) => {
         try {
             await dispatch(unblockClientAction({ userId })).unwrap()
-            setNotification({
-                show: true,
+            // setNotification({
+            //     show: true,
+            //     title: 'Thành công',
+            //     description: 'Khách hàng đã được mở khóa',
+            //     type: 'success',
+            // })
+            Swal.fire({
                 title: 'Thành công',
-                description: 'Khách hàng đã được mở khóa',
-                type: 'success',
+                text: 'Khách hàng đã được mở khóa',
+                icon: 'success',
             })
         } catch (error) {
-            setNotification({
-                show: true,
+            // setNotification({
+            //     show: true,
+            //     title: 'Thất bại',
+            //     description: error.message,
+            //     type: 'error',
+            // })
+            Swal.fire({
                 title: 'Thất bại',
-                description: error.message,
-                type: 'error',
+                text: error.message,
+                icon: 'error',
             })
         }
     }
@@ -97,19 +104,29 @@ function CustomerManagement() {
     const handleUnblockClients = async () => {
         try {
             await dispatch(unblockManyClientAction({ userIds: selectedClient })).unwrap()
-            setNotification({
-                show: true,
+            // setNotification({
+            //     show: true,
+            //     title: 'Thành công',
+            //     description: 'Những khách hàng đã được mở khóa',
+            //     type: 'success',
+            // })
+            Swal.fire({
                 title: 'Thành công',
-                description: 'Những khách hàng đã được mở khóa',
-                type: 'success',
+                text: 'Những khách hàng đã được mở khóa',
+                icon: 'success',
             })
             setSelectedClient([])
         } catch (error) {
-            setNotification({
-                show: true,
+            // setNotification({
+            //     show: true,
+            //     title: 'Thất bại',
+            //     description: error.message,
+            //     type: 'error',
+            // })
+            Swal.fire({
                 title: 'Thất bại',
-                description: error.message,
-                type: 'error',
+                text: error.message,
+                icon: 'error',
             })
         } finally {
             setBulkAction('')
@@ -191,16 +208,28 @@ function CustomerManagement() {
             </div>
             <div className="bg-white rounded-4 shadow-sm">
                 <div className=" border-bottom d-flex">
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === '' ? 'active' : ''}`} onClick={() => setClientType('')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === '' ? 'active' : ''}`}
+                        onClick={() => setClientType('')}
+                    >
                         Tất cả
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'new' ? 'active' : ''}`} onClick={() => setClientType('new')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'new' ? 'active' : ''}`}
+                        onClick={() => setClientType('new')}
+                    >
                         Khách hàng mới
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'potential' ? 'active' : ''}`} onClick={() => setClientType('potential')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'potential' ? 'active' : ''}`}
+                        onClick={() => setClientType('potential')}
+                    >
                         Khách hàng tiềm năng
                     </p>
-                    <p className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'loyal' ? 'active' : ''}`} onClick={() => setClientType('loyal')}>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${clientType === 'loyal' ? 'active' : ''}`}
+                        onClick={() => setClientType('loyal')}
+                    >
                         Khách hàng thân thiết
                     </p>
                 </div>
@@ -432,7 +461,13 @@ function CustomerManagement() {
                                     </p>
                                     <p className="fs-4 fw-medium text-center">{client.totalSpent}</p>
                                     <p className="fs-4 fw-medium text-center">{client.orderCount}</p>
-                                    <p className={`fs-4 fw-medium text-center ${client.isBlocked ? 'text-danger' : 'text-success'}`}>{client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}</p>
+                                    <p
+                                        className={`fs-4 fw-medium text-center ${
+                                            client.isBlocked ? 'text-danger' : 'text-success'
+                                        }`}
+                                    >
+                                        {client.isBlocked ? 'Bị chặn' : 'Đang hoạt động'}
+                                    </p>
                                     <div className="px-2 dropdown-container">
                                         <FontAwesomeIcon
                                             icon={faEllipsisVertical}
@@ -546,130 +581,139 @@ function CustomerManagement() {
                     />
                 </Modal>
             )}
-            {showOrderHistory && <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title className="fs-4">Lịch sử mua hàng - {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="p-3 overflow-y-auto" style={{ maxHeight: '500px' }}>
-                        {console.log(ordersByUserId)}
-                        {ordersByUserId.length > 0 ? (
-                            ordersByUserId.map((order) => (
-                                <div key={order._id} className="border rounded p-3 mb-3">
-                                    <div className="d-flex justify-content-between mb-2">
-                                        <p className="fs-4 fw-medium">Mã đơn hàng: {order._id}</p>
-                                        <p className="fs-4">
-                                            Ngày đặt: {new Date(order.createdAt).toLocaleDateString('vi-VN')}
-                                        </p>
-                                    </div>
-                                    <div className="mb-2">
-                                        <p className="fs-4">
-                                            Trạng thái:{' '}
-                                            <span className="ps-2 text-uppercase me-3 fs-4">
-                                                {order.status === 'processing' ? (
-                                                    <span className="text-warning">Đang xử lý</span>
-                                                ) : order.status === 'pending' ? (
-                                                    <span className="text-pending ">Chờ xác nhận</span>
-                                                ) : order.status === 'delivering' ? (
-                                                    <span className="text-delivering">Đang giao hàng</span>
-                                                ) : order.status === 'delivered' ? (
-                                                    <span className="text-delivered">Đã giao</span>
-                                                ) : order.status === 'cancelled' ? (
-                                                    <span className="text-cancelled">Đã hủy</span>
-                                                ) : null}{' '}
-                                            </span>
-                                        </p>
-                                        <p className="fs-4">
-                                            Tổng tiền:{' '}
-                                            <span className="fw-medium">
-                                                {order.productsPrice.toLocaleString('vi-VN')}đ
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div className="d-flex justify-content-between">
-                                        <div className="w-50">
-                                            <div className="mb-2">
-                                                <p className="fs-4 fw-medium overflow-y-hidden">Sản phẩm:</p>
-                                                {order.products.map((item, index) => (
-                                                    <div key={index} className="d-flex align-items-center mb-2">
-                                                        <img
-                                                            src={item.product.imageUrl}
-                                                            alt="Product image"
-                                                            style={{
-                                                                width: '50px',
-                                                                height: '50px',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                            className="me-3"
-                                                        />
-                                                        <div>
-                                                            <p className="fs-4">{item.product.product.name}</p>
-                                                            <p className="fs-4">Số lượng: {item.quantity}</p>
-                                                            <p className="fs-4">
-                                                                Phân loại hàng:{' '}
-                                                                {item.product.product.categories.map(
-                                                                    (categorie, index) => (
-                                                                        <span key={index} className="ms-2">
-                                                                            {categorie.name}
-                                                                        </span>
-                                                                    )
-                                                                )}
-                                                            </p>
+            {showOrderHistory && (
+                <Modal show={showOrderHistory} onHide={() => setShowOrderHistory(false)} size="lg" centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fs-4">
+                            Lịch sử mua hàng -{' '}
+                            {selectedOrderHistory?.name || selectedOrderHistory?.email?.split('@')[0]}
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="p-3 overflow-y-auto" style={{ maxHeight: '500px' }}>
+                            {console.log(ordersByUserId)}
+                            {ordersByUserId.length > 0 ? (
+                                ordersByUserId.map((order) => (
+                                    <div key={order._id} className="border rounded p-3 mb-3">
+                                        <div className="d-flex justify-content-between mb-2">
+                                            <p className="fs-4 fw-medium">Mã đơn hàng: {order._id}</p>
+                                            <p className="fs-4">
+                                                Ngày đặt: {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                                            </p>
+                                        </div>
+                                        <div className="mb-2">
+                                            <p className="fs-4">
+                                                Trạng thái:{' '}
+                                                <span className="ps-2 text-uppercase me-3 fs-4">
+                                                    {order.status === 'processing' ? (
+                                                        <span className="text-warning">Đang xử lý</span>
+                                                    ) : order.status === 'pending' ? (
+                                                        <span className="text-pending ">Chờ xác nhận</span>
+                                                    ) : order.status === 'delivering' ? (
+                                                        <span className="text-delivering">Đang giao hàng</span>
+                                                    ) : order.status === 'delivered' ? (
+                                                        <span className="text-delivered">Đã giao</span>
+                                                    ) : order.status === 'cancelled' ? (
+                                                        <span className="text-cancelled">Đã hủy</span>
+                                                    ) : null}{' '}
+                                                </span>
+                                            </p>
+                                            <p className="fs-4">
+                                                Tổng tiền:{' '}
+                                                <span className="fw-medium">
+                                                    {order.productsPrice.toLocaleString('vi-VN')}đ
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <div className="w-50">
+                                                <div className="mb-2">
+                                                    <p className="fs-4 fw-medium overflow-y-hidden">Sản phẩm:</p>
+                                                    {order.products.map((item, index) => (
+                                                        <div key={index} className="d-flex align-items-center mb-2">
+                                                            <img
+                                                                src={item.product.imageUrl}
+                                                                alt="Product image"
+                                                                style={{
+                                                                    width: '50px',
+                                                                    height: '50px',
+                                                                    objectFit: 'cover',
+                                                                }}
+                                                                className="me-3"
+                                                            />
+                                                            <div>
+                                                                <p className="fs-4">{item.product.product.name}</p>
+                                                                <p className="fs-4">Số lượng: {item.quantity}</p>
+                                                                <p className="fs-4">
+                                                                    Phân loại hàng:{' '}
+                                                                    {item.product.product.categories.map(
+                                                                        (categorie, index) => (
+                                                                            <span key={index} className="ms-2">
+                                                                                {categorie.name}
+                                                                            </span>
+                                                                        )
+                                                                    )}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="w-50 ps-4 border-start">
-                                            <div className="mb-3">
-                                                <p className="fs-4 fw-medium">Thông tin giao hàng:</p>
-                                                <p className="fs-4 fw-medium">
-                                                    Người nhận:{' '}
-                                                    <span className="fw-normal">{order.shippingAddress?.name}</span>
-                                                </p>
-                                                <p className="fs-4 fw-medium">
-                                                    SĐT:{' '}
-                                                    <span className="fw-normal">{order.shippingAddress?.phone}</span>
-                                                </p>
-                                                <p className="fs-4 fw-medium">
-                                                    Địa chỉ:{' '}
-                                                    <span className="fw-normal">{order.shippingAddress?.location}</span>
-                                                </p>
-                                            </div>
-
-                                            <div className="mb-3">
-                                                <p className="fs-4 fw-medium">Thanh toán:</p>
-                                                <p className="fs-4">
-                                                    Phương thức:{' '}
-                                                    {order.paymentMethod === 'paymentUponReceipt'
-                                                        ? 'Thanh toán sau khi nhận hàng.'
-                                                        : 'Thanh toán qua thẻ.'}
-                                                </p>
-                                                <p className="fs-4">
-                                                    Tạm tính: {order.productsPrice?.toLocaleString('vi-VN')}đ
-                                                </p>
-                                                <p className="fs-4">
-                                                    Phí vận chuyển: {order.shippingPrice?.toLocaleString('vi-VN')}đ
-                                                </p>
-                                                {order.vouchers?.length > 0 && (
-                                                    <p className="fs-4">
-                                                        Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ
+                                            <div className="w-50 ps-4 border-start">
+                                                <div className="mb-3">
+                                                    <p className="fs-4 fw-medium">Thông tin giao hàng:</p>
+                                                    <p className="fs-4 fw-medium">
+                                                        Người nhận:{' '}
+                                                        <span className="fw-normal">{order.shippingAddress?.name}</span>
                                                     </p>
-                                                )}
-                                                <p className="fs-4 fw-medium">
-                                                    Tổng cộng: {order.totalPrice?.toLocaleString('vi-VN')}đ
-                                                </p>
+                                                    <p className="fs-4 fw-medium">
+                                                        SĐT:{' '}
+                                                        <span className="fw-normal">
+                                                            {order.shippingAddress?.phone}
+                                                        </span>
+                                                    </p>
+                                                    <p className="fs-4 fw-medium">
+                                                        Địa chỉ:{' '}
+                                                        <span className="fw-normal">
+                                                            {order.shippingAddress?.location}
+                                                        </span>
+                                                    </p>
+                                                </div>
+
+                                                <div className="mb-3">
+                                                    <p className="fs-4 fw-medium">Thanh toán:</p>
+                                                    <p className="fs-4">
+                                                        Phương thức:{' '}
+                                                        {order.paymentMethod === 'paymentUponReceipt'
+                                                            ? 'Thanh toán sau khi nhận hàng.'
+                                                            : 'Thanh toán qua thẻ.'}
+                                                    </p>
+                                                    <p className="fs-4">
+                                                        Tạm tính: {order.productsPrice?.toLocaleString('vi-VN')}đ
+                                                    </p>
+                                                    <p className="fs-4">
+                                                        Phí vận chuyển: {order.shippingPrice?.toLocaleString('vi-VN')}đ
+                                                    </p>
+                                                    {order.vouchers?.length > 0 && (
+                                                        <p className="fs-4">
+                                                            Giảm giá: -{order.voucherDiscount?.toLocaleString('vi-VN')}đ
+                                                        </p>
+                                                    )}
+                                                    <p className="fs-4 fw-medium">
+                                                        Tổng cộng: {order.totalPrice?.toLocaleString('vi-VN')}đ
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="fs-4 text-center">Khách hàng chưa có đơn hàng nào</p>
-                        )}
-                    </div>
-                </Modal.Body>
-            </Modal>}
+                                ))
+                            ) : (
+                                <p className="fs-4 text-center">Khách hàng chưa có đơn hàng nào</p>
+                            )}
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            )}
         </div>
     )
 }

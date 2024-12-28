@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import Modal from 'react-bootstrap/Modal'
 import Pagination from 'react-bootstrap/Pagination'
 import { useSearchParams } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 import {
     fetchProducts,
@@ -20,7 +21,6 @@ import {
 } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import CategoryDropdown from '../../components/CategoryDropdown'
-import Notification from '../../components/Notification'
 import './ProductManagement.scss'
 
 function ProductManagement() {
@@ -36,11 +36,6 @@ function ProductManagement() {
     const [selectedCategories, setSelectedCategories] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
     const [bulkAction, setBulkAction] = useState('')
-    const [productNames, setProductNames] = useState([])
-    const [showNotification, setShowNotification] = useState(false)
-    const [notificationMessage, setNotificationMessage] = useState('')
-    const [notificationType, setNotificationType] = useState('')
-    const [notificationTitle, setNotificationTitle] = useState('')
 
     const pageFromUrl = parseInt(searchParams.get('page')) || 1
 
@@ -71,26 +66,31 @@ function ProductManagement() {
         setSoldQuantityRange((prev) => ({ ...prev, [type]: value }))
     }
 
-    const handleDeleteProduct = (product_name) => {
-        setProductNames([product_name])
+    const handleDeleteProduct = (productId) => {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa sản phẩm này?',
+            text: 'Bạn sẽ không thể hoàn tác sau khi xóa',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDeleteSelectedProducts([productId])
+            }
+        })
     }
 
-    const handleDeleteSelectedProducts = async () => {
-        if (productNames.length > 0) {
+    const handleDeleteSelectedProducts = async (productIds) => {
+        if (productIds?.length > 0) {
             try {
-                await dispatch(deleteManyProductsAction(productNames))
-                setNotificationTitle('Thành công')
-                setNotificationMessage('Xóa sản phẩm thành công')
-                setNotificationType('success')
-                setShowNotification(true)
-                setProductNames([])
+                await dispatch(deleteManyProductsAction(productIds))
+                showNotification('Thành công', 'Xóa sản phẩm thành công')
                 setSelectedProducts([])
                 setBulkAction('')
             } catch (error) {
-                setNotificationTitle('Thất bại')
-                setNotificationMessage('Xóa sản phẩm thất bại: ' + error.message)
-                setNotificationType('error')
-                setShowNotification(true)
+                showNotification('Thất bại', 'Xóa sản phẩm thất bại: ' + error.message, 'error')
             }
         }
     }
@@ -136,7 +136,21 @@ function ProductManagement() {
 
     useEffect(() => {
         if (bulkAction === 'deleteSelectedProducts' && selectedProducts.length > 0) {
-            setProductNames(selectedProducts)
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn xóa các sản phẩm này?',
+                text: 'Bạn sẽ không thể hoàn tác sau khi xóa',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    handleDeleteSelectedProducts(selectedProducts)
+                } else {
+                    setBulkAction('')
+                }
+            })
         }
     }, [bulkAction])
 
@@ -225,6 +239,15 @@ function ProductManagement() {
                 </div>
             )
         }
+    }
+
+    const showNotification = (title, message, type = 'success') => {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: type,
+            confirmButtonText: 'OK',
+        })
     }
 
     return (
@@ -544,35 +567,6 @@ function ProductManagement() {
                     </Pagination>
                 </div>
             </div>
-            {productNames.length > 0 && (
-                <Modal show={productNames.length > 0} onHide={() => setProductNames([])} centered>
-                    <Notification
-                        type="warning"
-                        title="Bạn có chắc chắn muốn xóa (các) sản phẩm này?"
-                        description="Bạn sẽ không thể hoàn tác sau khi xóa"
-                    >
-                        <div className="d-flex align-items-center justify-content-center bg-white">
-                            <button
-                                className=" border px-3 py-1 bg-white rounded-2"
-                                onClick={() => setProductNames([])}
-                            >
-                                <p className="fs-4">Hủy</p>
-                            </button>
-                            <button
-                                className="primary-btn shadow-none py-1 px-3 ms-3"
-                                onClick={handleDeleteSelectedProducts}
-                            >
-                                <p className="fs-4">Xóa</p>
-                            </button>
-                        </div>
-                    </Notification>
-                </Modal>
-            )}
-            {showNotification && (
-                <Modal show={showNotification} onHide={() => setShowNotification(false)} centered>
-                    <Notification type={notificationType} title={notificationTitle} description={notificationMessage} />
-                </Modal>
-            )}
         </>
     )
 }

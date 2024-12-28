@@ -112,7 +112,13 @@ const voucherSlice = createSlice({
         status: 'idle',
         error: null,
     },
-    reducers: {},
+    reducers: {
+        resetVoucherState: (state) => {
+            state.currentVoucher = null
+            state.error = null
+            state.status = 'idle'
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getVouchersAction.pending, (state) => {
@@ -195,5 +201,7 @@ const voucherSlice = createSlice({
             })
     },
 })
+
+export const { resetVoucherState } = voucherSlice.actions
 
 export default voucherSlice.reducer

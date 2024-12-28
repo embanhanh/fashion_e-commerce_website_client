@@ -5,7 +5,8 @@ import { faPen, faSave, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { getShopInfo, updateShopInfo } from '../../redux/slices/shopSlice'
 import { Modal } from 'react-bootstrap'
-import Notification from '../../components/Notification'
+import Swal from 'sweetalert2'
+
 import TomTomMap from '../../components/TomTomMap'
 
 function ShopManagerment() {
@@ -72,20 +73,38 @@ function ShopManagerment() {
             oldLogoUrl: newLogo ? editedShopInfo.logo : null,
         }
 
-        dispatch(updateShopInfo(updatedShopInfo))
-            .unwrap()
-            .then(() => {
-                setIsEditing(false)
-                setNewLogo(null)
-                setToastMessage('Cập nhật thông tin shop thành công')
-                setToastVariant('success')
-                setShowToast(true)
-            })
-            .catch((error) => {
-                setToastMessage('Cập nhật thông tin shop thất bại: ' + error.message)
-                setToastVariant('error')
-                setShowToast(true)
-            })
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc chắn muốn cập nhật thông tin shop?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(updateShopInfo(updatedShopInfo))
+                    .unwrap()
+                    .then(() => {
+                        setIsEditing(false)
+                        setNewLogo(null)
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Cập nhật thông tin shop thành công',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                        })
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            title: 'Thất bại',
+                            text: 'Cập nhật thông tin shop thất bại: ' + error.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        })
+                    })
+            }
+        })
     }
 
     const handleInputChange = (e) => {
@@ -179,11 +198,17 @@ function ShopManagerment() {
                             </p>
                             <div className="sticky-button-container d-inline-block ">
                                 {isEditing && (
-                                    <button className="me-2 py-2 px-4 rounded-4 border bg-white d-inline-flex align-items-center gap-2" onClick={() => setIsEditing(false)}>
+                                    <button
+                                        className="me-2 py-2 px-4 rounded-4 border bg-white d-inline-flex align-items-center gap-2"
+                                        onClick={() => setIsEditing(false)}
+                                    >
                                         <p className="fs-4 fw-medium">Hủy</p>
                                     </button>
                                 )}
-                                <button className=" py-2 px-4 rounded-4 primary-btn" onClick={isEditing ? handleSave : handleEdit}>
+                                <button
+                                    className=" py-2 px-4 rounded-4 primary-btn"
+                                    onClick={isEditing ? handleSave : handleEdit}
+                                >
                                     <p className="fs-4 fw-medium">{isEditing ? 'Lưu' : 'Chỉnh sửa'}</p>
                                     <FontAwesomeIcon icon={isEditing ? faSave : faPen} />
                                 </button>
@@ -207,11 +232,21 @@ function ShopManagerment() {
                                 <div className="d-flex align-items-center my-4">
                                     <p className="fs-4 fw-medium form-label">Logo Shop</p>
                                     <div className=" align-items-center w-100">
-                                        <img src={newLogo ? newLogo.previewUrl : shopInfo?.logo} alt="logo-shop" style={{ height: '100px' }} />
+                                        <img
+                                            src={newLogo ? newLogo.previewUrl : shopInfo?.logo}
+                                            alt="logo-shop"
+                                            style={{ height: '100px' }}
+                                        />
                                         {isEditing && (
                                             <label htmlFor="logo-upload" className="cursor-pointer fs-3 ms-3">
                                                 <FontAwesomeIcon icon={faPen} />
-                                                <input id="logo-upload" type="file" className="d-none" onChange={handleLogoChange} accept="image/*" />
+                                                <input
+                                                    id="logo-upload"
+                                                    type="file"
+                                                    className="d-none"
+                                                    onChange={handleLogoChange}
+                                                    accept="image/*"
+                                                />
                                             </label>
                                         )}
                                     </div>
@@ -247,7 +282,11 @@ function ShopManagerment() {
                                 </div>
                                 {isEditing && (
                                     <div className="mb-4">
-                                        <TomTomMap initialLocation={editedShopInfo.location} onLocationChange={handleLocationChange} setLocation={handleAddressChange} />
+                                        <TomTomMap
+                                            initialLocation={editedShopInfo.location}
+                                            onLocationChange={handleLocationChange}
+                                            setLocation={handleAddressChange}
+                                        />
                                     </div>
                                 )}
                                 <div className="d-flex align-items-center">
@@ -293,7 +332,9 @@ function ShopManagerment() {
                                         className="input-text w-100"
                                         placeholder="Url Facebook"
                                         value={editedShopInfo?.socialMedia?.facebook}
-                                        onChange={(e) => handleNestedInputChange('socialMedia', 'facebook', e.target.value)}
+                                        onChange={(e) =>
+                                            handleNestedInputChange('socialMedia', 'facebook', e.target.value)
+                                        }
                                         disabled={!isEditing}
                                     />
                                 </div>
@@ -307,7 +348,9 @@ function ShopManagerment() {
                                         className="input-text w-100"
                                         placeholder="Url Instagram"
                                         value={editedShopInfo?.socialMedia?.instagram}
-                                        onChange={(e) => handleNestedInputChange('socialMedia', 'instagram', e.target.value)}
+                                        onChange={(e) =>
+                                            handleNestedInputChange('socialMedia', 'instagram', e.target.value)
+                                        }
                                         disabled={!isEditing}
                                     />
                                 </div>
@@ -321,7 +364,9 @@ function ShopManagerment() {
                                         className="input-text w-100"
                                         placeholder="Url Twitter"
                                         value={editedShopInfo?.socialMedia?.twitter}
-                                        onChange={(e) => handleNestedInputChange('socialMedia', 'twitter', e.target.value)}
+                                        onChange={(e) =>
+                                            handleNestedInputChange('socialMedia', 'twitter', e.target.value)
+                                        }
                                         disabled={!isEditing}
                                     />
                                 </div>
@@ -388,7 +433,13 @@ function ShopManagerment() {
                                         <input
                                             type="time"
                                             className="input-text px-3"
-                                            value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].open : '08:00'}
+                                            value={
+                                                editedShopInfo &&
+                                                editedShopInfo.workingHours &&
+                                                editedShopInfo.workingHours[key]
+                                                    ? editedShopInfo.workingHours[key].open
+                                                    : '08:00'
+                                            }
                                             onChange={(e) => handleWorkingHoursChange(key, 'open', e.target.value)}
                                             disabled={!isEditing}
                                         />
@@ -398,7 +449,13 @@ function ShopManagerment() {
                                         <input
                                             type="time"
                                             className="input-text px-3"
-                                            value={editedShopInfo && editedShopInfo.workingHours && editedShopInfo.workingHours[key] ? editedShopInfo.workingHours[key].close : '22:00'}
+                                            value={
+                                                editedShopInfo &&
+                                                editedShopInfo.workingHours &&
+                                                editedShopInfo.workingHours[key]
+                                                    ? editedShopInfo.workingHours[key].close
+                                                    : '22:00'
+                                            }
                                             onChange={(e) => handleWorkingHoursChange(key, 'close', e.target.value)}
                                             disabled={!isEditing}
                                         />
@@ -409,9 +466,9 @@ function ShopManagerment() {
                     </div>
                 </>
             )}
-            <Modal show={showToast} onHide={() => setShowToast(false)} centered>
+            {/* <Modal show={showToast} onHide={() => setShowToast(false)} centered>
                 <Notification type={toastVariant} title="Thông báo" description={toastMessage} />
-            </Modal>
+            </Modal> */}
         </div>
     )
 }

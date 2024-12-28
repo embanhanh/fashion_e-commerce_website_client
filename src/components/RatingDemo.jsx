@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { Filter } from 'bad-words'
 import { ratingProductAction } from '../redux/slices/productSlice'
+import Swal from 'sweetalert2'
 import './RatingDemo.scss'
 
 const filter = new Filter()
@@ -48,7 +49,7 @@ const vietnameseBadWords = [
 ]
 filter.addWords(...vietnameseBadWords)
 
-const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
+const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose, onRatingSuccess }) => {
     const dispatch = useDispatch()
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
@@ -57,7 +58,6 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
     const [previews, setPreviews] = useState([])
     const [error, setError] = useState('')
 
-    console.log(productId)
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files)
         if (files.length + selectedFiles.length > 3) {
@@ -153,9 +153,27 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose }) => {
                     ratingData: formData,
                 })
             ).unwrap()
-            // onClose()
+
+            await Swal.fire({
+                title: 'Đánh giá thành công',
+                icon: 'success',
+                timer: 2000,
+            })
+            // Đảm bảo onRatingSuccess được gọi trước khi đóng modal
+            if (onRatingSuccess) {
+                onRatingSuccess()
+            }
+
+            // Đóng modal sau khi đã gọi onRatingSuccess
+            onClose()
         } catch (error) {
             console.error('Error submitting rating:', error)
+            Swal.fire({
+                title: 'Đánh giá thất bại',
+                text: error.message,
+                icon: 'error',
+                timer: 2000,
+            })
         } finally {
             setLoading(false)
         }

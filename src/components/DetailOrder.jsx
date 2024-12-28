@@ -73,21 +73,12 @@ function DetailOrder() {
                 <div className="d-flex justify-content-between my-3">
                     <div className="d-flex flex-column align-items-start gap-2 ms-3">
                         <p className="fs-4 fw-normal mb-0 fw-semibold ms-3">
-                            Thời gian đặt hàng:{' '}
+                            Thời gian đặt hàng:
                             <span className="fw-normal">
                                 {new Date(orderDetail?.createdAt).toLocaleTimeString('vi-VN')}{' '}
                                 {new Date(orderDetail?.createdAt).toLocaleDateString('vi-VN')}
                             </span>
                         </p>
-                        {orderDetail?.deliveredAt && (
-                            <p className="fs-4 fw-semibold me-3 ms-3">
-                                Thời gian nhận hàng:
-                                <span className="fs-4 fw-normal ms-2">
-                                    {new Date(orderDetail?.deliveredAt).toLocaleTimeString('vi-VN')}{' '}
-                                    {new Date(orderDetail?.deliveredAt).toLocaleDateString('vi-VN')}
-                                </span>
-                            </p>
-                        )}
                     </div>
                     {orderDetail?.status === 'cancelled' && (
                         <p className="fs-4 fw-semibold me-3">

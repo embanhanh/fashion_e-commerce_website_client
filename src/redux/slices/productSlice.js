@@ -116,7 +116,9 @@ const productSlice = createSlice({
             brand: [],
         },
         sortOption: '',
+        hasRated: 'false',
         status: 'idle',
+        loading: false,
         error: null,
     },
     reducers: {

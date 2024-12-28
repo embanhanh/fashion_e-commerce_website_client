@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo, faPen, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
+import Swal from 'sweetalert2'
 import {
     getAdminOrdersAction,
     setFilters,
@@ -12,7 +13,6 @@ import {
     getOrderByIdAction,
 } from '../../redux/slices/orderSilce'
 import ChangeStatusModal from '../../components/ChangeStatusModal'
-import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 import debounce from 'lodash/debounce'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
@@ -94,16 +94,30 @@ const OrderManagement = () => {
 
     const handleStatusChange = async () => {
         try {
-            await dispatch(updateOrderStatusManyAction({ orderIds: selectedOrderIds, status: bulkAction }))
-            setShowNotifyModal({
-                show: true,
-                description: 'Cập nhật trạng thái đơn hàng thành công',
+            await dispatch(updateOrderStatusManyAction({ orderIds: selectedOrderIds, status: bulkAction })).unwrap()
+            // setShowNotifyModal({
+            //     show: true,
+            //     description: 'Cập nhật trạng thái đơn hàng thành công',
+            //     title: 'Thành công',
+            //     type: 'success',
+            // })
+            Swal.fire({
                 title: 'Thành công',
-                type: 'success',
+                text: 'Cập nhật trạng thái đơn hàng thành công',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            }).then(() => {
+                dispatch(getAdminOrdersAction(filters))
             })
             setSelectedOrderIds([])
         } catch (error) {
-            setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            // setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            Swal.fire({
+                title: 'Thất bại',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             setBulkAction('')
         }
@@ -237,8 +251,8 @@ const OrderManagement = () => {
                                             id="all-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === ''}
-                                            value=""
+                                            checked={filterLocal.shippingMethod === 'all'}
+                                            value="all"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
                                         <label className="option" htmlFor="all-v2" data-txt="Tất cả" />
@@ -687,7 +701,7 @@ const OrderManagement = () => {
                                                     : 'Đã từ chối'}
                                             </p>
                                         )}
-                                        {order.status !== 'cancelled' && order.statusReason === 'pending' && (
+                                        {order.status !== 'cancelled' && (
                                             <FontAwesomeIcon
                                                 onClick={() => {
                                                     if (order.status !== 'returned') {
@@ -741,7 +755,7 @@ const OrderManagement = () => {
                     setShowNotifyModal={setShowNotifyModal}
                 />
             )}
-            {showNotifyModal.show && (
+            {/* {showNotifyModal.show && (
                 <Modal
                     show={showNotifyModal.show}
                     onHide={() => setShowNotifyModal({ show: false, description: '', title: '', type: '' })}
@@ -753,7 +767,7 @@ const OrderManagement = () => {
                         type={showNotifyModal.type}
                     />
                 </Modal>
-            )}
+            )} */}
             {showDetailOrder.show && (
                 <DetailModal
                     show={showDetailOrder.show}
@@ -764,8 +778,15 @@ const OrderManagement = () => {
             {showReturnModal.show && (
                 <ReturnModal
                     show={showReturnModal.show}
-                    onHide={() => setShowReturnModal({ show: false, orderId: '' })}
+                    onHide={() => {
+                        setShowReturnModal({ show: false, orderId: '' })
+                        dispatch(getAdminOrdersAction(filters))
+                    }}
                     orderId={showReturnModal.orderId}
+                    onSuccess={() => {
+                        setShowReturnModal({ show: false, orderId: '' })
+                        dispatch(getAdminOrdersAction(filters))
+                    }}
                 />
             )}
         </div>

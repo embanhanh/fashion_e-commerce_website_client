@@ -9,7 +9,7 @@ import { faMinus, faPlus, faThumbsUp, faHeart } from '@fortawesome/free-solid-sv
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, Button, Toast } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
@@ -23,7 +23,6 @@ import { doc, getDoc, updateDoc, onSnapshot, arrayUnion } from 'firebase/firesto
 import product1 from '../../assets/image/product_image/product_image_1.png'
 import Rating from '../../components/Rating'
 import ProductCard from '../../components/ProductCard'
-import Notification from '../../components/Notification'
 import CheckoutProcess from '../../components/CheckoutProcess'
 import './ProductDetail.scss'
 
@@ -56,9 +55,6 @@ function ProductDetail() {
         type: '',
     })
     const [showCheckoutProcess, setShowCheckoutProcess] = useState(false)
-    const [showToast, setShowToast] = useState(false)
-    const [toastMessage, setToastMessage] = useState('')
-    const [toastVariant, setToastVariant] = useState('success')
     const [notification, setNotification] = useState({
         show: false,
         title: '',
@@ -145,24 +141,40 @@ function ProductDetail() {
         const resultCode = searchParams.get('resultCode')
         if (resultCode) {
             if (resultCode === '0') {
-                setNotification({
-                    show: true,
-                    description: 'Đơn hàng đã được đặt thành công',
-                    type: 'success',
+                // setNotification({
+                //     show: true,
+                //     description: 'Đơn hàng đã được đặt thành công',
+                //     type: 'success',
+                //     title: 'Thành công',
+                //     onClose: () => {
+                //         navigate(location.pathname, { replace: true })
+                //     },
+                // })
+                Swal.fire({
                     title: 'Thành công',
-                    onClose: () => {
-                        navigate(location.pathname, { replace: true })
-                    },
+                    text: 'Đơn hàng đã được đặt thành công',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(location.pathname, { replace: true })
                 })
             } else {
-                setNotification({
-                    show: true,
-                    description: 'Thanh toán thất bại',
-                    type: 'error',
+                // setNotification({
+                //     show: true,
+                //     description: 'Thanh toán thất bại',
+                //     type: 'error',
+                //     title: 'Lỗi',
+                //     onClose: () => {
+                //         navigate(location.pathname, { replace: true })
+                //     },
+                // })
+                Swal.fire({
                     title: 'Lỗi',
-                    onClose: () => {
-                        navigate(location.pathname, { replace: true })
-                    },
+                    text: 'Thanh toán thất bại',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate(location.pathname, { replace: true })
                 })
             }
         }
@@ -205,7 +217,7 @@ function ProductDetail() {
     }
     const handleAddToCart = async () => {
         if (!isLoggedIn) {
-            setShowLoginModal({ show: true, type: 'addToCart' })
+            showLoginConfirmation('addToCart')
         } else {
             try {
                 const selectedVariant = currentProduct.variants.find(
@@ -232,11 +244,17 @@ function ProductDetail() {
                     })
                 }
             } catch (error) {
-                setNotification({
-                    show: true,
-                    description: 'Có lỗi xảy ra ' + error,
-                    type: 'error',
+                // setNotification({
+                //     show: true,
+                //     description: 'Có lỗi xảy ra ' + error,
+                //     type: 'error',
+                //     title: 'Lỗi',
+                // })
+                Swal.fire({
                     title: 'Lỗi',
+                    text: 'Có lỗi xảy ra ' + error,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
                 })
             }
         }
@@ -249,7 +267,7 @@ function ProductDetail() {
 
     const handleLove = async () => {
         if (!isLoggedIn) {
-            setShowLoginModal({ show: true, type: 'love' })
+            showLoginConfirmation('love')
             return
         }
         await dispatch(likeProductAction(currentProduct._id)).unwrap()
@@ -257,7 +275,7 @@ function ProductDetail() {
 
     const handleLike = async (ratingId) => {
         if (!isLoggedIn) {
-            setShowLoginModal({ show: true, type: 'like' })
+            showLoginConfirmation('like')
             return
         }
 
@@ -287,11 +305,17 @@ function ProductDetail() {
             }
         } catch (error) {
             console.error('Error handling like:', error)
-            setNotification({
-                show: true,
-                description: 'Có lỗi xảy ra khi thực hiện thao tác',
-                type: 'error',
+            // setNotification({
+            //     show: true,
+            //     description: 'Có lỗi xảy ra khi thực hiện thao tác',
+            //     type: 'error',
+            //     title: 'Lỗi',
+            // })
+            Swal.fire({
                 title: 'Lỗi',
+                text: 'Có lỗi xảy ra khi thực hiện thao tác',
+                icon: 'error',
+                confirmButtonText: 'OK',
             })
         }
     }
@@ -318,6 +342,47 @@ function ProductDetail() {
             reveals.forEach((reveal) => observer.unobserve(reveal))
         }
     }, [currentProduct])
+
+    const showLoginConfirmation = (type) => {
+        let message = ''
+        switch (type) {
+            case 'addToCart':
+                message = 'Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?'
+                break
+            case 'love':
+                message = 'Bạn có muốn đăng nhập để thích sản phẩm này không?'
+                break
+            default:
+                message = 'Bạn có muốn đăng nhập để like đánh giá sản phẩm không?'
+        }
+
+        Swal.fire({
+            title: 'Thông báo',
+            text: message,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Không',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleLoginRedirect()
+            } else {
+                if (type === 'addToCart') {
+                    setShowCheckoutProcess(true)
+                }
+            }
+        })
+    }
+
+    const showNotification = (message, type = 'success') => {
+        Swal.fire({
+            title: 'Thông báo',
+            text: message,
+            icon: type,
+            confirmButtonText: 'OK',
+        })
+    }
 
     if (!currentProduct) {
         return <div>Đang tải...</div>
@@ -453,7 +518,7 @@ function ProductDetail() {
                                     {/* {currentProduct.discount > 0 && (
                                         <> */}
                                     <p className="fs-2 fw-medium text-decoration-line-through text-body-tertiary">
-                                        {displayPrice.toLocaleString('vi-VN')}đ
+                                        {displayPrice.toLocaleString('vi-VN')}
                                     </p>
                                     <div className="product-badge discount-badge position-static ms-auto">
                                         - {currentProduct.discount}%{' '}
@@ -762,7 +827,7 @@ function ProductDetail() {
                                                                 if (isLoggedIn && rating.user._id !== user?._id) {
                                                                     handleLike(rating.user._id)
                                                                 } else {
-                                                                    setShowLoginModal({ show: true, type: 'like' })
+                                                                    showLoginConfirmation('like')
                                                                 }
                                                             }}
                                                         />
@@ -799,52 +864,7 @@ function ProductDetail() {
                     </>
                 )}
             </div>
-            <Modal show={showLoginModal.show} onHide={() => setShowLoginModal({ show: false, type: '' })} centered>
-                <Notification
-                    type="info"
-                    title="Thông báo"
-                    description={
-                        showLoginModal.type === 'addToCart'
-                            ? 'Bạn có muốn đăng nhập để có trải nghiệm mua sắm tốt hơn không?'
-                            : showLoginModal.type === 'love'
-                            ? 'Bạn có muốn đăng nhập để thích sản phẩm này không?'
-                            : 'Bạn có muốn đăng nhập để like đánh giá sản phẩm không?'
-                    }
-                >
-                    <div className="d-flex gap-4 align-items-center justify-content-center bg-white">
-                        <button
-                            className=" border px-4 py-2 bg-white rounded-4"
-                            onClick={() => {
-                                if (showLoginModal.type === 'addToCart') {
-                                    setShowCheckoutProcess(true)
-                                }
-                                setShowLoginModal({ show: false, type: '' })
-                            }}
-                        >
-                            <p className="fs-4">Không</p>
-                        </button>
-                        <button className="primary-btn info-btn py-2 px-4 rounded-4" onClick={handleLoginRedirect}>
-                            <p className="fs-4">Đăng nhập</p>
-                        </button>
-                    </div>
-                </Notification>
-            </Modal>
-            <Modal
-                show={notification.show}
-                onHide={() => {
-                    if (notification.onClose) {
-                        notification.onClose()
-                    }
-                    setNotification({ ...notification, show: false })
-                }}
-                centered
-            >
-                <Notification
-                    type={notification.type}
-                    title={notification.title}
-                    description={notification.description}
-                />
-            </Modal>
+
             {showCheckoutProcess && (
                 <CheckoutProcess
                     onClose={() => setShowCheckoutProcess(false)}

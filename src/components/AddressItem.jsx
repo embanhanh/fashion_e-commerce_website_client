@@ -44,6 +44,9 @@ function AddressItem({ address, onAddressUpdated }) {
                     text: 'Bạn có chắc chắn muốn thiết lập địa chỉ này làm mặc định không?',
                     icon: 'warning',
                     showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy',
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         await dispatch(setDefaultAddress({ address_id: address._id }))
@@ -77,11 +80,16 @@ function AddressItem({ address, onAddressUpdated }) {
                         </div>
                     </div>
                     <div className="address-actions">
-                        <button className="btn-update fs-5" onClick={() => setShowEditModal(true)}>Cập nhật</button> {/* Mở modal khi nhấn nút */}
+                        <button className="btn-update fs-5" onClick={() => setShowEditModal(true)}>
+                            Cập nhật
+                        </button>{' '}
+                        {/* Mở modal khi nhấn nút */}
                     </div>
                     {!address.default && (
                         <div className="address-actions">
-                            <button className="btn-update fs-5" onClick={handleDeleteAddress}>Xóa</button>
+                            <button className="btn-update fs-5" onClick={handleDeleteAddress}>
+                                Xóa
+                            </button>
                         </div>
                     )}
                 </div>
@@ -99,7 +107,9 @@ function AddressItem({ address, onAddressUpdated }) {
                                 Thiết lập mặc định
                             </button>
                         ) : (
-                            <button className="btn-set-default" onClick={handleSetDefaultAddress}>Thiết lập mặc định</button>
+                            <button className="btn-set-default" onClick={handleSetDefaultAddress}>
+                                Thiết lập mặc định
+                            </button>
                         )}
                     </div>
                 </div>
@@ -114,12 +124,14 @@ function AddressItem({ address, onAddressUpdated }) {
                 </div>
             </div>
             {/* Thêm EditAddressModal */}
-            {showEditModal && <EditAddressModal
-                show={showEditModal}
-                handleClose={() => setShowEditModal(false)}
-                onEditAddress={handleEditAddress}
-                address={address} // Truyền địa chỉ hiện tại vào modal
-            />}
+            {showEditModal && (
+                <EditAddressModal
+                    show={showEditModal}
+                    handleClose={() => setShowEditModal(false)}
+                    onEditAddress={handleEditAddress}
+                    address={address} // Truyền địa chỉ hiện tại vào modal
+                />
+            )}
         </div>
     )
 }

@@ -13,9 +13,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config'
 import { v4 as uuidv4 } from 'uuid'
 import { Badge } from 'react-bootstrap'
-import Notification from '../../components/Notification'
 import { Modal } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 function CreateProduct() {
     const { product_name } = useParams()
@@ -258,23 +258,57 @@ function CreateProduct() {
                 }
 
                 if (product_name) {
-                    const response = await dispatch(updateProductAction({ product_name, productData }))
-                    if (response.payload.product) {
-                        setMessage({ type: 'success', title: 'Cập nhật sản phẩm thành công', description: '' })
-                    }
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn muốn cập nhật sản phẩm này?',
+                        text: 'Bạn sẽ không thể hoàn tác sau khi cập nhật',
+                        icon: 'warning',
+                        confirmButtonText: 'Cập nhật',
+                        cancelButtonText: 'Hủy',
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const response = await dispatch(updateProductAction({ product_name, productData }))
+                            if (response.payload.product) {
+                                Swal.fire({
+                                    title: 'Thành công',
+                                    text: 'Cập nhật sản phẩm thành công',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK',
+                                }).then(() => {
+                                    resetForm()
+                                    navigate('/seller/products/create')
+                                })
+                            }
+                        }
+                    })
                 } else {
-                    const response = await createProduct(productData)
-                    if (response) {
-                        setMessage({ type: 'success', title: 'Thêm sản phẩm thành công', description: '' })
-                    }
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn muốn tạo sản phẩm này?',
+                        text: 'Bạn sẽ không thể hoàn tác sau khi tạo',
+                        icon: 'warning',
+                        confirmButtonText: 'Tạo',
+                        cancelButtonText: 'Hủy',
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const response = await createProduct(productData)
+                            if (response) {
+                                Swal.fire({
+                                    title: 'Thành công',
+                                    text: 'Thêm sản phẩm thành công',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK',
+                                })
+                            }
+                        }
+                    })
                 }
                 resetForm()
             } catch (error) {
                 console.error('Error creating product:', error)
-                setMessage({
-                    type: 'error',
-                    title: error.message || 'Có lỗi xảy ra khi tạo sản phẩm',
-                    description: 'Vui lòng thử lại',
+                Swal.fire({
+                    title: 'Thất bại',
+                    text: 'Có lỗi xảy ra khi tạo sản phẩm: ' + error.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
                 })
             } finally {
                 setIsLoading(false)
@@ -408,9 +442,9 @@ function CreateProduct() {
 
     return (
         <>
-            <Modal show={!!message.type} onHide={() => setMessage({ type: '', title: '', description: '' })} centered>
+            {/* <Modal show={!!message.type} onHide={() => setMessage({ type: '', title: '', description: '' })} centered>
                 <Notification title={message.title} description={message.description} type={message.type} />
-            </Modal>
+            </Modal> */}
 
             <div className="pb-5 d-flex flex-column gap-4 align-items-center">
                 <section id="section1" className="p-4 bg-white rounded-4 shadow-sm create-product-section">

@@ -7,8 +7,13 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ProductModal from '../../components/ProductModal'
 import { useDispatch, useSelector } from 'react-redux'
-import { createPromotionalComboAction, getPromotionalComboByIdAction, updatePromotionalComboAction } from '../../redux/slices/promotionalComboSlice'
-import Notification from '../../components/Notification'
+import {
+    createPromotionalComboAction,
+    getPromotionalComboByIdAction,
+    updatePromotionalComboAction,
+    resetPromotionalCombo,
+} from '../../redux/slices/promotionalComboSlice'
+import Swal from 'sweetalert2'
 import Modal from 'react-bootstrap/Modal'
 
 function CreatePromotionalCombos() {
@@ -47,6 +52,12 @@ function CreatePromotionalCombos() {
     }, [combo_id])
 
     useEffect(() => {
+        return () => {
+            dispatch(resetPromotionalCombo())
+        }
+    }, [dispatch])
+
+    useEffect(() => {
         if (promotionalCombo) {
             setComboData({
                 ...promotionalCombo,
@@ -69,7 +80,10 @@ function CreatePromotionalCombos() {
                 if (!value) error = 'Giới hạn đặt hàng không được để trống'
                 break
             case 'discountCombos':
-                if (comboData.discountCombos.length === 0 || comboData.discountCombos.some((discount) => !discount.quantity || !discount.discountValue))
+                if (
+                    comboData.discountCombos.length === 0 ||
+                    comboData.discountCombos.some((discount) => !discount.quantity || !discount.discountValue)
+                )
                     error = 'Phải có ít nhất 1 mức ưu đãi và không được để trống số lượng và giá trị giảm'
                 break
             case 'products':
@@ -108,18 +122,31 @@ function CreatePromotionalCombos() {
                 } else {
                     await dispatch(createPromotionalComboAction(comboData)).unwrap()
                 }
-                setShowNotification({
-                    show: true,
-                    description: `${combo_id ? 'Cập nhật' : 'Tạo'} combo khuyến mãi thành công`,
-                    type: 'success',
+                // setShowNotification({
+                //     show: true,
+                //     description: `${combo_id ? 'Cập nhật' : 'Tạo'} combo khuyến mãi thành công`,
+                //     type: 'success',
+                //     title: 'Thành công',
+                // })
+                Swal.fire({
                     title: 'Thành công',
+                    text: `${combo_id ? 'Cập nhật' : 'Tạo'} combo khuyến mãi thành công`,
+                    icon: 'success',
+                }).then(() => {
+                    dispatch(resetPromotionalCombo())
+                    navigate('/seller/combo')
                 })
             } catch (error) {
-                setShowNotification({
-                    show: true,
-                    description: error.message,
-                    type: 'error',
+                // setShowNotification({
+                //     show: true,
+                //     description: error.message,
+                //     type: 'error',
+                //     title: 'Thất bại',
+                // })
+                Swal.fire({
                     title: 'Thất bại',
+                    text: error.message,
+                    icon: 'error',
                 })
             } finally {
                 setLoading(false)
@@ -137,8 +164,18 @@ function CreatePromotionalCombos() {
                             <span style={{ color: 'red' }}>*</span> Tên combo:
                         </p>
                         <div className="w-100 d-flex align-items-center">
-                            <div className={`input-form d-flex align-items-center ${errors.name ? 'border-danger-subtle' : ''}`}>
-                                <input type="text" value={comboData.name} onChange={(e) => handleChangeComboData('name', e.target.value)} className="input-text w-100" placeholder="Tên combo" />
+                            <div
+                                className={`input-form d-flex align-items-center ${
+                                    errors.name ? 'border-danger-subtle' : ''
+                                }`}
+                            >
+                                <input
+                                    type="text"
+                                    value={comboData.name}
+                                    onChange={(e) => handleChangeComboData('name', e.target.value)}
+                                    className="input-text w-100"
+                                    placeholder="Tên combo"
+                                />
                             </div>
                         </div>
                     </div>
@@ -176,7 +213,12 @@ function CreatePromotionalCombos() {
                         <div className="w-100 d-flex align-items-center">
                             <div className="select">
                                 <div className="selected" data-one="Theo phần trăm" data-two="Theo số tiền">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -215,14 +257,24 @@ function CreatePromotionalCombos() {
                             {comboData.discountCombos.map((discount, index) => (
                                 <div key={index} className="d-flex align-items-center py-2 my-2">
                                     <p className="fs-4 me-2">Mua</p>
-                                    <div className={`input-form d-flex align-items-center ${errors.discountCombos && !comboData.discountCombos[index].quantity ? 'border-danger-subtle' : ''}`}>
+                                    <div
+                                        className={`input-form d-flex align-items-center ${
+                                            errors.discountCombos && !comboData.discountCombos[index].quantity
+                                                ? 'border-danger-subtle'
+                                                : ''
+                                        }`}
+                                    >
                                         <input
                                             type="number"
                                             value={discount.quantity}
                                             onChange={(e) =>
                                                 handleChangeComboData(
                                                     'discountCombos',
-                                                    comboData.discountCombos.map((discount, ind) => (ind === index ? { ...discount, quantity: e.target.value } : discount))
+                                                    comboData.discountCombos.map((discount, ind) =>
+                                                        ind === index
+                                                            ? { ...discount, quantity: e.target.value }
+                                                            : discount
+                                                    )
                                                 )
                                             }
                                             className="input-text w-100"
@@ -230,15 +282,27 @@ function CreatePromotionalCombos() {
                                         />
                                     </div>
                                     <p className="fs-4 mx-2">để được giảm</p>
-                                    <div className={`input-form d-flex align-items-center ${errors.discountCombos && !comboData.discountCombos[index].discountValue ? 'border-danger-subtle' : ''}`}>
-                                        <span className="fs-4 px-2 border-end text-body-tertiary fw-medium">{comboData.comboType === 'percentage' ? '%' : 'VNĐ'}</span>
+                                    <div
+                                        className={`input-form d-flex align-items-center ${
+                                            errors.discountCombos && !comboData.discountCombos[index].discountValue
+                                                ? 'border-danger-subtle'
+                                                : ''
+                                        }`}
+                                    >
+                                        <span className="fs-4 px-2 border-end text-body-tertiary fw-medium">
+                                            {comboData.comboType === 'percentage' ? '%' : 'VNĐ'}
+                                        </span>
                                         <input
                                             type="number"
                                             value={discount.discountValue}
                                             onChange={(e) =>
                                                 handleChangeComboData(
                                                     'discountCombos',
-                                                    comboData.discountCombos.map((discount, ind) => (ind === index ? { ...discount, discountValue: e.target.value } : discount))
+                                                    comboData.discountCombos.map((discount, ind) =>
+                                                        ind === index
+                                                            ? { ...discount, discountValue: e.target.value }
+                                                            : discount
+                                                    )
                                                 )
                                             }
                                             className="input-text w-100"
@@ -259,7 +323,15 @@ function CreatePromotionalCombos() {
                                 </div>
                             ))}
                             {comboData.discountCombos.length < 3 && (
-                                <button className="p-3 border bg-white" onClick={() => handleChangeComboData('discountCombos', [...comboData.discountCombos, { quantity: 0, discountValue: 0 }])}>
+                                <button
+                                    className="p-3 border bg-white"
+                                    onClick={() =>
+                                        handleChangeComboData('discountCombos', [
+                                            ...comboData.discountCombos,
+                                            { quantity: 0, discountValue: 0 },
+                                        ])
+                                    }
+                                >
                                     <p className="fs-4 fw-medium">
                                         Thêm mức ưu đãi <FontAwesomeIcon className="ms-2 fs-5" icon={faPlus} />
                                     </p>
@@ -273,7 +345,11 @@ function CreatePromotionalCombos() {
                             <span style={{ color: 'red' }}>*</span> Giới hạn đặt hàng:
                         </p>
                         <div className="w-100 d-flex align-items-center">
-                            <div className={`input-form d-flex align-items-center ${errors.limitCombo ? 'border-danger-subtle' : ''}`}>
+                            <div
+                                className={`input-form d-flex align-items-center ${
+                                    errors.limitCombo ? 'border-danger-subtle' : ''
+                                }`}
+                            >
                                 <input
                                     type="number"
                                     value={comboData.limitCombo}
@@ -321,11 +397,13 @@ function CreatePromotionalCombos() {
                     </div>
                 </div>
             </section>
-            {showProductModal && <ProductModal show={showProductModal} onHide={() => setShowProductModal(false)} handleConfirm={handleConfirm} comboData={comboData} />}
-            {showNotification.show && (
-                <Modal show={showNotification.show} onHide={() => setShowNotification({ ...showNotification, show: false })} centered>
-                    <Notification title={showNotification.title} description={showNotification.description} type={showNotification.type} />
-                </Modal>
+            {showProductModal && (
+                <ProductModal
+                    show={showProductModal}
+                    onHide={() => setShowProductModal(false)}
+                    handleConfirm={handleConfirm}
+                    comboData={comboData}
+                />
             )}
         </div>
     )

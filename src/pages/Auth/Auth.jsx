@@ -10,7 +10,6 @@ import { signInWithPopup } from 'firebase/auth'
 import { auth, fbProvider, ggProvider } from '../../firebase.config'
 import brand1 from '../../assets/image/brand/brand-1.png'
 import brand2 from '../../assets/image/brand/brand-2.png'
-import Notification from '../../components/Notification'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     loginWithFirebaseAction,
@@ -77,7 +76,6 @@ function Auth() {
     const [showPassword, setShowPassword] = useState(false)
     const [showPassword2, setShowPassword2] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [notication, setNotication] = useState('')
     const [verificationCode, setVerificationCode] = useState('')
     const [step, setStep] = useState(1)
     const [countdown, setCountdown] = useState(0)

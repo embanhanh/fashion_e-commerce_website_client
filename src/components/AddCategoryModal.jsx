@@ -99,9 +99,10 @@ const AddCategoryModal = ({ show, handleClose, categories }) => {
             newErrors.parentCategory = 'Vui lòng nhập và chọn hình ảnh cho danh mục lớn'
         }
         if (
-            selectedCategory &&
-            selectedCategory.name === parentCategory &&
-            selectedCategory.urlImage === categoryImage
+            !childCategory &&
+            categories.some(
+                (cat) => cat.name === parentCategory && cat.parentCategory === null && cat.urlImage === categoryImage
+            )
         ) {
             newErrors.parentCategory = 'Danh mục lớn đã tồn tại'
         }

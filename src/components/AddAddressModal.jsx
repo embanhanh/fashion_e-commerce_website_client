@@ -7,7 +7,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [location, setLocation] = useState('')
-    const [type, setType] = useState('') // State cho loại địa chỉ
+    const [type, setType] = useState('home') // State cho loại địa chỉ
     const [isDefault, setIsDefault] = useState(false)
     const [address, setAddress] = useState({ lat: 21.0285, lng: 105.8542 })
     const [errors, setErrors] = useState({})
@@ -22,7 +22,7 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
             setName('')
             setPhone('')
             setLocation('')
-            setType('') // Reset loại địa chỉ
+            setType('home') // Reset loại địa chỉ
             setIsDefault(false)
             setErrors({})
             setShowSuggestions(false)
@@ -107,7 +107,13 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         <Form.Group className="mb-3 fs-4">
                             <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Họ và tên:</p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} />
+                                <input
+                                    type="text"
+                                    className="input-text w-100"
+                                    placeholder="Họ và tên"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
                             </div>
                             {errors.name && <p className="text-danger">{errors.name}</p>}
                         </Form.Group>
@@ -115,7 +121,13 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         <Form.Group className="mb-3 fs-4">
                             <p className="fs-4 fw-medium text-nowrap mb-2 label-width">Số điện thoại:</p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                <input
+                                    type="text"
+                                    className="input-text w-100"
+                                    placeholder="Số điện thoại"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
                             </div>
                             {errors.phone && <p className="text-danger">{errors.phone}</p>}
                         </Form.Group>
@@ -136,7 +148,11 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                             {showSuggestions && suggestions.length > 0 && (
                                 <ListGroup className="suggestions-list" ref={suggestionsRef}>
                                     {suggestions.map((suggestion, index) => (
-                                        <ListGroup.Item key={index} action onClick={() => handleSuggestionClick(suggestion)}>
+                                        <ListGroup.Item
+                                            key={index}
+                                            action
+                                            onClick={() => handleSuggestionClick(suggestion)}
+                                        >
                                             {suggestion}
                                         </ListGroup.Item>
                                     ))}
@@ -144,27 +160,52 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                             )}
                             {errors.location && <p className="text-danger">{errors.location}</p>}
                             <div className="my-3">
-                                <TomTomMap initialLocation={address} onLocationChange={setAddress} height="200px" setLocation={setLocation} />
+                                <TomTomMap
+                                    initialLocation={address}
+                                    onLocationChange={setAddress}
+                                    height="200px"
+                                    setLocation={setLocation}
+                                />
                             </div>
                         </Form.Group>
 
                         <Form.Group className="mb-3 fs-4">
                             <Form.Label>Loại địa chỉ</Form.Label>
-                            <div className="select">
-                                <div className="selected">
-                                    <span>{type ? (type === 'home' ? 'Nhà riêng' : 'Cơ quan') : 'Chọn loại địa chỉ'}</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
-                                        <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
-                                    </svg>
-                                </div>
-                                <div className="options">
-                                    <div title="home">
-                                        <input id="home-address" name="address-type" type="radio" checked={type === 'home'} value="home" onChange={(e) => setType(e.target.value)} />
-                                        <label className="option" htmlFor="home-address" data-txt="Nhà riêng" />
+                            <div className="d-flex align-items-center">
+                                <div className="select">
+                                    <div className="selected" data-default="Nhà riêng" data-one="Cơ quan">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="1em"
+                                            viewBox="0 0 512 512"
+                                            className="arrow"
+                                        >
+                                            <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                                        </svg>
                                     </div>
-                                    <div title="work">
-                                        <input id="work-address" name="address-type" type="radio" checked={type === 'work'} value="work" onChange={(e) => setType(e.target.value)} />
-                                        <label className="option" htmlFor="work-address" data-txt="Cơ quan" />
+                                    <div className="options">
+                                        <div title="all">
+                                            <input
+                                                id="all-v2"
+                                                name="option-v2"
+                                                type="radio"
+                                                checked={type === 'home'}
+                                                value="home"
+                                                onChange={(e) => setType(e.target.value)}
+                                            />
+                                            <label className="option" htmlFor="all-v2" data-txt="Nhà riêng" />
+                                        </div>
+                                        <div title="option-1">
+                                            <input
+                                                id="option-1-v2"
+                                                name="option-v2"
+                                                type="radio"
+                                                checked={type === 'work'}
+                                                value="work"
+                                                onChange={(e) => setType(e.target.value)}
+                                            />
+                                            <label className="option" htmlFor="option-1-v2" data-txt="Cơ quan" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +214,13 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                         <Form.Group className="mb-3 fs-4">
                             <div className="checkbox-cell">
                                 <label className="d-flex align-items-center">
-                                    <input type="checkbox" className="input-checkbox" name="isDefault" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
+                                    <input
+                                        type="checkbox"
+                                        className="input-checkbox"
+                                        name="isDefault"
+                                        checked={isDefault}
+                                        onChange={(e) => setIsDefault(e.target.checked)}
+                                    />
                                     <span className="custom-checkbox" />
                                     <span className="ms-2">Đặt làm địa chỉ mặc định.</span>
                                 </label>
@@ -188,7 +235,11 @@ function AddAddressModal({ show, handleClose, onAddAddress }) {
                     <Button className="btn btn-outline-danger mx-3" onClick={handleClose}>
                         Trở lại
                     </Button>
-                    <Button className="btn btn-outline-success mx-3" style={{ minWidth: '130px' }} onClick={handleSubmit}>
+                    <Button
+                        className="btn btn-outline-success mx-3"
+                        style={{ minWidth: '130px' }}
+                        onClick={handleSubmit}
+                    >
                         Hoàn thành
                     </Button>
                 </div>

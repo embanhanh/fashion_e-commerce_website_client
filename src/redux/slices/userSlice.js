@@ -228,6 +228,20 @@ export const fetchOrdersByUserId = createAsyncThunk('user/fetchOrdersByUserId', 
     }
 })
 
+export const returnOrderUser = createAsyncThunk(
+    'user/returnOrder',
+    async ({ orderId, returnData }, { rejectWithValue }) => {
+        try {
+            console.log('returnData', returnData)
+            console.log('orderId', orderId)
+            const response = await returnOrder(orderId, returnData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Có lỗi xảy ra')
+        }
+    }
+)
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
@@ -520,6 +534,18 @@ const userSlice = createSlice({
             })
             .addCase(fetchOrdersByUserId.rejected, (state, action) => {
                 state.loading = false
+                state.error = action.payload
+            })
+            .addCase(returnOrderUser.pending, (state) => {
+                state.error = null
+            })
+            .addCase(returnOrderUser.fulfilled, (state, action) => {
+                state.error = null
+                state.orders = state.orders.map((order) =>
+                    order._id === action.payload.orderId ? action.payload : order
+                )
+            })
+            .addCase(returnOrderUser.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

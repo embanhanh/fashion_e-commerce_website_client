@@ -107,3 +107,20 @@ export const updateOrder = async (orderData) => {
         throw error
     }
 }
+
+export const confirmReturnOrder = async (orderId, statusReason) => {
+    try {
+        const response = await axios.put(
+            API_URL + 'confirm-return/' + orderId,
+            { statusReason },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

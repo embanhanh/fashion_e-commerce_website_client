@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { FaCircleUser, FaBagShopping, FaRegHeart, FaLocationDot, FaRegBell, FaGear } from 'react-icons/fa6'
+import { FaCircleUser, FaBagShopping, FaRegHeart, FaLocationDot, FaRegBell, FaTicket } from 'react-icons/fa6'
 import './Sidebar.scss'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUser } from '../redux/slices/userSlice'
@@ -28,6 +28,11 @@ function Sidebar() {
             icon: <FaLocationDot />,
         },
         {
+            path: '/user/account/vouchers',
+            name: 'Vouchers',
+            icon: <FaTicket />,
+        },
+        {
             path: '/user/account/notifications',
             name: 'Thông báo',
             icon: <FaRegBell />,
@@ -45,7 +50,6 @@ function Sidebar() {
             name: 'Thông báo',
             icon: <FaRegBell />,
         },
-
     ]
 
     const dispatch = useDispatch()
@@ -83,7 +87,13 @@ function Sidebar() {
                 <ul className="nav nav-pills flex-column mb-auto">
                     {menuItems.map((item, index) => (
                         <li key={index} className="nav-item">
-                            <NavLink className={({ isActive }) => (isActive ? 'sidebar-nav-link active' : 'sidebar-nav-link')} to={item.path} end>
+                            <NavLink
+                                className={({ isActive }) =>
+                                    isActive ? 'sidebar-nav-link active' : 'sidebar-nav-link'
+                                }
+                                to={item.path}
+                                end
+                            >
                                 <span className="icon-container">{item.icon}</span>
                                 <span className="d-block">{item.name}</span>
                             </NavLink>

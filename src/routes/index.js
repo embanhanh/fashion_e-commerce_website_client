@@ -37,6 +37,7 @@ import Delivery from '../pages/Policy/Delivery.jsx'
 import Payment from '../pages/Policy/Payment.jsx'
 import Check from '../pages/Policy/Check.jsx'
 import DetailOrder from '../components/DetailOrder.jsx'
+import Vouchers from '../pages/Profile/Vouchers.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
@@ -71,7 +72,7 @@ const privateRoutes = [
             { path: 'orders', element: Orders, layout: Fragment },
             { path: 'wishlists', element: Wishlists, layout: Fragment },
             { path: 'addresses', element: Addresses, layout: Fragment },
-            { path: 'savedcards', element: SavedCards, layout: Fragment },
+            { path: 'vouchers', element: Vouchers, layout: Fragment },
             { path: 'notifications', element: Notifications, layout: Fragment },
             { path: 'settings', element: Settings, layout: Fragment },
         ],

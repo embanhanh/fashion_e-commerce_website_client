@@ -184,7 +184,7 @@ function ProductManagement() {
                             icon={faEye}
                             className="fs-3 my-2 p-2 hover-icon"
                             color="#000"
-                            onClick={() => navigate(`/seller/products/detail/${product.slug}`)}
+                            onClick={() => navigate(`/products/${product.slug}`)}
                         />
                     </div>
                 </div>

@@ -91,6 +91,18 @@ export const updateOrderAction = createAsyncThunk('order/updateOrder', async (or
     }
 })
 
+export const confirmReturnOrderAction = createAsyncThunk(
+    'order/confirmReturnOrder',
+    async ({ orderId, reasonStatus }, { rejectWithValue }) => {
+        try {
+            const response = await confirmReturnOrder(orderId, reasonStatus)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
@@ -185,6 +197,15 @@ const orderSlice = createSlice({
                 state.ordersByUserId = action.payload
             })
             .addCase(getOrdersByUserIdAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(confirmReturnOrderAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(confirmReturnOrderAction.fulfilled, (state, action) => {
+                state.currentOrder = action.payload
+            })
+            .addCase(confirmReturnOrderAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

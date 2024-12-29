@@ -37,7 +37,7 @@ function ProductList() {
 
     const debouncedFetchProducts = useCallback(
         debounce(async () => {
-            await dispatch(fetchProducts({ ...filters, sort: sortOption, page: pageFromUrl }))
+            await dispatch(fetchProducts({ ...filters, sort: sortOption, page: pageFromUrl, limit: 12 }))
         }, 300),
         [dispatch, filters, sortOption, pageFromUrl]
     )

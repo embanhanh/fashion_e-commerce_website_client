@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faPen, faTrashCan, faShare } from '@fortawesome/free-solid-svg-icons'
 import { ref, listAll, getDownloadURL } from 'firebase/storage'
 import { storage } from '../../firebase.config'
-import Modal from 'react-bootstrap/Modal'
-import Notification from '../../components/Notification'
+import Swal from 'sweetalert2'
+import { Modal } from 'react-bootstrap'
 
 const VoucherManagement = () => {
     const navigate = useNavigate()
@@ -19,13 +19,8 @@ const VoucherManagement = () => {
     const [filters, setFilters] = useState({ code: '', voucherType: '', status: '' })
     const [filteredVouchers, setFilteredVouchers] = useState([])
     const [bulkAction, setBulkAction] = useState('')
-    const [selectedVoucherIds, setSelectedVoucherIds] = useState([])
-    const [showNotification, setShowNotification] = useState(false)
-    const [showDetailVoucher, setShowDetailVoucher] = useState(false)
-    const [notificationMessage, setNotificationMessage] = useState('')
-    const [notificationType, setNotificationType] = useState('')
-    const [notificationTitle, setNotificationTitle] = useState('')
     const [voucherId, setVoucherId] = useState(null) // Thêm state để lưu voucherId
+    const [showDetailVoucher, setShowDetailVoucher] = useState(false)
 
     const fetchVoucherImages = async () => {
         const vouchersRef = ref(storage, 'vouchers')
@@ -100,7 +95,9 @@ const VoucherManagement = () => {
                 const isMatchStatus =
                     (filters.status === '' ||
                         (filters.status === 'upcoming' && new Date(voucher.validFrom) > new Date()) ||
-                        (filters.status === 'ongoing' && new Date(voucher.validFrom) <= new Date() && new Date(voucher.validUntil) >= new Date()) ||
+                        (filters.status === 'ongoing' &&
+                            new Date(voucher.validFrom) <= new Date() &&
+                            new Date(voucher.validUntil) >= new Date()) ||
                         (filters.status === 'ended' && new Date(voucher.validUntil) < new Date())) &&
                     voucher.code.toLowerCase().trim().includes(filters.code.toLowerCase().trim()) &&
                     (filters.voucherType === '' || voucher.voucherType === filters.voucherType)
@@ -114,32 +111,47 @@ const VoucherManagement = () => {
     }
 
     const handleDeleteVoucher = (voucherId) => {
-        setSelectedVoucherIds([voucherId])
+        handleDeleteSelectedVouchers([voucherId])
     }
 
-    const handleDeleteSelectedVouchers = async () => {
-        if (selectedVoucherIds.length > 0) {
+    const handleDeleteSelectedVouchers = async (voucherIds) => {
+        if (voucherIds?.length > 0) {
             try {
-                await dispatch(deleteManyVoucherAction(selectedVoucherIds))
-                setNotificationTitle('Thành công')
-                setNotificationMessage('Xóa voucher thành công')
-                setNotificationType('success')
-                setShowNotification(true)
-                setSelectedVoucherIds([])
-                setSelectedVouchers([])
-                setBulkAction('')
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa các voucher này?',
+                    text: 'Bạn sẽ không thể hoàn tác sau khi xóa',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy',
+                    reverseButtons: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // await dispatch(deleteManyVoucherAction(voucherIds))
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Xóa voucher thành công',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                        })
+                        setSelectedVouchers([])
+                        setBulkAction('')
+                    }
+                })
             } catch (error) {
-                setNotificationTitle('Thất bại')
-                setNotificationMessage('Xóa voucher thất bại: ' + error.message)
-                setNotificationType('error')
-                setShowNotification(true)
+                Swal.fire({
+                    title: 'Thất bại',
+                    text: 'Xóa voucher thất bại: ' + error.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                })
             }
         }
     }
 
     useEffect(() => {
         if (bulkAction === 'deleteSelectedVouchers' && selectedVouchers.length > 0) {
-            setSelectedVoucherIds(selectedVouchers)
+            handleDeleteSelectedVouchers(selectedVouchers)
         }
     }, [bulkAction])
 
@@ -156,30 +168,73 @@ const VoucherManagement = () => {
                         <div className="col-6 d-flex align-items-center">
                             <p className="fs-4 fw-medium text-nowrap me-4 label-width text-end">Mã giảm giá</p>
                             <div className="input-form d-flex align-items-center w-100">
-                                <input type="text" className="input-text w-100" placeholder="Mã voucher" value={filters.code} onChange={(e) => handleFilterChange('code', e.target.value)} />
+                                <input
+                                    type="text"
+                                    className="input-text w-100"
+                                    placeholder="Mã voucher"
+                                    value={filters.code}
+                                    onChange={(e) => handleFilterChange('code', e.target.value)}
+                                />
                             </div>
                         </div>
                         <div className="col-6 d-flex align-items-center">
                             <p className="fs-4 fw-medium text-nowrap me-4 label-width text-end">Loại mã</p>
                             <div className="d-flex align-items-center">
                                 <div className="select ">
-                                    <div className="selected" data-default="Tất cả" data-one="Giảm giá toàn Shop" data-two="Giảm giá theo sản phẩm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                    <div
+                                        className="selected"
+                                        data-default="Tất cả"
+                                        data-one="Giảm giá toàn Shop"
+                                        data-two="Giảm giá theo sản phẩm"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="1em"
+                                            viewBox="0 0 512 512"
+                                            className="arrow"
+                                        >
                                             <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                         </svg>
                                     </div>
                                     <div className="options">
                                         <div title="all">
-                                            <input id="all-v2" name="option-v2" type="radio" defaultChecked value="" onChange={(e) => handleFilterChange('voucherType', e.target.value)} />
+                                            <input
+                                                id="all-v2"
+                                                name="option-v2"
+                                                type="radio"
+                                                defaultChecked
+                                                value=""
+                                                onChange={(e) => handleFilterChange('voucherType', e.target.value)}
+                                            />
                                             <label className="option" htmlFor="all-v2" data-txt="Tất cả" />
                                         </div>
                                         <div title="option-1">
-                                            <input id="option-1-v2" name="option-v2" type="radio" value="all" onChange={(e) => handleFilterChange('voucherType', e.target.value)} />
-                                            <label className="option" htmlFor="option-1-v2" data-txt="Giảm giá toàn Shop" />
+                                            <input
+                                                id="option-1-v2"
+                                                name="option-v2"
+                                                type="radio"
+                                                value="all"
+                                                onChange={(e) => handleFilterChange('voucherType', e.target.value)}
+                                            />
+                                            <label
+                                                className="option"
+                                                htmlFor="option-1-v2"
+                                                data-txt="Giảm giá toàn Shop"
+                                            />
                                         </div>
                                         <div title="option-2">
-                                            <input id="option-2-v2" name="option-v2" type="radio" value="product" onChange={(e) => handleFilterChange('voucherType', e.target.value)} />
-                                            <label className="option" htmlFor="option-2-v2" data-txt="Giảm giá theo sản phẩm" />
+                                            <input
+                                                id="option-2-v2"
+                                                name="option-v2"
+                                                type="radio"
+                                                value="product"
+                                                onChange={(e) => handleFilterChange('voucherType', e.target.value)}
+                                            />
+                                            <label
+                                                className="option"
+                                                htmlFor="option-2-v2"
+                                                data-txt="Giảm giá theo sản phẩm"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -187,7 +242,10 @@ const VoucherManagement = () => {
                         </div>
                     </div>
                     <div className="d-flex p-3 justify-content-center align-items-center">
-                        <button className="primary-btn shadow-none py-1 px-4 rounded-2 border-1" onClick={handleConfirmFilters}>
+                        <button
+                            className="primary-btn shadow-none py-1 px-4 rounded-2 border-1"
+                            onClick={handleConfirmFilters}
+                        >
                             <p className="fs-4 fw-medium">Tìm</p>
                         </button>
 
@@ -202,14 +260,30 @@ const VoucherManagement = () => {
                         <p className="fs-3 fw-medium">{filteredVouchers.length} voucher</p>
                         <div className="d-flex">
                             <div className="select ">
-                                <div className="selected" data-default="Công cụ xử lý hàng loạt" data-one="Xóa ccc voucher đang chọn">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <div
+                                    className="selected"
+                                    data-default="Công cụ xử lý hàng loạt"
+                                    data-one="Xóa ccc voucher đang chọn"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
                                 <div className="options">
                                     <div title="all">
-                                        <input id="all-v3" name="option-v3" type="radio" checked={bulkAction === ''} value="" onChange={(e) => setBulkAction(e.target.value)} />
+                                        <input
+                                            id="all-v3"
+                                            name="option-v3"
+                                            type="radio"
+                                            checked={bulkAction === ''}
+                                            value=""
+                                            onChange={(e) => setBulkAction(e.target.value)}
+                                        />
                                         <label className="option" htmlFor="all-v3" data-txt="Công cụ xử lý hàng loạt" />
                                     </div>
                                     <div title="option-1">
@@ -225,13 +299,28 @@ const VoucherManagement = () => {
                                                 }
                                             }}
                                         />
-                                        <label className="option" htmlFor="option-1-v3" data-txt="Xóa các voucher đang chọn" />
+                                        <label
+                                            className="option"
+                                            htmlFor="option-1-v3"
+                                            data-txt="Xóa các voucher đang chọn"
+                                        />
                                     </div>
                                 </div>
                             </div>
                             <div className="select mx-3">
-                                <div className="selected" data-default="Tất cả" data-one="Sắp diễn ra" data-two="Đang diễn ra" data-three="Đã kết thúc">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <div
+                                    className="selected"
+                                    data-default="Tất cả"
+                                    data-one="Sắp diễn ra"
+                                    data-two="Đang diễn ra"
+                                    data-three="Đã kết thúc"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -287,7 +376,10 @@ const VoucherManagement = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button className="primary-btn shadow-none py-2 px-4 rounded-2 border-1" onClick={() => navigate('/seller/voucher/create')}>
+                            <button
+                                className="primary-btn shadow-none py-2 px-4 rounded-2 border-1"
+                                onClick={() => navigate('/seller/voucher/create')}
+                            >
                                 <p className="fs-4 fw-medium">
                                     Thêm voucher mới <span className="ms-2">+</span>
                                 </p>
@@ -299,7 +391,12 @@ const VoucherManagement = () => {
                             <div className=" voucher-grid py-3 border-bottom">
                                 <div className="checkbox-cell">
                                     <label className="d-flex align-items-center">
-                                        <input type="checkbox" className="input-checkbox" checked={selectedVouchers.length === filteredVouchers.length} onChange={handleSelectAllVoucher} />
+                                        <input
+                                            type="checkbox"
+                                            className="input-checkbox"
+                                            checked={selectedVouchers.length === filteredVouchers.length}
+                                            onChange={handleSelectAllVoucher}
+                                        />
                                         <span className="custom-checkbox"></span>
                                     </label>
                                 </div>
@@ -327,22 +424,31 @@ const VoucherManagement = () => {
                                     <div key={voucher._id} className="voucher-grid py-3 border-bottom">
                                         <div className="checkbox-cell">
                                             <label className="d-flex align-items-center">
-                                                <input type="checkbox" className="input-checkbox" checked={selectedVouchers.includes(voucher._id)} onChange={() => handleSelectVoucher(voucher._id)} />
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={selectedVouchers.includes(voucher._id)}
+                                                    onChange={() => handleSelectVoucher(voucher._id)}
+                                                />
                                                 <span className="custom-checkbox"></span>
                                             </label>
                                         </div>
                                         <div className="d-flex align-items-center">
                                             <img
                                                 src={
-                                                    voucher.voucherType === 'all' && voucher.discountType === 'percentage'
+                                                    voucher.voucherType === 'all' &&
+                                                    voucher.discountType === 'percentage'
                                                         ? voucherImages[3]
-                                                        : voucher.voucherType === 'all' && voucher.discountType === 'fixedamount'
-                                                            ? voucherImages[2]
-                                                            : voucher.voucherType === 'product' && voucher.discountType === 'percentage'
-                                                                ? voucherImages[1]
-                                                                : voucher.voucherType === 'product' && voucher.discountType === 'fixedamount'
-                                                                    ? voucherImages[0]
-                                                                    : null
+                                                        : voucher.voucherType === 'all' &&
+                                                          voucher.discountType === 'fixedamount'
+                                                        ? voucherImages[2]
+                                                        : voucher.voucherType === 'product' &&
+                                                          voucher.discountType === 'percentage'
+                                                        ? voucherImages[1]
+                                                        : voucher.voucherType === 'product' &&
+                                                          voucher.discountType === 'fixedamount'
+                                                        ? voucherImages[0]
+                                                        : null
                                                 }
                                                 alt=""
                                                 style={{ width: '120px', height: '50px', objectFit: 'cover' }}
@@ -357,26 +463,52 @@ const VoucherManagement = () => {
                                         <p className="fs-4 fw-medium text-center">{voucher.used}</p>
                                         <div>
                                             <p
-                                                className={`text-center fw-medium ${new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil)
-                                                    ? 'text-success'
-                                                    : new Date() > new Date(voucher.validUntil)
+                                                className={`text-center fw-medium ${
+                                                    new Date() >= new Date(voucher.validFrom) &&
+                                                    new Date() <= new Date(voucher.validUntil)
+                                                        ? 'text-success'
+                                                        : new Date() > new Date(voucher.validUntil)
                                                         ? 'text-danger'
                                                         : 'text-warning'
-                                                    }`}
+                                                }`}
                                             >
-                                                {(new Date() >= new Date(voucher.validFrom) && new Date() <= new Date(voucher.validUntil) && 'Đang diễn ra') ||
+                                                {(new Date() >= new Date(voucher.validFrom) &&
+                                                    new Date() <= new Date(voucher.validUntil) &&
+                                                    'Đang diễn ra') ||
                                                     (new Date() > new Date(voucher.validUntil) && 'Đã kết thúc') ||
                                                     (new Date() < new Date(voucher.validFrom) && 'Sắp diễn ra')}
                                             </p>
                                             <p className="text-center fs-4 fw-medium">
-                                                {new Date(voucher.validFrom).toLocaleDateString('vi-VN')} - {new Date(voucher.validUntil).toLocaleDateString('vi-VN')}
+                                                {new Date(voucher.validFrom).toLocaleDateString('vi-VN')} -{' '}
+                                                {new Date(voucher.validUntil).toLocaleDateString('vi-VN')}
                                             </p>
                                         </div>
                                         <div className="d-flex align-items-center flex-column">
-                                            <FontAwesomeIcon icon={faEye} className="fs-3 my-2 p-2 hover-icon" color="#000" onClick={() => handleShowDetail(voucher._id)} />
-                                            <FontAwesomeIcon icon={faPen} className="fs-3 p-2 hover-icon" color="#4a90e2" onClick={() => navigate(`/seller/voucher/edit/${voucher._id}`)} />
-                                            <FontAwesomeIcon icon={faTrashCan} className="fs-3 my-2 p-2 hover-icon" color="#e74c3c" onClick={() => handleDeleteVoucher(voucher._id)} />
-                                            {voucher.voucherType === 'product' && <FontAwesomeIcon icon={faShare} className="fs-3 p-2 hover-icon" color="#4a90e2" />}
+                                            <FontAwesomeIcon
+                                                icon={faEye}
+                                                className="fs-3 my-2 p-2 hover-icon"
+                                                color="#000"
+                                                onClick={() => handleShowDetail(voucher._id)}
+                                            />
+                                            <FontAwesomeIcon
+                                                icon={faPen}
+                                                className="fs-3 p-2 hover-icon"
+                                                color="#4a90e2"
+                                                onClick={() => navigate(`/seller/voucher/edit/${voucher._id}`)}
+                                            />
+                                            <FontAwesomeIcon
+                                                icon={faTrashCan}
+                                                className="fs-3 my-2 p-2 hover-icon"
+                                                color="#e74c3c"
+                                                onClick={() => handleDeleteVoucher(voucher._id)}
+                                            />
+                                            {voucher.voucherType === 'product' && (
+                                                <FontAwesomeIcon
+                                                    icon={faShare}
+                                                    className="fs-3 p-2 hover-icon"
+                                                    color="#4a90e2"
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 ))
@@ -384,32 +516,11 @@ const VoucherManagement = () => {
                         </div>
                     </div>
                 </div>
-                {selectedVoucherIds.length > 0 && (
-                    <Modal show={selectedVoucherIds.length > 0} onHide={() => setSelectedVoucherIds([])} centered>
-                        <Notification type="warning" title="Bạn có chắc chắn muốn xóa (các) voucher này?" description="Bạn sẽ không thể hoàn tác sau khi xóa">
-                            <div className="d-flex align-items-center justify-content-center bg-white">
-                                <button className=" border px-3 py-1 bg-white rounded-2" onClick={() => setSelectedVoucherIds([])}>
-                                    <p className="fs-4">Hủy</p>
-                                </button>
-                                <button className="primary-btn shadow-none py-1 px-3 ms-3" onClick={handleDeleteSelectedVouchers}>
-                                    <p className="fs-4">Xóa</p>
-                                </button>
-                            </div>
-                        </Notification>
-                    </Modal>
-                )}
-                {showNotification && (
-                    <Modal show={showNotification} onHide={() => setShowNotification(false)} centered>
-                        <Notification type={notificationType} title={notificationTitle} description={notificationMessage} />
-                    </Modal>
-                )}
-            </div>
-            {showDetailVoucher && (
-                <Modal show={showDetailVoucher} onHide={handleCloseVoucher} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fs-2 fw-bold">Chi tiết voucher giảm giá</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
+                {showDetailVoucher && (
+                    <Modal show={showDetailVoucher} onHide={() => setShowDetailVoucher(false)} centered>
+                        <Modal.Header closeButton>
+                            <p className="fs-3 fw-medium">Chi tiết voucher giảm giá</p>
+                        </Modal.Header>
                         {status === 'loading' ? (
                             <div className="text-center">
                                 <div className="spinner-border" role="status">
@@ -417,19 +528,23 @@ const VoucherManagement = () => {
                                 </div>
                             </div>
                         ) : currentVoucher ? (
-                            <div className="voucher-details p-3 border rounded ">
+                            <div className="voucher-details p-3 border ">
                                 <div className="d-flex justify-content-between mb-3 fs-3">
                                     <img
                                         src={
-                                            currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'percentage'
+                                            currentVoucher.voucherType === 'all' &&
+                                            currentVoucher.discountType === 'percentage'
                                                 ? voucherImages[3]
-                                                : currentVoucher.voucherType === 'all' && currentVoucher.discountType === 'fixedamount'
-                                                    ? voucherImages[2]
-                                                    : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'percentage'
-                                                        ? voucherImages[1]
-                                                        : currentVoucher.voucherType === 'product' && currentVoucher.discountType === 'fixedamount'
-                                                            ? voucherImages[0]
-                                                            : null
+                                                : currentVoucher.voucherType === 'all' &&
+                                                  currentVoucher.discountType === 'fixedamount'
+                                                ? voucherImages[2]
+                                                : currentVoucher.voucherType === 'product' &&
+                                                  currentVoucher.discountType === 'percentage'
+                                                ? voucherImages[1]
+                                                : currentVoucher.voucherType === 'product' &&
+                                                  currentVoucher.discountType === 'fixedamount'
+                                                ? voucherImages[0]
+                                                : null
                                         }
                                         alt=""
                                         style={{ width: '120px', height: '50px', objectFit: 'cover' }}
@@ -453,8 +568,19 @@ const VoucherManagement = () => {
                                             {currentVoucher.applicableProducts?.map((product) => (
                                                 <div key={product._id} className="d-flex flex-column my-2">
                                                     <div className="d-flex align-items-center">
-                                                        <img src={product.urlImage[0]} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                                        <p className="fs-4 fw-medium overflow-hidden text-nowrap ms-2" style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                        <img
+                                                            src={product.urlImage[0]}
+                                                            alt=""
+                                                            style={{
+                                                                width: '50px',
+                                                                height: '50px',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                        />
+                                                        <p
+                                                            className="fs-4 fw-medium overflow-hidden text-nowrap ms-2"
+                                                            style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}
+                                                        >
                                                             {product.name}
                                                         </p>
                                                     </div>
@@ -511,14 +637,17 @@ const VoucherManagement = () => {
                                 <div className="dot"></div>
                             </section>
                         )}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div className="primary-btn px-4 py-2 shadow-none light border rounded-3" variant="secondary" onClick={handleCloseVoucher}>
-                            <p>Đóng</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
-            )}
+                        <Modal.Footer>
+                            <button
+                                className="primary-btn shadow-none py-1 px-4 rounded-2 border-1 d-flex justify-content-center"
+                                onClick={handleCloseVoucher}
+                            >
+                                <p className="fs-4 fw-medium">Đóng</p>
+                            </button>
+                        </Modal.Footer>
+                    </Modal>
+                )}
+            </div>
         </>
     )
 }

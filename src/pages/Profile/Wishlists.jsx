@@ -1,31 +1,32 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchFavoriteProducts } from '../../redux/slices/userSlice';
-import ProductCard from '../../components/ProductCard';
-import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchFavoriteProducts } from '../../redux/slices/userSlice'
+import FavoriteCard from '../../components/FavoriteCard'
+import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+
 function Wishlist() {
-    const dispatch = useDispatch();
-    const favoriteProducts = useSelector((state) => state.user.favoriteProducts);
+    const dispatch = useDispatch()
+    const favoriteProducts = useSelector((state) => state.user.favoriteProducts)
+
     useEffect(() => {
         dispatch(fetchFavoriteProducts())
-    }, [dispatch])
+    }, [])
+
+    useEffect(() => {
+        console.log(favoriteProducts)
+    }, [])
+
     return (
-        <div>
-            {console.log(favoriteProducts)}
-            {
-                favoriteProducts.map((product) => (
-                    <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
-                        <ProductCard
-                            url={product.imageUrl}
-                            name={product.product.name}
-                            originalPrice={product.product.originalPrice}
-                            discount={product.product.discount}
-                            rating={product.product.rating}
-                        />
+        <div className="container">
+            <div className="row">
+                {favoriteProducts.map((product, index) => (
+                    <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
+                        <FavoriteCard product={product} />
                     </div>
-                ))
-            }
+                ))}
+            </div>
         </div>
-    );
+    )
 }
 
-export default Wishlist;
+export default Wishlist

@@ -63,25 +63,48 @@ function DetailOrder() {
                                 <span className="text-delivered">Đã giao</span>
                             ) : orderDetail?.status === 'cancelled' ? (
                                 <span className="text-cancelled">Đã hủy</span>
+                            ) : orderDetail?.status === 'returned' ? (
+                                <span className="text-cancelled">Yêu cầu trả hàng</span>
                             ) : null}
                         </p>
                     </div>
                 </div>
 
                 <div className="d-flex justify-content-between my-3">
-                    <p className="fs-4 fw-normal mb-0 fw-semibold ms-3">
-                        Thời gian đặt hàng:{' '}
-                        <span className="fw-normal">
-                            {new Date(orderDetail?.createdAt).toLocaleTimeString('vi-VN')}{' '}
-                            {new Date(orderDetail?.createdAt).toLocaleDateString('vi-VN')}
-                        </span>
-                    </p>
+                    <div className="d-flex flex-column align-items-start gap-2 ms-3">
+                        <p className="fs-4 fw-normal mb-0 fw-semibold ms-3">
+                            Thời gian đặt hàng:
+                            <span className="fw-normal">
+                                {new Date(orderDetail?.createdAt).toLocaleTimeString('vi-VN')}{' '}
+                                {new Date(orderDetail?.createdAt).toLocaleDateString('vi-VN')}
+                            </span>
+                        </p>
+                    </div>
                     {orderDetail?.status === 'cancelled' && (
                         <p className="fs-4 fw-semibold me-3">
                             Thời gian hủy đơn hàng:
                             <span className="fs-4 fw-normal ms-2">
                                 {new Date(orderDetail?.reasonAt).toLocaleTimeString('vi-VN')}{' '}
                                 {new Date(orderDetail?.reasonAt).toLocaleDateString('vi-VN')}
+                            </span>
+                        </p>
+                    )}
+                    {orderDetail?.status === 'returned' && (
+                        <p className="fs-4 fw-semibold me-3">
+                            Thời gian yêu cầu trả hàng:
+                            <span className="fs-4 fw-normal ms-2">
+                                {new Date(orderDetail?.reasonAt).toLocaleTimeString('vi-VN')}{' '}
+                                {new Date(orderDetail?.reasonAt).toLocaleDateString('vi-VN')}
+                            </span>
+                        </p>
+                    )}
+
+                    {orderDetail?.status === 'delivered' && (
+                        <p className="fs-4 fw-semibold me-3">
+                            Thời gian nhận hàng:
+                            <span className="fs-4 fw-normal ms-2">
+                                {new Date(orderDetail?.deliveredAt).toLocaleTimeString('vi-VN')}{' '}
+                                {new Date(orderDetail?.deliveredAt).toLocaleDateString('vi-VN')}
                             </span>
                         </p>
                     )}
@@ -109,7 +132,7 @@ function DetailOrder() {
                                                 alt=""
                                                 style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                             />
-                                            <span className="text-wrap fs-4">{product.product.product.name}</span>
+                                            <span className="text-wrap fs-4 ms-2">{product.product.product.name}</span>
                                         </div>
                                     </td>
                                     <td>{product.product.price.toLocaleString('vi-VN')}đ</td>
@@ -158,6 +181,43 @@ function DetailOrder() {
                         </p>
                     </div>
                 </>
+            )}
+
+            {orderDetail?.status === 'returned' && (
+                <div>
+                    <div className="d-flex justify-content-start bg-white p-3 shadow-sm rounded-3 mt-2">
+                        <p className="fs-3 fw-semibold">
+                            Lý do trả hàng:{' '}
+                            <span className="fs-3 fw-normal ms-2">
+                                {orderDetail?.reason === 'product_defective'
+                                    ? 'Hàng lỗi.'
+                                    : orderDetail?.reason === 'product_not_match_description'
+                                    ? 'Sản phẩm không khớp với mô tả.'
+                                    : orderDetail?.reason === 'product_not_match'
+                                    ? 'Hàng không đúng màu, kích cỡ, phân loại hàng.'
+                                    : orderDetail?.reason === 'product_used'
+                                    ? 'Hàng đã qua sử dụng.'
+                                    : orderDetail?.reason === 'product_fake'
+                                    ? 'Hàng giả, nhái.'
+                                    : orderDetail?.reason === 'product_not_use'
+                                    ? 'Hàng nguyên vẹn nhưng không còn nhu cầu sử dụng.'
+                                    : 'Không có lý do'}
+                            </span>
+                        </p>
+                    </div>
+                    <div className="d-flex justify-content-start bg-white p-3 shadow-sm rounded-3 mt-2">
+                        <p className="fs-3 fw-semibold">
+                            Trạng thái xác nhận trả hàng:
+                            <span className="fs-3 fw-normal ms-2">
+                                {orderDetail?.statusReason === 'pending'
+                                    ? 'Chờ xác nhận'
+                                    : orderDetail?.statusReason === 'approved'
+                                    ? 'Chấp nhận trả hàng'
+                                    : 'Từ chối trả hàng'}
+                            </span>
+                        </p>
+                    </div>
+                </div>
             )}
         </>
     )

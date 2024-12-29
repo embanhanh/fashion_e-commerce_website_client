@@ -4,13 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLocationDot, faStore, faCheck, faBagShopping, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 
 import { getPromotionalComboByProductIdAction } from '../redux/slices/promotionalComboSlice'
 import { getShopInfo } from '../redux/slices/shopSlice'
 import { getVoucherByCodeAction } from '../redux/slices/voucherSlice'
 import { createOrderFromGuestAction } from '../redux/slices/orderSilce'
 import TomTomMap from './TomTomMap'
-import Notification from './Notification'
 import { calculateRouteDistance } from '../utils/MapUtils'
 import productImg from '../assets/image/product_image/product_image_1.png'
 import './CheckoutProcess.scss'
@@ -53,12 +53,12 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
     })
     const [errors, setErrors] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [notification, setNotification] = useState({
-        title: '',
-        description: '',
-        type: '',
-        show: false,
-    })
+    // const [notification, setNotification] = useState({
+    //     title: '',
+    //     description: '',
+    //     type: '',
+    //     show: false,
+    // })
 
     useEffect(() => {
         const fetchCombos = async () => {
@@ -161,21 +161,33 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                     window.location.href = payUrl
                 } else {
                     await dispatch(createOrderFromGuestAction({ orderData, address })).unwrap()
-                    setNotification({
+                    // setNotification({
+                    //     title: 'Thành công',
+                    //     description:
+                    //         'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
+                    //     type: 'success',
+                    //     show: true,
+                    // })
+                    Swal.fire({
                         title: 'Thành công',
-                        description:
-                            'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
-                        type: 'success',
-                        show: true,
+                        text: 'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
                     })
                 }
             } catch (error) {
                 console.log(error)
-                setNotification({
+                // setNotification({
+                //     title: 'Thất bại',
+                //     description: error.response?.data?.message || error.message,
+                //     type: 'error',
+                //     show: true,
+                // })
+                Swal.fire({
                     title: 'Thất bại',
-                    description: error.response?.data?.message || error.message,
-                    type: 'error',
-                    show: true,
+                    text: error.response?.data?.message || error.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
                 })
             } finally {
                 setIsLoading(false)
@@ -531,8 +543,8 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                     {orderData.shippingMethod === 'basic'
                                         ? 'Vận chuyển cơ bản'
                                         : orderData.shippingMethod === 'fast'
-                                            ? 'Vận chuyển nhanh'
-                                            : 'Vận chuyển hỏa tốc'}
+                                        ? 'Vận chuyển nhanh'
+                                        : 'Vận chuyển hỏa tốc'}
                                 </p>
                                 <p className="fs-4 fw-medium">
                                     {orderData.shippingPrice.toLocaleString('vi-VN') + 'đ'}
@@ -642,8 +654,9 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                         {STEPS.map((step, index) => (
                             <div key={index} className="position-relative">
                                 <button
-                                    className={`checkout-process_step rounded-circle ${index === currentStep ? 'active' : ''
-                                        } ${index < currentStep ? 'completed' : ''}`}
+                                    className={`checkout-process_step rounded-circle ${
+                                        index === currentStep ? 'active' : ''
+                                    } ${index < currentStep ? 'completed' : ''}`}
                                     onClick={() => index <= currentStep && setCurrentStep(index)}
                                 >
                                     <FontAwesomeIcon
@@ -691,7 +704,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                     </button>
                 </Modal.Footer>
             </Modal>
-            {notification.show && (
+            {/* {notification.show && (
                 <Modal
                     show={notification.show}
                     onHide={() => {
@@ -708,7 +721,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                         type={notification.type}
                     />
                 </Modal>
-            )}
+            )} */}
         </>
     )
 }

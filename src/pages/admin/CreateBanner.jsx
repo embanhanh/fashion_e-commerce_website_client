@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useDropzone } from 'react-dropzone'
+import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import Modal from 'react-bootstrap/Modal'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -13,7 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import { createBannerAction, resetBannerState, fetchBannerById, updateBanner } from '../../redux/slices/bannerSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
-import Notification from '../../components/Notification'
 import { storage } from '../../firebase.config'
 import DraggableBox from '../../components/DraggableBox'
 import './CreateBanner.scss'
@@ -151,10 +151,12 @@ function CreateBanner() {
 
     const handleSave = async () => {
         if (!validateForm()) {
-            setNotificationTitle('Thông báo')
-            setNotificationMessage('Vui lòng kiểm tra lại thông tin')
-            setNotificationType('error')
-            setShowNotification(true)
+            Swal.fire({
+                title: 'Thông báo',
+                text: 'Vui lòng kiểm tra lại thông tin',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
             return
         }
 
@@ -173,30 +175,77 @@ function CreateBanner() {
             }
 
             if (banner_id) {
-                await dispatch(updateBanner({ bannerId: banner_id, bannerData })).unwrap()
+                Swal.fire({
+                    title: 'Xác nhận',
+                    text: 'Bạn có chắc chắn muốn cập nhật banner?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy',
+                    reverseButtons: true,
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await dispatch(updateBanner({ bannerId: banner_id, bannerData })).unwrap()
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Cập nhật banner thành công',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            setBannerInfo({
+                                imageUrl: '',
+                                title: '',
+                                description: '',
+                                buttonText: '',
+                                linkUrl: '',
+                                displayStartTime: new Date(),
+                                displayEndTime: new Date(),
+                            })
+                            setFile(null)
+                            setPreviewImage(null)
+                        })
+                    }
+                })
             } else {
-                await dispatch(createBannerAction(bannerData)).unwrap()
+                Swal.fire({
+                    title: 'Xác nhận',
+                    text: 'Bạn có chắc chắn muốn tạo banner?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy',
+                    reverseButtons: true,
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await dispatch(createBannerAction(bannerData)).unwrap()
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Tạo banner thành công',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            setBannerInfo({
+                                imageUrl: '',
+                                title: '',
+                                description: '',
+                                buttonText: '',
+                                linkUrl: '',
+                                displayStartTime: new Date(),
+                                displayEndTime: new Date(),
+                            })
+                            setFile(null)
+                            setPreviewImage(null)
+                        })
+                    }
+                })
             }
-            setNotificationTitle('Thành công')
-            setNotificationMessage(banner_id ? 'Cập nhật banner thành công' : 'Tạo banner thành công')
-            setNotificationType('success')
-            setShowNotification(true)
-            setBannerInfo({
-                imageUrl: '',
-                title: '',
-                description: '',
-                buttonText: '',
-                linkUrl: '',
-                displayStartTime: new Date(),
-                displayEndTime: new Date(),
-            })
-            setFile(null)
-            setPreviewImage(null)
         } catch (error) {
-            setNotificationTitle('Lỗi')
-            setNotificationMessage(`Có lỗi xảy ra, ${error}`)
-            setNotificationType('error')
-            setShowNotification(true)
+            Swal.fire({
+                title: 'Lỗi',
+                text: `Có lỗi xảy ra, ${error}`,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             setIsLoading(false)
         }
@@ -206,9 +255,12 @@ function CreateBanner() {
         const selectedFile = e.target.files[0]
 
         if (!selectedFile.type.startsWith('image/')) {
-            setNotificationMessage('Vui lòng chọn file ảnh')
-            setNotificationType('error')
-            setShowNotification(true)
+            Swal.fire({
+                title: 'Lỗi',
+                text: 'Vui lòng chọn file ảnh',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
             return
         }
 

@@ -5,16 +5,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleInfo, faPen, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAdminOrdersAction, setFilters, updateOrderStatusManyAction } from '../../redux/slices/orderSilce'
+import Swal from 'sweetalert2'
+import {
+    getAdminOrdersAction,
+    setFilters,
+    updateOrderStatusManyAction,
+    getOrderByIdAction,
+} from '../../redux/slices/orderSilce'
 import ChangeStatusModal from '../../components/ChangeStatusModal'
-import Notification from '../../components/Notification'
 import Modal from 'react-bootstrap/Modal'
 import debounce from 'lodash/debounce'
 import defaultAvatar from '../../assets/image/default/default-avatar.png'
+import DetailModal from '../../components/DetailModal'
+import ReturnModal from '../../components/ReturnModal'
 
 const OrderManagement = () => {
     const dispatch = useDispatch()
-    const { orders, status, error, filters, ordersByUserId } = useSelector((state) => state.order)
+    const { orders, status, error, filters, currentOrder } = useSelector((state) => state.order)
     // modal
     const [showChangeStatusModal, setShowChangeStatusModal] = useState({
         show: false,
@@ -27,6 +34,15 @@ const OrderManagement = () => {
         title: '',
         type: '',
     })
+    const [showDetailOrder, setShowDetailOrder] = useState({
+        show: false,
+        orderId: '',
+    })
+
+    const [showReturnModal, setShowReturnModal] = useState({
+        show: false,
+        orderId: '',
+    })
     // state
     const [filterStatus, setFilterStatus] = useState('')
     const [filterLocal, setFilterLocal] = useState({
@@ -38,8 +54,8 @@ const OrderManagement = () => {
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
     const [bulkAction, setBulkAction] = useState('')
-    const [selectedOrder, setSelectedOrder] = useState(null)
-    const [showDetailOrder, setShowDetailOrder] = useState(false)
+    const [orderId, setOrderId] = useState(null)
+    const [reasonStatus, setReasonStatus] = useState('')
 
     const debouncedFetchOrders = useCallback(
         debounce(() => {
@@ -47,10 +63,6 @@ const OrderManagement = () => {
         }, 300),
         [dispatch, filters]
     )
-
-    useEffect(() => {
-        console.log(orders)
-    }, [orders])
 
     useEffect(() => {
         debouncedFetchOrders()
@@ -82,26 +94,40 @@ const OrderManagement = () => {
 
     const handleStatusChange = async () => {
         try {
-            await dispatch(updateOrderStatusManyAction({ orderIds: selectedOrderIds, status: bulkAction }))
-            setShowNotifyModal({
-                show: true,
-                description: 'Cập nhật trạng thái đơn hàng thành công',
+            await dispatch(updateOrderStatusManyAction({ orderIds: selectedOrderIds, status: bulkAction })).unwrap()
+            // setShowNotifyModal({
+            //     show: true,
+            //     description: 'Cập nhật trạng thái đơn hàng thành công',
+            //     title: 'Thành công',
+            //     type: 'success',
+            // })
+            Swal.fire({
                 title: 'Thành công',
-                type: 'success',
+                text: 'Cập nhật trạng thái đơn hàng thành công',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            }).then(() => {
+                dispatch(getAdminOrdersAction(filters))
             })
             setSelectedOrderIds([])
         } catch (error) {
-            setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            // setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            Swal.fire({
+                title: 'Thất bại',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             setBulkAction('')
         }
     }
 
-    useEffect(() => {
-        if (orders) {
-            console.log(orders.filter((order) => order.status === 'cancelled'))
-        }
-    }, [orders])
+    // useEffect(() => {
+    //     if (orders) {
+    //         console.log(orders.filter((order) => order.status === 'cancelled'))
+    //     }
+    // }, [orders])
 
     const handlePrintInvoice = (order) => {
         localStorage.setItem('selectedOrders', JSON.stringify([order]))
@@ -118,9 +144,25 @@ const OrderManagement = () => {
         }
     }
 
-    const handleShowDetail = (order) => {
-        setSelectedOrder(order)
+    const handleShowDetail = (order_id) => {
+        setOrderId(order_id)
         setShowDetailOrder(true)
+    }
+
+    useEffect(() => {
+        if (orderId) {
+            dispatch(getOrderByIdAction(orderId))
+        }
+    }, [orderId])
+
+    useEffect(() => {
+        if (currentOrder) {
+            setReasonStatus(currentOrder?.statusReason)
+        }
+    }, [currentOrder])
+
+    const handleShowReturnModal = () => {
+        setShowReturnModal(true)
     }
 
     const handleCloseOrder = () => {
@@ -209,8 +251,8 @@ const OrderManagement = () => {
                                             id="all-v2"
                                             name="option-v2"
                                             type="radio"
-                                            checked={filterLocal.shippingMethod === ''}
-                                            value=""
+                                            checked={filterLocal.shippingMethod === 'all'}
+                                            value="all"
                                             onChange={(e) => handleChangeFilter('shippingMethod', e.target.value)}
                                         />
                                         <label className="option" htmlFor="all-v2" data-txt="Tất cả" />
@@ -382,6 +424,12 @@ const OrderManagement = () => {
                     >
                         <p className="nav-title fs-4">Đã hủy</p>
                     </div>
+                    <div
+                        className={`fs-4 py-3 px-4 nav-option ${filterStatus === 'returned' ? 'checked' : ''}`}
+                        onClick={() => setFilterStatus('returned')}
+                    >
+                        <p className="nav-title fs-4">Yêu cầu trả hàng</p>
+                    </div>
                 </div>
                 <div className="p-3 d-flex align-items-center justify-content-between">
                     <p className="fs-3 fw-medium">{orders.length} đơn hàng</p>
@@ -392,7 +440,8 @@ const OrderManagement = () => {
                                 data-default="Công cụ xử lý hàng loạt"
                                 data-one="Xác nhận các đơn hàng đang chọn"
                                 data-two="Xác nhận giao hàng các đơn đang chọn"
-                                data-three="In hóa đơn các đơn hàng đang chọn"
+                                data-three="Xác nhận đã giao các đơn đang chọn"
+                                data-four="In hóa đơn các đơn hàng đang chọn"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -453,9 +502,30 @@ const OrderManagement = () => {
                                         data-txt="Xác nhận giao hàng các đơn đang chọn"
                                     />
                                 </div>
+
                                 <div title="option-3">
                                     <input
                                         id="option-3"
+                                        name="option"
+                                        type="radio"
+                                        value="delivered"
+                                        checked={bulkAction === 'delivered'}
+                                        onChange={() => {
+                                            if (selectedOrderIds.length > 0) {
+                                                setBulkAction('delivered')
+                                            }
+                                        }}
+                                    />
+                                    <label
+                                        className="option"
+                                        htmlFor="option-3"
+                                        data-txt="Xác nhận đã giao các đơn đang chọn"
+                                    />
+                                </div>
+
+                                <div title="option-4">
+                                    <input
+                                        id="option-4"
                                         name="option"
                                         type="radio"
                                         value="printInvoice"
@@ -466,7 +536,7 @@ const OrderManagement = () => {
                                     />
                                     <label
                                         className="option"
-                                        htmlFor="option-3"
+                                        htmlFor="option-4"
                                         data-txt="In hóa đơn các đơn hàng đang chọn"
                                     />
                                 </div>
@@ -583,8 +653,8 @@ const OrderManagement = () => {
                                         {order.shippingMethod === 'basic'
                                             ? 'Cơ bản'
                                             : order.shippingMethod === 'fast'
-                                                ? 'Nhanh'
-                                                : 'Hỏa tốc'}
+                                            ? 'Nhanh'
+                                            : 'Hỏa tốc'}
                                     </p>
                                     <p className="fs-4 text-center">
                                         {order.paymentMethod === 'bankTransfer'
@@ -594,42 +664,71 @@ const OrderManagement = () => {
                                     <p className="fs-4 text-center">{order.totalPrice.toLocaleString('vi-VN')}đ</p>
                                     <div className="text-center">
                                         <p
-                                            className={`text-center ${order.status === 'cancelled'
-                                                ? 'text-danger'
-                                                : order.status === 'delivered'
+                                            className={`text-center ${
+                                                order.status === 'cancelled'
+                                                    ? 'text-danger'
+                                                    : order.status === 'delivered'
                                                     ? 'text-success'
                                                     : 'text-warning'
-                                                }`}
+                                            }`}
                                         >
                                             {order.status === 'pending'
                                                 ? 'Chờ xác nhận'
                                                 : order.status === 'processing'
-                                                    ? 'Đang xử lý'
-                                                    : order.status === 'delivering'
-                                                        ? 'Đang giao'
-                                                        : order.status === 'delivered'
-                                                            ? 'Đã giao'
-                                                            : 'Đã hủy'}
+                                                ? 'Đang xử lý'
+                                                : order.status === 'delivering'
+                                                ? 'Đang giao'
+                                                : order.status === 'delivered'
+                                                ? 'Đã giao'
+                                                : order.status === 'returned'
+                                                ? 'Yêu cầu trả hàng'
+                                                : 'Đã hủy'}
                                         </p>
-                                        {order.status !== 'cancelled' && <FontAwesomeIcon
-                                            onClick={() =>
-                                                setShowChangeStatusModal({
-                                                    show: true,
-                                                    originalStatus: order.status,
-                                                    orderId: order._id,
-                                                })
-                                            }
-                                            icon={faPen}
-                                            className="fs-3 p-2 hover-icon"
-                                            color="#4a90e2"
-                                        />}
+                                        {order.status === 'returned' && (
+                                            <p
+                                                className={
+                                                    order.statusReason === 'pending'
+                                                        ? 'text-warning'
+                                                        : order.statusReason === 'approved'
+                                                        ? 'text-success'
+                                                        : 'text-danger'
+                                                }
+                                            >
+                                                {order.statusReason === 'pending'
+                                                    ? 'Chờ xác nhận'
+                                                    : order.statusReason === 'approved'
+                                                    ? 'Đã xác nhận'
+                                                    : 'Đã từ chối'}
+                                            </p>
+                                        )}
+                                        {order.status !== 'cancelled' && (
+                                            <FontAwesomeIcon
+                                                onClick={() => {
+                                                    if (order.status !== 'returned') {
+                                                        setShowChangeStatusModal({
+                                                            show: true,
+                                                            originalStatus: order.status,
+                                                            orderId: order._id,
+                                                        })
+                                                    } else {
+                                                        setShowReturnModal({
+                                                            show: true,
+                                                            orderId: order._id,
+                                                        })
+                                                    }
+                                                }}
+                                                icon={faPen}
+                                                className="fs-3 p-2 hover-icon"
+                                                color="#4a90e2"
+                                            />
+                                        )}
                                     </div>
                                     <div className="d-flex align-items-center flex-column">
                                         <FontAwesomeIcon
                                             icon={faCircleInfo}
                                             className="fs-3 my-2 p-2 hover-icon"
                                             color="#000"
-                                            onClick={() => handleShowDetail(order)}
+                                            onClick={() => setShowDetailOrder({ show: true, orderId: order._id })}
                                         />
                                         <p
                                             className="fs-5 text-primary hover-icon p-2"
@@ -637,7 +736,9 @@ const OrderManagement = () => {
                                         >
                                             In hóa đơn
                                         </p>
-                                        {order.status !== 'cancelled' && <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>}
+                                        {order.status !== 'cancelled' && (
+                                            <p className="fs-5 text-danger hover-icon p-2">Hủy đơn</p>
+                                        )}
                                     </div>
                                 </div>
                             ))
@@ -654,7 +755,7 @@ const OrderManagement = () => {
                     setShowNotifyModal={setShowNotifyModal}
                 />
             )}
-            {showNotifyModal.show && (
+            {/* {showNotifyModal.show && (
                 <Modal
                     show={showNotifyModal.show}
                     onHide={() => setShowNotifyModal({ show: false, description: '', title: '', type: '' })}
@@ -666,243 +767,27 @@ const OrderManagement = () => {
                         type={showNotifyModal.type}
                     />
                 </Modal>
+            )} */}
+            {showDetailOrder.show && (
+                <DetailModal
+                    show={showDetailOrder.show}
+                    onHide={() => setShowDetailOrder({ show: false, orderId: '' })}
+                    orderId={showDetailOrder.orderId}
+                />
             )}
-            {showDetailOrder && (
-                <Modal show={showDetailOrder} onHide={handleCloseOrder} centered size="lg">
-                    <Modal.Header closeButton>
-                        <p className="fs-2 fw-bold">Chi tiết đơn hàng</p>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="d-flex justify-content-between">
-                            <div className="col-8 pe-4">
-                                <div className="d-flex justify-content-between align-items-center shadow-none p-3 mb-3 bg-light rounded border">
-                                    <div className="text-start">
-                                        <span className="fs-3 fw-semibold">
-                                            Đơn hàng:{' '}
-                                            <span className="text-primary fs-4 fw-normal text-nowrap">
-                                                {selectedOrder._id}
-                                            </span>
-                                        </span>
-                                        <div className="fs-5">
-                                            <span className="me-2">
-                                                {new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}
-                                            </span>
-                                            <span className="ms-2">
-                                                {new Date(selectedOrder.createdAt).toLocaleTimeString('vi-VN')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="text-center">
-                                        <p
-                                            className={`text-center ${selectedOrder.status === 'cancelled'
-                                                ? 'text-danger'
-                                                : selectedOrder.status === 'delivered'
-                                                    ? 'text-success'
-                                                    : 'text-warning'
-                                                } text-uppercase fs-3`}
-                                        >
-                                            {selectedOrder.status === 'pending'
-                                                ? 'Chờ xác nhận'
-                                                : selectedOrder.status === 'processing'
-                                                    ? 'Đang xử lý'
-                                                    : selectedOrder.status === 'delivering'
-                                                        ? 'Đang giao'
-                                                        : selectedOrder.status === 'delivered'
-                                                            ? 'Đã giao'
-                                                            : 'Đã hủy'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="d-flex">
-                                    <div
-                                        className="shadow-none p-3 mb-3 bg-white rounded border me-4"
-                                        style={{ minWidth: '200px' }}
-                                    >
-                                        <p className="fs-4 fw-semibold bg-light info-title">KHÁCH HÀNG</p>
-                                        <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
-                                    </div>
-                                    <div
-                                        className="shadow-none p-3 mb-3 bg-white rounded border"
-                                        style={{ flexGrow: 1 }}
-                                    >
-                                        <p className="fs-4 fw-semibold bg-light info-title">NGƯỜI NHẬN</p>
-                                        <p className="fs-5 fw-normal text-nowrap my-2">{selectedOrder?.user?.name}</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.user?.phone}</p>
-                                        <p className="fs-5 fw-normal">{selectedOrder?.shippingAddress?.location}</p>
-                                    </div>
-                                </div>
-
-                                <div className="d-flex py-3 border-bottom">
-                                    <div className="fs-4 fw-medium text-center" style={{ width: '5%' }}>
-                                        STT
-                                    </div>
-                                    <div className="fs-4 fw-medium text-start ms-3" style={{ width: '40%' }}>
-                                        Tên sản phẩm
-                                    </div>
-                                    <div className="fs-4 fw-medium text-center" style={{ width: '20%' }}>
-                                        Giá
-                                    </div>
-                                    <div className="fs-4 fw-medium text-center" style={{ width: '15%' }}>
-                                        Số lượng
-                                    </div>
-                                    <div className="fs-4 fw-medium text-center" style={{ width: '20%' }}>
-                                        Tổng tiền
-                                    </div>
-                                </div>
-
-                                <div className="overflow-y-auto" style={{ maxHeight: '150px' }}>
-                                    {selectedOrder?.products.map((product, index) => (
-                                        <div key={index} className="d-flex align-items-center py-2 border-bottom">
-                                            <div className="text-center" style={{ width: '5%' }}>
-                                                {index + 1}
-                                            </div>
-                                            <div className="text-start" style={{ width: '40%' }}>
-                                                <div className="ms-3 d-flex align-items-center">
-                                                    <img
-                                                        src={product.product?.imageUrl}
-                                                        alt=""
-                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                    />
-                                                    <p
-                                                        className="fs-5 fw-medium overflow-hidden d-flex aglin-items-center ms-2"
-                                                        style={{ maxWidth: '100%' }}
-                                                    >
-                                                        {product.product?.product?.name}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div
-                                                className="text-center fs-5 d-flex flex-column"
-                                                style={{ width: '20%' }}
-                                            >
-                                                <span>{product?.product?.price.toLocaleString('vi-VN')}đ</span>
-                                                {product?.product?.product?.originalPrice && (
-                                                    <span
-                                                        style={{
-                                                            textDecoration: 'line-through',
-                                                            color: 'gray',
-                                                            fontSize: '0.9em',
-                                                            marginLeft: '5px',
-                                                        }}
-                                                    >
-                                                        {product?.product?.product?.originalPrice?.toLocaleString(
-                                                            'vi-VN'
-                                                        )}
-                                                        đ
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="text-center fs-5" style={{ width: '15%' }}>
-                                                {product.quantity}
-                                            </div>
-
-                                            <div className="text-center fs-5" style={{ width: '20%' }}>
-                                                <span>
-                                                    {(product?.product?.price * product?.quantity).toLocaleString(
-                                                        'vi-VN'
-                                                    )}
-                                                    đ
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                {selectedOrder?.cancelReason && <div className="d-flex justify-content-between align-items-center mt-5">
-                                    <p className="fs-4 fw-semibold">Lý do hủy:</p>
-                                    <p className="fs-4 fw-normal">{selectedOrder?.cancelReason === 'change_address' ? 'Muốn thay đổi địa chỉ giao hàng.'
-                                        : selectedOrder?.cancelReason === 'change_voucher' ? 'Muốn nhập/thay đổi voucher.'
-                                            : selectedOrder?.cancelReason === 'change_product' ? 'Muốn thay đổi sản phẩm(số lượng, màu sắc, phân loại hàng,...).'
-                                                : selectedOrder?.cancelReason === 'find_cheaper' ? 'Tìm thấy giá rẻ ở chỗ khác.'
-                                                    : selectedOrder?.cancelReason === 'cancel_purchase' ? 'Đổi ý, không muốn mua nữa.'
-                                                        : 'Không có lý do'}
-                                    </p>
-                                </div>}
-                            </div>
-                            <div className="col-4">
-                                <div
-                                    className="shadow-none p-3 mb-3 bg-white rounded border "
-                                    style={{ minWidth: '200px' }}
-                                >
-                                    <p className="fs-4 fw-semibold bg-light info-title text-uppercase">
-                                        Thông tin khác
-                                    </p>
-                                    <div className="d-flex justify-content-between mt-3">
-                                        <p className="fs-5 fw-normal">
-                                            {selectedOrder?.paymentMethod === 'paymentUponReceipt'
-                                                ? 'Thanh toán khi nhận hàng:'
-                                                : 'Thanh toán chuyển khoản:'}
-                                        </p>
-                                        <p className="fs-5 fw-normal">
-                                            {selectedOrder?.totalPrice.toLocaleString('vi-VN')} đ
-                                        </p>
-                                    </div>
-                                    <div className="d-flex justify-content-between mt-3">
-                                        <p className="fs-5 fw-normal">Phương thức vận chuyển:</p>
-                                        <p className="fs-5 fw-normal">
-                                            {selectedOrder?.shippingMethod === 'basic'
-                                                ? 'Cơ bản'
-                                                : selectedOrder?.shippingMethod === 'fast'
-                                                    ? 'Nhanh'
-                                                    : 'Hỏa tốc'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div
-                                    className="shadow-none p-3 mb-3 bg-white rounded border d-flex flex-column"
-                                    style={{ minWidth: '200px', minHeight: '250px' }}
-                                >
-                                    {/* Phần trên */}
-                                    <div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="fs-5 fw-normal">Tạm tính</p>
-                                            <p className="fs-5 fw-normal">
-                                                {selectedOrder?.productsPrice.toLocaleString('vi-VN')} đ
-                                            </p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="fs-5 fw-normal">Khuyến mãi</p>
-                                            <p className="fs-5 fw-normal">
-                                                {selectedOrder?.products
-                                                    .reduce(
-                                                        (total, item) => total + (item.product.product.discount || 0),
-                                                        0
-                                                    )
-                                                    .toLocaleString('vi-VN')}
-                                                đ
-                                            </p>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="fs-5 fw-normal">Phí vận chuyển</p>
-                                            <p className="fs-5 fw-normal">
-                                                {selectedOrder?.shippingPrice.toLocaleString('vi-VN')}đ
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Phần tổng tiền */}
-                                    <div className="mt-auto">
-                                        <div className="d-flex justify-content-between">
-                                            <p className="fs-3 fw-normal">Tổng tiền</p>
-                                            <p className="fs-4 fw-normal text-center">
-                                                {selectedOrder?.totalPrice.toLocaleString('vi-VN')}đ
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <div
-                            className="primary-btn px-4 py-2 shadow-none light border rounded-3"
-                            variant="secondary"
-                            onClick={handleCloseOrder}
-                        >
-                            <p>Đóng</p>
-                        </div>
-                    </Modal.Footer>
-                </Modal>
+            {showReturnModal.show && (
+                <ReturnModal
+                    show={showReturnModal.show}
+                    onHide={() => {
+                        setShowReturnModal({ show: false, orderId: '' })
+                        dispatch(getAdminOrdersAction(filters))
+                    }}
+                    orderId={showReturnModal.orderId}
+                    onSuccess={() => {
+                        setShowReturnModal({ show: false, orderId: '' })
+                        dispatch(getAdminOrdersAction(filters))
+                    }}
+                />
             )}
         </div>
     )

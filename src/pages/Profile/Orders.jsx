@@ -65,6 +65,12 @@ function Orders() {
                     >
                         Đã hủy
                     </p>
+                    <p
+                        className={`fs-4 py-3 px-4 order-tab-item ${filterStatus === 'returned' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('returned')}
+                    >
+                        Yêu cầu trả hàng
+                    </p>
                 </div>
             </div>
 

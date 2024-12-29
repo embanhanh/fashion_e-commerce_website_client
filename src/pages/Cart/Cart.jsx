@@ -6,15 +6,15 @@ import Modal from 'react-bootstrap/Modal'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
+
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
 import { fetchAddresses } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
 import { createOrderAction, updateOrderAction, getOrderByIdAction } from '../../redux/slices/orderSilce'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
-
 import { calculateRouteDistance } from '../../utils/MapUtils'
 import SelectAddressModal from '../../components/SelectAddressModal'
-import Notification from '../../components/Notification'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
 import PaymentMethodModal from '../../components/PaymentMethodModal'
@@ -73,24 +73,38 @@ function Cart() {
         const resultCode = searchParams.get('resultCode')
         if (resultCode) {
             if (resultCode === '0') {
-                setNotification({
-                    show: true,
-                    description: 'Đơn hàng đã được đặt thành công',
-                    type: 'success',
+                // setNotification({
+                //     show: true,
+                //     description: 'Đơn hàng đã được đặt thành công',
+                //     type: 'success',
+                //     title: 'Thành công',
+                //     onClose: () => {
+                //         navigate('/cart', { replace: true })
+                //     },
+                // })
+                Swal.fire({
                     title: 'Thành công',
-                    onClose: () => {
-                        navigate('/cart', { replace: true })
-                    },
+                    text: 'Đơn hàng đã được đặt thành công',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate('/cart', { replace: true })
                 })
             } else {
-                setNotification({
-                    show: true,
-                    description: 'Thanh toán thất bại',
-                    type: 'error',
+                // setNotification({
+                //     show: true,
+                //     description: 'Thanh toán thất bại',
+                //     type: 'error',
+                //     title: 'Lỗi',
+                //     onClose: () => {
+                //         navigate('/cart', { replace: true })
+                //     },
+                // })
+                Swal.fire({
                     title: 'Lỗi',
-                    onClose: () => {
-                        navigate('/cart', { replace: true })
-                    },
+                    text: 'Thanh toán thất bại',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
                 })
             }
         }
@@ -271,11 +285,17 @@ function Cart() {
                         })
                     }
                 } catch (error) {
-                    setNotification({
-                        show: true,
-                        description: error.message,
-                        type: 'error',
+                    // setNotification({
+                    //     show: true,
+                    //     description: error.message,
+                    //     type: 'error',
+                    //     title: 'Lỗi',
+                    // })
+                    Swal.fire({
                         title: 'Lỗi',
+                        text: error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
                     })
                 } finally {
                     setIsLoading((pre) => ({
@@ -378,22 +398,36 @@ function Cart() {
                     window.location.href = payUrl
                 } else {
                     await dispatch(createOrderAction(finalOrderData)).unwrap()
-                    setNotification({
-                        show: true,
-                        description: 'Đặt hàng thành công',
-                        type: 'success',
+                    // setNotification({
+                    //     show: true,
+                    //     description: 'Đặt hàng thành công',
+                    //     type: 'success',
+                    //     title: 'Thành công',
+                    //     onClose: () => {
+                    //         window.location.reload()
+                    //     },
+                    // })
+                    Swal.fire({
                         title: 'Thành công',
-                        onClose: () => {
-                            window.location.reload()
-                        },
+                        text: 'Đặt hàng thành công',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        window.location.reload()
                     })
                 }
             } catch (error) {
-                setNotification({
-                    show: true,
-                    description: error.response?.data?.message || error.message,
-                    type: 'error',
+                // setNotification({
+                //     show: true,
+                //     description: error.response?.data?.message || error.message,
+                //     type: 'error',
+                //     title: 'Lỗi',
+                // })
+                Swal.fire({
                     title: 'Lỗi',
+                    text: error.response?.data?.message || error.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
                 })
             } finally {
                 setIsLoading((pre) => ({
@@ -784,7 +818,7 @@ function Cart() {
                     </div>
                 </div>
             </div>
-            {notification.show && (
+            {/* {notification.show && (
                 <Modal
                     show={notification.show}
                     onHide={() => {
@@ -801,7 +835,7 @@ function Cart() {
                         type={notification.type}
                     />
                 </Modal>
-            )}
+            )} */}
             {showShippingMethod && (
                 <ShippingMethodModal
                     showShippingMethod={showShippingMethod}

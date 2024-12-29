@@ -8,59 +8,77 @@ import {
     getPromotionalComboByProductId,
 } from '../../services/PromotionalComboService'
 
-export const createPromotionalComboAction = createAsyncThunk('promotionalCombo/createPromotionalCombo', async (promotionalComboData, { rejectWithValue }) => {
-    try {
-        const response = await createPromotionalCombo(promotionalComboData)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const createPromotionalComboAction = createAsyncThunk(
+    'promotionalCombo/createPromotionalCombo',
+    async (promotionalComboData, { rejectWithValue }) => {
+        try {
+            const response = await createPromotionalCombo(promotionalComboData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const getPromotionalCombosAction = createAsyncThunk('promotionalCombo/getPromotionalCombos', async (_, { rejectWithValue }) => {
-    try {
-        const response = await getPromotionalCombos()
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const getPromotionalCombosAction = createAsyncThunk(
+    'promotionalCombo/getPromotionalCombos',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getPromotionalCombos()
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const getPromotionalComboByIdAction = createAsyncThunk('promotionalCombo/getPromotionalComboById', async (combo_id, { rejectWithValue }) => {
-    try {
-        const response = await getPromotionalComboById(combo_id)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const getPromotionalComboByIdAction = createAsyncThunk(
+    'promotionalCombo/getPromotionalComboById',
+    async (combo_id, { rejectWithValue }) => {
+        try {
+            const response = await getPromotionalComboById(combo_id)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const updatePromotionalComboAction = createAsyncThunk('promotionalCombo/updatePromotionalCombo', async ({ combo_id, promotionalComboData }, { rejectWithValue }) => {
-    try {
-        const response = await updatePromotionalCombo(combo_id, promotionalComboData)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const updatePromotionalComboAction = createAsyncThunk(
+    'promotionalCombo/updatePromotionalCombo',
+    async ({ combo_id, promotionalComboData }, { rejectWithValue }) => {
+        try {
+            const response = await updatePromotionalCombo(combo_id, promotionalComboData)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const deleteManyPromotionalCombosAction = createAsyncThunk('promotionalCombo/deleteManyPromotionalCombos', async (comboIds, { rejectWithValue }) => {
-    try {
-        const response = await deleteManyPromotionalCombos(comboIds)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const deleteManyPromotionalCombosAction = createAsyncThunk(
+    'promotionalCombo/deleteManyPromotionalCombos',
+    async (comboIds, { rejectWithValue }) => {
+        try {
+            const response = await deleteManyPromotionalCombos(comboIds)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
-export const getPromotionalComboByProductIdAction = createAsyncThunk('promotionalCombo/getPromotionalComboByProductId', async (productId, { rejectWithValue }) => {
-    try {
-        const response = await getPromotionalComboByProductId(productId)
-        return response
-    } catch (error) {
-        return rejectWithValue(error)
+export const getPromotionalComboByProductIdAction = createAsyncThunk(
+    'promotionalCombo/getPromotionalComboByProductId',
+    async (productId, { rejectWithValue }) => {
+        try {
+            const response = await getPromotionalComboByProductId(productId)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
     }
-})
+)
 
 const promotionalComboSlice = createSlice({
     name: 'promotionalCombo',
@@ -71,7 +89,13 @@ const promotionalComboSlice = createSlice({
         error: null,
         promotionalComboByProduct: null,
     },
-    reducers: {},
+    reducers: {
+        resetPromotionalCombo: (state) => {
+            state.promotionalCombo = null
+            state.error = null
+            state.status = 'idle'
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getPromotionalCombosAction.pending, (state) => {
@@ -107,7 +131,9 @@ const promotionalComboSlice = createSlice({
                 state.error = null
             })
             .addCase(updatePromotionalComboAction.fulfilled, (state, action) => {
-                state.promotionalCombos = state.promotionalCombos.map((combo) => (combo._id === action.payload._id ? action.payload : combo))
+                state.promotionalCombos = state.promotionalCombos.map((combo) =>
+                    combo._id === action.payload._id ? action.payload : combo
+                )
                 state.promotionalCombo = action.payload
             })
             .addCase(updatePromotionalComboAction.rejected, (state, action) => {
@@ -134,4 +160,5 @@ const promotionalComboSlice = createSlice({
     },
 })
 
+export const { resetPromotionalCombo } = promotionalComboSlice.actions
 export default promotionalComboSlice.reducer

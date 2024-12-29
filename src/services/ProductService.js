@@ -119,3 +119,16 @@ export const getProductOutOfStock = async () => {
         throw error
     }
 }
+
+export const checkUserRating = async (productId) => {
+    try {
+        const response = await axios.get(`${API_URL}check-rating/${productId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

@@ -1,6 +1,7 @@
 import Modal from 'react-bootstrap/Modal'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
 import { updateOrderStatusManyAction } from '../redux/slices/orderSilce'
 
 export default function ChangeStatusModal({ show, onHide, originalStatus, orderId, setShowNotifyModal }) {
@@ -11,14 +12,26 @@ export default function ChangeStatusModal({ show, onHide, originalStatus, orderI
     const handleSubmit = async () => {
         try {
             await dispatch(updateOrderStatusManyAction({ orderIds: [orderId], status }))
-            setShowNotifyModal({
-                show: true,
-                description: 'Cập nhật trạng thái đơn hàng thành công',
+            // setShowNotifyModal({
+            //     show: true,
+            //     description: 'Cập nhật trạng thái đơn hàng thành công',
+            //     title: 'Thành công',
+            //     type: 'success',
+            // })
+            Swal.fire({
                 title: 'Thành công',
-                type: 'success',
+                text: 'Cập nhật trạng thái đơn hàng thành công',
+                icon: 'success',
+                confirmButtonText: 'OK',
             })
         } catch (error) {
-            setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            // setShowNotifyModal({ show: true, description: error.message, title: 'Thất bại', type: 'error' })
+            Swal.fire({
+                title: 'Thất bại',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
         } finally {
             onHide()
         }

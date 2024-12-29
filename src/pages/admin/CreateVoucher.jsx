@@ -4,11 +4,16 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import ProductModal from '../../components/ProductModal'
 import { useDispatch, useSelector } from 'react-redux'
-import { createVoucherAction, getVoucherByIdAction, updateVoucherAction } from '../../redux/slices/voucherSlice'
-import Notification from '../../components/Notification'
+import {
+    createVoucherAction,
+    getVoucherByIdAction,
+    updateVoucherAction,
+    resetVoucherState,
+} from '../../redux/slices/voucherSlice'
 import Modal from 'react-bootstrap/Modal'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 const CreateVoucher = () => {
     const dispatch = useDispatch()
@@ -32,10 +37,6 @@ const CreateVoucher = () => {
     const [showProductModal, setShowProductModal] = useState(false)
     const [errors, setErrors] = useState({})
     const [loading, setLoading] = useState(false)
-    const [showNotification, setShowNotification] = useState(false)
-    const [notificationMessage, setNotificationMessage] = useState('')
-    const [notificationType, setNotificationType] = useState('success')
-    const [notificationTitle, setNotificationTitle] = useState('')
 
     useEffect(() => {
         if (voucher_id) {
@@ -75,10 +76,12 @@ const CreateVoucher = () => {
                 break
             case 'discountValue':
                 if (!value) error = 'Mức giảm giá không được để trống'
-                else if (voucherData.discountType === 'percentage' && (value < 0 || value > 100)) error = 'Phần trăm giảm giá phải từ 0 đến 100'
+                else if (voucherData.discountType === 'percentage' && (value < 0 || value > 100))
+                    error = 'Phần trăm giảm giá phải từ 0 đến 100'
                 break
             case 'maxDiscountValue':
-                if (voucherData.discountType === 'percentage' && !value) error = 'Giảm tối đa không được để trống khi giảm theo phần trăm'
+                if (voucherData.discountType === 'percentage' && !value)
+                    error = 'Giảm tối đa không được để trống khi giảm theo phần trăm'
                 break
             case 'minOrderValue':
                 if (!value) error = 'Giá trị đơn hàng tối thiểu không được để trống'
@@ -113,20 +116,85 @@ const CreateVoucher = () => {
             setLoading(true)
             try {
                 if (voucher_id) {
-                    await dispatch(updateVoucherAction({ voucherId: voucher_id, voucherData })).unwrap()
-                    setNotificationMessage('Khuyến mãi đã được cập nhật thành công')
+                    Swal.fire({
+                        title: 'Xác nhận',
+                        text: 'Bạn có chắc chắn muốn cập nhật khuyến mãi?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy',
+                        reverseButtons: true,
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await dispatch(updateVoucherAction({ voucherId: voucher_id, voucherData })).unwrap()
+                            Swal.fire({
+                                title: 'Thành công',
+                                text: 'Khuyến mãi đã được cập nhật thành công',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                            }).then(() => {
+                                setVoucherData({
+                                    voucherType: 'all',
+                                    code: '',
+                                    display: 'public',
+                                    validFrom: new Date(),
+                                    validUntil: new Date(),
+                                    discountType: 'percentage',
+                                    discountValue: '',
+                                    maxDiscountValue: '',
+                                    usageLimit: '',
+                                    quantityPerUser: 1,
+                                    minOrderValue: '',
+                                    applicableProducts: [],
+                                })
+                                dispatch(resetVoucherState())
+                            })
+                        }
+                    })
                 } else {
-                    await dispatch(createVoucherAction(voucherData)).unwrap()
-                    setNotificationMessage('Khuyến mãi đã được tạo thành công')
+                    Swal.fire({
+                        title: 'Xác nhận',
+                        text: 'Bạn có chắc chắn muốn tạo khuyến mãi?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy',
+                        reverseButtons: true,
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await dispatch(createVoucherAction(voucherData)).unwrap()
+                            Swal.fire({
+                                title: 'Thành công',
+                                text: 'Khuyến mãi đã được tạo thành công',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                            }).then(() => {
+                                setVoucherData({
+                                    voucherType: 'all',
+                                    code: '',
+                                    display: 'public',
+                                    validFrom: new Date(),
+                                    validUntil: new Date(),
+                                    discountType: 'percentage',
+                                    discountValue: '',
+                                    maxDiscountValue: '',
+                                    usageLimit: '',
+                                    quantityPerUser: 1,
+                                    minOrderValue: '',
+                                    applicableProducts: [],
+                                })
+                                dispatch(resetVoucherState())
+                            })
+                        }
+                    })
                 }
-                setShowNotification(true)
-                setNotificationTitle('Thành công')
-                setNotificationType('success')
             } catch (error) {
-                setShowNotification(true)
-                setNotificationTitle('Lỗi')
-                setNotificationMessage('Có lỗi xảy ra khi tạo khuyến mãi ' + error.message)
-                setNotificationType('error')
+                Swal.fire({
+                    title: 'Lỗi',
+                    text: 'Có lỗi xảy ra khi tạo khuyến mãi: ' + error.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                })
             } finally {
                 setLoading(false)
             }
@@ -149,8 +217,17 @@ const CreateVoucher = () => {
                         </p>
                         <div className="w-100 d-flex align-items-center">
                             <div className="select ">
-                                <div className="selected" data-one="Giảm giá toàn Shop" data-two="Giảm giá theo sản phẩm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                <div
+                                    className="selected"
+                                    data-one="Giảm giá toàn Shop"
+                                    data-two="Giảm giá theo sản phẩm"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -175,16 +252,26 @@ const CreateVoucher = () => {
                                             onChange={(e) => handleChange('voucherType', e.target.value)}
                                             checked={voucherData.voucherType === 'product'}
                                         />
-                                        <label className="option" htmlFor="option-2-v2" data-txt="Giảm giá theo sản phẩm" />
+                                        <label
+                                            className="option"
+                                            htmlFor="option-2-v2"
+                                            data-txt="Giảm giá theo sản phẩm"
+                                        />
                                     </div>
                                 </div>
                             </div>
                             {voucherData.voucherType === 'product' && (
                                 <>
-                                    <button className="mx-3 shadow-none px-3 py-2 border bg-white" onClick={() => setShowProductModal(true)}>
+                                    <button
+                                        className="mx-3 shadow-none px-3 py-2 border bg-white"
+                                        onClick={() => setShowProductModal(true)}
+                                    >
                                         <p className="fs-4 fw-medium">Chọn sản phẩm</p>
                                     </button>
-                                    <p className="fs-4 fw-medium"> {voucherData.applicableProducts.length} Sản phẩm đã chọn</p>
+                                    <p className="fs-4 fw-medium">
+                                        {' '}
+                                        {voucherData.applicableProducts.length} Sản phẩm đã chọn
+                                    </p>
                                 </>
                             )}
                         </div>
@@ -194,8 +281,18 @@ const CreateVoucher = () => {
                         <p className="text-nowrap me-4 w-25">
                             <span style={{ color: 'red' }}>*</span> Mã khuyến mãi:
                         </p>
-                        <div className={`input-form d-flex align-items-center w-100 ${errors.code ? 'border-danger-subtle' : ''}`}>
-                            <input value={voucherData.code || ''} type="text" className="input-text w-100" placeholder="Mã khuyến mãi" onChange={(e) => handleChange('code', e.target.value)} />
+                        <div
+                            className={`input-form d-flex align-items-center w-100 ${
+                                errors.code ? 'border-danger-subtle' : ''
+                            }`}
+                        >
+                            <input
+                                value={voucherData.code || ''}
+                                type="text"
+                                className="input-text w-100"
+                                placeholder="Mã khuyến mãi"
+                                onChange={(e) => handleChange('code', e.target.value)}
+                            />
                         </div>
                     </div>
                     <div className="d-flex mt-5  align-items-center">
@@ -231,7 +328,12 @@ const CreateVoucher = () => {
                         <div className="w-100 d-flex  align-items-center">
                             <div className="select">
                                 <div className="selected" data-one="Theo phần trăm" data-two="Theo số tiền">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -261,7 +363,11 @@ const CreateVoucher = () => {
                                 </div>
                             </div>
 
-                            <div className={`input-form d-flex align-items-center ms-3 ${errors.discountValue ? 'border-danger-subtle' : ''}`}>
+                            <div
+                                className={`input-form d-flex align-items-center ms-3 ${
+                                    errors.discountValue ? 'border-danger-subtle' : ''
+                                }`}
+                            >
                                 <input
                                     value={voucherData.discountValue || ''}
                                     type="number"
@@ -271,7 +377,11 @@ const CreateVoucher = () => {
                                 />
                             </div>
                             {voucherData.discountType === 'percentage' && (
-                                <div className={`input-form d-flex align-items-center ms-3 ${errors.maxDiscountValue ? 'border-danger-subtle' : ''}`}>
+                                <div
+                                    className={`input-form d-flex align-items-center ms-3 ${
+                                        errors.maxDiscountValue ? 'border-danger-subtle' : ''
+                                    }`}
+                                >
                                     <input
                                         value={voucherData.maxDiscountValue || ''}
                                         type="number"
@@ -287,7 +397,11 @@ const CreateVoucher = () => {
                         <p className="text-nowrap me-4 w-25">
                             <span style={{ color: 'red' }}>*</span> Giá trị đơn hàng tối thiểu:
                         </p>
-                        <div className={`input-form d-flex align-items-center w-100 ${errors.minOrderValue ? 'border-danger-subtle' : ''}`}>
+                        <div
+                            className={`input-form d-flex align-items-center w-100 ${
+                                errors.minOrderValue ? 'border-danger-subtle' : ''
+                            }`}
+                        >
                             <input
                                 value={voucherData.minOrderValue || ''}
                                 type="number"
@@ -301,7 +415,11 @@ const CreateVoucher = () => {
                         <p className="text-nowrap me-4 w-25">
                             <span style={{ color: 'red' }}>*</span> Tổng lượt sử dụng tối đa:
                         </p>
-                        <div className={`input-form d-flex align-items-center w-100 ${errors.usageLimit ? 'border-danger-subtle' : ''}`}>
+                        <div
+                            className={`input-form d-flex align-items-center w-100 ${
+                                errors.usageLimit ? 'border-danger-subtle' : ''
+                            }`}
+                        >
                             <input
                                 value={voucherData.usageLimit || ''}
                                 type="number"
@@ -315,7 +433,11 @@ const CreateVoucher = () => {
                         <p className="text-nowrap me-4 w-25">
                             <span style={{ color: 'red' }}>*</span> Lượt sử dụng tối đa/Người:
                         </p>
-                        <div className={`input-form d-flex align-items-center w-100 ${errors.quantityPerUser ? 'border-danger-subtle' : ''}`}>
+                        <div
+                            className={`input-form d-flex align-items-center w-100 ${
+                                errors.quantityPerUser ? 'border-danger-subtle' : ''
+                            }`}
+                        >
                             <input
                                 value={voucherData.quantityPerUser || ''}
                                 type="number"
@@ -332,7 +454,12 @@ const CreateVoucher = () => {
                         <div className="w-100 d-flex  align-items-center">
                             <div className="select">
                                 <div className="selected" data-one="Công khai" data-two="Riêng tư">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className="arrow">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="1em"
+                                        viewBox="0 0 512 512"
+                                        className="arrow"
+                                    >
                                         <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
                                     </svg>
                                 </div>
@@ -386,36 +513,18 @@ const CreateVoucher = () => {
                             <p>Hủy</p>
                         </button>
                     </div>
-                    {Object.keys(errors).length > 0 && <p className="text-danger mt-3">Vui lòng kiểm tra lại thông tin</p>}
+                    {Object.keys(errors).length > 0 && (
+                        <p className="text-danger mt-3">Vui lòng kiểm tra lại thông tin</p>
+                    )}
                 </div>
             </section>
-            {showProductModal && <ProductModal show={showProductModal} onHide={() => setShowProductModal(false)} handleConfirm={handleConfirm} voucherData={voucherData} />}
-            {showNotification && (
-                <Modal
-                    show={showNotification}
-                    onHide={() => {
-                        if (notificationType === 'success' && !voucher_id) {
-                            setVoucherData({
-                                voucherType: 'all',
-                                code: '',
-                                display: 'public',
-                                validFrom: new Date(),
-                                validUntil: new Date(),
-                                discountType: 'percentage',
-                                discountValue: '',
-                                maxDiscountValue: '',
-                                usageLimit: '',
-                                quantityPerUser: 1,
-                                minOrderValue: '',
-                                applicableProducts: [],
-                            })
-                        }
-                        setShowNotification(false)
-                    }}
-                    centered
-                >
-                    <Notification title={notificationTitle} description={notificationMessage} type={notificationType} />
-                </Modal>
+            {showProductModal && (
+                <ProductModal
+                    show={showProductModal}
+                    onHide={() => setShowProductModal(false)}
+                    handleConfirm={handleConfirm}
+                    voucherData={voucherData}
+                />
             )}
         </div>
     )

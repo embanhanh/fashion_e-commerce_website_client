@@ -46,7 +46,7 @@ function ProductManagement() {
 
     const debouncedFetchProducts = useCallback(
         debounce(() => {
-            dispatch(fetchProducts({ ...filters, sort: sortOption, page: pageFromUrl, limit: 1 }))
+            dispatch(fetchProducts({ ...filters, sort: sortOption, page: pageFromUrl, limit: 12 }))
         }, 300),
         [dispatch, filters, sortOption, pageFromUrl]
     )
@@ -492,7 +492,7 @@ function ProductManagement() {
                                     />
                                 </div>
                             </div>
-                            <div className={`product-container ${viewMode}`}>
+                            <div className={`product-container ${viewMode} scrollbar-y`}>
                                 {status === 'loading' ? (
                                     <section className="dots-container mt-4">
                                         <div className="dot"></div>

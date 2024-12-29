@@ -223,40 +223,48 @@ function MainManager() {
                             </tr>
                         </thead>
                         <tbody>
-                            {productOutOfStock.map((item, index) => (
-                                <tr key={item._id}>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <img src={item.urlImage[0]} alt={item.name} width={50} height={50} />
-                                            <p className="mb-0 product-name">{item.name}</p>
-                                        </div>
-                                    </td>
-                                    <td>{item.stockQuantity}</td>
-                                    <td>{item.soldQuantity}</td>
-                                    <td>
-                                        <p
-                                            className={`table__status ${
-                                                item.stockQuantity > 0 ? 'warning' : 'error'
-                                            } shadow-sm`}
-                                        >
-                                            {item.stockQuantity > 0 ? 'Sắp hết hàng' : 'Đã hết hàng'}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <div className="h-100 d-flex align-items-center justify-content-center">
-                                            <button
-                                                className="px-3  py-2 rounded-4 primary-btn shadow-sm"
-                                                onClick={() => {
-                                                    navigate(`/seller/products/edit/${item.slug}`)
-                                                }}
+                            {productOutOfStock.length > 0 ? (
+                                productOutOfStock.map((item, index) => (
+                                    <tr key={item._id}>
+                                        <td>{index + 1}</td>
+                                        <td>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <img src={item.urlImage[0]} alt={item.name} width={50} height={50} />
+                                                <p className="mb-0 product-name">{item.name}</p>
+                                            </div>
+                                        </td>
+                                        <td>{item.stockQuantity}</td>
+                                        <td>{item.soldQuantity}</td>
+                                        <td>
+                                            <p
+                                                className={`table__status ${
+                                                    item.stockQuantity > 0 ? 'warning' : 'error'
+                                                } shadow-sm`}
                                             >
-                                                Bổ sung
-                                            </button>
-                                        </div>
+                                                {item.stockQuantity > 0 ? 'Sắp hết hàng' : 'Đã hết hàng'}
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <div className="h-100 d-flex align-items-center justify-content-center">
+                                                <button
+                                                    className="px-3  py-2 rounded-4 primary-btn shadow-sm"
+                                                    onClick={() => {
+                                                        navigate(`/seller/products/edit/${item.slug}`)
+                                                    }}
+                                                >
+                                                    Bổ sung
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        Không có sản phẩm nào
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

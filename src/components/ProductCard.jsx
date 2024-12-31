@@ -6,7 +6,7 @@ import cart from '../assets/image/icons/shopping-cart.png'
 import { useDispatch } from 'react-redux'
 import { getPromotionalComboByProductIdAction } from '../redux/slices/promotionalComboSlice'
 
-function ProductCard({ name, url, originalPrice, discount, rating, isFeature, productId }) {
+function ProductCard({ name, url, originalPrice, discount, rating, isFeature, productId, onClick }) {
     const price = originalPrice - (originalPrice * discount) / 100
     const dispatch = useDispatch()
     const [promotionalComboByProduct, setPromotionalComboByProduct] = useState(null)
@@ -21,7 +21,7 @@ function ProductCard({ name, url, originalPrice, discount, rating, isFeature, pr
     }, [dispatch, productId])
     return (
         <>
-            <div className="product-card d-flex flex-column w-100 shadow rounded-5 h-100">
+            <div className="product-card d-flex flex-column w-100 shadow rounded-5 h-100" onClick={onClick}>
                 {discount > 0 && <div className="product-badge discount-badge">-{discount}%</div>}
 
                 {isFeature && <div className="product-badge hot-badge">HOT</div>}

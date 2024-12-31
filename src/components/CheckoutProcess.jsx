@@ -12,7 +12,11 @@ import { getVoucherByCodeAction } from '../redux/slices/voucherSlice'
 import { createOrderFromGuestAction } from '../redux/slices/orderSilce'
 import TomTomMap from './TomTomMap'
 import { calculateRouteDistance } from '../utils/MapUtils'
-import productImg from '../assets/image/product_image/product_image_1.png'
+import paypal from '../assets/image/default/paypal.png'
+import vietcombank from '../assets/image/default/vietcombank.png'
+import momo from '../assets/image/default/momo.png'
+import vnpay from '../assets/image/default/vnpay.png'
+import zalopay from '../assets/image/default/zalopay.png'
 import './CheckoutProcess.scss'
 
 const STEPS = [
@@ -53,12 +57,6 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
     })
     const [errors, setErrors] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    // const [notification, setNotification] = useState({
-    //     title: '',
-    //     description: '',
-    //     type: '',
-    //     show: false,
-    // })
 
     useEffect(() => {
         const fetchCombos = async () => {
@@ -161,31 +159,19 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                     window.location.href = payUrl
                 } else {
                     await dispatch(createOrderFromGuestAction({ orderData, address })).unwrap()
-                    // setNotification({
-                    //     title: 'Thành công',
-                    //     description:
-                    //         'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
-                    //     type: 'success',
-                    //     show: true,
-                    // })
-                    Swal.fire({
+                    await Swal.fire({
                         title: 'Thành công',
                         text: 'Đơn hàng đã được tạo thành công, trạng thái đơn hàng sẽ được cập nhật qua email của bạn',
                         icon: 'success',
                         confirmButtonText: 'OK',
                     })
+                    onClose()
                 }
             } catch (error) {
                 console.log(error)
-                // setNotification({
-                //     title: 'Thất bại',
-                //     description: error.response?.data?.message || error.message,
-                //     type: 'error',
-                //     show: true,
-                // })
-                Swal.fire({
+                await Swal.fire({
                     title: 'Thất bại',
-                    text: error.response?.data?.message || error.message,
+                    text: 'Đơn hàng không được tạo thành công, vui lòng thử lại sau',
                     icon: 'error',
                     confirmButtonText: 'OK',
                 })
@@ -486,7 +472,7 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                 </div>
                             </div>
                             {orderData.paymentMethod === 'bankTransfer' && (
-                                <div className="d-flex gap-3 px-2">
+                                <div className="d-flex gap-3 px-2 justify-content-between">
                                     <div className="d-flex flex-column gap-2 align-items-center">
                                         <div className="d-flex align-items-center gap-3">
                                             <label className="d-flex align-items-center">
@@ -505,13 +491,87 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                                             </label>
                                             <p className="fs-3">ví MoMo</p>
                                         </div>
-                                        <img
-                                            src={
-                                                'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
-                                            }
-                                            alt="momo"
-                                            style={{ width: '35px', height: '35px' }}
-                                        />
+                                        <img src={momo} alt="momo" style={{ width: '35px', height: '35px' }} />
+                                    </div>
+                                    <div className="d-flex flex-column gap-2 align-items-center">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <label className="d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={orderData.transferOption === 'paypal'}
+                                                    onChange={(e) =>
+                                                        setOrderData((pre) => ({
+                                                            ...pre,
+                                                            transferOption: e.target.checked ? 'paypal' : null,
+                                                        }))
+                                                    }
+                                                />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                            <p className="fs-3">Paypal</p>
+                                        </div>
+                                        <img src={paypal} alt="paypal" style={{ width: '35px', height: '35px' }} />
+                                    </div>
+                                    <div className="d-flex flex-column gap-2 align-items-center">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <label className="d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={orderData.transferOption === 'vietcombank'}
+                                                    onChange={(e) =>
+                                                        setOrderData((pre) => ({
+                                                            ...pre,
+                                                            transferOption: e.target.checked ? 'vietcombank' : null,
+                                                        }))
+                                                    }
+                                                />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                            <p className="fs-3">Vietcombank</p>
+                                        </div>
+                                        <img src={vietcombank} alt="vietcombank" style={{ height: '35px' }} />
+                                    </div>
+                                    <div className="d-flex flex-column gap-2 align-items-center">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <label className="d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={orderData.transferOption === 'vnpay'}
+                                                    onChange={(e) =>
+                                                        setOrderData((pre) => ({
+                                                            ...pre,
+                                                            transferOption: e.target.checked ? 'vnpay' : null,
+                                                        }))
+                                                    }
+                                                />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                            <p className="fs-3">VNPay</p>
+                                        </div>
+                                        <img src={vnpay} alt="vnpay" style={{ height: '35px' }} />
+                                    </div>
+                                    <div className="d-flex flex-column gap-2 align-items-center">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <label className="d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="input-checkbox"
+                                                    checked={orderData.transferOption === 'zalopay'}
+                                                    onChange={(e) =>
+                                                        setOrderData((pre) => ({
+                                                            ...pre,
+                                                            transferOption: e.target.checked ? 'zalopay' : null,
+                                                        }))
+                                                    }
+                                                />
+                                                <span className="custom-checkbox"></span>
+                                            </label>
+                                            <p className="fs-3">ZaloPay</p>
+                                        </div>
+                                        <img src={zalopay} alt="zalopay" style={{ height: '35px' }} />
                                     </div>
                                 </div>
                             )}
@@ -704,24 +764,6 @@ const CheckoutProcess = ({ onClose, product, variantInfo }) => {
                     </button>
                 </Modal.Footer>
             </Modal>
-            {/* {notification.show && (
-                <Modal
-                    show={notification.show}
-                    onHide={() => {
-                        setNotification({ ...notification, show: false })
-                        if (notification.type === 'success') {
-                            onClose()
-                        }
-                    }}
-                    centered
-                >
-                    <Notification
-                        title={notification.title}
-                        description={notification.description}
-                        type={notification.type}
-                    />
-                </Modal>
-            )} */}
         </>
     )
 }

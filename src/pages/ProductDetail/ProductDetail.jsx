@@ -536,7 +536,9 @@ function ProductDetail() {
                                                 <div className="col-3 px-3" key={index}>
                                                     <div
                                                         className={`${
-                                                            selectedColor == variant.color ? 'border-theme border' : ''
+                                                            selectedColor == variant.color
+                                                                ? 'border-theme border-2'
+                                                                : ''
                                                         } product-color p-2 h-100 border d-flex align-items-center justify-content-center rounded-3`}
                                                         onClick={() => handleColorSelect(variant.color)}
                                                         style={{ cursor: 'pointer' }}
@@ -571,8 +573,8 @@ function ProductDetail() {
                                             ].map((size) => (
                                                 <div
                                                     key={size}
-                                                    className={`primary-btn light ${
-                                                        selectedSize === size ? 'size-selected' : ''
+                                                    className={`primary-btn light border ${
+                                                        selectedSize == size ? 'size-selected' : ''
                                                     } py-2 px-4 shadow-none me-3`}
                                                     onClick={() => handleSizeSelect(size)}
                                                     style={{ cursor: 'pointer' }}

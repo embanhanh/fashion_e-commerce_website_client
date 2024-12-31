@@ -1,5 +1,10 @@
 import Modal from 'react-bootstrap/Modal'
 import { useState } from 'react'
+import paypal from '../assets/image/default/paypal.png'
+import vietcombank from '../assets/image/default/vietcombank.png'
+import momo from '../assets/image/default/momo.png'
+import vnpay from '../assets/image/default/vnpay.png'
+import zalopay from '../assets/image/default/zalopay.png'
 
 function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, orderData, setOrderData }) {
     const [paymentMethod, setPaymentMethod] = useState(orderData.paymentMethod)
@@ -41,7 +46,7 @@ function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, order
                             <p className="fs-3">Thanh toán bằng chuyển khoản</p>
                         </div>
                         {paymentMethod === 'bankTransfer' && (
-                            <div className="d-flex gap-3 p-3">
+                            <div className="d-flex gap-5 p-3 flex-wrap justify-content-center">
                                 <div className="d-flex flex-column gap-3 align-items-center">
                                     <div className="d-flex align-items-center gap-3">
                                         <label className="d-flex align-items-center">
@@ -55,11 +60,69 @@ function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, order
                                         </label>
                                         <p className="fs-3">ví MoMo</p>
                                     </div>
-                                    <img
-                                        src={'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'}
-                                        alt="momo"
-                                        style={{ width: '60px', height: '60px' }}
-                                    />
+                                    <img src={momo} alt="momo" style={{ width: '60px', height: '60px' }} />
+                                </div>
+                                <div className="d-flex flex-column gap-3 align-items-center">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={transferOption === 'paypal'}
+                                                onChange={(e) => setTransferOption(e.target.checked ? 'paypal' : '')}
+                                            />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <p className="fs-3">Paypal</p>
+                                    </div>
+                                    <img src={paypal} alt="paypal" style={{ width: '60px', height: '60px' }} />
+                                </div>
+                                <div className="d-flex flex-column gap-3 align-items-center">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={transferOption === 'vietcombank'}
+                                                onChange={(e) =>
+                                                    setTransferOption(e.target.checked ? 'vietcombank' : '')
+                                                }
+                                            />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <p className="fs-3">Vietcombank</p>
+                                    </div>
+                                    <img src={vietcombank} alt="vietcombank" style={{ height: '60px' }} />
+                                </div>
+                                <div className="d-flex flex-column gap-3 align-items-center">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={transferOption === 'vnpay'}
+                                                onChange={(e) => setTransferOption(e.target.checked ? 'vnpay' : '')}
+                                            />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <p className="fs-3">VNPay</p>
+                                    </div>
+                                    <img src={vnpay} alt="vnpay" style={{ height: '60px' }} />
+                                </div>
+                                <div className="d-flex flex-column gap-3 align-items-center">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="input-checkbox"
+                                                checked={transferOption === 'zalopay'}
+                                                onChange={(e) => setTransferOption(e.target.checked ? 'zalopay' : '')}
+                                            />
+                                            <span className="custom-checkbox"></span>
+                                        </label>
+                                        <p className="fs-3">ZaloPay</p>
+                                    </div>
+                                    <img src={zalopay} alt="zalopay" style={{ width: '60px', height: '60px' }} />
                                 </div>
                             </div>
                         )}

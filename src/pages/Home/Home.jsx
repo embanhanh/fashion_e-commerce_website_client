@@ -24,6 +24,7 @@ import promotion from '../../assets/image/icons/shopping-bag.png'
 import quote from '../../assets/image/icons/quote.png'
 import avatar from '../../assets/image/default/default-avatar.png'
 import './Home.scss'
+import axios from 'axios'
 
 function Home() {
     const navigate = useNavigate()
@@ -33,6 +34,7 @@ function Home() {
     const { banners } = useSelector((state) => state.banner)
     const { user } = useSelector((state) => state.auth)
     const { categories } = useSelector((state) => state.category)
+    const [bestSeller, setBestSeller] = useState([])
 
     const handleExploreCategory = (categorySlug) => {
         navigate(`/products?category=${categorySlug}&page=1`)
@@ -41,6 +43,11 @@ function Home() {
     useEffect(() => {
         dispatch(fetchBanners())
         dispatch(fetchCategories())
+        const fetchBestSeller = async () => {
+            const response = await axios.get('http://localhost:5000/product/best-seller')
+            setBestSeller(response.data)
+        }
+        fetchBestSeller()
     }, [dispatch])
 
     const handleClickBanner = async (banner) => {
@@ -176,17 +183,16 @@ function Home() {
                     <div className="content-bestseller py-5 reveal reveal-delay-1">
                         <p className="shop-sm-title text-center theme-color">Bán Chạy Nhất</p>
                         <div className="row">
-                            {[...Array(8)].map((_, index) => (
-                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
+                            {bestSeller.map((product) => (
+                                <div key={product?._id} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5 ">
                                     <ProductCard
-                                        url={
-                                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNeJa_l26MBy8VuAnFG5ff2SIBCpEP5RdIVA&s'
-                                        }
-                                        name={'Giày thể thao hhhhhhhhhh jasdasd jasdasda'}
-                                        originalPrice={150000}
-                                        discount={15}
-                                        rating={5}
-                                        isFeature={true}
+                                        onClick={() => navigate(`/products/${product?.slug}`)}
+                                        url={product?.urlImage[0]}
+                                        name={product?.name}
+                                        originalPrice={product?.originalPrice}
+                                        discount={product?.discount}
+                                        rating={product?.rating}
+                                        isFeature={product?.isFeatured}
                                     />
                                 </div>
                             ))}

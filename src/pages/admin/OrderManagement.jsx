@@ -50,7 +50,7 @@ const OrderManagement = () => {
         orderStartDate: null,
         orderEndDate: null,
         paymentMethod: '',
-        shippingMethod: '',
+        shippingMethod: 'all',
     })
     const [selectedOrderIds, setSelectedOrderIds] = useState([])
     const [bulkAction, setBulkAction] = useState('')

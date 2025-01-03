@@ -21,6 +21,7 @@ import { db } from '../../firebase.config'
 import { doc, getDoc, updateDoc, onSnapshot, arrayUnion } from 'firebase/firestore'
 
 import product1 from '../../assets/image/product_image/product_image_1.png'
+import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import Rating from '../../components/Rating'
 import ProductCard from '../../components/ProductCard'
 import CheckoutProcess from '../../components/CheckoutProcess'
@@ -783,7 +784,7 @@ function ProductDetail() {
                                                 >
                                                     <div className="d-flex align-items-center justify-self-end mt-auto">
                                                         <img
-                                                            src={rating.user.avatar}
+                                                            src={rating.user.avatar || defaultAvatar}
                                                             alt=""
                                                             className="rounded-circle"
                                                             style={{ height: 50, width: 50 }}

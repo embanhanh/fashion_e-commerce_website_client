@@ -9,6 +9,8 @@ import { cancelOrderUser, fetchOrderUser, returnOrderUser } from '../redux/slice
 import { addItemToCart } from '../redux/slices/cartSlice'
 import RatingDemo from './RatingDemo'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { db } from '../firebase.config'
+import { doc, getDoc } from 'firebase/firestore'
 import { storage } from '../firebase.config'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -20,6 +22,7 @@ function OrderCard({ order }) {
     const dispatch = useDispatch()
     const { loading: cartLoading } = useSelector((state) => state.cart)
     const { error } = useSelector((state) => state.user)
+    const { user } = useSelector((state) => state.auth)
     const { isLoggedIn } = useSelector((state) => state.auth)
 
     const [showCancelOrderModal, setShowCancelOrderModal] = useState(false)
@@ -29,6 +32,7 @@ function OrderCard({ order }) {
     const [showReturnOrderModal, setShowReturnOrderModal] = useState(false)
     const [files, setFiles] = useState([])
     const [previews, setPreviews] = useState([])
+    const [isRating, setIsRating] = useState(false)
 
     const handleDetailOrder = (order_id) => {
         navigate(`/user/account/orders/${order._id}`)
@@ -276,6 +280,21 @@ function OrderCard({ order }) {
         }
     }
 
+    const checkUserRating = async (productId, userId) => {
+        let isRating = false
+        const ratingDoc = doc(db, 'product_ratings', productId)
+        const ratingSnapshot = await getDoc(ratingDoc)
+        if (ratingSnapshot.exists()) {
+            const ratings = ratingSnapshot.data().ratings
+            isRating = ratings.some((rating) => rating.user._id === userId)
+        }
+        setIsRating(isRating)
+    }
+
+    useEffect(() => {
+        checkUserRating(order.products[0].product.product._id, user._id)
+    }, [order, user])
+
     return (
         <div className="d-flex flex-column justify-content-between bg-white my-5">
             <div className="d-flex justify-content-between my-4">
@@ -363,7 +382,7 @@ function OrderCard({ order }) {
                                 Xem chi tiết đơn hàng
                             </button>
 
-                            <button className="btn-preview-order" onClick={handleReviewOrder}>
+                            <button className="btn-preview-order" onClick={handleReviewOrder} disabled={isRating}>
                                 Đánh giá
                             </button>
 
@@ -688,7 +707,6 @@ function OrderCard({ order }) {
                     onClose={() => setShowRatingModal(false)}
                     onRatingSuccess={() => {
                         dispatch(fetchOrderUser())
-                        dispatch(checkUserRatingAction(order.products[0].product.product._id))
                         setShowRatingModal(false)
                     }}
                 />

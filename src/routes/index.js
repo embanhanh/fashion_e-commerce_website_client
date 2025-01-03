@@ -38,6 +38,7 @@ import Payment from '../pages/Policy/Payment.jsx'
 import Check from '../pages/Policy/Check.jsx'
 import DetailOrder from '../components/DetailOrder.jsx'
 import Vouchers from '../pages/Profile/Vouchers.jsx'
+import Contact from '../pages/Contact/Contact.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
@@ -47,6 +48,7 @@ const publicRoutes = [
     { path: '/policy/delivery', element: Delivery },
     { path: '/policy/payment', element: Payment },
     { path: '/policy/check', element: Check },
+    { path: '/contact', element: Contact },
     {
         path: '/products',
         element: ProductList,

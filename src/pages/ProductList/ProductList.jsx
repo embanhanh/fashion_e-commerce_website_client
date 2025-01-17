@@ -1,7 +1,7 @@
 import './ProductList.scss'
 import { useEffect, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faMicrophone, faImage } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
@@ -9,10 +9,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
+import { fetchProducts, setFilters, setSortOption } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { removeDiacritics } from '../../utils/StringUtil'
 import Rating from '../../components/Rating'
+import VoiceModal from '../../components/VoiceModal/VoiceModal'
+import { searchByImage } from '../../services/ProductService'
+import Swal from 'sweetalert2'
 
 function ProductList() {
     const navigate = useNavigate()
@@ -32,8 +35,12 @@ function ProductList() {
         search: '',
         rating: 0,
         brand: [],
+        searchImageLabels: [],
     })
     const pageFromUrl = parseInt(searchParams.get('page')) || 1
+    const [isListening, setIsListening] = useState(false)
+    const [showVoiceModal, setShowVoiceModal] = useState(false)
+    const [isSearchingImage, setIsSearchingImage] = useState(false)
 
     const debouncedFetchProducts = useCallback(
         debounce(async () => {
@@ -174,6 +181,62 @@ function ProductList() {
     const handleRatingChange = (value) => {
         setFilters((prev) => ({ ...prev, rating: value }))
     }
+
+    const handleVoiceResult = (result) => {
+        setSearch(result)
+        handleFilterChange('search', result)
+    }
+
+    const handleVoiceSearch = () => {
+        if ('webkitSpeechRecognition' in window) {
+            setShowVoiceModal(true)
+        } else {
+            alert('Trình duyệt của bạn không hỗ trợ tìm kiếm bằng giọng nói')
+        }
+    }
+
+    const handleImageSearch = async (e) => {
+        const file = e.target.files[0]
+        e.target.value = ''
+        if (!file) return
+
+        try {
+            setIsSearchingImage(true)
+            const { labels } = await searchByImage(file)
+
+            // Đảm bảo labels là mảng
+            const validLabels = Array.isArray(labels) ? labels : []
+
+            // Cập nhật URL
+            const searchParams = new URLSearchParams(window.location.search)
+            searchParams.set('page', '1')
+            navigate(`?${searchParams.toString()}`)
+
+            // Tạo object filters mới
+            const newFilters = {
+                ...filters,
+                search: '',
+                searchImageLabels: validLabels,
+            }
+
+            // Dispatch action
+            setFilters(newFilters)
+            setSearch('')
+        } catch (error) {
+            console.error('Lỗi khi tìm kiếm bằng hình ảnh:', error)
+            Swal.fire({
+                title: 'Lỗi',
+                text: 'Có lỗi xảy ra khi tìm kiếm bằng hình ảnh',
+                icon: 'error',
+            })
+        } finally {
+            setIsSearchingImage(false)
+        }
+    }
+
+    useEffect(() => {
+        console.log(filters)
+    }, [filters])
 
     return (
         <>
@@ -336,11 +399,34 @@ function ProductList() {
                                         onChange={(e) => setSearch(e.target.value)}
                                         value={search}
                                     />
+                                    <label className="mb-0" style={{ cursor: 'pointer' }}>
+                                        <FontAwesomeIcon
+                                            icon={faImage}
+                                            size="xl"
+                                            className={`theme-color p-2 ${isSearchingImage ? 'fa-spin' : ''}`}
+                                        />
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="d-none"
+                                            onChange={handleImageSearch}
+                                        />
+                                    </label>
+                                    <FontAwesomeIcon
+                                        icon={faMicrophone}
+                                        size="xl"
+                                        className={`theme-color p-2 cursor-pointer ${isListening ? 'text-danger' : ''}`}
+                                        onClick={handleVoiceSearch}
+                                        style={{ cursor: 'pointer' }}
+                                    />
                                     <FontAwesomeIcon
                                         icon={faSearch}
                                         size="xl"
                                         className="theme-color p-2"
-                                        onClick={() => handleFilterChange('search', search)}
+                                        onClick={() => {
+                                            setFilters((prev) => ({ ...prev, search: search, searchImageLabels: [] }))
+                                        }}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                 </div>
                             </div>
@@ -491,6 +577,7 @@ function ProductList() {
                     </div>
                 </div>
             </div>
+            <VoiceModal show={showVoiceModal} onHide={() => setShowVoiceModal(false)} onResult={handleVoiceResult} />
         </>
     )
 }

@@ -114,6 +114,7 @@ const productSlice = createSlice({
             search: '',
             rating: 0,
             brand: [],
+            searchImageLabels: [],
         },
         sortOption: '',
         hasRated: 'false',

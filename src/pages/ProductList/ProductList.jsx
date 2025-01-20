@@ -1,7 +1,7 @@
 import './ProductList.scss'
 import { useEffect, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
-import { faSearch, faMicrophone, faImage } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faMicrophone, faImage, faHistory } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
@@ -16,6 +16,8 @@ import Rating from '../../components/Rating'
 import VoiceModal from '../../components/VoiceModal/VoiceModal'
 import { searchByImage } from '../../services/ProductService'
 import Swal from 'sweetalert2'
+import { addSearchTerm } from '../../redux/slices/searchHistorySlice'
+import { getSuggestions } from '../../constants/searchSuggestions'
 
 function ProductList() {
     const navigate = useNavigate()
@@ -41,6 +43,9 @@ function ProductList() {
     const [isListening, setIsListening] = useState(false)
     const [showVoiceModal, setShowVoiceModal] = useState(false)
     const [isSearchingImage, setIsSearchingImage] = useState(false)
+    const searchHistory = useSelector((state) => state.searchHistory.history)
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [suggestions, setSuggestions] = useState([])
 
     const debouncedFetchProducts = useCallback(
         debounce(async () => {
@@ -238,6 +243,38 @@ function ProductList() {
         console.log(filters)
     }, [filters])
 
+    const handleSearchChange = (e) => {
+        const value = e.target.value
+        setSearch(value)
+
+        if (value.trim()) {
+            const newSuggestions = getSuggestions(value)
+            setSuggestions(newSuggestions)
+        } else {
+            setSuggestions([])
+        }
+    }
+
+    const handleSearch = () => {
+        if (search.trim()) {
+            dispatch(addSearchTerm(search.trim()))
+        }
+        setFilters((prev) => ({ ...prev, search: search.trim(), searchImageLabels: [] }))
+        setShowDropdown(false)
+    }
+
+    // Xử lý click ra ngoài dropdown
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.search-container')) {
+                setShowDropdown(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
     return (
         <>
             <div className="container h-100 py-5">
@@ -391,14 +428,66 @@ function ProductList() {
                     <div style={{ width: '80%' }} className="px-5 py-2">
                         <div className="d-flex align-items-center justify-content-between border-bottom pb-3 gap-3">
                             <div className="flex-grow-1">
-                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4">
+                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4 position-relative search-container">
                                     <input
                                         type="text"
                                         className="input-text w-100"
                                         placeholder="Tìm kiếm"
-                                        onChange={(e) => setSearch(e.target.value)}
+                                        onChange={handleSearchChange}
                                         value={search}
+                                        onFocus={() => setShowDropdown(true)}
                                     />
+
+                                    {showDropdown && (
+                                        <div className="search-dropdown">
+                                            {!search.trim() && searchHistory.length > 0 ? (
+                                                // Hiển thị lịch sử tìm kiếm
+                                                <div className="search-history-section">
+                                                    {searchHistory.map((term, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="search-item"
+                                                            onClick={() => {
+                                                                setSearch(term)
+                                                                setFilters((prev) => ({
+                                                                    ...prev,
+                                                                    search: term,
+                                                                    searchImageLabels: [],
+                                                                }))
+                                                                setShowDropdown(false)
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faHistory} className="search-icon" />
+                                                            <span>{term}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : suggestions.length > 0 ? (
+                                                // Hiển thị gợi ý
+                                                <div className="search-suggestions-section">
+                                                    {suggestions.map((suggestion, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="search-item"
+                                                            onClick={() => {
+                                                                setSearch(suggestion)
+                                                                dispatch(addSearchTerm(suggestion))
+                                                                setFilters((prev) => ({
+                                                                    ...prev,
+                                                                    search: suggestion,
+                                                                    searchImageLabels: [],
+                                                                }))
+                                                                setShowDropdown(false)
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                                                            <span>{suggestion}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    )}
                                     <label className="mb-0" style={{ cursor: 'pointer' }}>
                                         <FontAwesomeIcon
                                             icon={faImage}
@@ -423,9 +512,7 @@ function ProductList() {
                                         icon={faSearch}
                                         size="xl"
                                         className="theme-color p-2"
-                                        onClick={() => {
-                                            setFilters((prev) => ({ ...prev, search: search, searchImageLabels: [] }))
-                                        }}
+                                        onClick={handleSearch}
                                         style={{ cursor: 'pointer' }}
                                     />
                                 </div>

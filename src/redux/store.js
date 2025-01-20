@@ -11,6 +11,8 @@ import userReducer from './slices/userSlice'
 import voucherReducer from './slices/voucherSlice'
 import orderReducer from './slices/orderSilce'
 import promotionalComboReducer from './slices/promotionalComboSlice'
+import searchHistoryReducer from './slices/searchHistorySlice'
+
 const authPersistConfig = {
     key: 'auth',
     storage,
@@ -18,6 +20,14 @@ const authPersistConfig = {
 }
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer)
+
+const searchHistoryPersistConfig = {
+    key: 'searchHistory',
+    storage,
+    whitelist: ['history'],
+}
+
+const persistedSearchHistoryReducer = persistReducer(searchHistoryPersistConfig, searchHistoryReducer)
 
 export const store = configureStore({
     reducer: {
@@ -31,6 +41,7 @@ export const store = configureStore({
         voucher: voucherReducer,
         order: orderReducer,
         promotionalCombo: promotionalComboReducer,
+        searchHistory: persistedSearchHistoryReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

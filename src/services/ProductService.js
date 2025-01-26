@@ -132,3 +132,19 @@ export const checkUserRating = async (productId) => {
         throw error
     }
 }
+
+export const searchByImage = async (imageFile) => {
+    try {
+        const formData = new FormData()
+        formData.append('image', imageFile)
+
+        const response = await axios.post(`${API_URL}search-by-image`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

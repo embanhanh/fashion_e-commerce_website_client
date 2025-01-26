@@ -9,6 +9,7 @@ import {
     likeProduct,
 } from '../../services/ProductService'
 import _ from 'lodash'
+import axios from 'axios'
 
 // export const fetchAllProducts = createAsyncThunk('product/fetchAllProducts', async (_, { rejectWithValue }) => {
 //     try {
@@ -97,6 +98,15 @@ export const likeProductAction = createAsyncThunk('product/likeProduct', async (
     }
 })
 
+export const fetchAllProducts = createAsyncThunk('product/fetchAllProducts', async (_, { rejectWithValue }) => {
+    try {
+        const response = await axios.get('http://localhost:5000/product/all')
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const productSlice = createSlice({
     name: 'product',
     initialState: {
@@ -114,12 +124,14 @@ const productSlice = createSlice({
             search: '',
             rating: 0,
             brand: [],
+            searchImageLabels: [],
         },
         sortOption: '',
         hasRated: 'false',
         status: 'idle',
         loading: false,
         error: null,
+        allProducts: [],
     },
     reducers: {
         setFilters: (state, action) => {
@@ -174,17 +186,17 @@ const productSlice = createSlice({
             .addCase(ratingProductAction.rejected, (state, action) => {
                 state.error = action.payload
             })
-            // .addCase(fetchAllProducts.pending, (state) => {
-            //     state.status = 'loading'
-            // })
-            // .addCase(fetchAllProducts.fulfilled, (state, action) => {
-            //     state.status = 'succeeded'
-            //     state.products = action.payload.products
-            // })
-            // .addCase(fetchAllProducts.rejected, (state, action) => {
-            //     state.status = 'failed'
-            //     state.error = action.error.message
-            // })
+            .addCase(fetchAllProducts.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(fetchAllProducts.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.allProducts = action.payload
+            })
+            .addCase(fetchAllProducts.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.error.message
+            })
             .addCase(likeProductAction.fulfilled, (state, action) => {
                 state.currentProduct.favoriteProducts = action.payload
             })

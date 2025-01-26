@@ -1,7 +1,7 @@
 import './ProductList.scss'
 import { useEffect, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import Pagination from 'react-bootstrap/Pagination'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faMicrophone, faImage, faHistory } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
@@ -9,10 +9,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Accordion from '../../components/Accordion'
 import ProductCard from '../../components/ProductCard'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProducts, setFilters, setSortOption, setCurrentPage } from '../../redux/slices/productSlice'
+import { fetchProducts, setFilters, setSortOption } from '../../redux/slices/productSlice'
 import { fetchCategories } from '../../redux/slices/categorySlice'
 import { removeDiacritics } from '../../utils/StringUtil'
 import Rating from '../../components/Rating'
+import VoiceModal from '../../components/VoiceModal/VoiceModal'
+import { searchByImage } from '../../services/ProductService'
+import Swal from 'sweetalert2'
+import { addSearchTerm } from '../../redux/slices/searchHistorySlice'
+import { getSuggestions } from '../../constants/searchSuggestions'
 
 function ProductList() {
     const navigate = useNavigate()
@@ -32,8 +37,15 @@ function ProductList() {
         search: '',
         rating: 0,
         brand: [],
+        searchImageLabels: [],
     })
     const pageFromUrl = parseInt(searchParams.get('page')) || 1
+    const [isListening, setIsListening] = useState(false)
+    const [showVoiceModal, setShowVoiceModal] = useState(false)
+    const [isSearchingImage, setIsSearchingImage] = useState(false)
+    const searchHistory = useSelector((state) => state.searchHistory.history)
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [suggestions, setSuggestions] = useState([])
 
     const debouncedFetchProducts = useCallback(
         debounce(async () => {
@@ -174,6 +186,94 @@ function ProductList() {
     const handleRatingChange = (value) => {
         setFilters((prev) => ({ ...prev, rating: value }))
     }
+
+    const handleVoiceResult = (result) => {
+        setSearch(result)
+        handleFilterChange('search', result)
+    }
+
+    const handleVoiceSearch = () => {
+        if ('webkitSpeechRecognition' in window) {
+            setShowVoiceModal(true)
+        } else {
+            alert('Trình duyệt của bạn không hỗ trợ tìm kiếm bằng giọng nói')
+        }
+    }
+
+    const handleImageSearch = async (e) => {
+        const file = e.target.files[0]
+        e.target.value = ''
+        if (!file) return
+
+        try {
+            setIsSearchingImage(true)
+            const { labels } = await searchByImage(file)
+
+            // Đảm bảo labels là mảng
+            const validLabels = Array.isArray(labels) ? labels : []
+
+            // Cập nhật URL
+            const searchParams = new URLSearchParams(window.location.search)
+            searchParams.set('page', '1')
+            navigate(`?${searchParams.toString()}`)
+
+            // Tạo object filters mới
+            const newFilters = {
+                ...filters,
+                search: '',
+                searchImageLabels: validLabels,
+            }
+
+            // Dispatch action
+            setFilters(newFilters)
+            setSearch('')
+        } catch (error) {
+            console.error('Lỗi khi tìm kiếm bằng hình ảnh:', error)
+            Swal.fire({
+                title: 'Lỗi',
+                text: 'Có lỗi xảy ra khi tìm kiếm bằng hình ảnh',
+                icon: 'error',
+            })
+        } finally {
+            setIsSearchingImage(false)
+        }
+    }
+
+    useEffect(() => {
+        console.log(filters)
+    }, [filters])
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value
+        setSearch(value)
+
+        if (value.trim()) {
+            const newSuggestions = getSuggestions(value)
+            setSuggestions(newSuggestions)
+        } else {
+            setSuggestions([])
+        }
+    }
+
+    const handleSearch = () => {
+        if (search.trim()) {
+            dispatch(addSearchTerm(search.trim()))
+        }
+        setFilters((prev) => ({ ...prev, search: search.trim(), searchImageLabels: [] }))
+        setShowDropdown(false)
+    }
+
+    // Xử lý click ra ngoài dropdown
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.search-container')) {
+                setShowDropdown(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     return (
         <>
@@ -328,19 +428,92 @@ function ProductList() {
                     <div style={{ width: '80%' }} className="px-5 py-2">
                         <div className="d-flex align-items-center justify-content-between border-bottom pb-3 gap-3">
                             <div className="flex-grow-1">
-                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4">
+                                <div className="input-form d-flex align-items-center gap-2 px-3 rounded-4 position-relative search-container">
                                     <input
                                         type="text"
                                         className="input-text w-100"
                                         placeholder="Tìm kiếm"
-                                        onChange={(e) => setSearch(e.target.value)}
+                                        onChange={handleSearchChange}
                                         value={search}
+                                        onFocus={() => setShowDropdown(true)}
+                                    />
+
+                                    {showDropdown && (
+                                        <div className="search-dropdown">
+                                            {!search.trim() && searchHistory.length > 0 ? (
+                                                // Hiển thị lịch sử tìm kiếm
+                                                <div className="search-history-section">
+                                                    {searchHistory.map((term, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="search-item"
+                                                            onClick={() => {
+                                                                setSearch(term)
+                                                                setFilters((prev) => ({
+                                                                    ...prev,
+                                                                    search: term,
+                                                                    searchImageLabels: [],
+                                                                }))
+                                                                setShowDropdown(false)
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faHistory} className="search-icon" />
+                                                            <span>{term}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : suggestions.length > 0 ? (
+                                                // Hiển thị gợi ý
+                                                <div className="search-suggestions-section">
+                                                    {suggestions.map((suggestion, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="search-item"
+                                                            onClick={() => {
+                                                                setSearch(suggestion)
+                                                                dispatch(addSearchTerm(suggestion))
+                                                                setFilters((prev) => ({
+                                                                    ...prev,
+                                                                    search: suggestion,
+                                                                    searchImageLabels: [],
+                                                                }))
+                                                                setShowDropdown(false)
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                                                            <span>{suggestion}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    )}
+                                    <label className="mb-0" style={{ cursor: 'pointer' }}>
+                                        <FontAwesomeIcon
+                                            icon={faImage}
+                                            size="xl"
+                                            className={`theme-color p-2 ${isSearchingImage ? 'fa-spin' : ''}`}
+                                        />
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="d-none"
+                                            onChange={handleImageSearch}
+                                        />
+                                    </label>
+                                    <FontAwesomeIcon
+                                        icon={faMicrophone}
+                                        size="xl"
+                                        className={`theme-color p-2 cursor-pointer ${isListening ? 'text-danger' : ''}`}
+                                        onClick={handleVoiceSearch}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                     <FontAwesomeIcon
                                         icon={faSearch}
                                         size="xl"
                                         className="theme-color p-2"
-                                        onClick={() => handleFilterChange('search', search)}
+                                        onClick={handleSearch}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                 </div>
                             </div>
@@ -491,6 +664,7 @@ function ProductList() {
                     </div>
                 </div>
             </div>
+            <VoiceModal show={showVoiceModal} onHide={() => setShowVoiceModal(false)} onResult={handleVoiceResult} />
         </>
     )
 }

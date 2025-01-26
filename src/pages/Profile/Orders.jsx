@@ -2,6 +2,8 @@ import './Orders.scss'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchOrderUser, setOrderFilters } from '../../redux/slices/userSlice'
+import { db } from '../../firebase.config'
+import { doc, getDoc } from 'firebase/firestore'
 import OrderCard from '../../components/OrderCard.jsx'
 
 function Orders() {

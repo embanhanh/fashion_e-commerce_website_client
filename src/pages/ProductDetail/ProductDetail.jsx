@@ -13,7 +13,7 @@ import { Button } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
-import { fetchProductByProductName, likeProductAction } from '../../redux/slices/productSlice'
+import { fetchProductByProductName, likeProductAction, fetchAllProducts } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
 import { fetchUser } from '../../redux/slices/userSlice'
@@ -21,10 +21,12 @@ import { db } from '../../firebase.config'
 import { doc, getDoc, updateDoc, onSnapshot, arrayUnion } from 'firebase/firestore'
 
 import product1 from '../../assets/image/product_image/product_image_1.png'
+import defaultAvatar from '../../assets/image/default/default-avatar.png'
 import Rating from '../../components/Rating'
 import ProductCard from '../../components/ProductCard'
 import CheckoutProcess from '../../components/CheckoutProcess'
 import './ProductDetail.scss'
+import { getRelatedProducts } from '../../services/RecommendationService'
 
 function ProductDetail() {
     const { product_name } = useParams()
@@ -61,18 +63,25 @@ function ProductDetail() {
         description: '',
         type: 'success',
     })
+    const [relatedProducts, setRelatedProducts] = useState([])
+    const allProducts = useSelector((state) => state.product.allProducts)
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchData = async () => {
             try {
-                await dispatch(fetchProductByProductName(product_name)).unwrap()
+                await dispatch(fetchProductByProductName(product_name))
+                const result = await dispatch(fetchAllProducts()).unwrap()
+                if (!result) {
+                    console.error('Không thể tải danh sách sản phẩm')
+                }
             } catch (error) {
+                console.error('Lỗi khi tải dữ liệu:', error)
                 if (error.status === 404) {
                     navigate('/404')
                 }
             }
         }
-        fetchProduct()
+        fetchData()
     }, [dispatch, product_name])
 
     useEffect(() => {
@@ -179,6 +188,21 @@ function ProductDetail() {
             }
         }
     }, [location])
+
+    useEffect(() => {
+        const fetchRelatedProducts = async () => {
+            try {
+                if (currentProduct && allProducts?.length > 0) {
+                    const related = await getRelatedProducts(currentProduct, allProducts)
+                    setRelatedProducts(related)
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải sản phẩm liên quan:', error)
+                setRelatedProducts([])
+            }
+        }
+        fetchRelatedProducts()
+    }, [currentProduct, allProducts])
 
     const handleColorSelect = (color) => {
         if (color !== selectedColor) {
@@ -783,7 +807,7 @@ function ProductDetail() {
                                                 >
                                                     <div className="d-flex align-items-center justify-self-end mt-auto">
                                                         <img
-                                                            src={rating.user.avatar}
+                                                            src={rating.user.avatar || defaultAvatar}
                                                             alt=""
                                                             className="rounded-circle"
                                                             style={{ height: 50, width: 50 }}
@@ -863,17 +887,18 @@ function ProductDetail() {
                             </div>
                         </div>
 
-                        <div className="pt-4 ">
+                        <div className="pt-4">
                             <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3">
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={index}>
+                                {relatedProducts.map((product, index) => (
+                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={product._id}>
                                         <ProductCard
-                                            url={product1}
-                                            name={'Giày thể thao'}
-                                            originalPrice={150000}
-                                            discount={20}
-                                            rating={5}
+                                            url={product.urlImage[0]}
+                                            name={product.name}
+                                            originalPrice={product.originalPrice}
+                                            discount={product.discount}
+                                            rating={product.rating}
+                                            productId={product._id}
                                         />
                                     </div>
                                 ))}

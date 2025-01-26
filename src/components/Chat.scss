@@ -245,6 +245,25 @@ df-messenger {
     --df-messenger-input-box-focus-border: 2px solid #0b6477;
     --df-messenger-input-background: #aee1e1;
     --df-messenger-chat-window-box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.3);
+    --df-messenger-button-border: none;
+    --df-messenger-button-border-radius: 20px;
+    --df-messenger-button-font-color: #0b6477;
+    --df-messenger-button-background: #aee1e1;
+    --df-messenger-button-padding: 8px 16px;
+    --df-messenger-button-font-size: 1.6rem;
+    --df-messenger-button-icon-spacing: 24px;
+    --df-messenger-button-icon-font-size: 18px;
+
+    .message-card {
+        button {
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: #084857 !important;
+                transform: translateY(-2px);
+            }
+        }
+    }
 }
 
 .chatbot-additional-btn {

@@ -69,9 +69,13 @@ function ProductDetail() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await dispatch(fetchProductByProductName(product_name))
-                const result = await dispatch(fetchAllProducts()).unwrap()
-                if (!result) {
+                // Fetch song song cả product hiện tại và tất cả products
+                const [productResponse, allProductsResponse] = await Promise.all([
+                    dispatch(fetchProductByProductName(product_name)).unwrap(),
+                    dispatch(fetchAllProducts()).unwrap(),
+                ])
+
+                if (!allProductsResponse) {
                     console.error('Không thể tải danh sách sản phẩm')
                 }
             } catch (error) {
@@ -192,7 +196,7 @@ function ProductDetail() {
     useEffect(() => {
         const fetchRelatedProducts = async () => {
             try {
-                if (currentProduct && allProducts?.length > 0) {
+                if (currentProduct?._id && allProducts?.length > 0) {
                     const related = await getRelatedProducts(currentProduct, allProducts)
                     setRelatedProducts(related)
                 }
@@ -202,7 +206,7 @@ function ProductDetail() {
             }
         }
         fetchRelatedProducts()
-    }, [currentProduct, allProducts])
+    }, [currentProduct?._id, allProducts])
 
     const handleColorSelect = (color) => {
         if (color !== selectedColor) {
@@ -890,18 +894,22 @@ function ProductDetail() {
                         <div className="pt-4">
                             <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3">
-                                {relatedProducts.map((product, index) => (
-                                    <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={product._id}>
-                                        <ProductCard
-                                            url={product.urlImage[0]}
-                                            name={product.name}
-                                            originalPrice={product.originalPrice}
-                                            discount={product.discount}
-                                            rating={product.rating}
-                                            productId={product._id}
-                                        />
-                                    </div>
-                                ))}
+                                {relatedProducts && relatedProducts.length > 0 ? (
+                                    relatedProducts.map((product) => (
+                                        <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={product._id}>
+                                            <ProductCard
+                                                url={product.urlImage[0]}
+                                                name={product.name}
+                                                originalPrice={product.originalPrice}
+                                                discount={product.discount}
+                                                rating={product.rating}
+                                                productId={product._id}
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center fs-3">Không có sản phẩm liên quan</p>
+                                )}
                             </div>
                         </div>
                     </>

@@ -11,6 +11,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from 'react-bootstrap'
 import Swal from 'sweetalert2'
+import axios from 'axios'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
 import { fetchProductByProductName, likeProductAction, fetchAllProducts } from '../../redux/slices/productSlice'
@@ -64,7 +65,7 @@ function ProductDetail() {
         type: 'success',
     })
     const [relatedProducts, setRelatedProducts] = useState([])
-    const allProducts = useSelector((state) => state.product.allProducts)
+    const [allProducts, setAllProducts] = useState([])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -72,11 +73,13 @@ function ProductDetail() {
                 // Fetch song song cả product hiện tại và tất cả products
                 const [productResponse, allProductsResponse] = await Promise.all([
                     dispatch(fetchProductByProductName(product_name)).unwrap(),
-                    dispatch(fetchAllProducts()).unwrap(),
+                    axios.get('http://localhost:5000/product/all'),
                 ])
 
                 if (!allProductsResponse) {
                     console.error('Không thể tải danh sách sản phẩm')
+                } else {
+                    setAllProducts(allProductsResponse.data)
                 }
             } catch (error) {
                 console.error('Lỗi khi tải dữ liệu:', error)
@@ -154,15 +157,6 @@ function ProductDetail() {
         const resultCode = searchParams.get('resultCode')
         if (resultCode) {
             if (resultCode === '0') {
-                // setNotification({
-                //     show: true,
-                //     description: 'Đơn hàng đã được đặt thành công',
-                //     type: 'success',
-                //     title: 'Thành công',
-                //     onClose: () => {
-                //         navigate(location.pathname, { replace: true })
-                //     },
-                // })
                 Swal.fire({
                     title: 'Thành công',
                     text: 'Đơn hàng đã được đặt thành công',
@@ -172,15 +166,6 @@ function ProductDetail() {
                     navigate(location.pathname, { replace: true })
                 })
             } else {
-                // setNotification({
-                //     show: true,
-                //     description: 'Thanh toán thất bại',
-                //     type: 'error',
-                //     title: 'Lỗi',
-                //     onClose: () => {
-                //         navigate(location.pathname, { replace: true })
-                //     },
-                // })
                 Swal.fire({
                     title: 'Lỗi',
                     text: 'Thanh toán thất bại',
@@ -893,7 +878,7 @@ function ProductDetail() {
 
                         <div className="pt-4">
                             <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
-                            <div className="row mt-5 g-3">
+                            <div className="row mt-5 g-3 related-products">
                                 {relatedProducts && relatedProducts.length > 0 ? (
                                     relatedProducts.map((product) => (
                                         <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={product._id}>

@@ -25,6 +25,8 @@ import quote from '../../assets/image/icons/quote.png'
 import avatar from '../../assets/image/default/default-avatar.png'
 import './Home.scss'
 import axios from 'axios'
+import { getPersonalizedRecommendations } from '../../services/RecommendationService'
+import { getOrderUser } from '../../services/UserService'
 
 function Home() {
     const navigate = useNavigate()
@@ -35,10 +37,20 @@ function Home() {
     const { user } = useSelector((state) => state.auth)
     const { categories } = useSelector((state) => state.category)
     const [bestSeller, setBestSeller] = useState([])
+    const [recommendedProducts, setRecommendedProducts] = useState([])
+    const [allProducts, setAllProducts] = useState([])
 
     const handleExploreCategory = (categorySlug) => {
         navigate(`/products?category=${categorySlug}&page=1`)
     }
+
+    useEffect(() => {
+        const fetchAllProducts = async () => {
+            const response = await axios.get('http://localhost:5000/product/all')
+            setAllProducts(response.data)
+        }
+        fetchAllProducts()
+    }, [])
 
     useEffect(() => {
         dispatch(fetchBanners())
@@ -49,6 +61,27 @@ function Home() {
         }
         fetchBestSeller()
     }, [dispatch])
+
+    useEffect(() => {
+        const fetchRecommendedProducts = async () => {
+            try {
+                let completedOrders = []
+                if (user) {
+                    // Lấy lịch sử đơn hàng nếu user đã đăng nhập
+                    completedOrders = await getOrderUser('delivered')
+                }
+
+                const recommendations = await getPersonalizedRecommendations(user, allProducts, completedOrders)
+                setRecommendedProducts(recommendations)
+            } catch (error) {
+                console.error('Lỗi khi tải sản phẩm gợi ý:', error)
+            }
+        }
+
+        if (allProducts.length > 0) {
+            fetchRecommendedProducts()
+        }
+    }, [user, allProducts])
 
     const handleClickBanner = async (banner) => {
         navigate(banner?.linkUrl)
@@ -180,7 +213,28 @@ function Home() {
                             </Swiper>
                         </div>
                     </div>
-                    <div className="content-bestseller py-5 reveal reveal-delay-1">
+                    <div className="content-recommendation py-5 reveal reveal-delay-1">
+                        <p className="shop-sm-title text-center theme-color">
+                            {user ? 'Dành riêng cho bạn' : 'Có thể bạn sẽ thích'}
+                        </p>
+                        <div className="row">
+                            {recommendedProducts.map((product) => (
+                                <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
+                                    <ProductCard
+                                        onClick={() => navigate(`/products/${product.slug}`)}
+                                        url={product.urlImage[0]}
+                                        name={product.name}
+                                        originalPrice={product.originalPrice}
+                                        discount={product.discount}
+                                        rating={product.rating}
+                                        isFeature={product.isFeatured}
+                                        productId={product._id}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="content-bestseller py-5 reveal reveal-delay-2">
                         <p className="shop-sm-title text-center theme-color">Bán Chạy Nhất</p>
                         <div className="row">
                             {bestSeller.map((product) => (

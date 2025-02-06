@@ -511,3 +511,22 @@
     font-weight: 600;
     color: #646464;
 }
+
+.content-recommendation {
+    .shop-sm-title {
+        margin-bottom: 2rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--theme-color-1);
+            border-radius: 3px;
+        }
+    }
+}

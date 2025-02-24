@@ -3,7 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faImage, faMessage, faCirclePlus, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { serverTimestamp, doc, updateDoc, arrayUnion, getDoc, setDoc, onSnapshot, increment } from 'firebase/firestore'
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
+import swal from 'sweetalert2'
+import { addItemToCart } from '../redux/slices/cartSlice'
 
 import messageIcon from '../assets/image/default/messenger.png'
 import { db, storage } from '../firebase.config'
@@ -11,6 +15,7 @@ import './Chat.scss'
 
 function Chatbot() {
     const { user } = useSelector((state) => state.auth)
+    const dispatch = useDispatch()
     const [chatMode, setChatMode] = useState({
         show: false,
         mode: 'ai',
@@ -19,6 +24,8 @@ function Chatbot() {
     const fileInputRef = useRef(null)
     const [selectedImage, setSelectedImage] = useState([])
     const [imagePreview, setImagePreview] = useState([])
+    const navigate = useNavigate()
+    const location = useLocation()
 
     // Thêm hàm xử lý upload hình ảnh
     const handleImageUpload = (e) => {
@@ -232,20 +239,103 @@ function Chatbot() {
         )
     }
 
+    const handleDfButtonClicked = async (event) => {
+        // Ngăn chặn hành vi mặc định của button
+        event.preventDefault()
+        console.log('event: ', event)
+
+        // Kiểm tra xem có phải event add-to-cart không
+        if (event.detail?.event) {
+            const variantInfo = event.detail.event
+            try {
+                if (!user) {
+                    swal.fire({
+                        title: 'Vui lòng đăng nhập',
+                        text: 'Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng',
+                        icon: 'warning',
+                        confirmButtonText: 'Đăng nhập',
+                        showCancelButton: true,
+                        cancelButtonText: 'Đóng',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate('/user/login', { state: { from: location.pathname } })
+                        }
+                    })
+                    return
+                }
+
+                // Thêm vào giỏ hàng
+                await dispatch(
+                    addItemToCart({
+                        variant: variantInfo.variantId,
+                        quantity: 1,
+                    })
+                ).unwrap()
+
+                // Hiển thị thông báo trong chat
+                const dfMessenger = document.querySelector('df-messenger')
+                if (dfMessenger) {
+                    dfMessenger.renderCustomText(
+                        `✅ Đã thêm sản phẩm vào giỏ hàng:\n${variantInfo.productName}\nSize: ${
+                            variantInfo.size
+                        } - Màu: ${variantInfo.color}\nGiá: ${variantInfo.price.toLocaleString()}đ`,
+                        true
+                    )
+                }
+                await saveChatMessage(
+                    [
+                        {
+                            type: 'text',
+                            text: `✅ Đã thêm sản phẩm vào giỏ hàng:\n${variantInfo.productName}\nSize: ${
+                                variantInfo.size
+                            } - Màu: ${variantInfo.color}\nGiá: ${variantInfo.price.toLocaleString()}đ`,
+                        },
+                    ],
+                    false
+                )
+
+                // Hiển thị thông báo thành công
+                swal.fire({
+                    title: 'Thêm vào giỏ hàng thành công',
+                    text: `${variantInfo.productName} - Size: ${variantInfo.size} - Màu: ${variantInfo.color}`,
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xem giỏ hàng',
+                    cancelButtonText: 'Tiếp tục mua sắm',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        navigate('/cart')
+                    }
+                })
+            } catch (error) {
+                console.error('Lỗi khi thêm vào giỏ hàng:', error)
+                swal.fire({
+                    title: 'Có lỗi xảy ra',
+                    text: 'Không thể thêm sản phẩm vào giỏ hàng',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                })
+            }
+        }
+    }
+
     useEffect(() => {
-        window.addEventListener('df-chat-open-changed', handleChatOpenChanged)
         window.addEventListener('df-user-input-entered', handleDfMessengerResponse)
         window.addEventListener('df-response-received', handleDfMessengerResponse)
+        window.addEventListener('df-chat-open-changed', handleChatOpenChanged)
         window.addEventListener('df-request-sent', handleDfRequestSent)
         window.addEventListener('df-chip-clicked', handleChipClick)
+        window.addEventListener('df-button-clicked', handleDfButtonClicked)
+
         return () => {
             window.removeEventListener('df-user-input-entered', handleDfMessengerResponse)
             window.removeEventListener('df-response-received', handleDfMessengerResponse)
             window.removeEventListener('df-chat-open-changed', handleChatOpenChanged)
             window.removeEventListener('df-request-sent', handleDfRequestSent)
             window.removeEventListener('df-chip-clicked', handleChipClick)
+            window.removeEventListener('df-button-clicked', handleDfButtonClicked)
         }
-    }, [chatMode.mode, selectedImage])
+    }, [chatMode.mode, selectedImage, user, navigate, dispatch, location.pathname])
     return (
         <>
             {chatMode.show && user && (

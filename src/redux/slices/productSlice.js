@@ -7,6 +7,9 @@ import {
     deleteManyProducts,
     ratingProduct,
     likeProduct,
+    recommendContentBased,
+    recommendCollaborative,
+    recommendHybrid,
 } from '../../services/ProductService'
 import _ from 'lodash'
 import axios from 'axios'
@@ -107,11 +110,40 @@ export const fetchAllProducts = createAsyncThunk('product/fetchAllProducts', asy
     }
 })
 
+export const recommendContentBasedAction = createAsyncThunk('product/recommendContentBased', async (product_name, { rejectWithValue }) => {
+    try {
+        const response = await recommendContentBased(product_name)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const recommendCollaborativeAction = createAsyncThunk('product/recommendCollaborative', async (_, { rejectWithValue }) => {
+    try {
+        const response = await recommendCollaborative()
+        console.log('response', response)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const recommendHybridAction = createAsyncThunk('product/recommendHybrid', async (data, { rejectWithValue }) => {
+    try {
+        const response = await recommendHybrid(data)
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
 const productSlice = createSlice({
     name: 'product',
     initialState: {
         currentProduct: null,
         products: [],
+        recommendProducts: [],
         totalPages: 0,
         currentPage: 1,
         filters: {
@@ -201,6 +233,36 @@ const productSlice = createSlice({
                 state.currentProduct.favoriteProducts = action.payload
             })
             .addCase(likeProductAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(recommendContentBasedAction.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(recommendContentBasedAction.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.recommendProducts = action.payload
+            })
+            .addCase(recommendContentBasedAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(recommendCollaborativeAction.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(recommendCollaborativeAction.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.recommendProducts = action.payload
+            })
+            .addCase(recommendCollaborativeAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(recommendHybridAction.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(recommendHybridAction.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.recommendProducts = action.payload
+            })
+            .addCase(recommendHybridAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

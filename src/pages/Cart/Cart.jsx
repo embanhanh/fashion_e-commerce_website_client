@@ -18,6 +18,7 @@ import SelectAddressModal from '../../components/SelectAddressModal'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
 import PaymentMethodModal from '../../components/PaymentMethodModal'
+import zalopay from '../../assets/image/default/zalopay.png'
 import './Cart.scss'
 
 function Cart() {
@@ -67,6 +68,10 @@ function Cart() {
         order: false,
     })
     const [comboDiscounts, setComboDiscounts] = useState([])
+
+    useEffect(() => {
+        console.log(cart)
+    }, [cart])
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search)
@@ -165,6 +170,8 @@ function Cart() {
             })
         }
     }, [currentOrder, order_id])
+
+
 
     const handleChangeOrderData = (key, value) => {
         setOrderData({
@@ -371,11 +378,13 @@ function Cart() {
 
     const handleOrder = async () => {
         if (orderData.products.length > 0) {
+
             const finalOrderData = {
                 ...orderData,
                 shippingAddress: orderData.shippingAddress._id,
                 vouchers: orderData.vouchers.map((voucher) => voucher._id),
             }
+            console.log(finalOrderData)
             try {
                 setIsLoading((pre) => ({
                     ...pre,
@@ -394,19 +403,76 @@ function Cart() {
                             },
                         }
                     )
+                    Swal.fire({
+                        title: 'Thành công',
+                        text: 'Đang chuyển hướng đến trang thanh toán MoMo',
+                        icon: 'success',
+                    })
                     const { payUrl } = response.data
                     window.location.href = payUrl
+                } else if (orderData.paymentMethod === 'bankTransfer' && orderData.transferOption === 'vnpay') {
+                    try {
+                        const response = await axios.post(
+                            'http://localhost:5000/vnpay/create_payment_url',
+                            {
+                                amount: orderData.totalPrice,
+                                orderData: finalOrderData,
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                            }
+                        );
+
+                        // Chuyển hướng đến trang thanh toán VNPay
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Đang chuyển hướng đến trang thanh toán VNPay',
+                            icon: 'success',
+                        })
+                        const { payUrl } = response.data
+                        window.location.href = payUrl
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: error.response?.data?.message || 'Không thể kết nối với cổng thanh toán',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        });
+                    }
+                } else if (orderData.paymentMethod === 'bankTransfer' && orderData.transferOption === 'zalopay') {
+                    try {
+                        const response = await axios.post(
+                            'http://localhost:5000/zalo-pay/create_payment_url',
+                            {
+                                amount: orderData.totalPrice,
+                                orderData: finalOrderData,
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                            }
+                        );
+
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: 'Đang chuyển hướng đến trang thanh toán ZaloPay',
+                            icon: 'success',
+                        })
+                        const { payUrl } = response.data
+                        window.location.href = payUrl
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Lỗi',
+                            text: error.response?.data?.message || error.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        })
+                    }
                 } else {
                     await dispatch(createOrderAction(finalOrderData)).unwrap()
-                    // setNotification({
-                    //     show: true,
-                    //     description: 'Đặt hàng thành công',
-                    //     type: 'success',
-                    //     title: 'Thành công',
-                    //     onClose: () => {
-                    //         window.location.reload()
-                    //     },
-                    // })
                     Swal.fire({
                         title: 'Thành công',
                         text: 'Đặt hàng thành công',
@@ -417,12 +483,6 @@ function Cart() {
                     })
                 }
             } catch (error) {
-                // setNotification({
-                //     show: true,
-                //     description: error.response?.data?.message || error.message,
-                //     type: 'error',
-                //     title: 'Lỗi',
-                // })
                 Swal.fire({
                     title: 'Lỗi',
                     text: error.response?.data?.message || error.message,
@@ -585,7 +645,7 @@ function Cart() {
                                                     </label>
                                                     <img
                                                         className="mx-3"
-                                                        src={item?.variant?.product?.urlImage}
+                                                        src={item?.variant?.imageUrl}
                                                         alt=""
                                                         width={70}
                                                         height={70}
@@ -756,23 +816,57 @@ function Cart() {
                                 </p>
                                 <div className="d-flex align-items-center gap-2">
                                     {orderData.paymentMethod === 'bankTransfer' && (
-                                        <img
-                                            src={
-                                                orderData.transferOption === 'momo'
-                                                    ? 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
-                                                    : 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
-                                            }
-                                            alt="payment method"
-                                            width={50}
-                                            height={50}
-                                        />
+                                        <>
+                                            {orderData.transferOption === 'momo' && (
+                                                <img
+                                                    src={
+                                                        orderData.transferOption === 'momo'
+                                                            ? 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
+                                                            : 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png'
+                                                    }
+                                                    alt="payment method"
+                                                    width={50}
+                                                    height={50}
+                                                />
+                                            )}
+                                            {orderData.transferOption === 'vnpay' && (
+                                                <img
+                                                    src={
+                                                        orderData.transferOption === 'vnpay'
+                                                            ? 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png'
+                                                            : 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png'
+                                                    }
+                                                    alt="payment method"
+                                                    width={50}
+                                                    height={50}
+                                                />
+                                            )}
+                                            {orderData.transferOption === 'zalopay' && (
+                                                <img
+                                                    src={
+                                                        orderData.transferOption === 'zalopay'
+                                                            ? zalopay
+                                                            : zalopay
+                                                    }
+                                                    alt="payment method"
+                                                    width={50}
+                                                    height={50}
+                                                />
+                                            )}
+                                        </>
                                     )}
                                     <p className="fs-3">
                                         {orderData.paymentMethod === 'paymentUponReceipt' && 'Khi nhận hàng'}
                                         {(orderData.paymentMethod === 'bankTransfer' &&
                                             orderData.transferOption === 'momo' &&
                                             'Ví MoMo') ||
-                                            (orderData.transferOption === 'bank' && 'Chuyển khoản')}
+                                            (orderData.transferOption === 'bank' && 'Chuyển khoản') ||
+                                            (orderData.paymentMethod === 'bankTransfer' &&
+                                                orderData.transferOption === 'vnpay' &&
+                                                'VNPay') ||
+                                            (orderData.paymentMethod === 'bankTransfer' &&
+                                                orderData.transferOption === 'zalopay' &&
+                                                'ZaloPay')}
                                     </p>
                                     <FontAwesomeIcon
                                         icon={faPen}

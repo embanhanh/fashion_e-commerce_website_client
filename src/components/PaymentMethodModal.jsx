@@ -62,7 +62,7 @@ function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, order
                                     </div>
                                     <img src={momo} alt="momo" style={{ width: '60px', height: '60px' }} />
                                 </div>
-                                <div className="d-flex flex-column gap-3 align-items-center">
+                                {/* <div className="d-flex flex-column gap-3 align-items-center">
                                     <div className="d-flex align-items-center gap-3">
                                         <label className="d-flex align-items-center">
                                             <input
@@ -76,8 +76,8 @@ function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, order
                                         <p className="fs-3">Paypal</p>
                                     </div>
                                     <img src={paypal} alt="paypal" style={{ width: '60px', height: '60px' }} />
-                                </div>
-                                <div className="d-flex flex-column gap-3 align-items-center">
+                                </div> */}
+                                {/* <div className="d-flex flex-column gap-3 align-items-center">
                                     <div className="d-flex align-items-center gap-3">
                                         <label className="d-flex align-items-center">
                                             <input
@@ -93,7 +93,7 @@ function PaymentMethodModal({ showPaymentMethod, handleClosePaymentMethod, order
                                         <p className="fs-3">Vietcombank</p>
                                     </div>
                                     <img src={vietcombank} alt="vietcombank" style={{ height: '60px' }} />
-                                </div>
+                                </div> */}
                                 <div className="d-flex flex-column gap-3 align-items-center">
                                     <div className="d-flex align-items-center gap-3">
                                         <label className="d-flex align-items-center">

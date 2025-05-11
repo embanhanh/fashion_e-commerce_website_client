@@ -22,6 +22,7 @@ export const addToCart = async (productData) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         })
+        console.log(response.data)
         return response.data
     } catch (error) {
         throw error

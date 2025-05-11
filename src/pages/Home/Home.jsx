@@ -27,6 +27,7 @@ import './Home.scss'
 import axios from 'axios'
 import { getPersonalizedRecommendations } from '../../services/RecommendationService'
 import { getOrderUser } from '../../services/UserService'
+import { recommendCollaborativeAction, recommendHybridAction } from '../../redux/slices/productSlice'
 
 function Home() {
     const navigate = useNavigate()
@@ -36,8 +37,9 @@ function Home() {
     const { banners } = useSelector((state) => state.banner)
     const { user } = useSelector((state) => state.auth)
     const { categories } = useSelector((state) => state.category)
+    const { recommendProducts, status, error } = useSelector((state) => state.product)
     const [bestSeller, setBestSeller] = useState([])
-    const [recommendedProducts, setRecommendedProducts] = useState([])
+    // const [recommendedProducts, setRecommendedProducts] = useState([])
     const [allProducts, setAllProducts] = useState([])
 
     const handleExploreCategory = (categorySlug) => {
@@ -63,25 +65,39 @@ function Home() {
     }, [dispatch])
 
     useEffect(() => {
-        const fetchRecommendedProducts = async () => {
-            try {
-                let completedOrders = []
-                if (user) {
-                    // Lấy lịch sử đơn hàng nếu user đã đăng nhập
-                    completedOrders = await getOrderUser('delivered')
-                }
+        dispatch(recommendHybridAction({
+            top_k: 8,
+            alpha: 0,
+            beta: 1
+        }))
+    }, [dispatch])
 
-                const recommendations = await getPersonalizedRecommendations(user, allProducts, completedOrders)
-                setRecommendedProducts(recommendations)
-            } catch (error) {
-                console.error('Lỗi khi tải sản phẩm gợi ý:', error)
-            }
+    useEffect(() => {
+        if (status === 'succeeded') {
+            console.log('recommendProducts', recommendProducts)
         }
+    }, [recommendProducts, status])
 
-        if (allProducts.length > 0) {
-            fetchRecommendedProducts()
-        }
-    }, [user, allProducts])
+    // useEffect(() => {
+    //     const fetchRecommendedProducts = async () => {
+    //         try {
+    //             let completedOrders = []
+    //             if (user) {
+    //                 // Lấy lịch sử đơn hàng nếu user đã đăng nhập
+    //                 completedOrders = await getOrderUser('delivered')
+    //             }
+
+    //             const recommendations = await getPersonalizedRecommendations(user, allProducts, completedOrders)
+    //             setRecommendedProducts(recommendations)
+    //         } catch (error) {
+    //             console.error('Lỗi khi tải sản phẩm gợi ý:', error)
+    //         }
+    //     }
+
+    //     if (allProducts.length > 0) {
+    //         fetchRecommendedProducts()
+    //     }
+    // }, [user, allProducts])
 
     const handleClickBanner = async (banner) => {
         navigate(banner?.linkUrl)
@@ -218,17 +234,17 @@ function Home() {
                             {user ? 'Dành riêng cho bạn' : 'Có thể bạn sẽ thích'}
                         </p>
                         <div className="row">
-                            {recommendedProducts.map((product) => (
+                            {recommendProducts.map((product) => (
                                 <div key={product._id} className="col-12 col-sm-6 col-md-4 col-lg-3 g-5">
                                     <ProductCard
-                                        onClick={() => navigate(`/products/${product.slug}`)}
+                                        onClick={() => navigate(`/products/${product?.slug}`)}
                                         url={product.urlImage[0]}
-                                        name={product.name}
-                                        originalPrice={product.originalPrice}
-                                        discount={product.discount}
-                                        rating={product.rating}
-                                        isFeature={product.isFeatured}
-                                        productId={product._id}
+                                        name={product?.name}
+                                        originalPrice={product?.originalPrice}
+                                        discount={product?.discount}
+                                        rating={product?.rating}
+                                        isFeature={product?.isFeatured}
+                                        productId={product?._id}
                                     />
                                 </div>
                             ))}

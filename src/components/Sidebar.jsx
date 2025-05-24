@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { FaCircleUser, FaBagShopping, FaRegHeart, FaLocationDot, FaRegBell, FaTicket } from 'react-icons/fa6'
+import { FaCircleUser, FaBagShopping, FaRegHeart, FaLocationDot, FaRegBell, FaTicket, FaCoins } from 'react-icons/fa6'
 import './Sidebar.scss'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUser } from '../redux/slices/userSlice'
@@ -36,6 +36,11 @@ function Sidebar() {
             path: '/user/account/notifications',
             name: 'Thông báo',
             icon: <FaRegBell />,
+        },
+        {
+            path: '/user/account/heartie-coin',
+            name: 'Heartie Coin',
+            icon: <FaCoins />,
         },
     ]
 

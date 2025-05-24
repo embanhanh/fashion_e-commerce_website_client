@@ -1,0 +1,53 @@
+// HeartiePoint.scss
+.heartie-point-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: first baseline;
+}
+
+.h-100vh {
+    height: 100vh;
+}
+
+.daily-checkin-container {
+    margin-top: 200px;
+    padding: 1rem;
+}
+
+.checkin-card {
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.day-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 0.25rem;
+}
+
+.day-container.current {
+    border: 1px solid #374151;
+    color: black;
+}
+
+.day-container.normal {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+
+.claim-button {
+    background-color: #ea580c;
+    border-color: #ea580c;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 0.75rem 1rem;
+}
+
+.claim-button:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}

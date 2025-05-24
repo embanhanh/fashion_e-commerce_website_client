@@ -84,6 +84,7 @@ export const register = async (user) => {
 export const loginWithFirebase = async (token, type) => {
     try {
         const response = await axiosInstance.post(`login/${type}`, token)
+        console.log('response loginWithFirebase', response)
         return response.data
     } catch (error) {
         throw error

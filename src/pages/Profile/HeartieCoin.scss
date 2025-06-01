@@ -40,14 +40,16 @@
 
 
 .claim-button {
-    background-color: #ea580c;
-    border-color: #ea580c;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
     font-weight: bold;
     border-radius: 25px;
     padding: 0.75rem 1rem;
 }
 
 .claim-button:hover {
-    background-color: #dc2626;
-    border-color: #dc2626;
+    background-color: var(--theme-color-4);
+    border-color: var(--theme-color-4);
+    border-color: var(--primary-color)
 }

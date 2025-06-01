@@ -126,3 +126,22 @@ export const getVoucherByCode = async (voucherCode) => {
         throw error
     }
 }
+
+export const getApplicableVouchers = async (productsPrice, shippingPrice, products) => {
+    try {
+        const response = await axios.get(API_URL + 'applicable', {
+            params: {
+                productsPrice,
+                shippingPrice,
+                products: JSON.stringify(products),
+            },
+
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

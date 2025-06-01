@@ -9,16 +9,18 @@ import { useSelector, useDispatch } from 'react-redux'
 import Swal from 'sweetalert2'
 
 import { fetchCart, updateItemQuantity, removeItemFromCart } from '../../redux/slices/cartSlice'
-import { fetchAddresses } from '../../redux/slices/userSlice'
+import { fetchAddresses, fetchUser, updateCoinsUserAction } from '../../redux/slices/userSlice'
 import { getShopInfo } from '../../redux/slices/shopSlice'
 import { createOrderAction, updateOrderAction, getOrderByIdAction } from '../../redux/slices/orderSilce'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
+import { getApplicableVouchersAction } from '../../redux/slices/voucherSlice'
 import { calculateRouteDistance } from '../../utils/MapUtils'
 import SelectAddressModal from '../../components/SelectAddressModal'
 import ShippingMethodModal from '../../components/ShippingMethodModal'
 import VoucherModal from '../../components/VoucherModal'
 import PaymentMethodModal from '../../components/PaymentMethodModal'
 import zalopay from '../../assets/image/default/zalopay.png'
+import hearti_coin from '../../assets/image/logo/heirtie_coin.svg'
 import './Cart.scss'
 
 function Cart() {
@@ -28,6 +30,7 @@ function Cart() {
     const { addresses } = useSelector((state) => state.user)
     const { shopInfo } = useSelector((state) => state.shop)
     const { currentOrder } = useSelector((state) => state.order)
+    const { user } = useSelector((state) => state.user)
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -56,6 +59,7 @@ function Cart() {
         },
         transferOption: null,
     })
+    const [availableVouchers, setAvailableVouchers] = useState([])
     // notification
     const [notification, setNotification] = useState({
         show: false,
@@ -68,6 +72,7 @@ function Cart() {
         order: false,
     })
     const [comboDiscounts, setComboDiscounts] = useState([])
+    const [useHeartieCoins, setUseHeartieCoins] = useState(false)
 
     useEffect(() => {
         console.log(cart)
@@ -134,6 +139,7 @@ function Cart() {
         dispatch(fetchCart())
         dispatch(fetchAddresses())
         dispatch(getShopInfo())
+        dispatch(fetchUser())
     }, [dispatch])
 
     useEffect(() => {
@@ -171,7 +177,87 @@ function Cart() {
         }
     }, [currentOrder, order_id])
 
+    useEffect(() => {
+        let value = 0;
+        let shipping = 0;
+        const totalPrice =
+            orderData.productsPrice +
+            orderData.shippingPrice -
+            orderData.vouchers.reduce((total, voucher, index) => {
+                let originalValue = 0;
+                let finalValue = 0;
+                if (voucher.voucherType === 'shipping') {
+                    originalValue = orderData.productsPrice;
+                } else {
+                    originalValue = orderData.productsPrice + orderData.shippingPrice;
+                }
 
+                if (voucher.discountType === 'percentage') {
+                    const valueDiscount = (originalValue * voucher.discountValue) / 100;
+                    if (valueDiscount > voucher.maxDiscountValue) {
+                        finalValue = voucher.maxDiscountValue;
+                    } else {
+                        finalValue = valueDiscount;
+                    }
+                } else {
+                    finalValue = voucher.discountValue;
+                }
+
+                if (voucher.voucherType === 'shipping') {
+                    shipping += finalValue;
+                } else {
+                    value += finalValue;
+                }
+                return total + finalValue;
+            }, 0);
+
+
+        setOrderData((pre) => {
+            return {
+                ...pre,
+                totalPrice,
+            };
+        });
+        setDiscountValue({
+            value,
+            shipping,
+        });
+    }, [orderData.vouchers]);
+
+    useEffect(() => {
+        calculateTotalShippingPrice()
+    }, [orderData.shippingAddress, orderData.shippingMethod, orderData.products])
+
+    // 5. Thêm useEffect để fetch và auto apply voucher
+    useEffect(() => {
+        const fetchAndApplyVouchers = async () => {
+            if (orderData.products.length > 0 && orderData.productsPrice > 0) {
+                try {
+                    const bestVoucher = await dispatch(getApplicableVouchersAction({
+                        productsPrice: orderData.productsPrice,
+                        shippingPrice: orderData.shippingPrice,
+                        products: orderData.products
+                    })).unwrap();
+
+                    if (bestVoucher && bestVoucher.length > 0 && orderData.vouchers.length === 0) {
+                        const voucher = bestVoucher[0];
+                        setOrderData(prev => ({
+                            ...prev,
+                            vouchers: [voucher],
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi lấy voucher tốt nhất:', error);
+                }
+            }
+        };
+
+        fetchAndApplyVouchers();
+    }, [orderData.productsPrice, orderData.shippingPrice, orderData.products.length, dispatch]);
+
+    useEffect(() => {
+        console.log('Order Data:', orderData)
+    }, [orderData])
 
     const handleChangeOrderData = (key, value) => {
         setOrderData({
@@ -187,51 +273,6 @@ function Cart() {
         })
         setShowShippingMethod(false)
     }
-
-    useEffect(() => {
-        let value = 0
-        let shipping = 0
-        const totalPrice =
-            orderData.productsPrice +
-            orderData.shippingPrice -
-            orderData.vouchers.reduce((total, voucher) => {
-                let originalValue = 0
-                let finalValue = 0
-                if (voucher.voucherType === 'shipping') {
-                    originalValue = orderData.shippingPrice
-                } else {
-                    originalValue = orderData.productsPrice + orderData.shippingPrice
-                }
-                if (voucher.discountType === 'percentage') {
-                    const valueDiscount = (originalValue * voucher.discountValue) / 100
-                    if (valueDiscount > voucher.maxDiscountValue) {
-                        finalValue = voucher.maxDiscountValue
-                    } else {
-                        finalValue = valueDiscount
-                    }
-                } else {
-                    finalValue = voucher.discountValue
-                }
-                if (voucher.voucherType === 'shipping') {
-                    shipping += finalValue
-                } else {
-                    value += finalValue
-                }
-                return total + finalValue
-            }, 0)
-        setOrderData((pre) => ({
-            ...pre,
-            totalPrice,
-        }))
-        setDiscountValue({
-            value,
-            shipping,
-        })
-    }, [orderData.vouchers])
-
-    useEffect(() => {
-        calculateTotalShippingPrice()
-    }, [orderData.shippingAddress, orderData.shippingMethod, orderData.products])
 
     const calculateTotalShippingPrice = async () => {
         if (shopInfo && Object.keys(orderData.shippingAddress).length > 0 && addresses.length > 0) {
@@ -292,12 +333,6 @@ function Cart() {
                         })
                     }
                 } catch (error) {
-                    // setNotification({
-                    //     show: true,
-                    //     description: error.message,
-                    //     type: 'error',
-                    //     title: 'Lỗi',
-                    // })
                     Swal.fire({
                         title: 'Lỗi',
                         text: error.message,
@@ -332,11 +367,33 @@ function Cart() {
         }
     }
 
+    // const handleSelectItem = (item) => {
+    //     setOrderData((prev) => {
+    //         if (prev.products.some((product) => product.product === item.variant._id)) {
+    //             const productsPrice = prev.productsPrice - handleComboDiscountValue(item)
+    //             return {
+    //                 ...prev,
+    //                 products: prev.products.filter((product) => product.product !== item.variant._id),
+    //                 productsPrice,
+    //                 totalPrice: productsPrice + prev.shippingPrice,
+    //             }
+    //         } else {
+    //             const productsPrice = prev.productsPrice + handleComboDiscountValue(item)
+    //             return {
+    //                 ...prev,
+    //                 products: [...prev.products, { product: item.variant._id, quantity: item.quantity }],
+    //                 productsPrice,
+    //                 totalPrice: productsPrice + prev.shippingPrice,
+    //             }
+    //         }
+    //     })
+    // }
     const handleSelectItem = (item) => {
         setOrderData((prev) => {
+            let newOrderData
             if (prev.products.some((product) => product.product === item.variant._id)) {
                 const productsPrice = prev.productsPrice - handleComboDiscountValue(item)
-                return {
+                newOrderData = {
                     ...prev,
                     products: prev.products.filter((product) => product.product !== item.variant._id),
                     productsPrice,
@@ -344,14 +401,44 @@ function Cart() {
                 }
             } else {
                 const productsPrice = prev.productsPrice + handleComboDiscountValue(item)
-                return {
+                newOrderData = {
                     ...prev,
                     products: [...prev.products, { product: item.variant._id, quantity: item.quantity }],
                     productsPrice,
                     totalPrice: productsPrice + prev.shippingPrice,
                 }
             }
+
+            return newOrderData
         })
+    }
+
+
+    const handleSelectHeartieCoins = (e) => {
+        setUseHeartieCoins(e.target.checked)
+        const coinDiscount = e.target.checked ? user?.coins : 0
+        setOrderData(prev => ({
+            ...prev,
+            totalPrice: prev.productsPrice + prev.shippingPrice -
+                prev.vouchers.reduce((total, voucher) => {
+                    let originalValue = 0
+                    let finalValue = 0
+                    if (voucher.voucherType === 'shipping') {
+                        originalValue = prev.shippingPrice
+                    } else {
+                        originalValue = prev.productsPrice + prev.shippingPrice
+                    }
+                    if (voucher.discountType === 'percentage') {
+                        const valueDiscount = (originalValue * voucher.discountValue) / 100
+                        finalValue = valueDiscount > voucher.maxDiscountValue
+                            ? voucher.maxDiscountValue
+                            : valueDiscount
+                    } else {
+                        finalValue = voucher.discountValue
+                    }
+                    return total + finalValue
+                }, 0) - coinDiscount
+        }))
     }
 
     const handleSelectAll = (e) => {
@@ -423,7 +510,7 @@ function Cart() {
                                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                                 },
                             }
-                        );
+                        )
 
                         // Chuyển hướng đến trang thanh toán VNPay
                         Swal.fire({
@@ -439,7 +526,7 @@ function Cart() {
                             text: error.response?.data?.message || 'Không thể kết nối với cổng thanh toán',
                             icon: 'error',
                             confirmButtonText: 'OK',
-                        });
+                        })
                     }
                 } else if (orderData.paymentMethod === 'bankTransfer' && orderData.transferOption === 'zalopay') {
                     try {
@@ -454,7 +541,7 @@ function Cart() {
                                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                                 },
                             }
-                        );
+                        )
 
                         Swal.fire({
                             title: 'Thành công',
@@ -473,6 +560,7 @@ function Cart() {
                     }
                 } else {
                     await dispatch(createOrderAction(finalOrderData)).unwrap()
+                    await dispatch(updateCoinsUserAction({ coins: 0 })).unwrap()
                     Swal.fire({
                         title: 'Thành công',
                         text: 'Đặt hàng thành công',
@@ -523,6 +611,44 @@ function Cart() {
                 productsPrice: prev.productsPrice - handleComboDiscountValue(item),
             }))
         }
+    }
+
+    // 4. Thêm function để tự động áp voucher tốt nhất
+    const autoApplyBestVoucher = (vouchers, orderData) => {
+        if (!vouchers || vouchers.length === 0) return null
+
+        let bestVoucher = null
+        let maxDiscount = 0
+
+        vouchers.forEach(voucher => {
+            let originalValue = 0
+            let finalValue = 0
+
+            // Tính giá trị gốc để áp voucher
+            if (voucher.voucherType === 'shipping') {
+                originalValue = orderData.shippingPrice
+            } else {
+                originalValue = orderData.productsPrice + orderData.shippingPrice
+            }
+
+            // Tính giá trị giảm giá
+            if (voucher.discountType === 'percentage') {
+                const valueDiscount = (originalValue * voucher.discountValue) / 100
+                finalValue = valueDiscount > voucher.maxDiscountValue
+                    ? voucher.maxDiscountValue
+                    : valueDiscount
+            } else {
+                finalValue = voucher.discountValue
+            }
+
+            // So sánh để tìm voucher tốt nhất
+            if (finalValue > maxDiscount) {
+                maxDiscount = finalValue
+                bestVoucher = voucher
+            }
+        })
+
+        return bestVoucher
     }
 
     const handleCloseVoucher = () => setShowVoucher(false)
@@ -876,9 +1002,46 @@ function Cart() {
                                     />
                                 </div>
                             </div>
-                            <div className="d-flex justify-content-between py-3 border-bottom align-items-center">
-                                <p className="fs-3 fw-bolder ">Tổng tiền:</p>
-                                <p className="fs-3 fw-bolder">{orderData.totalPrice.toLocaleString('vi-VN')}đ</p>
+                            <div className="d-flex py-3 justify-content-between border-bottom align-items-center gap-4">
+                                <div className='d-flex align-items-center gap-2'>
+                                    <img src={hearti_coin} alt="Heartie Coin" width={50} height={50} />
+                                    <p className='fs-3 fw-medium'>Heartie Coin</p>
+                                </div>
+                                <div className='d-flex gap-2 align-items-center'>
+                                    <p className="fs-3 fw-medium">{`Dùng ${user?.coins} Heartie Coin`}</p>
+                                    <label className="d-flex align-items-center">
+                                        <input
+                                            type="checkbox"
+                                            className="input-checkbox"
+                                            onChange={handleSelectHeartieCoins}
+                                        />
+                                        <span className="custom-checkbox"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="d-flex flex-column py-3 border-bottom">
+                                <div className="d-flex justify-content-between">
+                                    <p className="fs-3 fw-medium">Tiền sản phẩm:</p>
+                                    <p className='fs-3'>{orderData.productsPrice.toLocaleString('vi-VN')}đ</p>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <p className="fs-3 fw-medium">Tiền ship:</p>
+                                    <p className='fs-3'>{orderData.shippingPrice.toLocaleString('vi-VN')}đ</p>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <p className="fs-3 fw-medium">Voucher:</p>
+                                    <p className='fs-3'>-{(orderData.shippingPrice + orderData.productsPrice - orderData.totalPrice).toLocaleString('vi-VN')}đ</p>
+                                </div>
+                                {useHeartieCoins && (
+                                    <div className="d-flex justify-content-between">
+                                        <p className="fs-3 fw-medium">Heartie Coin:</p>
+                                        <p className='fs-3'>-{user?.coins.toLocaleString('vi-VN')}đ</p>
+                                    </div>
+                                )}
+                                <div className="d-flex justify-content-between">
+                                    <p className="fs-3 fw-bolder">Tổng:</p>
+                                    <p className='fs-3'>{orderData.totalPrice.toLocaleString('vi-VN')}đ</p>
+                                </div>
                             </div>
                             <div className="text-center py-3">
                                 <button

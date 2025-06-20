@@ -12,6 +12,7 @@ import voucherReducer from './slices/voucherSlice'
 import orderReducer from './slices/orderSilce'
 import promotionalComboReducer from './slices/promotionalComboSlice'
 import searchHistoryReducer from './slices/searchHistorySlice'
+import chatbotReducer from './slices/chatbotSlice'
 
 const authPersistConfig = {
     key: 'auth',
@@ -42,6 +43,7 @@ export const store = configureStore({
         order: orderReducer,
         promotionalCombo: promotionalComboReducer,
         searchHistory: persistedSearchHistoryReducer,
+        chatbot: chatbotReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

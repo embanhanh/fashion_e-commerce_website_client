@@ -38,6 +38,8 @@ import Payment from '../pages/Policy/Payment.jsx'
 import Check from '../pages/Policy/Check.jsx'
 import DetailOrder from '../components/DetailOrder.jsx'
 import Vouchers from '../pages/Profile/Vouchers.jsx'
+import Contact from '../pages/Contact/Contact.jsx'
+import HeartieCoin from '../pages/Profile/HeartieCoin.jsx'
 
 const publicRoutes = [
     { path: '/', element: Home },
@@ -47,6 +49,7 @@ const publicRoutes = [
     { path: '/policy/delivery', element: Delivery },
     { path: '/policy/payment', element: Payment },
     { path: '/policy/check', element: Check },
+    { path: '/contact', element: Contact },
     {
         path: '/products',
         element: ProductList,
@@ -75,6 +78,7 @@ const privateRoutes = [
             { path: 'vouchers', element: Vouchers, layout: Fragment },
             { path: 'notifications', element: Notifications, layout: Fragment },
             { path: 'settings', element: Settings, layout: Fragment },
+            {path: 'heartie-coin', element: HeartieCoin, layout: Fragment},
         ],
     },
     { path: '/cart/edit/:order_id', element: Cart, allowedRoles: ['user', 'admin'] },

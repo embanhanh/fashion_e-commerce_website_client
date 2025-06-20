@@ -47,6 +47,7 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
     }
 
     const isVoucherValid = (voucher) => {
+
         const now = new Date()
         return (
             voucher.minOrderValue <= orderData.totalPrice &&
@@ -75,13 +76,16 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
     }, [dispatch])
 
     useEffect(() => {
-        console.log(vouchers)
         setVoucherList(vouchers)
     }, [vouchers])
 
     useEffect(() => {
         setVoucherList(vouchers.filter((voucher) => voucher.voucher.code.includes(searchVoucher)))
     }, [searchVoucher])
+
+    useEffect(() => {
+        console.log('orderData', orderData)
+    }, [orderData])
 
     return (
         <Modal show={showVoucher} onHide={handleCloseVoucher} centered>
@@ -107,7 +111,9 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                     <div className="my-2" style={{ maxHeight: 260, overflowY: 'auto' }}>
                         {voucherList.length > 0 ? (
                             voucherList.map((voucher) => {
+                                console.log('voucher', voucher)
                                 const isValid = isVoucherValid(voucher.voucher)
+                                console.log('isValid', isValid)
                                 return (
                                     <div
                                         key={voucher.voucher?._id}
@@ -117,18 +123,18 @@ const VoucherModal = ({ showVoucher, handleCloseVoucher, orderData, setOrderData
                                         <img
                                             src={
                                                 voucher.voucher?.voucherType === 'all' &&
-                                                voucher.voucher?.discountType === 'percentage'
+                                                    voucher.voucher?.discountType === 'percentage'
                                                     ? voucherImages[3]
                                                     : voucher.voucher?.voucherType === 'all' &&
-                                                      voucher.voucher?.discountType === 'fixedamount'
-                                                    ? voucherImages[2]
-                                                    : voucher.voucher?.voucherType === 'product' &&
-                                                      voucher.voucher?.discountType === 'percentage'
-                                                    ? voucherImages[1]
-                                                    : voucher.voucher?.voucherType === 'product' &&
-                                                      voucher.voucher?.discountType === 'fixedamount'
-                                                    ? voucherImages[0]
-                                                    : null
+                                                        voucher.voucher?.discountType === 'fixedamount'
+                                                        ? voucherImages[2]
+                                                        : voucher.voucher?.voucherType === 'product' &&
+                                                            voucher.voucher?.discountType === 'percentage'
+                                                            ? voucherImages[1]
+                                                            : voucher.voucher?.voucherType === 'product' &&
+                                                                voucher.voucher?.discountType === 'fixedamount'
+                                                                ? voucherImages[0]
+                                                                : null
                                             }
                                             alt=""
                                             width={120}

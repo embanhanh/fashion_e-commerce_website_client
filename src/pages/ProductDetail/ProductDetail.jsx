@@ -7,14 +7,14 @@ import 'swiper/css/thumbs'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinus, faPlus, faThumbsUp, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 
 import { useScrollReveal } from '../../hook/useScrollReveal'
-import { fetchProductByProductName, likeProductAction, fetchAllProducts } from '../../redux/slices/productSlice'
+import { fetchProductByProductName, likeProductAction, fetchAllProducts, recommendContentBasedAction, recommendHybridAction } from '../../redux/slices/productSlice'
 import { addItemToCart, resetAddToCartSuccess } from '../../redux/slices/cartSlice'
 import { getPromotionalComboByProductIdAction } from '../../redux/slices/promotionalComboSlice'
 import { fetchUser } from '../../redux/slices/userSlice'
@@ -28,7 +28,7 @@ import ProductCard from '../../components/ProductCard'
 import CheckoutProcess from '../../components/CheckoutProcess'
 import './ProductDetail.scss'
 import { getRelatedProducts } from '../../services/RecommendationService'
-
+// import { recommendProduct } from '../../services/ProductService'
 function ProductDetail() {
     const { product_name } = useParams()
     const dispatch = useDispatch()
@@ -38,7 +38,7 @@ function ProductDetail() {
     const { user: userInfo } = useSelector((state) => state.user)
     const { loading: cartLoading, error: cartError, addToCartSuccess } = useSelector((state) => state.cart)
     // state ...
-    const { currentProduct } = useSelector((state) => state.product)
+    const { currentProduct, recommendProducts, status, error } = useSelector((state) => state.product)
     const [thumbsSwiper, setThumbsSwiper] = useState(null)
     const [mainSwiper, setMainSwiper] = useState(null)
     const [activeIndex, setActiveIndex] = useState(0)
@@ -71,16 +71,23 @@ function ProductDetail() {
         const fetchData = async () => {
             try {
                 // Fetch song song cả product hiện tại và tất cả products
-                const [productResponse, allProductsResponse] = await Promise.all([
-                    dispatch(fetchProductByProductName(product_name)).unwrap(),
-                    axios.get('http://localhost:5000/product/all'),
-                ])
+                // const [productResponse, allProductsResponse] = await Promise.all([
+                //     dispatch(fetchProductByProductName(product_name)).unwrap(),
+                //     axios.get('http://localhost:5000/product/all'),
+                // ])
 
-                if (!allProductsResponse) {
-                    console.error('Không thể tải danh sách sản phẩm')
-                } else {
-                    setAllProducts(allProductsResponse.data)
-                }
+                await dispatch(fetchProductByProductName(product_name)).unwrap()
+                await dispatch(recommendHybridAction({
+                    product_slug: product_name,
+                    top_k: 6,
+                }))
+
+
+                // if (!allProductsResponse) {
+                //     console.error('Không thể tải danh sách sản phẩm')
+                // } else {
+                //     setAllProducts(allProductsResponse.data)
+                // }
             } catch (error) {
                 console.error('Lỗi khi tải dữ liệu:', error)
                 if (error.status === 404) {
@@ -178,20 +185,33 @@ function ProductDetail() {
         }
     }, [location])
 
+    // useEffect(() => {
+    //     const fetchRelatedProducts = async () => {
+    //         try {
+    //             if (currentProduct?._id && allProducts?.length > 0) {
+    //                 // const related = await getRelatedProducts(currentProduct, allProducts)
+    //                 dispatch(recommendProductAction(currentProduct.name))
+    //                 setRelatedProducts(related)
+    //             }
+    //         } catch (error) {
+    //             console.error('Lỗi khi tải sản phẩm liên quan:', error)
+    //             setRelatedProducts([])
+    //         }
+    //     }
+    //     fetchRelatedProducts()
+    // }, [currentProduct?._id, allProducts, dispatch])
+
+    // useEffect(() => {
+    //     const fetchRecommendProducts = async () => {
+    //         await dispatch(recommendContentBasedAction(currentProduct?.name))
+    //     }
+    //     fetchRecommendProducts()
+    // }, [currentProduct?.name, dispatch])
+
     useEffect(() => {
-        const fetchRelatedProducts = async () => {
-            try {
-                if (currentProduct?._id && allProducts?.length > 0) {
-                    const related = await getRelatedProducts(currentProduct, allProducts)
-                    setRelatedProducts(related)
-                }
-            } catch (error) {
-                console.error('Lỗi khi tải sản phẩm liên quan:', error)
-                setRelatedProducts([])
-            }
-        }
-        fetchRelatedProducts()
-    }, [currentProduct?._id, allProducts])
+        console.log('recommendProducts', recommendProducts)
+        console.log('currentProduct', currentProduct)
+    }, [recommendProducts, currentProduct])
 
     const handleColorSelect = (color) => {
         if (color !== selectedColor) {
@@ -234,8 +254,9 @@ function ProductDetail() {
         } else {
             try {
                 const selectedVariant = currentProduct.variants.find(
-                    (v) => v.color === selectedColor && v.size === selectedSize
+                    (v) => v.color === selectedColor && (v.size === selectedSize || !selectedSize)
                 )
+                console.log(selectedVariant)
                 if (selectedVariant) {
                     await dispatch(
                         addItemToCart({
@@ -243,12 +264,6 @@ function ProductDetail() {
                             quantity: quantity,
                         })
                     ).unwrap()
-                    // setNotification({
-                    //     show: true,
-                    //     description: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
-                    //     type: 'success',
-                    //     title: 'Thành công',
-                    // })
                     Swal.fire({
                         title: 'Thành công',
                         text: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
@@ -257,12 +272,6 @@ function ProductDetail() {
                     })
                 }
             } catch (error) {
-                // setNotification({
-                //     show: true,
-                //     description: 'Có lỗi xảy ra ' + error,
-                //     type: 'error',
-                //     title: 'Lỗi',
-                // })
                 Swal.fire({
                     title: 'Lỗi',
                     text: 'Có lỗi xảy ra ' + error,
@@ -548,11 +557,10 @@ function ProductDetail() {
                                             return (
                                                 <div className="col-3 px-3" key={index}>
                                                     <div
-                                                        className={`${
-                                                            selectedColor == variant.color
-                                                                ? 'border-theme border-2'
-                                                                : ''
-                                                        } product-color p-2 h-100 border d-flex align-items-center justify-content-center rounded-3`}
+                                                        className={`${selectedColor == variant.color
+                                                            ? 'border-theme border-2'
+                                                            : ''
+                                                            } product-color p-2 h-100 border d-flex align-items-center justify-content-center rounded-3`}
                                                         onClick={() => handleColorSelect(variant.color)}
                                                         style={{ cursor: 'pointer' }}
                                                     >
@@ -586,9 +594,8 @@ function ProductDetail() {
                                             ].map((size) => (
                                                 <div
                                                     key={size}
-                                                    className={`primary-btn light border ${
-                                                        selectedSize == size ? 'size-selected' : ''
-                                                    } py-2 px-4 shadow-none me-3`}
+                                                    className={`primary-btn light border ${selectedSize == size ? 'size-selected' : ''
+                                                        } py-2 px-4 shadow-none me-3`}
                                                     onClick={() => handleSizeSelect(size)}
                                                     style={{ cursor: 'pointer' }}
                                                 >
@@ -784,9 +791,8 @@ function ProductDetail() {
 
                                 {activeTab === 'reviews' && (
                                     <div
-                                        className={`reveal ${
-                                            activeTab === 'reviews' ? 'active' : ''
-                                        } d-flex flex-column gap-4 p-4`}
+                                        className={`reveal ${activeTab === 'reviews' ? 'active' : ''
+                                            } d-flex flex-column gap-4 p-4`}
                                     >
                                         {ratings.length > 0 ? (
                                             ratings.map((rating, index) => (
@@ -848,12 +854,11 @@ function ProductDetail() {
                                                     <div className="d-flex justify-content-end align-items-center">
                                                         <FontAwesomeIcon
                                                             icon={faThumbsUp}
-                                                            className={`p-2 fs-1 like-icon__product-detail ${
-                                                                rating.likes.includes(user?._id) ||
+                                                            className={`p-2 fs-1 like-icon__product-detail ${rating.likes.includes(user?._id) ||
                                                                 rating.user._id === user?._id
-                                                                    ? 'liked'
-                                                                    : ''
-                                                            }`}
+                                                                ? 'liked'
+                                                                : ''
+                                                                }`}
                                                             onClick={() => {
                                                                 if (isLoggedIn && rating.user._id !== user?._id) {
                                                                     handleLike(rating.user._id)
@@ -879,17 +884,19 @@ function ProductDetail() {
                         <div className="pt-4">
                             <p className="fs-1 theme-color fw-bold text-center text-muted">Sản phẩm liên quan</p>
                             <div className="row mt-5 g-3 related-products">
-                                {relatedProducts && relatedProducts.length > 0 ? (
-                                    relatedProducts.map((product) => (
-                                        <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={product._id}>
-                                            <ProductCard
-                                                url={product.urlImage[0]}
-                                                name={product.name}
-                                                originalPrice={product.originalPrice}
-                                                discount={product.discount}
-                                                rating={product.rating}
-                                                productId={product._id}
-                                            />
+                                {recommendProducts && recommendProducts.length > 0 ? (
+                                    recommendProducts.map((product, index) => (
+                                        <div className="col-12 col-sm-6 col-md-4 col-lg-2 reveal" key={index}>
+                                            <Link to={`/products/${product?.slug}`} className="text-decoration-none">
+                                                <ProductCard
+                                                    url={product?.urlImage && product?.urlImage[0]}
+                                                    name={product?.name}
+                                                    originalPrice={product?.originalPrice}
+                                                    discount={product?.discount}
+                                                    rating={product?.rating}
+                                                    productId={product?._id}
+                                                />
+                                            </Link>
                                         </div>
                                     ))
                                 ) : (

@@ -7,10 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { Filter } from 'bad-words'
 import { ratingProductAction } from '../redux/slices/productSlice'
+import { updateCoinsUserAction } from '../redux/slices/userSlice'
 import Swal from 'sweetalert2'
 import './RatingDemo.scss'
 
 const filter = new Filter()
+const coins = 500
 const vietnameseBadWords = [
     'đụ',
     'địt',
@@ -154,6 +156,10 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose, onRatingS
                 })
             ).unwrap()
 
+            await dispatch(updateCoinsUserAction({ coins })).unwrap()
+
+
+
             await Swal.fire({
                 title: 'Đánh giá thành công',
                 icon: 'success',
@@ -282,7 +288,7 @@ const RatingDemo = ({ productId = '671073e908e89f153bf58f21', onClose, onRatingS
                         className="px-4 py-2 primary-btn shadow-none rounded-4"
                         onClick={handleSubmit}
                     >
-                        <p className="m-0">Đánh giá</p>
+                        <p className="m-0">Đánh giá nhận 500 Heartie Coins</p>
                         {loading && (
                             <div className="dot-spinner ms-4">
                                 <div className="dot-spinner__dot"></div>

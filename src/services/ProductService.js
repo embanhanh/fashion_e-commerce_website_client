@@ -17,9 +17,11 @@ export const createProduct = async (productData) => {
 
 export const getAllProducts = async (params) => {
     try {
-        const response = await axios.get(API_URL, { params })
+        const response = await axios.get(API_URL, { params, timeout: 30000 })
+        console.log('response', response)
         return response.data
     } catch (error) {
+        console.error('Lỗi khi gọi API:', error)
         throw error
     }
 }
@@ -148,3 +150,39 @@ export const searchByImage = async (imageFile) => {
         throw error
     }
 }
+
+export const recommendContentBased = async (product_slug) => {
+    try {
+        const response = await axios.get(`${API_URL}recommend-content-based/${product_slug}`)
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const recommendCollaborative = async () => {
+    try {
+        const response = await axios.get(`${API_URL}recommend-collaborative`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const recommendHybrid = async (data) => {
+    try {
+        const response = await axios.post(`${API_URL}recommend-hybrid`, data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+

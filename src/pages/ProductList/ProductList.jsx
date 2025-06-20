@@ -208,6 +208,7 @@ function ProductList() {
         try {
             setIsSearchingImage(true)
             const { labels } = await searchByImage(file)
+            console.log(labels)
 
             // Đảm bảo labels là mảng
             const validLabels = Array.isArray(labels) ? labels : []
@@ -641,15 +642,65 @@ function ProductList() {
                                 >
                                     <FontAwesomeIcon icon={faCaretLeft} size="lg" />
                                 </Pagination.Prev>
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item
-                                        key={index + 1}
-                                        active={index + 1 === pageFromUrl}
-                                        onClick={() => handlePageChange(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </Pagination.Item>
-                                ))}
+
+                                {(() => {
+                                    const pagesToShow = [];
+                                    const range = 2; // Số trang hiển thị ở hai bên trang hiện tại
+
+                                    // Luôn hiển thị trang đầu tiên
+                                    if (pageFromUrl > 1) {
+                                        pagesToShow.push(
+                                            <Pagination.Item
+                                                key={1}
+                                                onClick={() => handlePageChange(1)}
+                                            >
+                                                1
+                                            </Pagination.Item>
+                                        );
+                                    }
+
+                                    // Thêm dấu ... nếu cần thiết
+                                    if (pageFromUrl > range + 2) {
+                                        pagesToShow.push(<Pagination.Ellipsis key="ellipsis-1" disabled />);
+                                    }
+
+                                    // Thêm các trang xung quanh trang hiện tại
+                                    for (
+                                        let i = Math.max(2, pageFromUrl - range);
+                                        i <= Math.min(totalPages - 1, pageFromUrl + range);
+                                        i++
+                                    ) {
+                                        pagesToShow.push(
+                                            <Pagination.Item
+                                                key={i}
+                                                active={i === pageFromUrl}
+                                                onClick={() => handlePageChange(i)}
+                                            >
+                                                {i}
+                                            </Pagination.Item>
+                                        );
+                                    }
+
+                                    // Thêm dấu ... nếu cần thiết
+                                    if (pageFromUrl < totalPages - range - 1) {
+                                        pagesToShow.push(<Pagination.Ellipsis key="ellipsis-2" disabled />);
+                                    }
+
+                                    // Luôn hiển thị trang cuối cùng
+                                    if (totalPages > 1 && pageFromUrl !== totalPages) {
+                                        pagesToShow.push(
+                                            <Pagination.Item
+                                                key={totalPages}
+                                                onClick={() => handlePageChange(totalPages)}
+                                            >
+                                                {totalPages}
+                                            </Pagination.Item>
+                                        );
+                                    }
+
+                                    return pagesToShow;
+                                })()}
+
                                 <Pagination.Next
                                     onClick={() => {
                                         window.scrollTo(0, 0)

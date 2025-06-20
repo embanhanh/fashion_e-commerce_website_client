@@ -21,6 +21,9 @@ import {
     getOrderDetail,
     getOrdersByUserId,
     returnOrder,
+    getCoinsUser,
+    checkinCoins,
+    updateCoinsUser,
 } from '../../services/UserService'
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, { rejectWithValue }) => {
@@ -239,6 +242,38 @@ export const returnOrderUser = createAsyncThunk(
             return response
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Có lỗi xảy ra')
+        }
+    }
+)
+
+export const fetchCoinsUser = createAsyncThunk('user/fetchCoinsUser', async (_, { rejectWithValue }) => {
+    try {
+        const response = await getCoinsUser()
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const checkinCoinsAction = createAsyncThunk('user/checkinCoins', async (_, { rejectWithValue }) => {
+    try {
+        const response = await checkinCoins()
+        return response
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const updateCoinsUserAction = createAsyncThunk(
+    'user/updateCoinsUser',
+    async ({ coins }, { rejectWithValue }) => {
+        try {
+            console.log('updateCoinsUserAction coins', coins)
+            const response = await updateCoinsUser(coins)
+            console.log('updateCoinsUserAction response', response)
+            return response
+        } catch (error) {
+            return rejectWithValue(error)
         }
     }
 )
@@ -547,6 +582,46 @@ const userSlice = createSlice({
                 )
             })
             .addCase(returnOrderUser.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(fetchCoinsUser.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(fetchCoinsUser.fulfilled, (state, action) => {
+                state.loading = false
+                state.user.coins = action.payload.coins
+                state.user.lastCheckinDate = action.payload.lastCheckinDate
+                state.user.lastUpdateDate = action.payload.lastUpdateDate
+            })
+            .addCase(fetchCoinsUser.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(checkinCoinsAction.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(checkinCoinsAction.fulfilled, (state, action) => {
+                state.loading = false
+                state.user.coins = action.payload.coins
+                state.user.lastCheckinDate = action.payload.lastCheckinDate
+                state.user.lastUpdateDate = action.payload.lastUpdateDate
+            })
+            .addCase(checkinCoinsAction.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(updateCoinsUserAction.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(updateCoinsUserAction.fulfilled, (state, action) => {
+                state.loading = false
+                state.user.coins = action.payload.coins
+            })
+            .addCase(updateCoinsUserAction.rejected, (state, action) => {
+                state.loading = false
                 state.error = action.payload
             })
     },

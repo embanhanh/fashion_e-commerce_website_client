@@ -126,7 +126,7 @@ function Header({ location }) {
         },
         {
             title: 'Liên hệ',
-            to: '/',
+            to: '/contact',
         },
         {
             title: 'Chính sách',
@@ -143,11 +143,13 @@ function Header({ location }) {
         <>
             <div
                 className={`header d-flex ${isScrollPastHero ? 'header-scrolled' : ''} 
-            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${location.pathname === '/' ? 'header-home' : ''
-                    } ${location.pathname.includes('/seller') || location.pathname.includes('/products/')
+            ${location.pathname === '/' && isHeaderFixed ? 'header-fixed' : ''} ${
+                    location.pathname === '/' ? 'header-home' : ''
+                } ${
+                    location.pathname.includes('/seller') || location.pathname.includes('/products/')
                         ? 'header-fixed shadow'
                         : ''
-                    }`}
+                }`}
             >
                 <div className="container d-flex align-items-center justify-content-between">
                     <div className="header-section h-100">
@@ -165,8 +167,9 @@ function Header({ location }) {
                                         onClick={() => {
                                             setNavOption(nav.title)
                                         }}
-                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${nav?.className
-                                            }`}
+                                        className={`nav-option ${navOption == nav.title ? 'checked' : ''} ${
+                                            nav?.className
+                                        }`}
                                     >
                                         <p className="nav-title">{nav.title}</p>
                                     </Link>
@@ -348,7 +351,10 @@ function Header({ location }) {
                                                 Tài khoản của tôi
                                             </Link>
                                             {user?.role !== 'admin' && (
-                                                <Link className="user-action fs-4 fw-medium py-3 px-2 border-bottom" to={'/user/account/orders'}>
+                                                <Link
+                                                    className="user-action fs-4 fw-medium py-3 px-2 border-bottom"
+                                                    to={'/user/account/orders'}
+                                                >
                                                     Đơn mua
                                                 </Link>
                                             )}

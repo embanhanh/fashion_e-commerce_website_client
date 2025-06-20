@@ -9,6 +9,7 @@ import {
     giveVoucher,
     giveVoucherMany,
     getVoucherByCode,
+    getApplicableVouchers,
 } from '../../services/VoucherService'
 
 export const createVoucherAction = createAsyncThunk(
@@ -98,6 +99,18 @@ export const getVoucherByCodeAction = createAsyncThunk(
         try {
             const response = await getVoucherByCode(voucherCode)
             return response
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const getApplicableVouchersAction = createAsyncThunk(
+    'voucher/getApplicableVouchers',
+    async ({ productsPrice, shippingPrice, products }, { rejectWithValue }) => {
+        try {
+            const response = await getApplicableVouchers(productsPrice, shippingPrice, products)
+            return response.data
         } catch (error) {
             return rejectWithValue(error)
         }
@@ -197,6 +210,15 @@ const voucherSlice = createSlice({
                 state.currentVoucher = action.payload
             })
             .addCase(getVoucherByCodeAction.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(getApplicableVouchersAction.pending, (state) => {
+                state.error = null
+            })
+            .addCase(getApplicableVouchersAction.fulfilled, (state, action) => {
+                state.currentVoucher = action.payload
+            })
+            .addCase(getApplicableVouchersAction.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

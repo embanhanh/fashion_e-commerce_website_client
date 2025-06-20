@@ -84,6 +84,7 @@ export const register = async (user) => {
 export const loginWithFirebase = async (token, type) => {
     try {
         const response = await axiosInstance.post(`login/${type}`, token)
+        console.log('response loginWithFirebase', response)
         return response.data
     } catch (error) {
         throw error
@@ -400,5 +401,52 @@ export const returnOrder = async (orderId, returnData) => {
         return response.data
     } catch (error) {
         throw error.response?.data?.message || 'Có lỗi xảy ra'
+    }
+}
+
+export const getCoinsUser = async () => {
+    try {
+        const response = await axiosInstance.get('account/coins', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const checkinCoins = async () => {
+    try {
+        const response = await axiosInstance.put(
+            'account/coins/checkin',
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const updateCoinsUser = async (coins) => {
+    try {
+        const response = await axiosInstance.put(
+            'account/coins/update-coins',
+            { coins },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
     }
 }

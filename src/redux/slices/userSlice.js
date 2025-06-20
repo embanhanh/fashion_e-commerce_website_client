@@ -268,7 +268,9 @@ export const updateCoinsUserAction = createAsyncThunk(
     'user/updateCoinsUser',
     async ({ coins }, { rejectWithValue }) => {
         try {
+            console.log('updateCoinsUserAction coins', coins)
             const response = await updateCoinsUser(coins)
+            console.log('updateCoinsUserAction response', response)
             return response
         } catch (error) {
             return rejectWithValue(error)
